@@ -1,0 +1,155 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: bdc_postgres
+    environment:
+      POSTGRES_USER: bdc_user
+      POSTGRES_PASSWORD: bdc_password
+      POSTGRES_DB: bdc_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - bdc_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bdc_user -d bdc_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: bdc_redis
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - bdc_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: bdc_backend
+    environment:
+      - FLASK_ENV=production
+      - DATABASE_URL=postgresql://bdc_user:bdc_password@postgres:5432/bdc_db
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/2
+      - CELERY_RESULT_BACKEND=redis://redis:6379/3
+    volumes:
+      - ./backend:/app
+      - uploads_data:/app/uploads
+    ports:
+      - "5000:5000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - bdc_network
+    command: gunicorn --bind 0.0.0.0:5000 --workers 4 --threads 2 wsgi:app
+
+  # Celery Worker
+  celery:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: bdc_celery
+    environment:
+      - FLASK_ENV=production
+      - DATABASE_URL=postgresql://bdc_user:bdc_password@postgres:5432/bdc_db
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/2
+      - CELERY_RESULT_BACKEND=redis://redis:6379/3
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - postgres
+      - redis
+      - backend
+    networks:
+      - bdc_network
+    command: celery -A app.celery worker --loglevel=info
+
+  # Celery Beat (Scheduler)
+  celery-beat:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: bdc_celery_beat
+    environment:
+      - FLASK_ENV=production
+      - DATABASE_URL=postgresql://bdc_user:bdc_password@postgres:5432/bdc_db
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/2
+      - CELERY_RESULT_BACKEND=redis://redis:6379/3
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - postgres
+      - redis
+      - backend
+    networks:
+      - bdc_network
+    command: celery -A app.celery beat --loglevel=info
+
+  # Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=http://localhost:5000
+    container_name: bdc_frontend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - bdc_network
+    environment:
+      - NODE_ENV=production
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: bdc_nginx
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - uploads_data:/var/www/uploads:ro
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - bdc_network
+
+networks:
+  bdc_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
+  uploads_data:

@@ -1,0 +1,561 @@
+{
+  "scenarios": [
+    {
+      "strategy": "crisis_intervention",
+      "student_profile": {
+        "name": "Ahmet Yılmaz",
+        "risk_score": "High",
+        "engagement_score": 25,
+        "performance_index": 42,
+        "days_inactive": 28,
+        "last_evaluations": [
+          { "score": 35, "date": "2024-05-15" },
+          { "score": 40, "date": "2024-05-01" },
+          { "score": 38, "date": "2024-04-20" }
+        ]
+      },
+      "generated_update": {
+        "update_type": "add_milestone",
+        "source": "ai",
+        "priority": "critical",
+        "reason": "Öğrenci kritik risk seviyesinde ve 28 gündür inaktif. Acil müdahale ve yeniden bağlanma aktiviteleri gerekiyor.",
+        "expected_impact": "🚨 İlk 2 haftada %50 aktivite artışı, motivasyon yenilenmesi ve risk seviyesinin 'Orta'ya düşürülmesi",
+        "suggested_milestones": [
+          {
+            "title": "🆘 Acil Durum: Bire Bir Mentorluk Oturumu",
+            "description": "Koç ile acil durum değerlendirme görüşmesi ve kişisel engellerin tespiti",
+            "objective": "Öğrenciyi platforma geri kazandırmak ve motivasyon bariyerlerini belirlemek",
+            "week_number": 1,
+            "estimated_hours": 1,
+            "skill_focus": "self_awareness",
+            "activities": [
+              {
+                "title": "🎯 Kişisel hedef belirleme seansı",
+                "duration": "30 dakika"
+              },
+              {
+                "title": "🗣️ Engel ve zorlukları paylaşma",
+                "duration": "30 dakika"
+              }
+            ],
+            "resources": [
+              {
+                "type": "video",
+                "title": "Motivasyon Yenileme Teknikleri",
+                "url": "https://example.com/motivation-reset"
+              }
+            ],
+            "assessment_criteria": [
+              "Görüşmeye katılım sağlandı",
+              "En az 3 kişisel engel belirlendi"
+            ]
+          },
+          {
+            "title": "💪 Güven Tazeleme: Mikro Başarı Aktiviteleri",
+            "description": "5-10 dakikalık mini aktivitelerle hızlı kazanımlar",
+            "objective": "Öğrencinin özgüvenini yeniden inşa etmek",
+            "week_number": 1,
+            "estimated_hours": 2,
+            "skill_focus": "confidence_building",
+            "activities": [
+              {
+                "title": "✅ Günlük 5 dakikalık mini quiz",
+                "duration": "5 dakika x 7 gün"
+              },
+              {
+                "title": "🏆 Başarı günlüğü tutma",
+                "duration": "10 dakika/gün"
+              }
+            ],
+            "resources": [
+              {
+                "type": "template",
+                "title": "Başarı Günlüğü Şablonu",
+                "url": "https://example.com/success-journal"
+              }
+            ]
+          },
+          {
+            "title": "🤝 Akran Destek Grubu Katılımı",
+            "description": "Benzer zorlukları yaşayan öğrencilerle haftalık buluşma",
+            "objective": "Sosyal destek ve hesap verebilirlik sağlamak",
+            "week_number": 2,
+            "estimated_hours": 3,
+            "skill_focus": "collaboration",
+            "activities": [
+              {
+                "title": "👥 Haftalık grup toplantısı",
+                "duration": "60 dakika"
+              },
+              {
+                "title": "💬 Forum'da günlük check-in",
+                "duration": "10 dakika/gün"
+              }
+            ]
+          }
+        ],
+        "ai_analysis_data": {
+          "intervention_strategy": "crisis_intervention",
+          "risk_factors": [
+            "28 gün inaktivite",
+            "Son 3 değerlendirmede başarısızlık",
+            "%25 katılım skoru"
+          ],
+          "recommended_approach": "Immediate re-engagement with low-pressure activities"
+        }
+      }
+    },
+    {
+      "strategy": "performance_recovery",
+      "student_profile": {
+        "name": "Elif Demir",
+        "risk_score": "Medium",
+        "engagement_score": 65,
+        "performance_index": 58,
+        "performance_trend": "declining",
+        "consecutive_failures": 3,
+        "last_evaluations": [
+          { "score": 55, "date": "2024-06-10" },
+          { "score": 62, "date": "2024-06-01" },
+          { "score": 70, "date": "2024-05-20" }
+        ]
+      },
+      "generated_update": {
+        "update_type": "modify_milestone",
+        "source": "ai",
+        "priority": "high",
+        "reason": "Öğrenci son 3 değerlendirmede düşüş trendinde. Temel konulara geri dönüş ve güçlendirme aktiviteleri eklenmeli.",
+        "expected_impact": "📈 4 hafta içinde performans indeksinin %75'e yükseltilmesi ve değerlendirme başarısının sağlanması",
+        "milestone_updates": {
+          "5": {
+            "add_activities": [
+              {
+                "title": "🔄 Temel Kavramlar Tazeleme Atölyesi",
+                "duration": "45 dakika"
+              },
+              {
+                "title": "🎯 Kişiselleştirilmiş Pratik Setleri",
+                "duration": "30 dakika/gün"
+              }
+            ],
+            "increase_hours": 2,
+            "add_resources": [
+              {
+                "type": "interactive",
+                "title": "Temel Kavramlar İnteraktif Haritası",
+                "url": "https://example.com/concept-map"
+              }
+            ]
+          }
+        },
+        "suggested_milestones": [
+          {
+            "title": "🎓 Bilgi Boşluğu Analizi ve Dolum",
+            "description": "Öğrencinin zayıf olduğu konuların tespiti ve hedefli çalışma",
+            "objective": "Temel bilgi eksikliklerini gidermek",
+            "week_number": 3,
+            "estimated_hours": 5,
+            "skill_focus": "fundamentals",
+            "activities": [
+              {
+                "title": "📊 Detaylı bilgi seviyesi testi",
+                "duration": "60 dakika"
+              },
+              {
+                "title": "📚 Kişiselleştirilmiş çalışma planı",
+                "duration": "30 dakika"
+              },
+              {
+                "title": "🔍 Günlük konsept pekiştirme",
+                "duration": "30 dakika x 7 gün"
+              }
+            ],
+            "resources": [
+              {
+                "type": "course",
+                "title": "Temel Konular Yenileme Kursu",
+                "url": "https://example.com/fundamentals-refresh"
+              },
+              {
+                "type": "pdf",
+                "title": "Hızlı Başvuru Kılavuzu",
+                "url": "https://example.com/quick-reference"
+              }
+            ]
+          },
+          {
+            "title": "💡 Öğrenme Stratejisi Optimizasyonu",
+            "description": "Etkili çalışma teknikleri ve zaman yönetimi",
+            "objective": "Öğrenme verimliliğini artırmak",
+            "week_number": 4,
+            "estimated_hours": 3,
+            "skill_focus": "study_skills",
+            "activities": [
+              {
+                "title": "⏰ Pomodoro tekniği uygulaması",
+                "duration": "25 dakika x 4 set/gün"
+              },
+              {
+                "title": "🗂️ Not alma sistemi kurulumu",
+                "duration": "45 dakika"
+              }
+            ]
+          }
+        ],
+        "ai_analysis_data": {
+          "intervention_strategy": "performance_recovery",
+          "identified_gaps": [
+            "Temel kavram eksiklikleri",
+            "Pratik yetersizliği",
+            "Zaman yönetimi sorunları"
+          ],
+          "recovery_plan": "Systematic review of fundamentals with increased practice"
+        }
+      }
+    },
+    {
+      "strategy": "accelerated_learning",
+      "student_profile": {
+        "name": "Mehmet Kaya",
+        "risk_score": "Low",
+        "engagement_score": 92,
+        "performance_index": 96,
+        "completion_rate": 95,
+        "mastery_level": "Expert",
+        "last_evaluations": [
+          { "score": 98, "date": "2024-06-15" },
+          { "score": 95, "date": "2024-06-08" },
+          { "score": 97, "date": "2024-06-01" }
+        ]
+      },
+      "generated_update": {
+        "update_type": "add_milestone",
+        "source": "ai",
+        "priority": "medium",
+        "reason": "Öğrenci üstün performans gösteriyor. İleri seviye içerik ve liderlik fırsatları sunulmalı.",
+        "expected_impact": "🚀 Uzmanlık seviyesine geçiş, mentorluk becerilerinin gelişimi ve topluluk liderliği",
+        "suggested_milestones": [
+          {
+            "title": "🎯 İleri Seviye Proje Bazlı Öğrenme",
+            "description": "Gerçek dünya problemlerine yenilikçi çözümler geliştirme",
+            "objective": "Teorik bilgiyi pratik uygulamalara dönüştürmek",
+            "week_number": 5,
+            "estimated_hours": 8,
+            "skill_focus": "advanced_application",
+            "activities": [
+              {
+                "title": "💼 Endüstri projesi seçimi ve planlama",
+                "duration": "2 saat"
+              },
+              {
+                "title": "🔬 Araştırma ve prototip geliştirme",
+                "duration": "4 saat"
+              },
+              {
+                "title": "📊 Proje sunumu hazırlama",
+                "duration": "2 saat"
+              }
+            ],
+            "resources": [
+              {
+                "type": "case_study",
+                "title": "Endüstri Liderleri Vaka Analizleri",
+                "url": "https://example.com/industry-cases"
+              },
+              {
+                "type": "tool",
+                "title": "Gelişmiş Analiz Araçları",
+                "url": "https://example.com/advanced-tools"
+              }
+            ],
+            "assessment_criteria": [
+              "Özgün proje fikri geliştirildi",
+              "Çalışan prototip oluşturuldu",
+              "Profesyonel sunum yapıldı"
+            ]
+          },
+          {
+            "title": "👨‍🏫 Akran Mentorluğu Programı",
+            "description": "Diğer öğrencilere rehberlik ve destek sağlama",
+            "objective": "Liderlik ve öğretme becerilerini geliştirmek",
+            "week_number": 6,
+            "estimated_hours": 6,
+            "skill_focus": "leadership",
+            "activities": [
+              {
+                "title": "🤝 3 öğrenciye haftalık mentorluk",
+                "duration": "3 x 45 dakika"
+              },
+              {
+                "title": "📝 Öğrenme materyali hazırlama",
+                "duration": "2 saat"
+              },
+              {
+                "title": "💬 Forum'da uzman yanıtları",
+                "duration": "30 dakika/gün"
+              }
+            ],
+            "resources": [
+              {
+                "type": "guide",
+                "title": "Etkili Mentorluk Teknikleri",
+                "url": "https://example.com/mentoring-guide"
+              }
+            ]
+          },
+          {
+            "title": "🏆 Uzmanlık Sertifikası Hazırlığı",
+            "description": "Endüstri tanınırlığı olan ileri seviye sertifika",
+            "objective": "Profesyonel gelişimi belgelendirmek",
+            "week_number": 7,
+            "estimated_hours": 10,
+            "skill_focus": "certification",
+            "activities": [
+              {
+                "title": "📚 Sertifika müfredatı çalışması",
+                "duration": "6 saat"
+              },
+              {
+                "title": "🧪 Pratik sınav simülasyonları",
+                "duration": "3 saat"
+              },
+              {
+                "title": "✍️ Sertifika sınavı",
+                "duration": "1 saat"
+              }
+            ]
+          }
+        ],
+        "ai_analysis_data": {
+          "intervention_strategy": "accelerated_learning",
+          "strengths_to_leverage": [
+            "Yüksek motivasyon ve katılım",
+            "Mükemmel değerlendirme performansı",
+            "Hızlı öğrenme yeteneği"
+          ],
+          "growth_opportunities": [
+            "Liderlik becerileri",
+            "Mentorluk deneyimi",
+            "İleri seviye uzmanlık"
+          ]
+        }
+      }
+    },
+    {
+      "strategy": "balanced_development",
+      "student_profile": {
+        "name": "Ayşe Öztürk",
+        "risk_score": "Medium",
+        "engagement_score": 78,
+        "performance_index": 72,
+        "skill_distribution": {
+          "technical_skills": 85,
+          "analytical_skills": 82,
+          "communication_skills": 45,
+          "collaboration_skills": 52,
+          "creativity": 48
+        },
+        "skill_gap": 40
+      },
+      "generated_update": {
+        "update_type": "add_milestone",
+        "source": "ai",
+        "priority": "medium",
+        "reason": "Öğrencinin teknik becerileri güçlü ancak sosyal ve yaratıcı becerilerde ciddi eksikler var. Dengeli gelişim sağlanmalı.",
+        "expected_impact": "⚖️ 6 hafta içinde beceri dağılımının dengelenmesi, iletişim becerilerinin %70'e yükseltilmesi",
+        "suggested_milestones": [
+          {
+            "title": "🗣️ İletişim Becerileri Güçlendirme",
+            "description": "Sunum, yazılı ve sözlü iletişim becerilerinin geliştirilmesi",
+            "objective": "Profesyonel iletişim yetkinliklerini artırmak",
+            "week_number": 4,
+            "estimated_hours": 6,
+            "skill_focus": "communication",
+            "activities": [
+              {
+                "title": "🎤 Haftalık sunum pratiği",
+                "duration": "60 dakika"
+              },
+              {
+                "title": "✍️ Teknik yazım atölyesi",
+                "duration": "90 dakika"
+              },
+              {
+                "title": "🎭 Rol yapma senaryoları",
+                "duration": "45 dakika"
+              }
+            ],
+            "resources": [
+              {
+                "type": "course",
+                "title": "Etkili İletişim Teknikleri",
+                "url": "https://example.com/communication-skills"
+              },
+              {
+                "type": "template",
+                "title": "Sunum Şablonları ve Örnekleri",
+                "url": "https://example.com/presentation-templates"
+              }
+            ],
+            "assessment_criteria": [
+              "5 dakikalık sunum başarıyla yapıldı",
+              "Teknik rapor net ve anlaşılır yazıldı",
+              "Takım toplantısında aktif katılım"
+            ]
+          },
+          {
+            "title": "🤝 Takım Çalışması ve İşbirliği",
+            "description": "Grup projeleri ve işbirlikçi öğrenme aktiviteleri",
+            "objective": "Takım içinde etkili çalışma becerilerini geliştirmek",
+            "week_number": 5,
+            "estimated_hours": 7,
+            "skill_focus": "collaboration",
+            "activities": [
+              {
+                "title": "👥 Çapraz fonksiyonel takım projesi",
+                "duration": "4 saat"
+              },
+              {
+                "title": "🔄 Peer review oturumları",
+                "duration": "2 saat"
+              },
+              {
+                "title": "🎯 Takım hedefi belirleme çalıştayı",
+                "duration": "1 saat"
+              }
+            ],
+            "resources": [
+              {
+                "type": "guide",
+                "title": "Agile Takım Çalışması Rehberi",
+                "url": "https://example.com/agile-teamwork"
+              }
+            ]
+          },
+          {
+            "title": "💡 Yaratıcı Düşünme ve İnovasyon",
+            "description": "Design thinking ve yaratıcı problem çözme teknikleri",
+            "objective": "Yaratıcılık ve yenilikçi düşünce becerilerini geliştirmek",
+            "week_number": 6,
+            "estimated_hours": 5,
+            "skill_focus": "creativity",
+            "activities": [
+              {
+                "title": "🧠 Brainstorming teknikleri atölyesi",
+                "duration": "90 dakika"
+              },
+              {
+                "title": "🎨 Design thinking projesi",
+                "duration": "3 saat"
+              },
+              {
+                "title": "🚀 İnovasyon pitch hazırlığı",
+                "duration": "30 dakika"
+              }
+            ],
+            "resources": [
+              {
+                "type": "interactive",
+                "title": "Yaratıcılık Araç Kiti",
+                "url": "https://example.com/creativity-toolkit"
+              },
+              {
+                "type": "video",
+                "title": "Design Thinking Masterclass",
+                "url": "https://example.com/design-thinking"
+              }
+            ]
+          }
+        ],
+        "ai_analysis_data": {
+          "intervention_strategy": "balanced_development",
+          "skill_gaps_identified": [
+            "İletişim becerileri (%45)",
+            "İşbirliği becerileri (%52)",
+            "Yaratıcılık (%48)"
+          ],
+          "development_focus": "Soft skills enhancement while maintaining technical excellence"
+        }
+      }
+    }
+  ],
+  "strategy_summary": {
+    "crisis_intervention": {
+      "trigger_conditions": [
+        "Risk skoru: Yüksek",
+        "Katılım skoru < %30",
+        "İnaktivite > 21 gün",
+        "Art arda başarısızlıklar"
+      ],
+      "key_features": [
+        "Acil müdahale",
+        "Düşük baskılı aktiviteler",
+        "Yoğun mentorluk",
+        "Mikro başarılar",
+        "Sosyal destek"
+      ],
+      "expected_outcomes": [
+        "Platforma geri dönüş",
+        "Motivasyon yenilenmesi",
+        "Risk seviyesi düşüşü",
+        "Özgüven artışı"
+      ]
+    },
+    "performance_recovery": {
+      "trigger_conditions": [
+        "Performans düşüş trendi",
+        "3+ ardışık başarısızlık",
+        "Katılım var ama başarı yok"
+      ],
+      "key_features": [
+        "Temel konulara dönüş",
+        "Bilgi boşluğu analizi",
+        "Yoğunlaştırılmış pratik",
+        "Öğrenme stratejisi revizyonu"
+      ],
+      "expected_outcomes": [
+        "Performans iyileşmesi",
+        "Başarı oranı artışı",
+        "Bilgi boşluklarının kapanması"
+      ]
+    },
+    "accelerated_learning": {
+      "trigger_conditions": [
+        "Performans > %95",
+        "Yüksek katılım",
+        "Tüm değerlendirmelerde başarı",
+        "Hızlı ilerleme"
+      ],
+      "key_features": [
+        "İleri seviye içerik",
+        "Proje bazlı öğrenme",
+        "Mentorluk fırsatları",
+        "Sertifika programları",
+        "Liderlik rolleri"
+      ],
+      "expected_outcomes": [
+        "Uzmanlık gelişimi",
+        "Topluluk liderliği",
+        "Kariyer avantajı"
+      ]
+    },
+    "balanced_development": {
+      "trigger_conditions": [
+        "Dengesiz beceri dağılımı",
+        "Teknik güçlü, sosyal zayıf",
+        "Belirli alanlarda eksiklik"
+      ],
+      "key_features": [
+        "Zayıf becerilere odaklanma",
+        "Soft skill geliştirme",
+        "Çapraz fonksiyonel projeler",
+        "360 derece gelişim"
+      ],
+      "expected_outcomes": [
+        "Dengeli beceri profili",
+        "Bütünsel gelişim",
+        "Kariyer hazırlığı"
+      ]
+    }
+  }
+}

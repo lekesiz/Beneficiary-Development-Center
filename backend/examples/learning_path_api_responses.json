@@ -1,0 +1,290 @@
+{
+  "api_endpoints": {
+    "suggest_updates": {
+      "endpoint": "POST /api/learning-paths/students/{student_id}/suggest-updates",
+      "description": "Öğrenci profili analiz edilerek öğrenme yolu güncellemeleri önerilir",
+      "example_response": {
+        "success": true,
+        "message": "Learning path updates suggested successfully",
+        "data": {
+          "student_id": 123,
+          "total_suggestions": 3,
+          "strategy_applied": "crisis_intervention",
+          "updates": [
+            {
+              "id": 456,
+              "learning_path_id": 789,
+              "update_type": "add_milestone",
+              "source": "ai",
+              "priority": "critical",
+              "status": "pending",
+              "created_at": "2024-06-20T10:30:00Z"
+            }
+          ]
+        }
+      }
+    },
+    "get_pending_updates": {
+      "endpoint": "GET /api/learning-paths/{path_id}/pending-updates",
+      "description": "Belirli bir öğrenme yolu için bekleyen güncellemeleri getirir",
+      "example_response": {
+        "success": true,
+        "data": {
+          "learning_path": {
+            "id": 789,
+            "title": "Full Stack Developer Yolu",
+            "student_name": "Ahmet Yılmaz",
+            "overall_progress": 45,
+            "status": "in_progress"
+          },
+          "updates": [
+            {
+              "id": 456,
+              "learning_path_id": 789,
+              "update_type": "add_milestone",
+              "source": "ai",
+              "reason": "Öğrenci kritik risk seviyesinde ve 28 gündür inaktif. Acil müdahale ve yeniden bağlanma aktiviteleri gerekiyor.",
+              "expected_impact": "🚨 İlk 2 haftada %50 aktivite artışı, motivasyon yenilenmesi ve risk seviyesinin 'Orta'ya düşürülmesi",
+              "priority": "critical",
+              "status": "pending",
+              "suggested_milestones": [
+                {
+                  "title": "🆘 Acil Durum: Bire Bir Mentorluk Oturumu",
+                  "description": "Koç ile acil durum değerlendirme görüşmesi ve kişisel engellerin tespiti",
+                  "objective": "Öğrenciyi platforma geri kazandırmak ve motivasyon bariyerlerini belirlemek",
+                  "week_number": 1,
+                  "estimated_hours": 1,
+                  "skill_focus": "self_awareness",
+                  "activities": [
+                    {
+                      "title": "🎯 Kişisel hedef belirleme seansı",
+                      "duration": "30 dakika"
+                    },
+                    {
+                      "title": "🗣️ Engel ve zorlukları paylaşma",
+                      "duration": "30 dakika"
+                    }
+                  ],
+                  "resources": [
+                    {
+                      "type": "video",
+                      "title": "Motivasyon Yenileme Teknikleri",
+                      "url": "https://example.com/motivation-reset"
+                    }
+                  ],
+                  "assessment_criteria": [
+                    "Görüşmeye katılım sağlandı",
+                    "En az 3 kişisel engel belirlendi"
+                  ]
+                }
+              ],
+              "ai_analysis_data": {
+                "intervention_strategy": "crisis_intervention",
+                "risk_factors": [
+                  "28 gün inaktivite",
+                  "Son 3 değerlendirmede başarısızlık",
+                  "%25 katılım skoru"
+                ],
+                "student_metrics": {
+                  "risk_score": "High",
+                  "engagement_score": 25,
+                  "performance_index": 42,
+                  "days_inactive": 28
+                }
+              },
+              "created_at": "2024-06-20T10:30:00Z"
+            },
+            {
+              "id": 457,
+              "learning_path_id": 789,
+              "update_type": "modify_milestone",
+              "source": "system",
+              "reason": "Mevcut 'React Temelleri' milestone'u öğrenci seviyesine göre çok hızlı. Ek pratik ve kaynak eklenmeli.",
+              "expected_impact": "📚 Milestone tamamlama oranının %80'e çıkması, React konusunda güven artışı",
+              "priority": "high",
+              "status": "pending",
+              "milestone_updates": {
+                "15": {
+                  "add_activities": [
+                    {
+                      "title": "🔄 Component Lifecycle Pratikleri",
+                      "duration": "45 dakika"
+                    },
+                    {
+                      "title": "🎮 İnteraktif React Oyunu",
+                      "duration": "30 dakika"
+                    }
+                  ],
+                  "increase_hours": 3,
+                  "add_resources": [
+                    {
+                      "type": "interactive",
+                      "title": "React Playground",
+                      "url": "https://example.com/react-playground"
+                    }
+                  ],
+                  "modify_description": "React temellerini adım adım, bol pratikle öğrenme"
+                }
+              },
+              "created_at": "2024-06-20T11:00:00Z"
+            }
+          ],
+          "summary": {
+            "total_updates": 2,
+            "pending": 2,
+            "approved": 0,
+            "rejected": 0,
+            "applied": 0,
+            "priority_breakdown": {
+              "critical": 1,
+              "high": 1,
+              "medium": 0,
+              "low": 0
+            }
+          }
+        }
+      }
+    },
+    "approve_update": {
+      "endpoint": "POST /api/learning-paths/updates/{update_id}/approve",
+      "description": "Bir güncelleme önerisini onaylar",
+      "example_request": {},
+      "example_response": {
+        "success": true,
+        "message": "Update approved successfully",
+        "data": {
+          "update": {
+            "id": 456,
+            "status": "approved",
+            "approved_by_user_id": 10,
+            "approved_at": "2024-06-20T12:00:00Z"
+          }
+        }
+      }
+    },
+    "reject_update": {
+      "endpoint": "POST /api/learning-paths/updates/{update_id}/reject",
+      "description": "Bir güncelleme önerisini reddeder",
+      "example_request": {
+        "reason": "Öğrenci şu anda farklı bir programa odaklanıyor. Bu değişiklikler 2 hafta sonra daha uygun olacak."
+      },
+      "example_response": {
+        "success": true,
+        "message": "Update rejected successfully",
+        "data": {
+          "update": {
+            "id": 457,
+            "status": "rejected",
+            "rejection_reason": "Öğrenci şu anda farklı bir programa odaklanıyor. Bu değişiklikler 2 hafta sonra daha uygun olacak.",
+            "updated_at": "2024-06-20T12:15:00Z"
+          }
+        }
+      }
+    },
+    "apply_update": {
+      "endpoint": "POST /api/learning-paths/updates/{update_id}/apply",
+      "description": "Onaylanmış bir güncellemeyi öğrenme yoluna uygular",
+      "example_response": {
+        "success": true,
+        "message": "Update applied successfully",
+        "data": {
+          "learning_path": {
+            "id": 789,
+            "title": "Full Stack Developer Yolu",
+            "total_milestones": 18,
+            "new_milestones_added": 3,
+            "milestones_modified": 0,
+            "updated_at": "2024-06-20T13:00:00Z"
+          },
+          "update": {
+            "id": 456,
+            "status": "applied",
+            "applied_at": "2024-06-20T13:00:00Z"
+          },
+          "changes_summary": {
+            "milestones_added": [
+              "🆘 Acil Durum: Bire Bir Mentorluk Oturumu",
+              "💪 Güven Tazeleme: Mikro Başarı Aktiviteleri",
+              "🤝 Akran Destek Grubu Katılımı"
+            ],
+            "total_hours_added": 6,
+            "expected_completion_extended_by_weeks": 2
+          }
+        }
+      }
+    }
+  },
+  "frontend_integration": {
+    "component_flow": [
+      {
+        "step": 1,
+        "component": "StudentProfile.tsx",
+        "action": "Koç, öğrenci profilinde 'Öğrenme Yolu' sekmesine tıklar"
+      },
+      {
+        "step": 2,
+        "component": "LearningPathUpdatesSection.tsx",
+        "action": "Aktif öğrenme yolları listelenir, koç birini seçer"
+      },
+      {
+        "step": 3,
+        "action": "Koç 'Önerileri Güncelle' butonuna tıklar",
+        "api_call": "POST /api/learning-paths/students/{student_id}/suggest-updates",
+        "result": "AI analizi yapılır ve yeni öneriler oluşturulur"
+      },
+      {
+        "step": 4,
+        "component": "LearningPathUpdatesSection.tsx",
+        "action": "Bekleyen güncellemeler öncelik sırasına göre gösterilir"
+      },
+      {
+        "step": 5,
+        "action": "Koç her güncelleme için:",
+        "options": [
+          "✅ Onayla - Güncelleme onaylanır",
+          "❌ Reddet - Sebep belirtilerek reddedilir",
+          "🚀 Uygula - Onaylı güncelleme öğrenme yoluna eklenir"
+        ]
+      }
+    ],
+    "ui_states": {
+      "loading": "Spinner gösterilir",
+      "empty": "Bekleyen güncelleme yok mesajı",
+      "error": "Hata mesajı ve yeniden deneme butonu",
+      "success": "Başarı bildirimi (toast)",
+      "reject_modal": "Reddetme sebebi için modal dialog"
+    }
+  },
+  "webhook_events": {
+    "learning_path_update_suggested": {
+      "description": "Yeni güncelleme önerisi oluşturulduğunda",
+      "payload": {
+        "event": "learning_path_update_suggested",
+        "student_id": 123,
+        "learning_path_id": 789,
+        "update_id": 456,
+        "priority": "critical",
+        "strategy": "crisis_intervention"
+      }
+    },
+    "learning_path_update_approved": {
+      "description": "Güncelleme onaylandığında",
+      "payload": {
+        "event": "learning_path_update_approved",
+        "update_id": 456,
+        "approved_by": 10,
+        "learning_path_id": 789
+      }
+    },
+    "learning_path_update_applied": {
+      "description": "Güncelleme uygulandığında",
+      "payload": {
+        "event": "learning_path_update_applied",
+        "update_id": 456,
+        "learning_path_id": 789,
+        "milestones_added": 3,
+        "student_id": 123
+      }
+    }
+  }
+}

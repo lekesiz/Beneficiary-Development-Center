@@ -1,0 +1,668 @@
+/**
+ * Program Form Page (Create/Edit)
+ */
+import React, { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { useProgram, useCreateProgram, useUpdateProgram } from '../../hooks/usePrograms';
+import { useAuth } from '../../contexts/AuthContext';
+import { Button, Input, Select, Textarea } from '../../components/ui/Form';
+import { Card } from '../../components/ui/Card';
+import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
+import { DatePicker } from '../../components/ui/DatePicker';
+import { Autocomplete } from '../../components/ui/Autocomplete';
+import { Badge } from '../../components/ui/Badge';
+import { PROGRAM_STATUS_OPTIONS, PROGRAM_TYPE_OPTIONS } from '../../constants/program';
+import { ProgramType, ProgramStatus } from '../../types/program';
+import type { CreateProgramRequest, UpdateProgramRequest } from '../../types/program';
+import { ArrowLeft, Save, X, Plus } from 'lucide-react';
+
+// Form validation schema
+const programFormSchema = z.object({
+  title: z.string().min(1, 'Program adı zorunludur').max(200, 'Program adı en fazla 200 karakter olabilir'),
+  code: z.string().optional(),
+  description: z.string().optional(),
+  objectives: z.array(z.string()).optional(),
+  program_type: z.nativeEnum(ProgramType).optional(),
+  status: z.nativeEnum(ProgramStatus).optional(),
+  start_date: z.string().min(1, 'Başlangıç tarihi zorunludur'),
+  end_date: z.string().min(1, 'Bitiş tarihi zorunludur'),
+  enrollment_start: z.string().optional(),
+  enrollment_end: z.string().optional(),
+  min_participants: z.number().min(1, 'Minimum katılımcı sayısı en az 1 olmalıdır').optional(),
+  max_participants: z.number().min(1, 'Maksimum katılımcı sayısı en az 1 olmalıdır'),
+  location: z.string().optional(),
+  is_online: z.boolean().optional(),
+  is_hybrid: z.boolean().optional(),
+  online_link: z.string().url('Geçerli bir URL giriniz').optional().or(z.literal('')),
+  price: z.number().min(0, 'Ücret 0 veya daha büyük olmalıdır').optional(),
+  currency: z.string().optional(),
+  tags: z.array(z.string()).optional(),
+  coordinator_id: z.number().optional(),
+}).refine((data) => {
+  if (data.end_date && data.start_date) {
+    return new Date(data.end_date) > new Date(data.start_date);
+  }
+  return true;
+}, {
+  message: 'Bitiş tarihi başlangıç tarihinden sonra olmalıdır',
+  path: ['end_date'],
+}).refine((data) => {
+  if (data.min_participants && data.max_participants) {
+    return data.max_participants >= data.min_participants;
+  }
+  return true;
+}, {
+  message: 'Maksimum katılımcı sayısı minimum sayıdan az olamaz',
+  path: ['max_participants'],
+});
+
+type ProgramFormData = z.infer<typeof programFormSchema>;
+
+export const ProgramForm: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const isEdit = !!id;
+  const programId = isEdit ? parseInt(id!) : null;
+
+  // Fetch program data for edit
+  const { data: program, isLoading: isLoadingProgram } = useProgram(
+    programId!,
+    false
+  );
+
+  // Mutations
+  const createProgram = useCreateProgram();
+  const updateProgram = useUpdateProgram();
+
+  // State
+  const [objectives, setObjectives] = useState<string[]>([]);
+  const [tags, setTags] = useState<string[]>([]);
+  const [newObjective, setNewObjective] = useState('');
+  const [newTag, setNewTag] = useState('');
+
+  // Permission checks
+  const canEdit = user?.role && ['admin', 'manager'].includes(user.role);
+  const canSetStatus = user?.role && ['admin', 'manager'].includes(user.role);
+
+  // Form setup
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    setValue,
+    watch,
+    reset,
+  } = useForm<ProgramFormData>({
+    resolver: zodResolver(programFormSchema),
+    defaultValues: {
+      program_type: ProgramType.TRAINING,
+      status: ProgramStatus.DRAFT,
+      is_online: false,
+      is_hybrid: false,
+      price: 0,
+      currency: 'TRY',
+      min_participants: 1,
+      max_participants: 50,
+    },
+  });
+
+  const watchIsOnline = watch('is_online');
+  const watchIsHybrid = watch('is_hybrid');
+
+  // Load program data for edit
+  useEffect(() => {
+    if (isEdit && program) {
+      reset({
+        title: program.title,
+        code: program.code,
+        description: program.description || '',
+        program_type: program.program_type,
+        status: program.status,
+        start_date: program.start_date.split('T')[0],
+        end_date: program.end_date.split('T')[0],
+        enrollment_start: program.enrollment_start ? program.enrollment_start.split('T')[0] : '',
+        enrollment_end: program.enrollment_end ? program.enrollment_end.split('T')[0] : '',
+        min_participants: program.min_participants,
+        max_participants: program.max_participants,
+        location: program.location || '',
+        is_online: program.is_online,
+        is_hybrid: program.is_hybrid,
+        online_link: program.online_link || '',
+        price: program.price,
+        currency: program.currency,
+        coordinator_id: program.coordinator_id,
+      });
+      setObjectives(program.objectives || []);
+      setTags(program.tags || []);
+    }
+  }, [isEdit, program, reset]);
+
+  // Auto-generate program code
+  const handleTitleChange = (title: string) => {
+    if (!isEdit && title) {
+      const code = title
+        .toUpperCase()
+        .replace(/[^A-Z0-9\s]/g, '')
+        .replace(/\s+/g, '_')
+        .substring(0, 20);
+      setValue('code', `PROG_${code}_${new Date().getFullYear()}`);
+    }
+  };
+
+  // Add objective
+  const addObjective = () => {
+    if (newObjective.trim() && !objectives.includes(newObjective.trim())) {
+      setObjectives([...objectives, newObjective.trim()]);
+      setNewObjective('');
+    }
+  };
+
+  // Remove objective
+  const removeObjective = (index: number) => {
+    setObjectives(objectives.filter((_, i) => i !== index));
+  };
+
+  // Add tag
+  const addTag = () => {
+    if (newTag.trim() && !tags.includes(newTag.trim())) {
+      setTags([...tags, newTag.trim()]);
+      setNewTag('');
+    }
+  };
+
+  // Remove tag
+  const removeTag = (index: number) => {
+    setTags(tags.filter((_, i) => i !== index));
+  };
+
+  // Form submission
+  const onSubmit = async (data: ProgramFormData) => {
+    try {
+      const formData: CreateProgramRequest | UpdateProgramRequest = {
+        ...data,
+        objectives: objectives.length > 0 ? objectives : undefined,
+        tags: tags.length > 0 ? tags : undefined,
+        // Convert empty strings to undefined
+        code: data.code || undefined,
+        description: data.description || undefined,
+        location: data.location || undefined,
+        online_link: data.online_link || undefined,
+        enrollment_start: data.enrollment_start || undefined,
+        enrollment_end: data.enrollment_end || undefined,
+        coordinator_id: data.coordinator_id || undefined,
+      };
+
+      if (isEdit && programId) {
+        await updateProgram.mutateAsync({ id: programId, data: formData });
+        navigate(`/programs/${programId}`);
+      } else {
+        const newProgram = await createProgram.mutateAsync(formData as CreateProgramRequest);
+        navigate(`/programs/${newProgram.id}`);
+      }
+    } catch (error) {
+      // Error handled by mutations
+    }
+  };
+
+  if (!canEdit) {
+    return (
+      <Card className="p-6">
+        <div className="text-center text-red-600">
+          Bu sayfaya erişim yetkiniz bulunmamaktadır.
+        </div>
+      </Card>
+    );
+  }
+
+  if (isEdit && isLoadingProgram) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <LoadingSpinner size="lg" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate('/programs')}
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Programlara Dön
+          </Button>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">
+              {isEdit ? 'Program Düzenle' : 'Yeni Program'}
+            </h1>
+            <p className="text-gray-600">
+              {isEdit ? 'Program bilgilerini güncelleyin' : 'Yeni bir program oluşturun'}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        {/* Basic Information */}
+        <Card className="p-6">
+          <h3 className="text-lg font-semibold mb-4">Temel Bilgiler</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="md:col-span-2">
+              <div className="space-y-2">
+                <label className="text-sm font-medium leading-none">
+                  Program Adı <span className="text-destructive">*</span>
+                </label>
+                <Controller
+                  name="title"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      error={!!errors.title}
+                      onChange={(e) => {
+                        field.onChange(e);
+                        handleTitleChange(e.target.value);
+                      }}
+                    />
+                  )}
+                />
+                {errors.title && (
+                  <p className="text-sm text-destructive">{errors.title.message}</p>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium leading-none">Program Kodu</label>
+              <Controller
+                name="code"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    error={!!errors.code}
+                    placeholder="Otomatik oluşturulur"
+                  />
+                )}
+              />
+              {errors.code && (
+                <p className="text-sm text-destructive">{errors.code.message}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium leading-none">Program Türü</label>
+              <Controller
+                name="program_type"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    error={!!errors.program_type}
+                  >
+                    {PROGRAM_TYPE_OPTIONS.map(option => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </Select>
+                )}
+              />
+              {errors.program_type && (
+                <p className="text-sm text-destructive">{errors.program_type.message}</p>
+              )}
+            </div>
+
+            {canSetStatus && (
+              <div className="space-y-2">
+                <label className="text-sm font-medium leading-none">Durum</label>
+                <Controller
+                  name="status"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      error={!!errors.status}
+                    >
+                      {PROGRAM_STATUS_OPTIONS.map(option => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </Select>
+                  )}
+                />
+                {errors.status && (
+                  <p className="text-sm text-destructive">{errors.status.message}</p>
+                )}
+              </div>
+            )}
+
+            <div className="md:col-span-2">
+              <div className="space-y-2">
+                <label className="text-sm font-medium leading-none">Açıklama</label>
+                <Controller
+                  name="description"
+                  control={control}
+                  render={({ field }) => (
+                    <Textarea
+                      {...field}
+                      error={!!errors.description}
+                      rows={4}
+                    />
+                  )}
+                />
+                {errors.description && (
+                  <p className="text-sm text-destructive">{errors.description.message}</p>
+                )}
+              </div>
+            </div>
+          </div>
+        </Card>
+
+        {/* Dates and Capacity */}
+        <Card className="p-6">
+          <h3 className="text-lg font-semibold mb-4">Tarihler ve Kapasite</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Controller
+              name="start_date"
+              control={control}
+              render={({ field }) => (
+                <DatePicker
+                  {...field}
+                  label="Başlangıç Tarihi *"
+                  error={errors.start_date?.message}
+                />
+              )}
+            />
+
+            <Controller
+              name="end_date"
+              control={control}
+              render={({ field }) => (
+                <DatePicker
+                  {...field}
+                  label="Bitiş Tarihi *"
+                  error={errors.end_date?.message}
+                />
+              )}
+            />
+
+            <Controller
+              name="enrollment_start"
+              control={control}
+              render={({ field }) => (
+                <DatePicker
+                  {...field}
+                  label="Kayıt Başlangıcı"
+                  error={errors.enrollment_start?.message}
+                />
+              )}
+            />
+
+            <Controller
+              name="enrollment_end"
+              control={control}
+              render={({ field }) => (
+                <DatePicker
+                  {...field}
+                  label="Kayıt Bitişi"
+                  error={errors.enrollment_end?.message}
+                />
+              )}
+            />
+
+            <Controller
+              name="min_participants"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  type="number"
+                  label="Minimum Katılımcı"
+                  error={errors.min_participants?.message}
+                  onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                />
+              )}
+            />
+
+            <Controller
+              name="max_participants"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  type="number"
+                  label="Maksimum Katılımcı *"
+                  error={errors.max_participants?.message}
+                  onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                />
+              )}
+            />
+          </div>
+        </Card>
+
+        {/* Location and Online */}
+        <Card className="p-6">
+          <h3 className="text-lg font-semibold mb-4">Konum ve Format</h3>
+          <div className="space-y-4">
+            <div className="flex items-center space-x-4">
+              <Controller
+                name="is_online"
+                control={control}
+                render={({ field }) => (
+                  <label className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      checked={field.value}
+                      onChange={field.onChange}
+                      className="rounded border-gray-300"
+                    />
+                    <span>Online Program</span>
+                  </label>
+                )}
+              />
+
+              <Controller
+                name="is_hybrid"
+                control={control}
+                render={({ field }) => (
+                  <label className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      checked={field.value}
+                      onChange={field.onChange}
+                      className="rounded border-gray-300"
+                    />
+                    <span>Hibrit Program</span>
+                  </label>
+                )}
+              />
+            </div>
+
+            {!watchIsOnline && (
+              <Controller
+                name="location"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    label="Konum"
+                    error={errors.location?.message}
+                    placeholder="Program konumu"
+                  />
+                )}
+              />
+            )}
+
+            {(watchIsOnline || watchIsHybrid) && (
+              <Controller
+                name="online_link"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    label="Online Link"
+                    error={errors.online_link?.message}
+                    placeholder="https://..."
+                  />
+                )}
+              />
+            )}
+          </div>
+        </Card>
+
+        {/* Price */}
+        <Card className="p-6">
+          <h3 className="text-lg font-semibold mb-4">Ücretlendirme</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Controller
+              name="price"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  type="number"
+                  step="0.01"
+                  label="Ücret"
+                  error={errors.price?.message}
+                  onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                />
+              )}
+            />
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium leading-none">Para Birimi</label>
+              <Controller
+                name="currency"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    error={!!errors.currency}
+                  >
+                    <option value="TRY">TRY - Türk Lirası</option>
+                    <option value="USD">USD - ABD Doları</option>
+                    <option value="EUR">EUR - Euro</option>
+                  </Select>
+                )}
+              />
+              {errors.currency && (
+                <p className="text-sm text-destructive">{errors.currency.message}</p>
+              )}
+            </div>
+          </div>
+        </Card>
+
+        {/* Objectives */}
+        <Card className="p-6">
+          <h3 className="text-lg font-semibold mb-4">Program Hedefleri</h3>
+          <div className="space-y-4">
+            <div className="flex space-x-2">
+              <Input
+                value={newObjective}
+                onChange={(e) => setNewObjective(e.target.value)}
+                placeholder="Yeni hedef ekleyin"
+                onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addObjective())}
+              />
+              <Button
+                type="button"
+                onClick={addObjective}
+                disabled={!newObjective.trim()}
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
+            </div>
+
+            {objectives.length > 0 && (
+              <div className="space-y-2">
+                {objectives.map((objective, index) => (
+                  <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                    <span>{objective}</span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removeObjective(index)}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </Card>
+
+        {/* Tags */}
+        <Card className="p-6">
+          <h3 className="text-lg font-semibold mb-4">Etiketler</h3>
+          <div className="space-y-4">
+            <div className="flex space-x-2">
+              <Input
+                value={newTag}
+                onChange={(e) => setNewTag(e.target.value)}
+                placeholder="Yeni etiket ekleyin"
+                onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
+              />
+              <Button
+                type="button"
+                onClick={addTag}
+                disabled={!newTag.trim()}
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
+            </div>
+
+            {tags.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {tags.map((tag, index) => (
+                  <Badge key={index} variant="outline" className="flex items-center space-x-1">
+                    <span>{tag}</span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removeTag(index)}
+                      className="p-0 h-auto"
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </Badge>
+                ))}
+              </div>
+            )}
+          </div>
+        </Card>
+
+        {/* Actions */}
+        <div className="flex items-center justify-end space-x-4">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => navigate('/programs')}
+          >
+            İptal
+          </Button>
+          <Button
+            type="submit"
+            disabled={isSubmitting || createProgram.isPending || updateProgram.isPending}
+          >
+            <Save className="h-4 w-4 mr-2" />
+            {isEdit ? 'Güncelle' : 'Oluştur'}
+          </Button>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+export default ProgramForm;
