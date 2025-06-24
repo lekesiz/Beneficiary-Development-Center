@@ -155,6 +155,7 @@ class Question(TenantBaseModel):
     question_text = Column(Text, nullable=False)
     question_type = Column(SQLEnum(QuestionType), nullable=False)
     difficulty_level = Column(SQLEnum(DifficultyLevel), default=DifficultyLevel.MEDIUM)
+    difficulty_score = Column(Float, default=0.0)  # IRT difficulty parameter (-3 to 3)
     points = Column(Float, default=1.0)
     order_index = Column(Integer, default=0)
     

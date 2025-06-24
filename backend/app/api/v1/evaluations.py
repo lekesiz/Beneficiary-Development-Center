@@ -415,3 +415,310 @@ def create_learning_path(evaluation_id: int, attempt_id: int):
     )
     
     return jsonify(learning_path.to_dict()), 201
+
+
+# AI Assessment Engine endpoints
+@evaluations_bp.route('/<int:evaluation_id>/adaptive/start', methods=['POST'])
+@require_auth
+def start_adaptive_assessment(evaluation_id: int):
+    """
+    Start an adaptive assessment session
+    """
+    user = get_current_user()
+    db = get_db()
+    
+    # Import AI service
+    from app.services.ai import AdaptiveAssessmentEngine
+    
+    evaluation_service = EvaluationService(db)
+    evaluation = evaluation_service.get_by_id(evaluation_id, user.tenant_id, include_questions=True)
+    
+    # Initialize adaptive engine
+    engine = AdaptiveAssessmentEngine()
+    
+    # Create new attempt
+    attempt_service = EvaluationAttemptService(db)
+    attempt = attempt_service.create(
+        evaluation_id=evaluation_id,
+        user_id=user.id,
+        tenant_id=user.tenant_id,
+        is_adaptive=True
+    )
+    
+    # Get first question based on average difficulty
+    questions = evaluation.questions
+    if not questions:
+        raise ValidationError("No questions available for this evaluation")
+    
+    # Convert questions to parameters format
+    question_params = []
+    for q in questions:
+        question_params.append({
+            'question_id': q.id,
+            'difficulty': getattr(q, 'difficulty_score', 0.0),
+            'discrimination': 1.0,  # Default discrimination
+            'guessing': 0.25  # Default guessing parameter
+        })
+    
+    # Start with average ability estimate
+    initial_theta = 0.0
+    
+    # Select first question
+    from app.services.ai.assessment_engine import QuestionParameters
+    available = [QuestionParameters(**params) for params in question_params]
+    first_question = engine.select_next_question(initial_theta, available, [])
+    
+    if not first_question:
+        raise ValidationError("Could not select initial question")
+    
+    # Find actual question object
+    selected_question = next(q for q in questions if q.id == first_question.question_id)
+    
+    return jsonify({
+        'attempt_id': attempt.id,
+        'session_id': attempt.session_id,
+        'question': selected_question.to_dict(),
+        'question_number': 1,
+        'estimated_remaining': engine.min_questions
+    }), 201
+
+
+@evaluations_bp.route('/adaptive/<int:attempt_id>/answer', methods=['POST'])
+@require_auth
+def submit_adaptive_answer(attempt_id: int):
+    """
+    Submit an answer and get the next adaptive question
+    """
+    user = get_current_user()
+    db = get_db()
+    data = request.get_json()
+    
+    if not data or 'question_id' not in data or 'answer' not in data:
+        raise ValidationError("question_id and answer are required")
+    
+    # Import AI service
+    from app.services.ai import AdaptiveAssessmentEngine
+    from app.services.ai.assessment_engine import QuestionParameters, StudentAbility
+    
+    # Get attempt
+    attempt_service = EvaluationAttemptService(db)
+    attempt = attempt_service.get_by_id(attempt_id, user.tenant_id)
+    
+    if attempt.completed_at:
+        raise ValidationError("This assessment has already been completed")
+    
+    # Save response
+    response_service = QuestionResponseService(db)
+    response = response_service.create(
+        attempt_id=attempt_id,
+        question_id=data['question_id'],
+        answer=data['answer'],
+        time_spent=data.get('time_spent', 0)
+    )
+    
+    # Get all responses so far
+    all_responses = response_service.get_by_attempt(attempt_id)
+    
+    # Initialize adaptive engine
+    engine = AdaptiveAssessmentEngine()
+    
+    # Get evaluation and questions
+    evaluation_service = EvaluationService(db)
+    evaluation = evaluation_service.get_by_id(attempt.evaluation_id, user.tenant_id, include_questions=True)
+    
+    # Convert to IRT format
+    question_map = {q.id: q for q in evaluation.questions}
+    response_data = []
+    answered_ids = []
+    
+    for resp in all_responses:
+        question = question_map.get(resp.question_id)
+        if question:
+            params = QuestionParameters(
+                question_id=question.id,
+                difficulty=getattr(question, 'difficulty_score', 0.0),
+                discrimination=1.0,
+                guessing=0.25
+            )
+            is_correct = resp.is_correct if hasattr(resp, 'is_correct') else (resp.answer == question.correct_answer)
+            response_data.append((params, is_correct))
+            answered_ids.append(question.id)
+    
+    # Estimate current ability
+    ability = engine.estimate_ability(response_data)
+    
+    # Check stopping criteria
+    if engine.should_stop_assessment(ability):
+        # Complete the assessment
+        attempt_service.complete(attempt_id, user.tenant_id)
+        
+        # Generate performance report
+        report = engine.generate_performance_report(ability, response_data)
+        
+        return jsonify({
+            'completed': True,
+            'report': report,
+            'total_questions': len(response_data)
+        })
+    
+    # Select next question
+    available_params = []
+    for q in evaluation.questions:
+        if q.id not in answered_ids:
+            available_params.append(QuestionParameters(
+                question_id=q.id,
+                difficulty=getattr(q, 'difficulty_score', 0.0),
+                discrimination=1.0,
+                guessing=0.25
+            ))
+    
+    next_question_params = engine.select_next_question(ability.theta, available_params, answered_ids)
+    
+    if not next_question_params:
+        # No more questions available
+        attempt_service.complete(attempt_id, user.tenant_id)
+        report = engine.generate_performance_report(ability, response_data)
+        
+        return jsonify({
+            'completed': True,
+            'report': report,
+            'total_questions': len(response_data)
+        })
+    
+    # Find actual question object
+    next_question = question_map[next_question_params.question_id]
+    
+    return jsonify({
+        'question': next_question.to_dict(),
+        'question_number': len(response_data) + 1,
+        'current_ability': round(ability.theta, 2),
+        'confidence_interval': {
+            'lower': round(ability.confidence_interval[0], 2),
+            'upper': round(ability.confidence_interval[1], 2)
+        },
+        'estimated_remaining': max(engine.min_questions - len(response_data), 1)
+    })
+
+
+@evaluations_bp.route('/adaptive/<int:attempt_id>/report', methods=['GET'])
+@require_auth
+def get_adaptive_report(attempt_id: int):
+    """
+    Get detailed adaptive assessment report
+    """
+    user = get_current_user()
+    db = get_db()
+    
+    # Import AI service
+    from app.services.ai import AdaptiveAssessmentEngine
+    from app.services.ai.assessment_engine import QuestionParameters
+    
+    # Get attempt and responses
+    attempt_service = EvaluationAttemptService(db)
+    attempt = attempt_service.get_by_id(attempt_id, user.tenant_id)
+    
+    if not attempt.completed_at:
+        raise ValidationError("Assessment is not yet completed")
+    
+    response_service = QuestionResponseService(db)
+    responses = response_service.get_by_attempt(attempt_id)
+    
+    # Get evaluation and questions
+    evaluation_service = EvaluationService(db)
+    evaluation = evaluation_service.get_by_id(attempt.evaluation_id, user.tenant_id, include_questions=True)
+    
+    # Convert to IRT format
+    question_map = {q.id: q for q in evaluation.questions}
+    response_data = []
+    
+    for resp in responses:
+        question = question_map.get(resp.question_id)
+        if question:
+            params = QuestionParameters(
+                question_id=question.id,
+                difficulty=getattr(question, 'difficulty_score', 0.0),
+                discrimination=1.0,
+                guessing=0.25
+            )
+            is_correct = resp.is_correct if hasattr(resp, 'is_correct') else (resp.answer == question.correct_answer)
+            response_data.append((params, is_correct))
+    
+    # Generate report
+    engine = AdaptiveAssessmentEngine()
+    ability = engine.estimate_ability(response_data)
+    report = engine.generate_performance_report(ability, response_data)
+    
+    # Add question-level details
+    question_details = []
+    for resp in responses:
+        question = question_map.get(resp.question_id)
+        if question:
+            question_details.append({
+                'question_id': question.id,
+                'question_text': question.text,
+                'difficulty': getattr(question, 'difficulty_score', 0.0),
+                'user_answer': resp.answer,
+                'correct_answer': question.correct_answer,
+                'is_correct': resp.answer == question.correct_answer,
+                'time_spent': resp.time_spent
+            })
+    
+    report['question_details'] = question_details
+    report['evaluation_name'] = evaluation.name
+    report['completed_at'] = attempt.completed_at.isoformat() if attempt.completed_at else None
+    
+    return jsonify(report)
+
+
+@evaluations_bp.route('/question-bank/analyze', methods=['POST'])
+@require_auth(['admin', 'trainer'])
+def analyze_question_bank():
+    """
+    Analyze question bank quality and get recommendations
+    """
+    user = get_current_user()
+    db = get_db()
+    data = request.get_json()
+    
+    evaluation_id = data.get('evaluation_id')
+    if not evaluation_id:
+        raise ValidationError("evaluation_id is required")
+    
+    # Import AI service
+    from app.services.ai import QuestionBankOptimizer
+    
+    # Get evaluation questions
+    evaluation_service = EvaluationService(db)
+    evaluation = evaluation_service.get_by_id(evaluation_id, user.tenant_id, include_questions=True)
+    
+    # Get question statistics
+    question_service = QuestionService(db)
+    optimizer = QuestionBankOptimizer()
+    
+    analysis_results = []
+    recommendations = []
+    
+    for question in evaluation.questions:
+        # Get usage statistics
+        stats = question_service.get_question_statistics(question.id)
+        
+        # Analyze quality
+        quality_metrics = optimizer.analyze_question_quality(stats)
+        quality_metrics['id'] = question.id
+        quality_metrics['text'] = question.text
+        
+        analysis_results.append(quality_metrics)
+    
+    # Get recommendations
+    recommendations = optimizer.recommend_questions_for_revision(analysis_results)
+    
+    return jsonify({
+        'analysis': analysis_results,
+        'recommendations': recommendations,
+        'summary': {
+            'total_questions': len(evaluation.questions),
+            'high_quality': len([q for q in analysis_results if q['quality_score'] > 0.7]),
+            'needs_revision': len(recommendations),
+            'average_discrimination': sum(q['discrimination'] for q in analysis_results) / len(analysis_results) if analysis_results else 0
+        }
+    })
