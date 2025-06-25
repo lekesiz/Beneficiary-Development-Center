@@ -1,0 +1,30 @@
+[flake8]
+max-line-length = 120
+exclude = 
+    .git,
+    __pycache__,
+    venv,
+    env,
+    .venv,
+    .eggs,
+    *.egg,
+    build,
+    dist,
+    migrations,
+    .pytest_cache,
+    htmlcov
+ignore = 
+    # Missing whitespace around operator
+    E226,
+    # Line break before binary operator (conflicts with black)
+    W503,
+    # Lambda assignment (useful for simple cases)
+    E731,
+    # Line too long (handled by black)
+    E501
+per-file-ignores =
+    # Imported but unused
+    __init__.py: F401
+    # Import at top of file
+    */settings/*.py: E402
+    */config/*.py: E402

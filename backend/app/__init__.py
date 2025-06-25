@@ -90,6 +90,10 @@ def register_blueprints(app):
     from app.api.v1.programs import programs_bp
     from app.api.v1.evaluations import evaluations_bp
     from app.api.v1.ai import ai_bp
+    from app.api.health import health_bp
+    
+    # Register health check endpoints (no prefix for easier access)
+    app.register_blueprint(health_bp)
     
     # Register API v1 blueprints
     app.register_blueprint(api_v1_bp, url_prefix='/api/v1')

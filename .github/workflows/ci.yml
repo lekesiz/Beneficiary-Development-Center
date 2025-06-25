@@ -1,0 +1,171 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main, main-clean, develop ]
+  pull_request:
+    branches: [ main, main-clean, develop ]
+
+jobs:
+  changes:
+    name: Detect Changes
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+      docs: ${{ steps.filter.outputs.docs }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            backend:
+              - 'backend/**'
+              - '.github/workflows/backend-ci.yml'
+              - '.github/workflows/ci.yml'
+            frontend:
+              - 'frontend/**'
+              - '.github/workflows/frontend-ci.yml'
+              - '.github/workflows/ci.yml'
+            docs:
+              - '**/*.md'
+              - 'docs/**'
+
+  backend-ci:
+    name: Backend CI
+    needs: changes
+    if: needs.changes.outputs.backend == 'true'
+    uses: ./.github/workflows/backend-ci.yml
+    secrets: inherit
+
+  frontend-ci:
+    name: Frontend CI
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true'
+    uses: ./.github/workflows/frontend-ci.yml
+    secrets: inherit
+
+  integration-tests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    needs: [backend-ci, frontend-ci]
+    if: always() && (needs.backend-ci.result == 'success' || needs.frontend-ci.result == 'success')
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: bdc_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Docker Compose
+        run: |
+          docker compose version
+      
+      - name: Start services
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/bdc_test
+          REDIS_URL: redis://localhost:6379/0
+          JWT_SECRET_KEY: test-secret-key
+          SECRET_KEY: test-secret-key
+          FLASK_ENV: testing
+        run: |
+          docker compose -f docker-compose.test.yml up -d
+          docker compose -f docker-compose.test.yml ps
+      
+      - name: Wait for services
+        run: |
+          timeout 60s bash -c 'until docker compose -f docker-compose.test.yml exec -T backend curl -f http://localhost:5000/health; do sleep 2; done'
+          timeout 60s bash -c 'until docker compose -f docker-compose.test.yml exec -T frontend curl -f http://localhost:3000; do sleep 2; done'
+      
+      - name: Run E2E tests
+        run: |
+          docker compose -f docker-compose.test.yml exec -T frontend npm run test:e2e
+      
+      - name: Collect logs on failure
+        if: failure()
+        run: |
+          docker compose -f docker-compose.test.yml logs
+      
+      - name: Stop services
+        if: always()
+        run: |
+          docker compose -f docker-compose.test.yml down -v
+
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    needs: [backend-ci, frontend-ci, integration-tests]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Check for version tag
+        id: check_tag
+        run: |
+          VERSION=$(grep -m1 version backend/pyproject.toml | tr -d ' "' | cut -d'=' -f2)
+          if git rev-parse "v$VERSION" >/dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Create Release Tag
+        if: steps.check_tag.outputs.exists == 'false'
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git tag -a "v${{ steps.check_tag.outputs.version }}" -m "Release v${{ steps.check_tag.outputs.version }}"
+          git push origin "v${{ steps.check_tag.outputs.version }}"
+      
+      - name: Generate Release Notes
+        if: steps.check_tag.outputs.exists == 'false'
+        id: release_notes
+        run: |
+          echo "RELEASE_NOTES<<EOF" >> $GITHUB_OUTPUT
+          git log --pretty=format:"- %s" $(git describe --tags --abbrev=0 HEAD^)..HEAD >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+      
+      - name: Create GitHub Release
+        if: steps.check_tag.outputs.exists == 'false'
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.check_tag.outputs.version }}
+          release_name: Release v${{ steps.check_tag.outputs.version }}
+          body: |
+            ## Changes in this release
+            ${{ steps.release_notes.outputs.RELEASE_NOTES }}
+            
+            ## Docker Images
+            - Backend: `ghcr.io/${{ github.repository }}/backend:v${{ steps.check_tag.outputs.version }}`
+            - Frontend: `ghcr.io/${{ github.repository }}/frontend:v${{ steps.check_tag.outputs.version }}`
+          draft: false
+          prerelease: false
