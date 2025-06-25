@@ -12,7 +12,14 @@
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
     "test:unit": "vitest run --coverage",
-    "test:watch": "vitest watch"
+    "test:watch": "vitest watch",
+    "test:ci": "vitest run",
+    "format:check": "prettier --check 'src/**/*.{ts,tsx}'",
+    "type-check": "tsc --noEmit",
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run",
+    "test:e2e": "cypress run",
+    "test:e2e:open": "cypress open"
   },
   "dependencies": {
     "react": "^18.2.0",
@@ -77,6 +84,9 @@
     "@testing-library/jest-dom": "^6.1.5",
     "@testing-library/user-event": "^14.5.1",
     "msw": "^2.0.11",
-    "@vitest/coverage-v8": "^1.0.4"
+    "@vitest/coverage-v8": "^1.0.4",
+    "cypress": "^13.6.0",
+    "@cypress/react": "^8.0.0",
+    "cypress-real-events": "^1.11.0"
   }
 }

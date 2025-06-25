@@ -317,10 +317,205 @@ def student_auth_headers(client, student_user):
     
     with client.application.app_context():
         access_token = create_access_token(
-            identity=student_user.id,
+            identity=str(student_user.id),
             additional_claims={
                 'tenant_id': student_user.tenant_id,
                 'role': student_user.role
             }
         )
         return {'Authorization': f'Bearer {access_token}'}
+
+
+@pytest.fixture
+def admin_headers(client, admin_user):
+    """Get authentication headers for admin user (alias for auth_headers)."""
+    from flask_jwt_extended import create_access_token
+    
+    with client.application.app_context():
+        access_token = create_access_token(
+            identity=str(admin_user.id),
+            additional_claims={
+                'tenant_id': admin_user.tenant_id,
+                'role': admin_user.role
+            }
+        )
+        return {'Authorization': f'Bearer {access_token}'}
+
+
+@pytest.fixture
+def manager_headers(client, manager_user):
+    """Get authentication headers for manager user."""
+    from flask_jwt_extended import create_access_token
+    
+    with client.application.app_context():
+        access_token = create_access_token(
+            identity=str(manager_user.id),
+            additional_claims={
+                'tenant_id': manager_user.tenant_id,
+                'role': manager_user.role
+            }
+        )
+        return {'Authorization': f'Bearer {access_token}'}
+
+
+@pytest.fixture
+def instructor_headers(client, instructor_user):
+    """Get authentication headers for instructor user."""
+    from flask_jwt_extended import create_access_token
+    
+    with client.application.app_context():
+        access_token = create_access_token(
+            identity=str(instructor_user.id),
+            additional_claims={
+                'tenant_id': instructor_user.tenant_id,
+                'role': instructor_user.role
+            }
+        )
+        return {'Authorization': f'Bearer {access_token}'}
+
+
+@pytest.fixture
+def staff_headers(client, staff_user):
+    """Get authentication headers for staff user."""
+    from flask_jwt_extended import create_access_token
+    
+    with client.application.app_context():
+        access_token = create_access_token(
+            identity=str(staff_user.id),
+            additional_claims={
+                'tenant_id': staff_user.tenant_id,
+                'role': staff_user.role
+            }
+        )
+        return {'Authorization': f'Bearer {access_token}'}
+
+
+@pytest.fixture
+def multi_tenant_setup(db_session):
+    """Create multiple tenants with users for testing multi-tenant scenarios."""
+    from app.models.tenant import Tenant
+    from app.models.user import User
+    
+    # Create two additional tenants
+    tenant2 = Tenant(
+        name='Second Organization',
+        subdomain='org2',
+        is_active=True,
+        settings={'locale': 'fr', 'timezone': 'Europe/Paris'}
+    )
+    tenant3 = Tenant(
+        name='Third Organization',
+        subdomain='org3',
+        is_active=True,
+        settings={'locale': 'es', 'timezone': 'America/Mexico_City'}
+    )
+    
+    db_session.add_all([tenant2, tenant3])
+    db_session.commit()
+    
+    # Create admin user for each tenant
+    admin2 = User(
+        email='admin@org2.com',
+        username='admin_org2',
+        password_hash=generate_password_hash('password123'),
+        first_name='Admin',
+        last_name='Org2',
+        role='admin',
+        tenant_id=tenant2.id,
+        is_active=True
+    )
+    
+    admin3 = User(
+        email='admin@org3.com',
+        username='admin_org3',
+        password_hash=generate_password_hash('password123'),
+        first_name='Admin',
+        last_name='Org3',
+        role='admin',
+        tenant_id=tenant3.id,
+        is_active=True
+    )
+    
+    db_session.add_all([admin2, admin3])
+    db_session.commit()
+    
+    return {
+        'tenant2': tenant2,
+        'tenant3': tenant3,
+        'admin2': admin2,
+        'admin3': admin3
+    }
+
+
+@pytest.fixture
+def api_client(client):
+    """Wrapper for API client with helper methods."""
+    class APIClient:
+        def __init__(self, test_client):
+            self.client = test_client
+            
+        def get(self, url, headers=None, **kwargs):
+            return self.client.get(url, headers=headers, **kwargs)
+            
+        def post(self, url, json=None, headers=None, **kwargs):
+            return self.client.post(url, json=json, headers=headers, **kwargs)
+            
+        def put(self, url, json=None, headers=None, **kwargs):
+            return self.client.put(url, json=json, headers=headers, **kwargs)
+            
+        def delete(self, url, headers=None, **kwargs):
+            return self.client.delete(url, headers=headers, **kwargs)
+            
+        def login(self, email, password):
+            response = self.post('/api/v1/auth/login', json={
+                'email': email,
+                'password': password
+            })
+            if response.status_code == 200:
+                data = response.get_json()
+                return {
+                    'Authorization': f'Bearer {data["access_token"]}',
+                    'X-Tenant-ID': str(data['user']['tenant_id'])
+                }
+            return None
+    
+    return APIClient(client)
+
+
+@pytest.fixture
+def sample_program_data():
+    """Sample data for creating programs."""
+    return {
+        'code': 'TEST-PRG-001',
+        'name': 'Test Program',
+        'description': 'A test program for unit tests',
+        'category': 'education',
+        'start_date': '2024-01-01',
+        'end_date': '2024-12-31',
+        'budget': 50000.00,
+        'objectives': {
+            'primary': ['Objective 1', 'Objective 2'],
+            'secondary': ['Secondary objective']
+        },
+        'eligibility_criteria': {
+            'min_age': 18,
+            'max_age': 65,
+            'requirements': ['Requirement 1']
+        }
+    }
+
+
+@pytest.fixture
+def sample_course_data():
+    """Sample data for creating courses."""
+    return {
+        'code': 'TEST-CRS-001',
+        'name': 'Test Course',
+        'description': 'A test course for unit tests',
+        'course_type': 'lecture',
+        'credits': 3,
+        'duration_hours': 40,
+        'max_students': 30,
+        'prerequisites': ['Basic knowledge'],
+        'learning_outcomes': ['Outcome 1', 'Outcome 2']
+    }
