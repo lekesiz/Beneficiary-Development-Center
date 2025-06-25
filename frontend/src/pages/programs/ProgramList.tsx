@@ -1,23 +1,33 @@
 /**
  * Program List Page
  */
-import React, { useState, useMemo } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { usePrograms, useDeleteProgram } from '../../hooks/usePrograms';
-import { useAuth } from '../../hooks/useAuth';
-import { DataTable } from '../../components/ui/DataTable';
-import { Button } from '../../components/ui/Button';
-import { Badge } from '../../components/ui/Badge';
-import { Input } from '../../components/ui/Input';
-import { Select } from '../../components/ui/Select';
-import { Card } from '../../components/ui/Card';
-import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
-import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
-import { formatProgramDate, getProgramStatusInfo, getProgramTypeInfo, formatProgramPrice } from '../../utils/program';
-import { PROGRAM_STATUS_OPTIONS, PROGRAM_TYPE_OPTIONS } from '../../constants/program';
-import type { Program, ProgramFilters } from '../../types/program';
 import type { ColumnDef } from '@tanstack/react-table';
 import { Edit, Eye, Trash2, Plus, Search, Filter } from 'lucide-react';
+import * as React from 'react';
+import { useState, useMemo } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+
+import { Badge } from '../../components/ui/Badge';
+import { Button } from '../../components/ui/Button';
+import { Card } from '../../components/ui/Card';
+import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
+import { DataTable } from '../../components/ui/DataTable';
+import { Input } from '../../components/ui/Input';
+import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
+import { Select } from '../../components/ui/Select';
+import {
+  PROGRAM_STATUS_OPTIONS,
+  PROGRAM_TYPE_OPTIONS,
+} from '../../constants/program';
+import { useAuth } from '../../contexts/AuthContext';
+import { usePrograms, useDeleteProgram } from '../../hooks/usePrograms';
+import type { Program, ProgramFilters } from '../../types/program';
+import {
+  formatProgramDate,
+  getProgramStatusInfo,
+  getProgramTypeInfo,
+  formatProgramPrice,
+} from '../../utils/program';
 
 export const ProgramList: React.FC = () => {
   const navigate = useNavigate();
@@ -31,7 +41,10 @@ export const ProgramList: React.FC = () => {
   });
   const [search, setSearch] = useState('');
   const [showFilters, setShowFilters] = useState(false);
-  const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; program?: Program }>({
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    isOpen: boolean;
+    program?: Program;
+  }>({
     isOpen: false,
   });
 
@@ -46,7 +59,7 @@ export const ProgramList: React.FC = () => {
   // Handle search
   const handleSearch = (value: string) => {
     setSearch(value);
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
       search: value || undefined,
       page: 1,
@@ -55,7 +68,7 @@ export const ProgramList: React.FC = () => {
 
   // Handle filter changes
   const handleFilterChange = (key: keyof ProgramFilters, value: any) => {
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
       [key]: value || undefined,
       page: 1,
@@ -64,7 +77,7 @@ export const ProgramList: React.FC = () => {
 
   // Handle pagination
   const handlePageChange = (page: number) => {
-    setFilters(prev => ({ ...prev, page }));
+    setFilters((prev) => ({ ...prev, page }));
   };
 
   // Handle delete
@@ -78,116 +91,126 @@ export const ProgramList: React.FC = () => {
   };
 
   // Table columns
-  const columns = useMemo<ColumnDef<Program>[]>(() => [
-    {
-      accessorKey: 'title',
-      header: 'Program Adı',
-      cell: ({ row }) => (
-        <div className="flex flex-col">
-          <Link
-            to={`/programs/${row.original.id}`}
-            className="font-medium text-blue-600 hover:text-blue-800"
-          >
-            {row.original.title}
-          </Link>
-          <span className="text-sm text-gray-500">{row.original.code}</span>
-        </div>
-      ),
-    },
-    {
-      accessorKey: 'program_type',
-      header: 'Tür',
-      cell: ({ row }) => {
-        const typeInfo = getProgramTypeInfo(row.original.program_type);
-        return (
+  const columns = useMemo<ColumnDef<Program>[]>(
+    () => [
+      {
+        accessorKey: 'title',
+        header: 'Program Adı',
+        cell: ({ row }) => (
+          <div className="flex flex-col">
+            <Link
+              to={`/programs/${row.original.id}`}
+              className="font-medium text-blue-600 hover:text-blue-800"
+            >
+              {row.original.title}
+            </Link>
+            <span className="text-sm text-gray-500">{row.original.code}</span>
+          </div>
+        ),
+      },
+      {
+        accessorKey: 'program_type',
+        header: 'Tür',
+        cell: ({ row }) => {
+          const typeInfo = getProgramTypeInfo(row.original.program_type);
+          return (
+            <div className="flex items-center space-x-2">
+              <span>{typeInfo.icon}</span>
+              <span>{typeInfo.label}</span>
+            </div>
+          );
+        },
+      },
+      {
+        accessorKey: 'status',
+        header: 'Durum',
+        cell: ({ row }) => {
+          const statusInfo = getProgramStatusInfo(row.original.status);
+          return <Badge color={statusInfo.color}>{statusInfo.label}</Badge>;
+        },
+      },
+      {
+        accessorKey: 'start_date',
+        header: 'Başlangıç',
+        cell: ({ row }) =>
+          formatProgramDate(row.original.start_date, 'dd MMM yyyy'),
+      },
+      {
+        accessorKey: 'end_date',
+        header: 'Bitiş',
+        cell: ({ row }) =>
+          formatProgramDate(row.original.end_date, 'dd MMM yyyy'),
+      },
+      {
+        accessorKey: 'enrollment_count',
+        header: 'Katılımcı',
+        cell: ({ row }) => (
+          <div className="text-center">
+            <div className="font-medium">
+              {row.original.enrollment_count || 0} /{' '}
+              {row.original.max_participants}
+            </div>
+            <div className="text-sm text-gray-500">
+              {Math.round(
+                ((row.original.enrollment_count || 0) /
+                  row.original.max_participants) *
+                  100
+              )}
+              %
+            </div>
+          </div>
+        ),
+      },
+      {
+        accessorKey: 'price',
+        header: 'Ücret',
+        cell: ({ row }) =>
+          formatProgramPrice(row.original.price, row.original.currency),
+      },
+      {
+        accessorKey: 'coordinator_name',
+        header: 'Koordinatör',
+        cell: ({ row }) => row.original.coordinator_name || '-',
+      },
+      {
+        id: 'actions',
+        header: 'İşlemler',
+        cell: ({ row }) => (
           <div className="flex items-center space-x-2">
-            <span>{typeInfo.icon}</span>
-            <span>{typeInfo.label}</span>
-          </div>
-        );
-      },
-    },
-    {
-      accessorKey: 'status',
-      header: 'Durum',
-      cell: ({ row }) => {
-        const statusInfo = getProgramStatusInfo(row.original.status);
-        return (
-          <Badge color={statusInfo.color}>
-            {statusInfo.label}
-          </Badge>
-        );
-      },
-    },
-    {
-      accessorKey: 'start_date',
-      header: 'Başlangıç',
-      cell: ({ row }) => formatProgramDate(row.original.start_date, 'dd MMM yyyy'),
-    },
-    {
-      accessorKey: 'end_date',
-      header: 'Bitiş',
-      cell: ({ row }) => formatProgramDate(row.original.end_date, 'dd MMM yyyy'),
-    },
-    {
-      accessorKey: 'enrollment_count',
-      header: 'Katılımcı',
-      cell: ({ row }) => (
-        <div className="text-center">
-          <div className="font-medium">
-            {row.original.enrollment_count || 0} / {row.original.max_participants}
-          </div>
-          <div className="text-sm text-gray-500">
-            {Math.round(((row.original.enrollment_count || 0) / row.original.max_participants) * 100)}%
-          </div>
-        </div>
-      ),
-    },
-    {
-      accessorKey: 'price',
-      header: 'Ücret',
-      cell: ({ row }) => formatProgramPrice(row.original.price, row.original.currency),
-    },
-    {
-      accessorKey: 'coordinator_name',
-      header: 'Koordinatör',
-      cell: ({ row }) => row.original.coordinator_name || '-',
-    },
-    {
-      id: 'actions',
-      header: 'İşlemler',
-      cell: ({ row }) => (
-        <div className="flex items-center space-x-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate(`/programs/${row.original.id}`)}
-          >
-            <Eye className="h-4 w-4" />
-          </Button>
-          {canEdit && (
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => navigate(`/programs/${row.original.id}/edit`)}
+              onClick={() => navigate(`/programs/${row.original.id}`)}
             >
-              <Edit className="h-4 w-4" />
+              <Eye className="h-4 w-4" />
             </Button>
-          )}
-          {canDelete && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setDeleteConfirm({ isOpen: true, program: row.original })}
-              className="text-red-600 hover:text-red-800"
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          )}
-        </div>
-      ),
-    },
-  ], [navigate, canEdit, canDelete]);
+            {canEdit && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate(`/programs/${row.original.id}/edit`)}
+              >
+                <Edit className="h-4 w-4" />
+              </Button>
+            )}
+            {canDelete && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() =>
+                  setDeleteConfirm({ isOpen: true, program: row.original })
+                }
+                className="text-red-600 hover:text-red-800"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+        ),
+      },
+    ],
+    [navigate, canEdit, canDelete]
+  );
 
   if (isLoading) {
     return (
@@ -259,7 +282,7 @@ export const ProgramList: React.FC = () => {
                 onChange={(value) => handleFilterChange('status', value)}
                 options={[
                   { value: '', label: 'Tüm Durumlar' },
-                  ...PROGRAM_STATUS_OPTIONS.map(option => ({
+                  ...PROGRAM_STATUS_OPTIONS.map((option) => ({
                     value: option.value,
                     label: option.label,
                   })),
@@ -271,7 +294,7 @@ export const ProgramList: React.FC = () => {
                 onChange={(value) => handleFilterChange('type', value)}
                 options={[
                   { value: '', label: 'Tüm Türler' },
-                  ...PROGRAM_TYPE_OPTIONS.map(option => ({
+                  ...PROGRAM_TYPE_OPTIONS.map((option) => ({
                     value: option.value,
                     label: option.label,
                   })),
@@ -282,7 +305,9 @@ export const ProgramList: React.FC = () => {
                   type="checkbox"
                   id="upcoming_only"
                   checked={filters.upcoming_only || false}
-                  onChange={(e) => handleFilterChange('upcoming_only', e.target.checked)}
+                  onChange={(e) =>
+                    handleFilterChange('upcoming_only', e.target.checked)
+                  }
                   className="rounded border-gray-300"
                 />
                 <label htmlFor="upcoming_only" className="text-sm">
@@ -294,7 +319,9 @@ export const ProgramList: React.FC = () => {
                   type="checkbox"
                   id="active_only"
                   checked={filters.active_only || false}
-                  onChange={(e) => handleFilterChange('active_only', e.target.checked)}
+                  onChange={(e) =>
+                    handleFilterChange('active_only', e.target.checked)
+                  }
                   className="rounded border-gray-300"
                 />
                 <label htmlFor="active_only" className="text-sm">
@@ -328,7 +355,9 @@ export const ProgramList: React.FC = () => {
       <ConfirmDialog
         isOpen={deleteConfirm.isOpen}
         onClose={() => setDeleteConfirm({ isOpen: false })}
-        onConfirm={() => deleteConfirm.program && handleDelete(deleteConfirm.program)}
+        onConfirm={() =>
+          deleteConfirm.program && handleDelete(deleteConfirm.program)
+        }
         title="Programı Sil"
         description={`"${deleteConfirm.program?.title}" programını silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.`}
         confirmText="Sil"

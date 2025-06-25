@@ -3,9 +3,20 @@
  */
 
 export type EvaluationStatus = 'draft' | 'active' | 'archived' | 'completed';
-export type QuestionType = 'multiple_choice' | 'true_false' | 'short_answer' | 'essay' | 'matching' | 'ordering' | 'fill_in_blank';
-export type DifficultyLevel = 'easy' | 'medium' | 'hard';
-export type AttemptStatus = 'in_progress' | 'completed' | 'abandoned' | 'timed_out';
+export type QuestionType =
+  | 'multiple_choice'
+  | 'true_false'
+  | 'short_answer'
+  | 'essay'
+  | 'matching'
+  | 'ordering'
+  | 'fill_in_blank';
+export type EvaluationDifficultyLevel = 'easy' | 'medium' | 'hard';
+export type AttemptStatus =
+  | 'in_progress'
+  | 'completed'
+  | 'abandoned'
+  | 'timed_out';
 
 export interface Evaluation {
   id: number;
@@ -45,7 +56,7 @@ export interface Question {
   evaluation_id: number;
   question_text: string;
   question_type: QuestionType;
-  difficulty_level: DifficultyLevel;
+  difficulty_level: EvaluationDifficultyLevel;
   points: number;
   order_index: number;
   question_data: Record<string, any>;
@@ -107,7 +118,7 @@ export interface QuestionBank {
   description?: string;
   subject?: string;
   topic?: string;
-  difficulty_level: DifficultyLevel;
+  difficulty_level: EvaluationDifficultyLevel;
   question_text: string;
   question_type: QuestionType;
   points: number;
@@ -142,12 +153,13 @@ export interface CreateEvaluationRequest {
   tags?: string[];
 }
 
-export interface UpdateEvaluationRequest extends Partial<CreateEvaluationRequest> {}
+export interface UpdateEvaluationRequest
+  extends Partial<CreateEvaluationRequest> {}
 
 export interface CreateQuestionRequest {
   question_text: string;
   question_type: QuestionType;
-  difficulty_level?: DifficultyLevel;
+  difficulty_level?: EvaluationDifficultyLevel;
   points?: number;
   order_index?: number;
   question_data: Record<string, any>;
@@ -158,7 +170,7 @@ export interface CreateQuestionRequest {
   tags?: string[];
 }
 
-export interface UpdateQuestionRequest extends Partial<CreateQuestionRequest> {}
+export type UpdateQuestionRequest = Partial<CreateQuestionRequest>
 
 export interface SaveResponseRequest {
   question_id: number;

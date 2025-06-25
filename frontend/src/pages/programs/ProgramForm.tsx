@@ -1,63 +1,97 @@
 /**
  * Program Form Page (Create/Edit)
  */
-import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { ArrowLeft, Save, X, Plus } from 'lucide-react';
+import * as React from 'react';
+import { useEffect, useState } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { useParams, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
-import { useProgram, useCreateProgram, useUpdateProgram } from '../../hooks/usePrograms';
-import { useAuth } from '../../contexts/AuthContext';
-import { Button, Input, Select, Textarea } from '../../components/ui/Form';
-import { Card } from '../../components/ui/Card';
-import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
-import { DatePicker } from '../../components/ui/DatePicker';
+
 import { Autocomplete } from '../../components/ui/Autocomplete';
 import { Badge } from '../../components/ui/Badge';
-import { PROGRAM_STATUS_OPTIONS, PROGRAM_TYPE_OPTIONS } from '../../constants/program';
+import { Card } from '../../components/ui/Card';
+import { DatePicker } from '../../components/ui/DatePicker';
+import { Button, Input, Select, Textarea } from '../../components/ui/Form';
+import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
+import {
+  PROGRAM_STATUS_OPTIONS,
+  PROGRAM_TYPE_OPTIONS,
+} from '../../constants/program';
+import { useAuth } from '../../contexts/AuthContext';
+import {
+  useProgram,
+  useCreateProgram,
+  useUpdateProgram,
+} from '../../hooks/usePrograms';
 import { ProgramType, ProgramStatus } from '../../types/program';
-import type { CreateProgramRequest, UpdateProgramRequest } from '../../types/program';
-import { ArrowLeft, Save, X, Plus } from 'lucide-react';
+import type {
+  CreateProgramRequest,
+  UpdateProgramRequest,
+} from '../../types/program';
+
 
 // Form validation schema
-const programFormSchema = z.object({
-  title: z.string().min(1, 'Program adı zorunludur').max(200, 'Program adı en fazla 200 karakter olabilir'),
-  code: z.string().optional(),
-  description: z.string().optional(),
-  objectives: z.array(z.string()).optional(),
-  program_type: z.nativeEnum(ProgramType).optional(),
-  status: z.nativeEnum(ProgramStatus).optional(),
-  start_date: z.string().min(1, 'Başlangıç tarihi zorunludur'),
-  end_date: z.string().min(1, 'Bitiş tarihi zorunludur'),
-  enrollment_start: z.string().optional(),
-  enrollment_end: z.string().optional(),
-  min_participants: z.number().min(1, 'Minimum katılımcı sayısı en az 1 olmalıdır').optional(),
-  max_participants: z.number().min(1, 'Maksimum katılımcı sayısı en az 1 olmalıdır'),
-  location: z.string().optional(),
-  is_online: z.boolean().optional(),
-  is_hybrid: z.boolean().optional(),
-  online_link: z.string().url('Geçerli bir URL giriniz').optional().or(z.literal('')),
-  price: z.number().min(0, 'Ücret 0 veya daha büyük olmalıdır').optional(),
-  currency: z.string().optional(),
-  tags: z.array(z.string()).optional(),
-  coordinator_id: z.number().optional(),
-}).refine((data) => {
-  if (data.end_date && data.start_date) {
-    return new Date(data.end_date) > new Date(data.start_date);
-  }
-  return true;
-}, {
-  message: 'Bitiş tarihi başlangıç tarihinden sonra olmalıdır',
-  path: ['end_date'],
-}).refine((data) => {
-  if (data.min_participants && data.max_participants) {
-    return data.max_participants >= data.min_participants;
-  }
-  return true;
-}, {
-  message: 'Maksimum katılımcı sayısı minimum sayıdan az olamaz',
-  path: ['max_participants'],
-});
+const programFormSchema = z
+  .object({
+    title: z
+      .string()
+      .min(1, 'Program adı zorunludur')
+      .max(200, 'Program adı en fazla 200 karakter olabilir'),
+    code: z.string().optional(),
+    description: z.string().optional(),
+    objectives: z.array(z.string()).optional(),
+    program_type: z.nativeEnum(ProgramType).optional(),
+    status: z.nativeEnum(ProgramStatus).optional(),
+    start_date: z.string().min(1, 'Başlangıç tarihi zorunludur'),
+    end_date: z.string().min(1, 'Bitiş tarihi zorunludur'),
+    enrollment_start: z.string().optional(),
+    enrollment_end: z.string().optional(),
+    min_participants: z
+      .number()
+      .min(1, 'Minimum katılımcı sayısı en az 1 olmalıdır')
+      .optional(),
+    max_participants: z
+      .number()
+      .min(1, 'Maksimum katılımcı sayısı en az 1 olmalıdır'),
+    location: z.string().optional(),
+    is_online: z.boolean().optional(),
+    is_hybrid: z.boolean().optional(),
+    online_link: z
+      .string()
+      .url('Geçerli bir URL giriniz')
+      .optional()
+      .or(z.literal('')),
+    price: z.number().min(0, 'Ücret 0 veya daha büyük olmalıdır').optional(),
+    currency: z.string().optional(),
+    tags: z.array(z.string()).optional(),
+    coordinator_id: z.number().optional(),
+  })
+  .refine(
+    (data) => {
+      if (data.end_date && data.start_date) {
+        return new Date(data.end_date) > new Date(data.start_date);
+      }
+      return true;
+    },
+    {
+      message: 'Bitiş tarihi başlangıç tarihinden sonra olmalıdır',
+      path: ['end_date'],
+    }
+  )
+  .refine(
+    (data) => {
+      if (data.min_participants && data.max_participants) {
+        return data.max_participants >= data.min_participants;
+      }
+      return true;
+    },
+    {
+      message: 'Maksimum katılımcı sayısı minimum sayıdan az olamaz',
+      path: ['max_participants'],
+    }
+  );
 
 type ProgramFormData = z.infer<typeof programFormSchema>;
 
@@ -70,8 +104,8 @@ export const ProgramForm: React.FC = () => {
 
   // Fetch program data for edit
   const { data: program, isLoading: isLoadingProgram } = useProgram(
-    programId!,
-    false
+    programId,
+    !!programId
   );
 
   // Mutations
@@ -124,8 +158,12 @@ export const ProgramForm: React.FC = () => {
         status: program.status,
         start_date: program.start_date.split('T')[0],
         end_date: program.end_date.split('T')[0],
-        enrollment_start: program.enrollment_start ? program.enrollment_start.split('T')[0] : '',
-        enrollment_end: program.enrollment_end ? program.enrollment_end.split('T')[0] : '',
+        enrollment_start: program.enrollment_start
+          ? program.enrollment_start.split('T')[0]
+          : '',
+        enrollment_end: program.enrollment_end
+          ? program.enrollment_end.split('T')[0]
+          : '',
         min_participants: program.min_participants,
         max_participants: program.max_participants,
         location: program.location || '',
@@ -200,7 +238,9 @@ export const ProgramForm: React.FC = () => {
         await updateProgram.mutateAsync({ id: programId, data: formData });
         navigate(`/programs/${programId}`);
       } else {
-        const newProgram = await createProgram.mutateAsync(formData as CreateProgramRequest);
+        const newProgram = await createProgram.mutateAsync(
+          formData as CreateProgramRequest
+        );
         navigate(`/programs/${newProgram.id}`);
       }
     } catch (error) {
@@ -244,7 +284,9 @@ export const ProgramForm: React.FC = () => {
               {isEdit ? 'Program Düzenle' : 'Yeni Program'}
             </h1>
             <p className="text-gray-600">
-              {isEdit ? 'Program bilgilerini güncelleyin' : 'Yeni bir program oluşturun'}
+              {isEdit
+                ? 'Program bilgilerini güncelleyin'
+                : 'Yeni bir program oluşturun'}
             </p>
           </div>
         </div>
@@ -275,13 +317,17 @@ export const ProgramForm: React.FC = () => {
                   )}
                 />
                 {errors.title && (
-                  <p className="text-sm text-destructive">{errors.title.message}</p>
+                  <p className="text-sm text-destructive">
+                    {errors.title.message}
+                  </p>
                 )}
               </div>
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium leading-none">Program Kodu</label>
+              <label className="text-sm font-medium leading-none">
+                Program Kodu
+              </label>
               <Controller
                 name="code"
                 control={control}
@@ -294,21 +340,22 @@ export const ProgramForm: React.FC = () => {
                 )}
               />
               {errors.code && (
-                <p className="text-sm text-destructive">{errors.code.message}</p>
+                <p className="text-sm text-destructive">
+                  {errors.code.message}
+                </p>
               )}
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium leading-none">Program Türü</label>
+              <label className="text-sm font-medium leading-none">
+                Program Türü
+              </label>
               <Controller
                 name="program_type"
                 control={control}
                 render={({ field }) => (
-                  <Select
-                    {...field}
-                    error={!!errors.program_type}
-                  >
-                    {PROGRAM_TYPE_OPTIONS.map(option => (
+                  <Select {...field} error={!!errors.program_type}>
+                    {PROGRAM_TYPE_OPTIONS.map((option) => (
                       <option key={option.value} value={option.value}>
                         {option.label}
                       </option>
@@ -317,22 +364,23 @@ export const ProgramForm: React.FC = () => {
                 )}
               />
               {errors.program_type && (
-                <p className="text-sm text-destructive">{errors.program_type.message}</p>
+                <p className="text-sm text-destructive">
+                  {errors.program_type.message}
+                </p>
               )}
             </div>
 
             {canSetStatus && (
               <div className="space-y-2">
-                <label className="text-sm font-medium leading-none">Durum</label>
+                <label className="text-sm font-medium leading-none">
+                  Durum
+                </label>
                 <Controller
                   name="status"
                   control={control}
                   render={({ field }) => (
-                    <Select
-                      {...field}
-                      error={!!errors.status}
-                    >
-                      {PROGRAM_STATUS_OPTIONS.map(option => (
+                    <Select {...field} error={!!errors.status}>
+                      {PROGRAM_STATUS_OPTIONS.map((option) => (
                         <option key={option.value} value={option.value}>
                           {option.label}
                         </option>
@@ -341,14 +389,18 @@ export const ProgramForm: React.FC = () => {
                   )}
                 />
                 {errors.status && (
-                  <p className="text-sm text-destructive">{errors.status.message}</p>
+                  <p className="text-sm text-destructive">
+                    {errors.status.message}
+                  </p>
                 )}
               </div>
             )}
 
             <div className="md:col-span-2">
               <div className="space-y-2">
-                <label className="text-sm font-medium leading-none">Açıklama</label>
+                <label className="text-sm font-medium leading-none">
+                  Açıklama
+                </label>
                 <Controller
                   name="description"
                   control={control}
@@ -361,7 +413,9 @@ export const ProgramForm: React.FC = () => {
                   )}
                 />
                 {errors.description && (
-                  <p className="text-sm text-destructive">{errors.description.message}</p>
+                  <p className="text-sm text-destructive">
+                    {errors.description.message}
+                  </p>
                 )}
               </div>
             </div>
@@ -429,7 +483,9 @@ export const ProgramForm: React.FC = () => {
                   type="number"
                   label="Minimum Katılımcı"
                   error={errors.min_participants?.message}
-                  onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                  onChange={(e) =>
+                    field.onChange(parseInt(e.target.value) || 0)
+                  }
                 />
               )}
             />
@@ -443,7 +499,9 @@ export const ProgramForm: React.FC = () => {
                   type="number"
                   label="Maksimum Katılımcı *"
                   error={errors.max_participants?.message}
-                  onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                  onChange={(e) =>
+                    field.onChange(parseInt(e.target.value) || 0)
+                  }
                 />
               )}
             />
@@ -534,21 +592,22 @@ export const ProgramForm: React.FC = () => {
                   step="0.01"
                   label="Ücret"
                   error={errors.price?.message}
-                  onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                  onChange={(e) =>
+                    field.onChange(parseFloat(e.target.value) || 0)
+                  }
                 />
               )}
             />
 
             <div className="space-y-2">
-              <label className="text-sm font-medium leading-none">Para Birimi</label>
+              <label className="text-sm font-medium leading-none">
+                Para Birimi
+              </label>
               <Controller
                 name="currency"
                 control={control}
                 render={({ field }) => (
-                  <Select
-                    {...field}
-                    error={!!errors.currency}
-                  >
+                  <Select {...field} error={!!errors.currency}>
                     <option value="TRY">TRY - Türk Lirası</option>
                     <option value="USD">USD - ABD Doları</option>
                     <option value="EUR">EUR - Euro</option>
@@ -556,7 +615,9 @@ export const ProgramForm: React.FC = () => {
                 )}
               />
               {errors.currency && (
-                <p className="text-sm text-destructive">{errors.currency.message}</p>
+                <p className="text-sm text-destructive">
+                  {errors.currency.message}
+                </p>
               )}
             </div>
           </div>
@@ -571,7 +632,9 @@ export const ProgramForm: React.FC = () => {
                 value={newObjective}
                 onChange={(e) => setNewObjective(e.target.value)}
                 placeholder="Yeni hedef ekleyin"
-                onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addObjective())}
+                onKeyPress={(e) =>
+                  e.key === 'Enter' && (e.preventDefault(), addObjective())
+                }
               />
               <Button
                 type="button"
@@ -585,7 +648,10 @@ export const ProgramForm: React.FC = () => {
             {objectives.length > 0 && (
               <div className="space-y-2">
                 {objectives.map((objective, index) => (
-                  <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                  <div
+                    key={index}
+                    className="flex items-center justify-between p-2 bg-gray-50 rounded"
+                  >
                     <span>{objective}</span>
                     <Button
                       type="button"
@@ -611,13 +677,11 @@ export const ProgramForm: React.FC = () => {
                 value={newTag}
                 onChange={(e) => setNewTag(e.target.value)}
                 placeholder="Yeni etiket ekleyin"
-                onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
+                onKeyPress={(e) =>
+                  e.key === 'Enter' && (e.preventDefault(), addTag())
+                }
               />
-              <Button
-                type="button"
-                onClick={addTag}
-                disabled={!newTag.trim()}
-              >
+              <Button type="button" onClick={addTag} disabled={!newTag.trim()}>
                 <Plus className="h-4 w-4" />
               </Button>
             </div>
@@ -625,7 +689,11 @@ export const ProgramForm: React.FC = () => {
             {tags.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {tags.map((tag, index) => (
-                  <Badge key={index} variant="outline" className="flex items-center space-x-1">
+                  <Badge
+                    key={index}
+                    variant="outline"
+                    className="flex items-center space-x-1"
+                  >
                     <span>{tag}</span>
                     <Button
                       type="button"
@@ -654,7 +722,9 @@ export const ProgramForm: React.FC = () => {
           </Button>
           <Button
             type="submit"
-            disabled={isSubmitting || createProgram.isPending || updateProgram.isPending}
+            disabled={
+              isSubmitting || createProgram.isPending || updateProgram.isPending
+            }
           >
             <Save className="h-4 w-4 mr-2" />
             {isEdit ? 'Güncelle' : 'Oluştur'}

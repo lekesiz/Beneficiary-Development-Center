@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   Brain,
   TrendingUp,
@@ -12,18 +11,20 @@ import {
   AlertCircle,
   BookOpen,
   Award,
-  Lightbulb
+  Lightbulb,
 } from 'lucide-react';
-import { Card } from '@/components/ui/Card';
+import * as React from 'react';
+
 import { Badge } from '@/components/ui/Badge';
+import { Card } from '@/components/ui/Card';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
-import { 
+import {
   useEvaluationInsights,
   getPerformanceLevelColor,
   getPerformanceLevelLabel,
   getTrendIcon,
   getTrendLabel,
-  formatPerformanceMetrics
+  formatPerformanceMetrics,
 } from '@/hooks/useEvaluationInsights';
 import type { LearningInsights as LearningInsightsType } from '@/types/evaluation';
 
@@ -76,7 +77,9 @@ const InsightItem: React.FC<{
   };
 
   return (
-    <div className={`flex items-start space-x-3 p-3 rounded-lg border ${getColorClass()}`}>
+    <div
+      className={`flex items-start space-x-3 p-3 rounded-lg border ${getColorClass()}`}
+    >
       <div className="flex-shrink-0 mt-0.5">{icon}</div>
       <p className="text-sm leading-relaxed">{text}</p>
     </div>
@@ -91,7 +94,7 @@ const ProgressBar: React.FC<{
   color?: string;
 }> = ({ value, max = 100, label, color = 'bg-blue-600' }) => {
   const percentage = (value / max) * 100;
-  
+
   return (
     <div className="space-y-1">
       {label && (
@@ -101,7 +104,7 @@ const ProgressBar: React.FC<{
         </div>
       )}
       <div className="w-full bg-gray-200 rounded-full h-2.5">
-        <div 
+        <div
           className={`${color} h-2.5 rounded-full transition-all duration-500`}
           style={{ width: `${Math.min(percentage, 100)}%` }}
         />
@@ -112,15 +115,21 @@ const ProgressBar: React.FC<{
 
 export const LearningInsights: React.FC<LearningInsightsProps> = ({
   evaluationId,
-  attemptId
+  attemptId,
 }) => {
-  const { data: insights, isLoading, error } = useEvaluationInsights(evaluationId, attemptId);
+  const {
+    data: insights,
+    isLoading,
+    error,
+  } = useEvaluationInsights(evaluationId, attemptId);
 
   if (isLoading) {
     return (
       <div className="flex justify-center items-center py-12">
         <LoadingSpinner size="lg" />
-        <p className="ml-3 text-gray-600">AI öğrenme tavsiyeleri hazırlanıyor...</p>
+        <p className="ml-3 text-gray-600">
+          AI öğrenme tavsiyeleri hazırlanıyor...
+        </p>
       </div>
     );
   }
@@ -148,15 +157,19 @@ export const LearningInsights: React.FC<LearningInsightsProps> = ({
             AI Öğrenme Analizi
           </h3>
           <div className="flex items-center space-x-3">
-            <Badge 
+            <Badge
               variant="outline"
-              className={getPerformanceLevelColor(insights.visual_indicators.level)}
+              className={getPerformanceLevelColor(
+                insights.visual_indicators.level
+              )}
             >
               <Award className="mr-1 h-3 w-3" />
               {getPerformanceLevelLabel(insights.visual_indicators.level)}
             </Badge>
             <Badge variant="outline" className="flex items-center">
-              <span className="mr-1">{getTrendIcon(insights.visual_indicators.trend)}</span>
+              <span className="mr-1">
+                {getTrendIcon(insights.visual_indicators.trend)}
+              </span>
               {getTrendLabel(insights.visual_indicators.trend)}
             </Badge>
           </div>
@@ -200,23 +213,38 @@ export const LearningInsights: React.FC<LearningInsightsProps> = ({
           Detaylı Performans Metrikleri
         </h4>
         <div className="space-y-4">
-          <ProgressBar 
-            value={insights.performance_metrics.accuracy_percentage} 
+          <ProgressBar
+            value={insights.performance_metrics.accuracy_percentage}
             label="Doğruluk Oranı"
-            color={insights.performance_metrics.accuracy_percentage >= 80 ? 'bg-green-600' : 
-                   insights.performance_metrics.accuracy_percentage >= 60 ? 'bg-yellow-600' : 'bg-red-600'}
+            color={
+              insights.performance_metrics.accuracy_percentage >= 80
+                ? 'bg-green-600'
+                : insights.performance_metrics.accuracy_percentage >= 60
+                ? 'bg-yellow-600'
+                : 'bg-red-600'
+            }
           />
-          <ProgressBar 
-            value={insights.performance_metrics.time_efficiency} 
+          <ProgressBar
+            value={insights.performance_metrics.time_efficiency}
             label="Zaman Verimliliği"
-            color={insights.performance_metrics.time_efficiency >= 80 ? 'bg-green-600' : 
-                   insights.performance_metrics.time_efficiency >= 60 ? 'bg-yellow-600' : 'bg-red-600'}
+            color={
+              insights.performance_metrics.time_efficiency >= 80
+                ? 'bg-green-600'
+                : insights.performance_metrics.time_efficiency >= 60
+                ? 'bg-yellow-600'
+                : 'bg-red-600'
+            }
           />
-          <ProgressBar 
-            value={insights.performance_metrics.consistency_score} 
+          <ProgressBar
+            value={insights.performance_metrics.consistency_score}
             label="Tutarlılık Skoru"
-            color={insights.performance_metrics.consistency_score >= 80 ? 'bg-green-600' : 
-                   insights.performance_metrics.consistency_score >= 60 ? 'bg-yellow-600' : 'bg-red-600'}
+            color={
+              insights.performance_metrics.consistency_score >= 80
+                ? 'bg-green-600'
+                : insights.performance_metrics.consistency_score >= 60
+                ? 'bg-yellow-600'
+                : 'bg-red-600'
+            }
           />
         </div>
       </Card>
@@ -240,7 +268,9 @@ export const LearningInsights: React.FC<LearningInsightsProps> = ({
                 />
               ))
             ) : (
-              <p className="text-sm text-gray-500">Henüz belirlenmiş güçlü yön yok</p>
+              <p className="text-sm text-gray-500">
+                Henüz belirlenmiş güçlü yön yok
+              </p>
             )}
           </div>
         </Card>
@@ -262,7 +292,9 @@ export const LearningInsights: React.FC<LearningInsightsProps> = ({
                 />
               ))
             ) : (
-              <p className="text-sm text-gray-500">Henüz belirlenmiş gelişim alanı yok</p>
+              <p className="text-sm text-gray-500">
+                Henüz belirlenmiş gelişim alanı yok
+              </p>
             )}
           </div>
         </Card>
@@ -299,24 +331,30 @@ export const LearningInsights: React.FC<LearningInsightsProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <p className="text-sm text-gray-700">
-              <span className="font-medium">🎯 Hedef Belirleme:</span> Zayıf olduğunuz konulara öncelik verin
+              <span className="font-medium">🎯 Hedef Belirleme:</span> Zayıf
+              olduğunuz konulara öncelik verin
             </p>
             <p className="text-sm text-gray-700">
-              <span className="font-medium">⏰ Düzenli Çalışma:</span> Günde en az 30 dakika pratik yapın
+              <span className="font-medium">⏰ Düzenli Çalışma:</span> Günde en
+              az 30 dakika pratik yapın
             </p>
             <p className="text-sm text-gray-700">
-              <span className="font-medium">📝 Not Alma:</span> Yanlış yaptığınız soruları not edin
+              <span className="font-medium">📝 Not Alma:</span> Yanlış
+              yaptığınız soruları not edin
             </p>
           </div>
           <div className="space-y-2">
             <p className="text-sm text-gray-700">
-              <span className="font-medium">🔄 Tekrar:</span> Öğrendiğiniz konuları düzenli tekrarlayın
+              <span className="font-medium">🔄 Tekrar:</span> Öğrendiğiniz
+              konuları düzenli tekrarlayın
             </p>
             <p className="text-sm text-gray-700">
-              <span className="font-medium">💪 Motivasyon:</span> Küçük başarılarınızı kutlayın
+              <span className="font-medium">💪 Motivasyon:</span> Küçük
+              başarılarınızı kutlayın
             </p>
             <p className="text-sm text-gray-700">
-              <span className="font-medium">🤝 Destek:</span> Anlamadığınız konularda yardım isteyin
+              <span className="font-medium">🤝 Destek:</span> Anlamadığınız
+              konularda yardım isteyin
             </p>
           </div>
         </div>

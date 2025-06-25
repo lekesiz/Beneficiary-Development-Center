@@ -1,77 +1,101 @@
-import React, { useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { 
-  ArrowLeft, 
-  Save, 
-  Clock, 
-  Users, 
-  FileText, 
+import {
+  ArrowLeft,
+  Save,
+  Clock,
+  Users,
+  FileText,
   Settings,
   Calendar,
   Info,
-  Brain
+  Brain,
 } from 'lucide-react';
+import * as React from 'react';
+import { useEffect } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { useNavigate, useParams } from 'react-router-dom';
+import { z } from 'zod';
+
 import { Card } from '@/components/ui/Card';
-import { FormField, Input, Textarea, Select, Button } from '@/components/ui/Form';
+import { DatePicker } from '@/components/ui/DatePicker';
+import {
+  FormField,
+  Input,
+  Textarea,
+  Select,
+  Button,
+} from '@/components/ui/Form';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { TagInput } from '@/components/ui/TagInput';
-import { DatePicker } from '@/components/ui/DatePicker';
-import { 
-  useEvaluation, 
-  useCreateEvaluation, 
-  useUpdateEvaluation 
-} from '@/hooks/useEvaluations';
 import { useCourses } from '@/hooks/useCourses';
+import {
+  useEvaluation,
+  useCreateEvaluation,
+  useUpdateEvaluation,
+} from '@/hooks/useEvaluations';
 import { usePrograms } from '@/hooks/usePrograms';
-import type { CreateEvaluationRequest, UpdateEvaluationRequest } from '@/types/evaluation';
+import type {
+  CreateEvaluationRequest,
+  UpdateEvaluationRequest,
+} from '@/types/evaluation';
 
 // Zod validation schema
-const evaluationSchema = z.object({
-  title: z.string()
-    .min(1, 'Başlık gereklidir')
-    .max(200, 'Başlık en fazla 200 karakter olabilir'),
-  description: z.string().optional(),
-  instructions: z.string().optional(),
-  course_id: z.number().optional(),
-  program_id: z.number().optional(),
-  time_limit_minutes: z.number()
-    .min(1, 'Süre en az 1 dakika olmalıdır')
-    .max(1440, 'Süre en fazla 24 saat olabilir')
-    .optional(),
-  max_attempts: z.number()
-    .min(1, 'Maksimum deneme sayısı en az 1 olmalıdır')
-    .max(10, 'Maksimum deneme sayısı en fazla 10 olabilir')
-    .default(1),
-  passing_score: z.number()
-    .min(0, 'Geçme puanı 0-100 arasında olmalıdır')
-    .max(100, 'Geçme puanı 0-100 arasında olmalıdır')
-    .default(70),
-  shuffle_questions: z.boolean().default(false),
-  show_results_immediately: z.boolean().default(true),
-  allow_review: z.boolean().default(true),
-  is_adaptive: z.boolean().default(false),
-  available_from: z.string().optional(),
-  available_until: z.string().optional(),
-  tags: z.array(z.string()).default([]),
-}).refine((data) => {
-  // At least one of course_id or program_id must be selected
-  return data.course_id || data.program_id;
-}, {
-  message: 'Kurs veya program seçilmelidir',
-  path: ['course_id']
-}).refine((data) => {
-  // If both dates are provided, available_from must be before available_until
-  if (data.available_from && data.available_until) {
-    return new Date(data.available_from) < new Date(data.available_until);
-  }
-  return true;
-}, {
-  message: 'Başlangıç tarihi bitiş tarihinden önce olmalıdır',
-  path: ['available_until']
-});
+const evaluationSchema = z
+  .object({
+    title: z
+      .string()
+      .min(1, 'Başlık gereklidir')
+      .max(200, 'Başlık en fazla 200 karakter olabilir'),
+    description: z.string().optional(),
+    instructions: z.string().optional(),
+    course_id: z.number().optional(),
+    program_id: z.number().optional(),
+    time_limit_minutes: z
+      .number()
+      .min(1, 'Süre en az 1 dakika olmalıdır')
+      .max(1440, 'Süre en fazla 24 saat olabilir')
+      .optional(),
+    max_attempts: z
+      .number()
+      .min(1, 'Maksimum deneme sayısı en az 1 olmalıdır')
+      .max(10, 'Maksimum deneme sayısı en fazla 10 olabilir')
+      .default(1),
+    passing_score: z
+      .number()
+      .min(0, 'Geçme puanı 0-100 arasında olmalıdır')
+      .max(100, 'Geçme puanı 0-100 arasında olmalıdır')
+      .default(70),
+    shuffle_questions: z.boolean().default(false),
+    show_results_immediately: z.boolean().default(true),
+    allow_review: z.boolean().default(true),
+    is_adaptive: z.boolean().default(false),
+    available_from: z.string().optional(),
+    available_until: z.string().optional(),
+    tags: z.array(z.string()).default([]),
+  })
+  .refine(
+    (data) => {
+      // At least one of course_id or program_id must be selected
+      return data.course_id || data.program_id;
+    },
+    {
+      message: 'Kurs veya program seçilmelidir',
+      path: ['course_id'],
+    }
+  )
+  .refine(
+    (data) => {
+      // If both dates are provided, available_from must be before available_until
+      if (data.available_from && data.available_until) {
+        return new Date(data.available_from) < new Date(data.available_until);
+      }
+      return true;
+    },
+    {
+      message: 'Başlangıç tarihi bitiş tarihinden önce olmalıdır',
+      path: ['available_until'],
+    }
+  );
 
 type EvaluationFormData = z.infer<typeof evaluationSchema>;
 
@@ -86,8 +110,8 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
 
   // React Query hooks
   const { data: evaluation, isLoading: evaluationLoading } = useEvaluation(
-    evaluationId!, 
-    false, 
+    evaluationId!,
+    false,
     { enabled: mode === 'edit' && !!evaluationId }
   );
   const { data: coursesData } = useCourses({ per_page: 100 });
@@ -102,7 +126,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
     formState: { errors, isSubmitting },
     reset,
     watch,
-    setValue
+    setValue,
   } = useForm<EvaluationFormData>({
     resolver: zodResolver(evaluationSchema),
     defaultValues: {
@@ -115,8 +139,8 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
       show_results_immediately: true,
       allow_review: true,
       is_adaptive: false,
-      tags: []
-    }
+      tags: [],
+    },
   });
 
   // Watch form values for dynamic behavior
@@ -140,7 +164,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
         is_adaptive: evaluation.is_adaptive || false,
         available_from: evaluation.available_from || undefined,
         available_until: evaluation.available_until || undefined,
-        tags: evaluation.tags || []
+        tags: evaluation.tags || [],
       });
     }
   }, [mode, evaluation, reset]);
@@ -149,7 +173,9 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
   const filteredCourses = React.useMemo(() => {
     if (!coursesData?.courses) return [];
     if (!watchedProgramId) return coursesData.courses;
-    return coursesData.courses.filter(course => course.program_id === watchedProgramId);
+    return coursesData.courses.filter(
+      (course) => course.program_id === watchedProgramId
+    );
   }, [coursesData?.courses, watchedProgramId]);
 
   // Handle form submission
@@ -158,17 +184,23 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
       // Convert string dates to ISO format
       const formattedData = {
         ...data,
-        available_from: data.available_from ? new Date(data.available_from).toISOString() : undefined,
-        available_until: data.available_until ? new Date(data.available_until).toISOString() : undefined,
+        available_from: data.available_from
+          ? new Date(data.available_from).toISOString()
+          : undefined,
+        available_until: data.available_until
+          ? new Date(data.available_until).toISOString()
+          : undefined,
       };
 
       if (mode === 'create') {
-        const newEvaluation = await createMutation.mutateAsync(formattedData as CreateEvaluationRequest);
+        const newEvaluation = await createMutation.mutateAsync(
+          formattedData as CreateEvaluationRequest
+        );
         navigate(`/evaluations/${newEvaluation.id}`);
       } else if (mode === 'edit' && evaluationId) {
         const updatedEvaluation = await updateMutation.mutateAsync({
           id: evaluationId,
-          data: formattedData as UpdateEvaluationRequest
+          data: formattedData as UpdateEvaluationRequest,
         });
         navigate(`/evaluations/${updatedEvaluation.id}`);
       }
@@ -198,13 +230,14 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
         </button>
         <div>
           <h1 className="text-2xl font-bold">
-            {mode === 'create' ? 'Yeni Değerlendirme' : 'Değerlendirmeyi Düzenle'}
+            {mode === 'create'
+              ? 'Yeni Değerlendirme'
+              : 'Değerlendirmeyi Düzenle'}
           </h1>
           <p className="text-gray-600">
-            {mode === 'create' 
-              ? 'Yeni bir değerlendirme oluşturun' 
-              : 'Mevcut değerlendirmeyi düzenleyin'
-            }
+            {mode === 'create'
+              ? 'Yeni bir değerlendirme oluşturun'
+              : 'Mevcut değerlendirmeyi düzenleyin'}
           </p>
         </div>
       </div>
@@ -216,7 +249,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
             <Info className="h-5 w-5 text-blue-600" />
             <h2 className="text-lg font-semibold">Temel Bilgiler</h2>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="md:col-span-2">
               <Controller
@@ -237,7 +270,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
                 )}
               />
             </div>
-            
+
             <div className="md:col-span-2">
               <Controller
                 name="description"
@@ -257,7 +290,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
                 )}
               />
             </div>
-            
+
             <div className="md:col-span-2">
               <Controller
                 name="instructions"
@@ -286,21 +319,20 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
             <FileText className="h-5 w-5 text-green-600" />
             <h2 className="text-lg font-semibold">Program ve Kurs</h2>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Controller
               name="program_id"
               control={control}
               render={({ field }) => (
-                <FormField
-                  label="Program"
-                  error={errors.program_id?.message}
-                >
+                <FormField label="Program" error={errors.program_id?.message}>
                   <Select
                     {...field}
                     value={field.value || ''}
                     onChange={(e) => {
-                      const value = e.target.value ? parseInt(e.target.value) : undefined;
+                      const value = e.target.value
+                        ? parseInt(e.target.value)
+                        : undefined;
                       field.onChange(value);
                       // Clear course selection when program changes
                       setValue('course_id', undefined);
@@ -317,20 +349,19 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
                 </FormField>
               )}
             />
-            
+
             <Controller
               name="course_id"
               control={control}
               render={({ field }) => (
-                <FormField
-                  label="Kurs"
-                  error={errors.course_id?.message}
-                >
+                <FormField label="Kurs" error={errors.course_id?.message}>
                   <Select
                     {...field}
                     value={field.value || ''}
                     onChange={(e) => {
-                      const value = e.target.value ? parseInt(e.target.value) : undefined;
+                      const value = e.target.value
+                        ? parseInt(e.target.value)
+                        : undefined;
                       field.onChange(value);
                     }}
                     error={!!errors.course_id}
@@ -347,7 +378,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
               )}
             />
           </div>
-          
+
           {!watchedProgramId && (
             <p className="text-sm text-gray-500 mt-2">
               Kurs seçebilmek için önce bir program seçin
@@ -361,7 +392,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
             <Settings className="h-5 w-5 text-purple-600" />
             <h2 className="text-lg font-semibold">Ayarlar</h2>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Controller
               name="time_limit_minutes"
@@ -377,13 +408,17 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
                     min="1"
                     max="1440"
                     placeholder="Örn: 60"
-                    onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                    onChange={(e) =>
+                      field.onChange(
+                        e.target.value ? parseInt(e.target.value) : undefined
+                      )
+                    }
                     error={!!errors.time_limit_minutes}
                   />
                 </FormField>
               )}
             />
-            
+
             <Controller
               name="max_attempts"
               control={control}
@@ -404,7 +439,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
                 </FormField>
               )}
             />
-            
+
             <Controller
               name="passing_score"
               control={control}
@@ -426,7 +461,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
               )}
             />
           </div>
-          
+
           {/* Boolean Settings */}
           <div className="mt-6 space-y-4">
             <Controller
@@ -444,7 +479,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
                 </label>
               )}
             />
-            
+
             <Controller
               name="show_results_immediately"
               control={control}
@@ -456,11 +491,13 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
                     onChange={field.onChange}
                     className="rounded border-gray-300"
                   />
-                  <span className="text-sm font-medium">Sonuçları hemen göster</span>
+                  <span className="text-sm font-medium">
+                    Sonuçları hemen göster
+                  </span>
                 </label>
               )}
             />
-            
+
             <Controller
               name="allow_review"
               control={control}
@@ -472,11 +509,13 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
                     onChange={field.onChange}
                     className="rounded border-gray-300"
                   />
-                  <span className="text-sm font-medium">İncelemeye izin ver</span>
+                  <span className="text-sm font-medium">
+                    İncelemeye izin ver
+                  </span>
                 </label>
               )}
             />
-            
+
             <Controller
               name="is_adaptive"
               control={control}
@@ -490,16 +529,19 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
                   />
                   <div className="flex items-center space-x-2">
                     <Brain className="h-4 w-4 text-purple-600" />
-                    <span className="text-sm font-medium">AI Destekli Adaptif Değerlendirme</span>
+                    <span className="text-sm font-medium">
+                      AI Destekli Adaptif Değerlendirme
+                    </span>
                   </div>
                 </label>
               )}
             />
-            
+
             {watch('is_adaptive') && (
               <div className="mt-2 p-3 bg-purple-50 rounded-lg">
                 <p className="text-sm text-purple-700">
-                  <strong>Adaptif mod etkin:</strong> Sorular öğrencinin performansına göre AI tarafından otomatik olarak ayarlanacak. 
+                  <strong>Adaptif mod etkin:</strong> Sorular öğrencinin
+                  performansına göre AI tarafından otomatik olarak ayarlanacak.
                   Zorluk seviyesi dinamik olarak değişecek.
                 </p>
               </div>
@@ -513,7 +555,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
             <Calendar className="h-5 w-5 text-orange-600" />
             <h2 className="text-lg font-semibold">Kullanılabilirlik</h2>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Controller
               name="available_from"
@@ -531,7 +573,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
                 </FormField>
               )}
             />
-            
+
             <Controller
               name="available_until"
               control={control}
@@ -557,15 +599,12 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
             <span className="text-lg">#</span>
             <h2 className="text-lg font-semibold">Etiketler</h2>
           </div>
-          
+
           <Controller
             name="tags"
             control={control}
             render={({ field }) => (
-              <FormField
-                label="Etiketler"
-                error={errors.tags?.message}
-              >
+              <FormField label="Etiketler" error={errors.tags?.message}>
                 <TagInput
                   value={field.value}
                   onChange={field.onChange}
@@ -586,12 +625,8 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
           >
             İptal
           </Button>
-          
-          <Button
-            type="submit"
-            loading={isSubmitting}
-            disabled={isSubmitting}
-          >
+
+          <Button type="submit" loading={isSubmitting} disabled={isSubmitting}>
             <Save className="mr-2 h-4 w-4" />
             {mode === 'create' ? 'Oluştur' : 'Güncelle'}
           </Button>

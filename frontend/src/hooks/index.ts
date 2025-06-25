@@ -11,7 +11,7 @@ export {
   useDeleteProgram,
   useUpdateProgramStatus,
   useAddCourseToProgram,
-  programQueryKeys
+  programQueryKeys,
 } from './usePrograms';
 
 // Course hooks
@@ -25,7 +25,7 @@ export {
   useAddSession,
   useDuplicateCourse,
   useReorderCourse,
-  courseQueryKeys
+  courseQueryKeys,
 } from './useCourses';
 
 // Beneficiary hooks
@@ -39,7 +39,7 @@ export {
   useAddTag,
   useRemoveTag,
   useAssignTrainer,
-  useBeneficiaryStatistics
+  useBeneficiaryStatistics,
 } from './useBeneficiaries';
 
 // Evaluation hooks
@@ -62,5 +62,5 @@ export {
   useStartEvaluationAttempt,
   useSubmitEvaluationAttempt,
   useSaveQuestionResponse,
-  evaluationQueryKeys
+  evaluationQueryKeys,
 } from './useEvaluations';

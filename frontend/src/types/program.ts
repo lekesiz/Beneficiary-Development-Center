@@ -7,7 +7,7 @@ export enum ProgramStatus {
   PUBLISHED = 'published',
   ACTIVE = 'active',
   COMPLETED = 'completed',
-  ARCHIVED = 'archived'
+  ARCHIVED = 'archived',
 }
 
 export enum ProgramType {
@@ -16,7 +16,7 @@ export enum ProgramType {
   CERTIFICATION = 'certification',
   BOOTCAMP = 'bootcamp',
   MENTORSHIP = 'mentorship',
-  OTHER = 'other'
+  OTHER = 'other',
 }
 
 export interface Program {
@@ -49,14 +49,14 @@ export interface Program {
   coordinator_id?: number;
   created_at: string;
   updated_at: string;
-  
+
   // Computed fields
   duration_days: number;
   is_enrollment_open: boolean;
   is_active: boolean;
   is_upcoming: boolean;
   is_past: boolean;
-  
+
   // Related data (when include_related=true)
   enrollment_count?: number;
   available_spots?: number;
@@ -91,7 +91,7 @@ export interface CreateProgramRequest {
   coordinator_id?: number;
 }
 
-export interface UpdateProgramRequest extends Partial<CreateProgramRequest> {}
+export type UpdateProgramRequest = Partial<CreateProgramRequest>
 
 export interface ProgramFilters {
   page?: number;

@@ -1,5 +1,3 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   Target,
   BookOpen,
@@ -7,13 +5,16 @@ import {
   TrendingUp,
   Calendar,
   Clock,
-  AlertCircle
+  AlertCircle,
 } from 'lucide-react';
+import * as React from 'react';
+import { useNavigate } from 'react-router-dom';
+
+import LearningPathMilestones from '@/components/student/LearningPathMilestones';
+import { Badge } from '@/components/ui/Badge';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Form';
 import { ProgressBar } from '@/components/ui/ProgressBar';
-import { Badge } from '@/components/ui/Badge';
-import LearningPathMilestones from '@/components/student/LearningPathMilestones';
 import { useAuth } from '@/contexts/AuthContext';
 import { useStudentDashboard } from '@/hooks/useStudentDashboard';
 import { formatDate } from '@/utils/date';
@@ -29,7 +30,7 @@ export default function StudentDashboard() {
         <div className="animate-pulse space-y-4">
           <div className="h-8 bg-gray-200 rounded w-1/4"></div>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {[1, 2, 3, 4].map(i => (
+            {[1, 2, 3, 4].map((i) => (
               <div key={i} className="h-32 bg-gray-200 rounded"></div>
             ))}
           </div>
@@ -55,10 +56,14 @@ export default function StudentDashboard() {
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Genel İlerleme</p>
-              <p className="text-2xl font-bold">{dashboard.stats.overall_progress}%</p>
-              <ProgressBar 
-                value={dashboard.stats.overall_progress} 
+              <p className="text-sm font-medium text-gray-600">
+                Genel İlerleme
+              </p>
+              <p className="text-2xl font-bold">
+                {dashboard.stats.overall_progress}%
+              </p>
+              <ProgressBar
+                value={dashboard.stats.overall_progress}
                 className="mt-2"
                 variant="primary"
               />
@@ -71,7 +76,9 @@ export default function StudentDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Tamamlanan</p>
-              <p className="text-2xl font-bold">{dashboard.stats.completed_milestones}</p>
+              <p className="text-2xl font-bold">
+                {dashboard.stats.completed_milestones}
+              </p>
               <p className="text-xs text-gray-500">Hedef</p>
             </div>
             <Award className="h-8 w-8 text-green-600 opacity-80" />
@@ -82,7 +89,9 @@ export default function StudentDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Bu Hafta</p>
-              <p className="text-2xl font-bold">{dashboard.stats.weekly_hours}s</p>
+              <p className="text-2xl font-bold">
+                {dashboard.stats.weekly_hours}s
+              </p>
               <p className="text-xs text-gray-500">Çalışma</p>
             </div>
             <Clock className="h-8 w-8 text-purple-600 opacity-80" />
@@ -93,7 +102,9 @@ export default function StudentDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Aktif Yol</p>
-              <p className="text-2xl font-bold">{dashboard.stats.active_paths}</p>
+              <p className="text-2xl font-bold">
+                {dashboard.stats.active_paths}
+              </p>
               <p className="text-xs text-gray-500">Program</p>
             </div>
             <Target className="h-8 w-8 text-orange-600 opacity-80" />
@@ -140,7 +151,7 @@ export default function StudentDashboard() {
             {dashboard.upcoming_evaluations.length > 0 ? (
               <div className="space-y-3">
                 {dashboard.upcoming_evaluations.map((evaluation) => (
-                  <div 
+                  <div
                     key={evaluation.id}
                     className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
                     onClick={() => navigate(`/evaluations/${evaluation.id}`)}
@@ -171,7 +182,10 @@ export default function StudentDashboard() {
             {dashboard.recent_achievements.length > 0 ? (
               <div className="space-y-3">
                 {dashboard.recent_achievements.map((achievement) => (
-                  <div key={achievement.id} className="flex items-center space-x-3">
+                  <div
+                    key={achievement.id}
+                    className="flex items-center space-x-3"
+                  >
                     <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
                       <Award className="h-5 w-5 text-green-600" />
                     </div>
@@ -185,9 +199,7 @@ export default function StudentDashboard() {
                 ))}
               </div>
             ) : (
-              <p className="text-gray-500 text-sm">
-                Henüz başarı kazanılmadı
-              </p>
+              <p className="text-gray-500 text-sm">Henüz başarı kazanılmadı</p>
             )}
           </Card>
 

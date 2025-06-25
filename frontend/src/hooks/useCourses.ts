@@ -3,6 +3,7 @@
  */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
+
 import { coursesApi } from '../api/courses';
 import type {
   Course,
@@ -11,18 +12,20 @@ import type {
   CourseFilters,
   CreateSessionRequest,
   DuplicateCourseRequest,
-  ReorderCourseRequest
+  ReorderCourseRequest,
 } from '../types/course';
 
 // Query Keys
 export const courseQueryKeys = {
   all: ['courses'] as const,
   lists: () => [...courseQueryKeys.all, 'list'] as const,
-  list: (filters?: CourseFilters) => [...courseQueryKeys.lists(), filters] as const,
+  list: (filters?: CourseFilters) =>
+    [...courseQueryKeys.lists(), filters] as const,
   details: () => [...courseQueryKeys.all, 'detail'] as const,
-  detail: (id: number, includeSessions?: boolean) => 
+  detail: (id: number, includeSessions?: boolean) =>
     [...courseQueryKeys.details(), id, includeSessions] as const,
-  statistics: (programId?: number) => [...courseQueryKeys.all, 'statistics', programId] as const,
+  statistics: (programId?: number) =>
+    [...courseQueryKeys.all, 'statistics', programId] as const,
 };
 
 /**
@@ -71,22 +74,20 @@ export const useCreateCourse = () => {
       // Invalidate and refetch courses list
       queryClient.invalidateQueries({ queryKey: courseQueryKeys.lists() });
       queryClient.invalidateQueries({ queryKey: courseQueryKeys.statistics() });
-      
+
       // Invalidate related program details
-      queryClient.invalidateQueries({ 
-        queryKey: ['programs', 'detail', newCourse.program_id] 
+      queryClient.invalidateQueries({
+        queryKey: ['programs', 'detail', newCourse.program_id],
       });
-      
+
       // Add to cache
-      queryClient.setQueryData(
-        courseQueryKeys.detail(newCourse.id),
-        newCourse
-      );
-      
+      queryClient.setQueryData(courseQueryKeys.detail(newCourse.id), newCourse);
+
       toast.success('Kurs başarıyla oluşturuldu');
     },
     onError: (error: any) => {
-      const message = error.response?.data?.error || 'Kurs oluşturulurken hata oluştu';
+      const message =
+        error.response?.data?.error || 'Kurs oluşturulurken hata oluştu';
       toast.error(message);
     },
   });
@@ -107,20 +108,21 @@ export const useUpdateCourse = () => {
         courseQueryKeys.detail(updatedCourse.id),
         updatedCourse
       );
-      
+
       // Invalidate lists to refresh
       queryClient.invalidateQueries({ queryKey: courseQueryKeys.lists() });
       queryClient.invalidateQueries({ queryKey: courseQueryKeys.statistics() });
-      
+
       // Invalidate related program details
-      queryClient.invalidateQueries({ 
-        queryKey: ['programs', 'detail', updatedCourse.program_id] 
+      queryClient.invalidateQueries({
+        queryKey: ['programs', 'detail', updatedCourse.program_id],
       });
-      
+
       toast.success('Kurs başarıyla güncellendi');
     },
     onError: (error: any) => {
-      const message = error.response?.data?.error || 'Kurs güncellenirken hata oluştu';
+      const message =
+        error.response?.data?.error || 'Kurs güncellenirken hata oluştu';
       toast.error(message);
     },
   });
@@ -136,19 +138,22 @@ export const useDeleteCourse = () => {
     mutationFn: (id: number) => coursesApi.delete(id),
     onSuccess: (_, deletedId) => {
       // Remove from cache
-      queryClient.removeQueries({ queryKey: courseQueryKeys.detail(deletedId) });
-      
+      queryClient.removeQueries({
+        queryKey: courseQueryKeys.detail(deletedId),
+      });
+
       // Invalidate lists
       queryClient.invalidateQueries({ queryKey: courseQueryKeys.lists() });
       queryClient.invalidateQueries({ queryKey: courseQueryKeys.statistics() });
-      
+
       // Invalidate programs to refresh course counts
       queryClient.invalidateQueries({ queryKey: ['programs'] });
-      
+
       toast.success('Kurs başarıyla silindi');
     },
     onError: (error: any) => {
-      const message = error.response?.data?.error || 'Kurs silinirken hata oluştu';
+      const message =
+        error.response?.data?.error || 'Kurs silinirken hata oluştu';
       toast.error(message);
     },
   });
@@ -169,15 +174,16 @@ export const useUpdateCourseStatus = () => {
         courseQueryKeys.detail(updatedCourse.id),
         updatedCourse
       );
-      
+
       // Invalidate lists
       queryClient.invalidateQueries({ queryKey: courseQueryKeys.lists() });
       queryClient.invalidateQueries({ queryKey: courseQueryKeys.statistics() });
-      
+
       toast.success('Kurs durumu güncellendi');
     },
     onError: (error: any) => {
-      const message = error.response?.data?.error || 'Kurs durumu güncellenirken hata oluştu';
+      const message =
+        error.response?.data?.error || 'Kurs durumu güncellenirken hata oluştu';
       toast.error(message);
     },
   });
@@ -190,20 +196,24 @@ export const useAddSession = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ courseId, sessionData }: { 
-      courseId: number; 
-      sessionData: CreateSessionRequest 
+    mutationFn: ({
+      courseId,
+      sessionData,
+    }: {
+      courseId: number;
+      sessionData: CreateSessionRequest;
     }) => coursesApi.addSession(courseId, sessionData),
     onSuccess: (newSession, { courseId }) => {
       // Invalidate course details to refresh sessions
-      queryClient.invalidateQueries({ 
-        queryKey: courseQueryKeys.detail(courseId, true) 
+      queryClient.invalidateQueries({
+        queryKey: courseQueryKeys.detail(courseId, true),
       });
-      
+
       toast.success('Oturum başarıyla eklendi');
     },
     onError: (error: any) => {
-      const message = error.response?.data?.error || 'Oturum eklenirken hata oluştu';
+      const message =
+        error.response?.data?.error || 'Oturum eklenirken hata oluştu';
       toast.error(message);
     },
   });
@@ -216,28 +226,29 @@ export const useDuplicateCourse = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ courseId, data }: { 
-      courseId: number; 
-      data?: DuplicateCourseRequest 
+    mutationFn: ({
+      courseId,
+      data,
+    }: {
+      courseId: number;
+      data?: DuplicateCourseRequest;
     }) => coursesApi.duplicate(courseId, data),
     onSuccess: (newCourse) => {
       // Invalidate lists to show new course
       queryClient.invalidateQueries({ queryKey: courseQueryKeys.lists() });
       queryClient.invalidateQueries({ queryKey: courseQueryKeys.statistics() });
-      
+
       // Invalidate program details if moved to different program
       queryClient.invalidateQueries({ queryKey: ['programs'] });
-      
+
       // Add to cache
-      queryClient.setQueryData(
-        courseQueryKeys.detail(newCourse.id),
-        newCourse
-      );
-      
+      queryClient.setQueryData(courseQueryKeys.detail(newCourse.id), newCourse);
+
       toast.success('Kurs başarıyla kopyalandı');
     },
     onError: (error: any) => {
-      const message = error.response?.data?.error || 'Kurs kopyalanırken hata oluştu';
+      const message =
+        error.response?.data?.error || 'Kurs kopyalanırken hata oluştu';
       toast.error(message);
     },
   });
@@ -250,9 +261,12 @@ export const useReorderCourse = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ courseId, data }: { 
-      courseId: number; 
-      data: ReorderCourseRequest 
+    mutationFn: ({
+      courseId,
+      data,
+    }: {
+      courseId: number;
+      data: ReorderCourseRequest;
     }) => coursesApi.reorder(courseId, data),
     onSuccess: (updatedCourse) => {
       // Update cached data
@@ -260,21 +274,24 @@ export const useReorderCourse = () => {
         courseQueryKeys.detail(updatedCourse.id),
         updatedCourse
       );
-      
+
       // Invalidate lists to refresh order
-      queryClient.invalidateQueries({ 
-        queryKey: courseQueryKeys.list({ program_id: updatedCourse.program_id })
+      queryClient.invalidateQueries({
+        queryKey: courseQueryKeys.list({
+          program_id: updatedCourse.program_id,
+        }),
       });
-      
+
       // Invalidate program details
-      queryClient.invalidateQueries({ 
-        queryKey: ['programs', 'detail', updatedCourse.program_id] 
+      queryClient.invalidateQueries({
+        queryKey: ['programs', 'detail', updatedCourse.program_id],
       });
-      
+
       toast.success('Kurs sırası güncellendi');
     },
     onError: (error: any) => {
-      const message = error.response?.data?.error || 'Kurs sırası güncellenirken hata oluştu';
+      const message =
+        error.response?.data?.error || 'Kurs sırası güncellenirken hata oluştu';
       toast.error(message);
     },
   });

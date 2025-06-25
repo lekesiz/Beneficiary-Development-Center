@@ -1,13 +1,15 @@
-import React, { useState, KeyboardEvent } from 'react'
-import { X } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { X } from 'lucide-react';
+import * as React from 'react';
+import { useState, KeyboardEvent } from 'react';
+
+import { cn } from '@/lib/utils';
 
 interface TagInputProps {
-  value: string[]
-  onChange: (tags: string[]) => void
-  placeholder?: string
-  className?: string
-  error?: boolean
+  value: string[];
+  onChange: (tags: string[]) => void;
+  placeholder?: string;
+  className?: string;
+  error?: boolean;
 }
 
 export const TagInput: React.FC<TagInputProps> = ({
@@ -17,29 +19,29 @@ export const TagInput: React.FC<TagInputProps> = ({
   className,
   error,
 }) => {
-  const [inputValue, setInputValue] = useState('')
+  const [inputValue, setInputValue] = useState('');
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' || e.key === ',') {
-      e.preventDefault()
-      addTag()
+      e.preventDefault();
+      addTag();
     } else if (e.key === 'Backspace' && inputValue === '' && value.length > 0) {
-      removeTag(value.length - 1)
+      removeTag(value.length - 1);
     }
-  }
+  };
 
   const addTag = () => {
-    const tag = inputValue.trim()
+    const tag = inputValue.trim();
     if (tag && !value.includes(tag)) {
-      onChange([...value, tag])
-      setInputValue('')
+      onChange([...value, tag]);
+      setInputValue('');
     }
-  }
+  };
 
   const removeTag = (index: number) => {
-    const newTags = value.filter((_, i) => i !== index)
-    onChange(newTags)
-  }
+    const newTags = value.filter((_, i) => i !== index);
+    onChange(newTags);
+  };
 
   return (
     <div
@@ -74,5 +76,5 @@ export const TagInput: React.FC<TagInputProps> = ({
         className="flex-1 min-w-[120px] outline-none bg-transparent placeholder:text-muted-foreground"
       />
     </div>
-  )
-}
+  );
+};

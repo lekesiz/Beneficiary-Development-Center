@@ -1,17 +1,16 @@
-import React, { ReactElement } from 'react'
-import { render, RenderOptions } from '@testing-library/react'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { BrowserRouter } from 'react-router-dom'
-import { AuthProvider } from '@/contexts/AuthContext'
-import { ThemeProvider } from '@/contexts/ThemeContext'
-import { I18nProvider } from '@/contexts/I18nContext'
-import { SocketProvider } from '@/contexts/SocketContext'
-import { User } from '@/types/user'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { render, RenderOptions } from '@testing-library/react';
+import * as React from 'react';
+import { ReactElement } from 'react';
+import { BrowserRouter } from 'react-router-dom';
+import { vi } from 'vitest';
+
+import { User } from '@/types/user';
 
 // Create a custom render function that includes all providers
 interface CustomRenderOptions extends Omit<RenderOptions, 'wrapper'> {
-  user?: Partial<User>
-  initialRoute?: string
+  user?: Partial<User>;
+  initialRoute?: string;
 }
 
 // Default test user
@@ -48,7 +47,36 @@ const defaultUser: User = {
   roles: [{ id: 1, name: 'admin', description: 'Administrator' }],
   createdAt: '2024-01-01T00:00:00Z',
   updatedAt: '2024-01-01T00:00:00Z',
-}
+};
+
+// Mock the context providers to avoid dependency issues
+const MockAuthProvider = ({ children, value }: { children: React.ReactNode; value?: any }) => {
+  const mockValue = value || {
+    user: defaultUser,
+    isAuthenticated: true,
+    isLoading: false,
+    login: vi.fn(),
+    logout: vi.fn(),
+    register: vi.fn(),
+    updateProfile: vi.fn(),
+  };
+  
+  // Create a React context to provide the mock value
+  const AuthContext = React.createContext(mockValue);
+  return <AuthContext.Provider value={mockValue}>{children}</AuthContext.Provider>;
+};
+
+const MockI18nProvider = ({ children }: { children: React.ReactNode }) => (
+  <div data-testid="mock-i18n-provider">{children}</div>
+);
+
+const MockSocketProvider = ({ children }: { children: React.ReactNode }) => (
+  <div data-testid="mock-socket-provider">{children}</div>
+);
+
+const MockThemeProvider = ({ children }: { children: React.ReactNode }) => (
+  <div data-testid="mock-theme-provider">{children}</div>
+);
 
 export function createTestQueryClient() {
   return new QueryClient({
@@ -62,48 +90,31 @@ export function createTestQueryClient() {
         retry: false,
       },
     },
-  })
+  });
 }
 
-export function AllTheProviders({ 
+export function AllTheProviders({
   children,
   user = defaultUser,
-}: { 
-  children: React.ReactNode
-  user?: User
+}: {
+  children: React.ReactNode;
+  user?: User;
 }) {
-  const queryClient = createTestQueryClient()
-
-  // Mock AuthProvider with test user
-  const MockAuthProvider = ({ children }: { children: React.ReactNode }) => {
-    const value = {
-      user,
-      isAuthenticated: !!user,
-      isLoading: false,
-      login: async () => {},
-      logout: async () => {},
-      register: async () => {},
-      updateProfile: async () => {},
-    }
-
-    return <AuthProvider value={value}>{children}</AuthProvider>
-  }
+  const queryClient = createTestQueryClient();
 
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <I18nProvider>
-          <ThemeProvider>
-            <MockAuthProvider>
-              <SocketProvider>
-                {children}
-              </SocketProvider>
+        <MockI18nProvider>
+          <MockThemeProvider>
+            <MockAuthProvider value={{ user, isAuthenticated: !!user, isLoading: false }}>
+              <MockSocketProvider>{children}</MockSocketProvider>
             </MockAuthProvider>
-          </ThemeProvider>
-        </I18nProvider>
+          </MockThemeProvider>
+        </MockI18nProvider>
       </BrowserRouter>
     </QueryClientProvider>
-  )
+  );
 }
 
 export function renderWithProviders(
@@ -115,7 +126,7 @@ export function renderWithProviders(
   }: CustomRenderOptions = {}
 ) {
   if (initialRoute !== '/') {
-    window.history.pushState({}, 'Test page', initialRoute)
+    window.history.pushState({}, 'Test page', initialRoute);
   }
 
   return {
@@ -126,9 +137,9 @@ export function renderWithProviders(
       ...options,
     }),
     user,
-  }
+  };
 }
 
 // Re-export everything
-export * from '@testing-library/react'
-export { renderWithProviders as render }
+export * from '@testing-library/react';
+export { renderWithProviders as render };

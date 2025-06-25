@@ -1,9 +1,13 @@
-import { format, formatRelative, formatDistanceToNow, parseISO } from 'date-fns';
-import { tr } from 'date-fns/locale';
+import {
+  format,
+  formatRelative,
+  formatDistanceToNow,
+  parseISO,
+ tr } from 'date-fns';
 
 export function formatDate(date: string | Date | null | undefined): string {
   if (!date) return '-';
-  
+
   try {
     const dateObj = typeof date === 'string' ? parseISO(date) : date;
     return format(dateObj, 'dd MMM yyyy', { locale: tr });
@@ -15,7 +19,7 @@ export function formatDate(date: string | Date | null | undefined): string {
 
 export function formatDateTime(date: string | Date | null | undefined): string {
   if (!date) return '-';
-  
+
   try {
     const dateObj = typeof date === 'string' ? parseISO(date) : date;
     return format(dateObj, 'dd MMM yyyy HH:mm', { locale: tr });
@@ -25,9 +29,11 @@ export function formatDateTime(date: string | Date | null | undefined): string {
   }
 }
 
-export function formatRelativeDate(date: string | Date | null | undefined): string {
+export function formatRelativeDate(
+  date: string | Date | null | undefined
+): string {
   if (!date) return '-';
-  
+
   try {
     const dateObj = typeof date === 'string' ? parseISO(date) : date;
     return formatRelative(dateObj, new Date(), { locale: tr });
@@ -37,9 +43,11 @@ export function formatRelativeDate(date: string | Date | null | undefined): stri
   }
 }
 
-export function formatDistanceFromNow(date: string | Date | null | undefined): string {
+export function formatDistanceFromNow(
+  date: string | Date | null | undefined
+): string {
   if (!date) return '-';
-  
+
   try {
     const dateObj = typeof date === 'string' ? parseISO(date) : date;
     return formatDistanceToNow(dateObj, { addSuffix: true, locale: tr });
@@ -52,9 +60,11 @@ export function formatDistanceFromNow(date: string | Date | null | undefined): s
 // Alias for consistency with component usage
 export const formatDistanceToNow = formatDistanceFromNow;
 
-export function formatShortDate(date: string | Date | null | undefined): string {
+export function formatShortDate(
+  date: string | Date | null | undefined
+): string {
   if (!date) return '-';
-  
+
   try {
     const dateObj = typeof date === 'string' ? parseISO(date) : date;
     return format(dateObj, 'dd/MM/yyyy', { locale: tr });
@@ -66,7 +76,7 @@ export function formatShortDate(date: string | Date | null | undefined): string 
 
 export function formatTime(date: string | Date | null | undefined): string {
   if (!date) return '-';
-  
+
   try {
     const dateObj = typeof date === 'string' ? parseISO(date) : date;
     return format(dateObj, 'HH:mm', { locale: tr });

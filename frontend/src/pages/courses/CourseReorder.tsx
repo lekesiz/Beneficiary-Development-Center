@@ -1,23 +1,25 @@
 /**
  * Course Reorder Page
  */
-import React, { useState, useMemo } from 'react';
+import { ArrowLeft, Save, RotateCcw } from 'lucide-react';
+import * as React from 'react';
+import { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+
+import { Badge } from '../../components/ui/Badge';
+import { Card } from '../../components/ui/Card';
+import { DragDropList } from '../../components/ui/DragDropList';
+import { Button } from '../../components/ui/Form';
+import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
+import { useAuth } from '../../contexts/AuthContext';
 import { useCourses, useReorderCourse } from '../../hooks/useCourses';
 import { useProgram } from '../../hooks/usePrograms';
-import { useAuth } from '../../contexts/AuthContext';
-import { Button } from '../../components/ui/Form';
-import { Card } from '../../components/ui/Card';
-import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
-import { DragDropList } from '../../components/ui/DragDropList';
-import { Badge } from '../../components/ui/Badge';
-import { 
-  getCourseStatusInfo, 
-  getCourseFormatInfo, 
-  getDifficultyLevelInfo 
-} from '../../utils/course';
 import type { Course } from '../../types/course';
-import { ArrowLeft, Save, RotateCcw } from 'lucide-react';
+import {
+  getCourseStatusInfo,
+  getCourseFormatInfo,
+  getDifficultyLevelInfo,
+} from '../../utils/course';
 
 export const CourseReorder: React.FC = () => {
   const { programId } = useParams<{ programId: string }>();
@@ -25,10 +27,13 @@ export const CourseReorder: React.FC = () => {
   const { user } = useAuth();
   const programIdNum = parseInt(programId!);
 
-  const { data: program, isLoading: isLoadingProgram } = useProgram(programIdNum, false);
-  const { data: coursesData, isLoading: isLoadingCourses } = useCourses({ 
-    program_id: programIdNum, 
-    per_page: 100 
+  const { data: program, isLoading: isLoadingProgram } = useProgram(
+    programIdNum,
+    false
+  );
+  const { data: coursesData, isLoading: isLoadingCourses } = useCourses({
+    program_id: programIdNum,
+    per_page: 100,
   });
   const reorderCourse = useReorderCourse();
 
@@ -41,7 +46,9 @@ export const CourseReorder: React.FC = () => {
   // Initialize courses when data is loaded
   React.useEffect(() => {
     if (coursesData?.courses) {
-      const sortedCourses = [...coursesData.courses].sort((a, b) => a.order_index - b.order_index);
+      const sortedCourses = [...coursesData.courses].sort(
+        (a, b) => a.order_index - b.order_index
+      );
       setCourses(sortedCourses);
     }
   }, [coursesData]);
@@ -67,9 +74,7 @@ export const CourseReorder: React.FC = () => {
               </div>
             </div>
             <div className="flex items-center space-x-2">
-              <Badge color={statusInfo.color}>
-                {statusInfo.label}
-              </Badge>
+              <Badge color={statusInfo.color}>{statusInfo.label}</Badge>
               <div className="flex items-center space-x-1 text-gray-500">
                 <span>{formatInfo.icon}</span>
                 <span className="text-xs">{formatInfo.label}</span>
@@ -77,7 +82,9 @@ export const CourseReorder: React.FC = () => {
               <Badge color={difficultyInfo.color} size="sm">
                 {difficultyInfo.label}
               </Badge>
-              <span className="text-sm text-gray-500">{course.duration_hours}sa</span>
+              <span className="text-sm text-gray-500">
+                {course.duration_hours}sa
+              </span>
             </div>
           </div>
         ),
@@ -98,7 +105,9 @@ export const CourseReorder: React.FC = () => {
   // Reset to original order
   const handleReset = () => {
     if (coursesData?.courses) {
-      const sortedCourses = [...coursesData.courses].sort((a, b) => a.order_index - b.order_index);
+      const sortedCourses = [...coursesData.courses].sort(
+        (a, b) => a.order_index - b.order_index
+      );
       setCourses(sortedCourses);
       setHasChanges(false);
     }
@@ -169,15 +178,14 @@ export const CourseReorder: React.FC = () => {
           </Button>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Kurs Sıralama</h1>
-            <p className="text-gray-600">{program.title} - Kursları sürükleyerek sıralayın</p>
+            <p className="text-gray-600">
+              {program.title} - Kursları sürükleyerek sıralayın
+            </p>
           </div>
         </div>
         <div className="flex items-center space-x-2">
           {hasChanges && (
-            <Button
-              variant="outline"
-              onClick={handleReset}
-            >
+            <Button variant="outline" onClick={handleReset}>
               <RotateCcw className="h-4 w-4 mr-2" />
               Sıfırla
             </Button>
@@ -196,7 +204,8 @@ export const CourseReorder: React.FC = () => {
       <Card className="p-4 bg-blue-50 border-blue-200">
         <div className="flex items-center space-x-2 text-blue-700">
           <span className="text-sm">
-            💡 Kursları sürükleyerek istediğiniz sıraya getirin. Değişikliklerinizi kaydetmeyi unutmayın.
+            💡 Kursları sürükleyerek istediğiniz sıraya getirin.
+            Değişikliklerinizi kaydetmeyi unutmayın.
           </span>
         </div>
       </Card>
@@ -206,7 +215,7 @@ export const CourseReorder: React.FC = () => {
         <h3 className="text-lg font-semibold mb-4">
           Kurslar ({courses.length})
         </h3>
-        
+
         {courses.length === 0 ? (
           <div className="text-center py-12 text-gray-500">
             Bu programa henüz kurs eklenmemiş.
@@ -225,15 +234,15 @@ export const CourseReorder: React.FC = () => {
         <Card className="p-4 bg-yellow-50 border-yellow-200">
           <div className="flex items-center justify-between">
             <div className="text-yellow-700">
-              <span className="font-medium">Kaydedilmemiş değişiklikler var!</span>
-              <span className="ml-2 text-sm">Değişikliklerinizi kaydetmeyi unutmayın.</span>
+              <span className="font-medium">
+                Kaydedilmemiş değişiklikler var!
+              </span>
+              <span className="ml-2 text-sm">
+                Değişikliklerinizi kaydetmeyi unutmayın.
+              </span>
             </div>
             <div className="flex space-x-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleReset}
-              >
+              <Button variant="outline" size="sm" onClick={handleReset}>
                 Sıfırla
               </Button>
               <Button

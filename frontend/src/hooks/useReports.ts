@@ -1,6 +1,7 @@
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { apiClient } from '@/lib/api-client';
+
 import { API_BASE_URL } from '@/config/api';
+import { apiClient } from '@/lib/api-client';
 
 export interface DevelopmentReport {
   student_name: string;
@@ -65,56 +66,81 @@ export interface InsightsSummary {
 // API client functions
 const reportsApi = {
   // Get development report for a user
-  getDevelopmentReport: async (userId: number, days: number = 30): Promise<DevelopmentReport> => {
-    const response = await apiClient.get(`${API_BASE_URL}/reports/development/${userId}`, {
-      params: { days }
-    });
+  getDevelopmentReport: async (
+    userId: number,
+    days: number = 30
+  ): Promise<DevelopmentReport> => {
+    const response = await apiClient.get(
+      `${API_BASE_URL}/reports/development/${userId}`,
+      {
+        params: { days },
+      }
+    );
     return response.data;
   },
 
   // Get my development report
-  getMyDevelopmentReport: async (days: number = 30): Promise<DevelopmentReport> => {
-    const response = await apiClient.get(`${API_BASE_URL}/reports/my-development`, {
-      params: { days }
-    });
+  getMyDevelopmentReport: async (
+    days: number = 30
+  ): Promise<DevelopmentReport> => {
+    const response = await apiClient.get(
+      `${API_BASE_URL}/reports/my-development`,
+      {
+        params: { days },
+      }
+    );
     return response.data;
   },
 
   // Get batch reports
   getBatchReports: async (userIds: number[], days: number = 30) => {
-    const response = await apiClient.post(`${API_BASE_URL}/reports/development/batch`, {
-      user_ids: userIds,
-      days
-    });
+    const response = await apiClient.post(
+      `${API_BASE_URL}/reports/development/batch`,
+      {
+        user_ids: userIds,
+        days,
+      }
+    );
     return response.data;
   },
 
   // Get insights summary
   getInsightsSummary: async (): Promise<InsightsSummary> => {
-    const response = await apiClient.get(`${API_BASE_URL}/reports/insights/summary`);
+    const response = await apiClient.get(
+      `${API_BASE_URL}/reports/insights/summary`
+    );
     return response.data;
   },
 
   // Download report
-  downloadReport: async (userId: number, days: number = 30, format: 'json' = 'json') => {
+  downloadReport: async (
+    userId: number,
+    days: number = 30,
+    format: 'json' = 'json'
+  ) => {
     const response = await apiClient.get(
       `${API_BASE_URL}/reports/development/${userId}/download`,
       {
         params: { days, format },
-        responseType: 'blob'
+        responseType: 'blob',
       }
     );
-    
+
     // Create download link
     const url = window.URL.createObjectURL(new Blob([response.data]));
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', `development_report_${userId}_${new Date().toISOString().split('T')[0]}.${format}`);
+    link.setAttribute(
+      'download',
+      `development_report_${userId}_${
+        new Date().toISOString().split('T')[0]
+      }.${format}`
+    );
     document.body.appendChild(link);
     link.click();
     link.parentNode?.removeChild(link);
     window.URL.revokeObjectURL(url);
-  }
+  },
 };
 
 // React Query hooks
@@ -125,7 +151,7 @@ export const useDevelopmentReport = (userId: number, days: number = 30) => {
     queryKey: ['development-report', userId, days],
     queryFn: () => reportsApi.getDevelopmentReport(userId, days),
     enabled: !!userId,
-    staleTime: 1000 * 60 * 5 // 5 minutes
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 };
 
@@ -134,7 +160,7 @@ export const useMyDevelopmentReport = (days: number = 30) => {
   return useQuery({
     queryKey: ['my-development-report', days],
     queryFn: () => reportsApi.getMyDevelopmentReport(days),
-    staleTime: 1000 * 60 * 5 // 5 minutes
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 };
 
@@ -143,7 +169,7 @@ export const useInsightsSummary = () => {
   return useQuery({
     queryKey: ['insights-summary'],
     queryFn: reportsApi.getInsightsSummary,
-    staleTime: 1000 * 60 * 2 // 2 minutes
+    staleTime: 1000 * 60 * 2, // 2 minutes
   });
 };
 
@@ -151,14 +177,21 @@ export const useInsightsSummary = () => {
 export const useGenerateBatchReports = () => {
   return useMutation({
     mutationFn: ({ userIds, days }: { userIds: number[]; days?: number }) =>
-      reportsApi.getBatchReports(userIds, days || 30)
+      reportsApi.getBatchReports(userIds, days || 30),
   });
 };
 
 // Download report
 export const useDownloadReport = () => {
   return useMutation({
-    mutationFn: ({ userId, days, format }: { userId: number; days?: number; format?: 'json' }) =>
-      reportsApi.downloadReport(userId, days || 30, format || 'json')
+    mutationFn: ({
+      userId,
+      days,
+      format,
+    }: {
+      userId: number;
+      days?: number;
+      format?: 'json';
+    }) => reportsApi.downloadReport(userId, days || 30, format || 'json'),
   });
 };

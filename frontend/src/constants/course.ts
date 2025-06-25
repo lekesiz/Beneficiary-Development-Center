@@ -19,9 +19,24 @@ export const COURSE_FORMAT_OPTIONS = [
 ];
 
 export const DIFFICULTY_LEVEL_OPTIONS = [
-  { value: DifficultyLevel.BEGINNER, label: 'Başlangıç', color: 'green', order: 1 },
-  { value: DifficultyLevel.INTERMEDIATE, label: 'Orta', color: 'yellow', order: 2 },
-  { value: DifficultyLevel.ADVANCED, label: 'İleri', color: 'orange', order: 3 },
+  {
+    value: DifficultyLevel.BEGINNER,
+    label: 'Başlangıç',
+    color: 'green',
+    order: 1,
+  },
+  {
+    value: DifficultyLevel.INTERMEDIATE,
+    label: 'Orta',
+    color: 'yellow',
+    order: 2,
+  },
+  {
+    value: DifficultyLevel.ADVANCED,
+    label: 'İleri',
+    color: 'orange',
+    order: 3,
+  },
   { value: DifficultyLevel.EXPERT, label: 'Uzman', color: 'red', order: 4 },
 ];
 

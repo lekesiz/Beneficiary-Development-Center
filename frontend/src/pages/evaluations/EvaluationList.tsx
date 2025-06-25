@@ -1,13 +1,15 @@
-import React, { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ColumnDef, PaginationState, SortingState } from '@tanstack/react-table';
-import { 
-  Eye, 
-  Edit, 
-  Trash2, 
-  Plus, 
-  Play, 
-  Archive, 
+import {
+  ColumnDef,
+  PaginationState,
+  SortingState,
+} from '@tanstack/react-table';
+import {
+  Eye,
+  Edit,
+  Trash2,
+  Plus,
+  Play,
+  Archive,
   MoreHorizontal,
   Clock,
   Users,
@@ -16,19 +18,23 @@ import {
   Brain,
   BookOpen,
   Target,
-  Trophy
+  Trophy,
 } from 'lucide-react';
-import { DataTable } from '@/components/ui/DataTable';
+import * as React from 'react';
+import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import { Badge } from '@/components/ui/Badge';
 import { Card } from '@/components/ui/Card';
+import { DataTable } from '@/components/ui/DataTable';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { Modal } from '@/components/ui/Modal';
-import { 
-  useEvaluations, 
-  useDeleteEvaluation, 
-  useActivateEvaluation, 
+import {
+  useEvaluations,
+  useDeleteEvaluation,
+  useActivateEvaluation,
   useArchiveEvaluation,
-  useEvaluationStatistics 
+  useEvaluationStatistics,
 } from '@/hooks/useEvaluations';
 import type { Evaluation, EvaluationFilters } from '@/types/evaluation';
 
@@ -38,14 +44,14 @@ const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
     draft: 'secondary',
     active: 'success',
     archived: 'warning',
-    completed: 'default'
+    completed: 'default',
   } as const;
 
   const labels = {
     draft: 'Taslak',
     active: 'Aktif',
     archived: 'Arşivlenmiş',
-    completed: 'Tamamlanmış'
+    completed: 'Tamamlanmış',
   };
 
   return (
@@ -56,8 +62,8 @@ const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
 };
 
 // Actions dropdown component
-const ActionsDropdown: React.FC<{ 
-  evaluation: Evaluation; 
+const ActionsDropdown: React.FC<{
+  evaluation: Evaluation;
   onEdit: (id: number) => void;
   onDelete: (id: number) => void;
   onActivate: (id: number) => void;
@@ -74,18 +80,24 @@ const ActionsDropdown: React.FC<{
       >
         <MoreHorizontal className="h-4 w-4" />
       </button>
-      
+
       {isOpen && (
         <div className="absolute right-0 mt-2 w-48 bg-white border rounded-md shadow-lg z-10">
           <button
-            onClick={() => { onView(evaluation.id); setIsOpen(false); }}
+            onClick={() => {
+              onView(evaluation.id);
+              setIsOpen(false);
+            }}
             className="flex items-center w-full px-4 py-2 text-sm hover:bg-gray-100"
           >
             <Eye className="mr-2 h-4 w-4" />
             Görüntüle
           </button>
           <button
-            onClick={() => { onEdit(evaluation.id); setIsOpen(false); }}
+            onClick={() => {
+              onEdit(evaluation.id);
+              setIsOpen(false);
+            }}
             className="flex items-center w-full px-4 py-2 text-sm hover:bg-gray-100"
           >
             <Edit className="mr-2 h-4 w-4" />
@@ -93,7 +105,10 @@ const ActionsDropdown: React.FC<{
           </button>
           {evaluation.status === 'draft' && (
             <button
-              onClick={() => { onActivate(evaluation.id); setIsOpen(false); }}
+              onClick={() => {
+                onActivate(evaluation.id);
+                setIsOpen(false);
+              }}
               className="flex items-center w-full px-4 py-2 text-sm hover:bg-gray-100"
             >
               <Play className="mr-2 h-4 w-4" />
@@ -102,7 +117,10 @@ const ActionsDropdown: React.FC<{
           )}
           {evaluation.status === 'active' && (
             <button
-              onClick={() => { onArchive(evaluation.id); setIsOpen(false); }}
+              onClick={() => {
+                onArchive(evaluation.id);
+                setIsOpen(false);
+              }}
               className="flex items-center w-full px-4 py-2 text-sm hover:bg-gray-100"
             >
               <Archive className="mr-2 h-4 w-4" />
@@ -111,7 +129,10 @@ const ActionsDropdown: React.FC<{
           )}
           <hr className="my-1" />
           <button
-            onClick={() => { onDelete(evaluation.id); setIsOpen(false); }}
+            onClick={() => {
+              onDelete(evaluation.id);
+              setIsOpen(false);
+            }}
             className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
           >
             <Trash2 className="mr-2 h-4 w-4" />
@@ -139,7 +160,7 @@ const EvaluationFilters: React.FC<{
         <Filter className="mr-2 h-4 w-4" />
         Filtrele
       </button>
-      
+
       {isOpen && (
         <div className="absolute right-0 mt-2 w-64 bg-white border rounded-md shadow-lg z-10 p-4">
           <div className="space-y-4">
@@ -147,7 +168,12 @@ const EvaluationFilters: React.FC<{
               <label className="block text-sm font-medium mb-1">Durum</label>
               <select
                 value={filters.status || ''}
-                onChange={(e) => onFiltersChange({ ...filters, status: e.target.value || undefined })}
+                onChange={(e) =>
+                  onFiltersChange({
+                    ...filters,
+                    status: e.target.value || undefined,
+                  })
+                }
                 className="w-full p-2 border rounded-md"
               >
                 <option value="">Tümü</option>
@@ -157,12 +183,14 @@ const EvaluationFilters: React.FC<{
                 <option value="completed">Tamamlanmış</option>
               </select>
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium mb-1">Sıralama</label>
               <select
                 value={filters.sort_by || 'created_at'}
-                onChange={(e) => onFiltersChange({ ...filters, sort_by: e.target.value })}
+                onChange={(e) =>
+                  onFiltersChange({ ...filters, sort_by: e.target.value })
+                }
                 className="w-full p-2 border rounded-md"
               >
                 <option value="created_at">Oluşturulma Tarihi</option>
@@ -171,19 +199,23 @@ const EvaluationFilters: React.FC<{
                 <option value="passing_score">Geçme Puanı</option>
               </select>
             </div>
-            
+
             <div className="flex items-center">
               <input
                 type="checkbox"
                 id="sort_desc"
                 checked={filters.sort_desc || false}
-                onChange={(e) => onFiltersChange({ ...filters, sort_desc: e.target.checked })}
+                onChange={(e) =>
+                  onFiltersChange({ ...filters, sort_desc: e.target.checked })
+                }
                 className="mr-2"
               />
-              <label htmlFor="sort_desc" className="text-sm">Azalan sıralama</label>
+              <label htmlFor="sort_desc" className="text-sm">
+                Azalan sıralama
+              </label>
             </div>
           </div>
-          
+
           <div className="mt-4 pt-4 border-t">
             <button
               onClick={() => setIsOpen(false)}
@@ -204,17 +236,24 @@ export default function EvaluationList() {
     page: 1,
     per_page: 20,
     sort_by: 'created_at',
-    sort_desc: true
+    sort_desc: true,
   });
   const [searchTerm, setSearchTerm] = useState('');
-  const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; evaluationId?: number }>({
-    isOpen: false
+  const [deleteModal, setDeleteModal] = useState<{
+    isOpen: boolean;
+    evaluationId?: number;
+  }>({
+    isOpen: false,
   });
 
   // React Query hooks
-  const { data: evaluationsData, isLoading, error } = useEvaluations({
+  const {
+    data: evaluationsData,
+    isLoading,
+    error,
+  } = useEvaluations({
     ...filters,
-    search: searchTerm || undefined
+    search: searchTerm || undefined,
   });
   const { data: statistics } = useEvaluationStatistics();
   const deleteMutation = useDeleteEvaluation();
@@ -224,123 +263,133 @@ export default function EvaluationList() {
   // Pagination state
   const pagination: PaginationState = {
     pageIndex: (filters.page || 1) - 1,
-    pageSize: filters.per_page || 20
+    pageSize: filters.per_page || 20,
   };
 
   // Sorting state
-  const sorting: SortingState = filters.sort_by ? [{
-    id: filters.sort_by,
-    desc: filters.sort_desc || false
-  }] : [];
+  const sorting: SortingState = filters.sort_by
+    ? [
+        {
+          id: filters.sort_by,
+          desc: filters.sort_desc || false,
+        },
+      ]
+    : [];
 
   // Table columns
-  const columns: ColumnDef<Evaluation>[] = useMemo(() => [
-    {
-      accessorKey: 'title',
-      header: 'Başlık',
-      cell: ({ row }) => (
-        <div className="flex flex-col">
-          <div className="flex items-center space-x-2">
-            <span className="font-medium">{row.original.title}</span>
-            {row.original.is_adaptive && (
-              <Badge 
-                variant="outline" 
-                className="bg-purple-50 text-purple-700 border-purple-200"
-              >
-                <Brain className="mr-1 h-3 w-3" />
-                AI Adaptif
-              </Badge>
+  const columns: ColumnDef<Evaluation>[] = useMemo(
+    () => [
+      {
+        accessorKey: 'title',
+        header: 'Başlık',
+        cell: ({ row }) => (
+          <div className="flex flex-col">
+            <div className="flex items-center space-x-2">
+              <span className="font-medium">{row.original.title}</span>
+              {row.original.is_adaptive && (
+                <Badge
+                  variant="outline"
+                  className="bg-purple-50 text-purple-700 border-purple-200"
+                >
+                  <Brain className="mr-1 h-3 w-3" />
+                  AI Adaptif
+                </Badge>
+              )}
+            </div>
+            {row.original.description && (
+              <span className="text-sm text-gray-500 truncate max-w-xs">
+                {row.original.description}
+              </span>
             )}
           </div>
-          {row.original.description && (
-            <span className="text-sm text-gray-500 truncate max-w-xs">
-              {row.original.description}
-            </span>
-          )}
-        </div>
-      )
-    },
-    {
-      accessorKey: 'status',
-      header: 'Durum',
-      cell: ({ row }) => <StatusBadge status={row.original.status} />
-    },
-    {
-      accessorKey: 'total_questions',
-      header: 'Soru Sayısı',
-      cell: ({ row }) => (
-        <div className="flex items-center">
-          <FileText className="mr-1 h-4 w-4 text-gray-400" />
-          {row.original.total_questions}
-        </div>
-      )
-    },
-    {
-      accessorKey: 'total_points',
-      header: 'Toplam Puan',
-      cell: ({ row }) => row.original.total_points.toFixed(1)
-    },
-    {
-      accessorKey: 'passing_score',
-      header: 'Geçme Puanı',
-      cell: ({ row }) => `${row.original.passing_score}%`
-    },
-    {
-      accessorKey: 'duration_display',
-      header: 'Süre',
-      cell: ({ row }) => (
-        <div className="flex items-center">
-          <Clock className="mr-1 h-4 w-4 text-gray-400" />
-          {row.original.duration_display}
-        </div>
-      )
-    },
-    {
-      accessorKey: 'is_available',
-      header: 'Kullanılabilirlik',
-      cell: ({ row }) => (
-        <Badge variant={row.original.is_available ? 'success' : 'secondary'}>
-          {row.original.is_available ? 'Mevcut' : 'Mevcut Değil'}
-        </Badge>
-      )
-    },
-    {
-      accessorKey: 'created_at',
-      header: 'Oluşturulma',
-      cell: ({ row }) => new Date(row.original.created_at).toLocaleDateString('tr-TR')
-    },
-    {
-      id: 'actions',
-      header: 'İşlemler',
-      cell: ({ row }) => (
-        <ActionsDropdown
-          evaluation={row.original}
-          onView={(id) => navigate(`/evaluations/${id}`)}
-          onEdit={(id) => navigate(`/evaluations/${id}/edit`)}
-          onDelete={(id) => setDeleteModal({ isOpen: true, evaluationId: id })}
-          onActivate={(id) => activateMutation.mutate(id)}
-          onArchive={(id) => archiveMutation.mutate(id)}
-        />
-      )
-    }
-  ], [navigate, activateMutation, archiveMutation]);
+        ),
+      },
+      {
+        accessorKey: 'status',
+        header: 'Durum',
+        cell: ({ row }) => <StatusBadge status={row.original.status} />,
+      },
+      {
+        accessorKey: 'total_questions',
+        header: 'Soru Sayısı',
+        cell: ({ row }) => (
+          <div className="flex items-center">
+            <FileText className="mr-1 h-4 w-4 text-gray-400" />
+            {row.original.total_questions}
+          </div>
+        ),
+      },
+      {
+        accessorKey: 'total_points',
+        header: 'Toplam Puan',
+        cell: ({ row }) => row.original.total_points.toFixed(1),
+      },
+      {
+        accessorKey: 'passing_score',
+        header: 'Geçme Puanı',
+        cell: ({ row }) => `${row.original.passing_score}%`,
+      },
+      {
+        accessorKey: 'duration_display',
+        header: 'Süre',
+        cell: ({ row }) => (
+          <div className="flex items-center">
+            <Clock className="mr-1 h-4 w-4 text-gray-400" />
+            {row.original.duration_display}
+          </div>
+        ),
+      },
+      {
+        accessorKey: 'is_available',
+        header: 'Kullanılabilirlik',
+        cell: ({ row }) => (
+          <Badge variant={row.original.is_available ? 'success' : 'secondary'}>
+            {row.original.is_available ? 'Mevcut' : 'Mevcut Değil'}
+          </Badge>
+        ),
+      },
+      {
+        accessorKey: 'created_at',
+        header: 'Oluşturulma',
+        cell: ({ row }) =>
+          new Date(row.original.created_at).toLocaleDateString('tr-TR'),
+      },
+      {
+        id: 'actions',
+        header: 'İşlemler',
+        cell: ({ row }) => (
+          <ActionsDropdown
+            evaluation={row.original}
+            onView={(id) => navigate(`/evaluations/${id}`)}
+            onEdit={(id) => navigate(`/evaluations/${id}/edit`)}
+            onDelete={(id) =>
+              setDeleteModal({ isOpen: true, evaluationId: id })
+            }
+            onActivate={(id) => activateMutation.mutate(id)}
+            onArchive={(id) => archiveMutation.mutate(id)}
+          />
+        ),
+      },
+    ],
+    [navigate, activateMutation, archiveMutation]
+  );
 
   // Handle pagination change
   const handlePaginationChange = (newPagination: PaginationState) => {
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
       page: newPagination.pageIndex + 1,
-      per_page: newPagination.pageSize
+      per_page: newPagination.pageSize,
     }));
   };
 
   // Handle sorting change
   const handleSortingChange = (newSorting: SortingState) => {
     const sort = newSorting[0];
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
       sort_by: sort?.id,
-      sort_desc: sort?.desc
+      sort_desc: sort?.desc,
     }));
   };
 
@@ -356,7 +405,9 @@ export default function EvaluationList() {
     return (
       <div className="p-6">
         <div className="text-center py-12">
-          <p className="text-red-600">Değerlendirmeler yüklenirken hata oluştu.</p>
+          <p className="text-red-600">
+            Değerlendirmeler yüklenirken hata oluştu.
+          </p>
         </div>
       </div>
     );
@@ -386,8 +437,12 @@ export default function EvaluationList() {
             <div className="flex items-center">
               <FileText className="h-8 w-8 text-blue-600" />
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Toplam Değerlendirme</p>
-                <p className="text-2xl font-bold">{statistics.total_evaluations}</p>
+                <p className="text-sm font-medium text-gray-600">
+                  Toplam Değerlendirme
+                </p>
+                <p className="text-2xl font-bold">
+                  {statistics.total_evaluations}
+                </p>
               </div>
             </div>
           </Card>
@@ -395,8 +450,12 @@ export default function EvaluationList() {
             <div className="flex items-center">
               <Play className="h-8 w-8 text-green-600" />
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Aktif Değerlendirmeler</p>
-                <p className="text-2xl font-bold">{statistics.active_evaluations}</p>
+                <p className="text-sm font-medium text-gray-600">
+                  Aktif Değerlendirmeler
+                </p>
+                <p className="text-2xl font-bold">
+                  {statistics.active_evaluations}
+                </p>
               </div>
             </div>
           </Card>
@@ -404,8 +463,12 @@ export default function EvaluationList() {
             <div className="flex items-center">
               <Users className="h-8 w-8 text-purple-600" />
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Toplam Deneme</p>
-                <p className="text-2xl font-bold">{statistics.total_attempts}</p>
+                <p className="text-sm font-medium text-gray-600">
+                  Toplam Deneme
+                </p>
+                <p className="text-2xl font-bold">
+                  {statistics.total_attempts}
+                </p>
               </div>
             </div>
           </Card>
@@ -415,8 +478,12 @@ export default function EvaluationList() {
                 <span className="text-yellow-600 font-bold">%</span>
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Ortalama Başarı</p>
-                <p className="text-2xl font-bold">{statistics.average_score.toFixed(1)}%</p>
+                <p className="text-sm font-medium text-gray-600">
+                  Ortalama Başarı
+                </p>
+                <p className="text-2xl font-bold">
+                  {statistics.average_score.toFixed(1)}%
+                </p>
               </div>
             </div>
           </Card>
@@ -434,10 +501,7 @@ export default function EvaluationList() {
             className="w-full px-4 py-2 border rounded-md"
           />
         </div>
-        <EvaluationFilters
-          filters={filters}
-          onFiltersChange={setFilters}
-        />
+        <EvaluationFilters filters={filters} onFiltersChange={setFilters} />
       </div>
 
       {/* Data Table */}
@@ -461,7 +525,10 @@ export default function EvaluationList() {
         title="Değerlendirmeyi Sil"
       >
         <div className="space-y-4">
-          <p>Bu değerlendirmeyi silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.</p>
+          <p>
+            Bu değerlendirmeyi silmek istediğinizden emin misiniz? Bu işlem geri
+            alınamaz.
+          </p>
           <div className="flex justify-end space-x-2">
             <button
               onClick={() => setDeleteModal({ isOpen: false })}

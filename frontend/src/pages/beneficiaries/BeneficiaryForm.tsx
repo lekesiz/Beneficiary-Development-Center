@@ -1,36 +1,46 @@
-import React, { useEffect } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
-import { useForm, Controller } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { ArrowLeft, Save, Loader2 } from 'lucide-react'
-import { 
-  beneficiaryFormSchema, 
+import { zodResolver } from '@hookform/resolvers/zod';
+import { ArrowLeft, Save, Loader2 } from 'lucide-react';
+import * as React from 'react';
+import { useEffect } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { useNavigate, useParams } from 'react-router-dom';
+
+import {
+  FormField,
+  Input,
+  Select,
+  Textarea,
+  Button,
+} from '@/components/ui/Form';
+import { TagInput } from '@/components/ui/TagInput';
+import { useAuth } from '@/contexts/AuthContext';
+import {
+  useBeneficiary,
+  useCreateBeneficiary,
+  useUpdateBeneficiary,
+} from '@/hooks/useBeneficiaries';
+import {
+  beneficiaryFormSchema,
   BeneficiaryFormData,
-  transformFormDataForAPI 
-} from '@/schemas/beneficiary'
-import { 
-  useBeneficiary, 
-  useCreateBeneficiary, 
-  useUpdateBeneficiary 
-} from '@/hooks/useBeneficiaries'
-import { BeneficiaryStatus, EmploymentStatus, EducationLevel } from '@/types/beneficiary'
-import { FormField, Input, Select, Textarea, Button } from '@/components/ui/Form'
-import { TagInput } from '@/components/ui/TagInput'
-import { useAuth } from '@/contexts/AuthContext'
+  transformFormDataForAPI,
+} from '@/schemas/beneficiary';
+import {
+  BeneficiaryStatus,
+  EmploymentStatus,
+  EducationLevel,
+} from '@/types/beneficiary';
 
 export default function BeneficiaryForm() {
-  const navigate = useNavigate()
-  const { id } = useParams()
-  const { user } = useAuth()
-  const isEditMode = !!id
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const { user } = useAuth();
+  const isEditMode = !!id;
 
   // Queries and mutations
-  const { data: beneficiaryData, isLoading: isLoadingBeneficiary } = useBeneficiary(
-    Number(id),
-    isEditMode
-  )
-  const createMutation = useCreateBeneficiary()
-  const updateMutation = useUpdateBeneficiary()
+  const { data: beneficiaryData, isLoading: isLoadingBeneficiary } =
+    useBeneficiary(Number(id), isEditMode);
+  const createMutation = useCreateBeneficiary();
+  const updateMutation = useUpdateBeneficiary();
 
   // Form setup
   const {
@@ -52,12 +62,12 @@ export default function BeneficiaryForm() {
       goals: [],
       tags: [],
     },
-  })
+  });
 
   // Load existing data in edit mode
   useEffect(() => {
     if (isEditMode && beneficiaryData?.data.beneficiary) {
-      const beneficiary = beneficiaryData.data.beneficiary
+      const beneficiary = beneficiaryData.data.beneficiary;
       reset({
         first_name: beneficiary.first_name,
         last_name: beneficiary.last_name,
@@ -84,37 +94,37 @@ export default function BeneficiaryForm() {
         status: beneficiary.status,
         external_id: beneficiary.external_id || '',
         assigned_trainer_id: beneficiary.assigned_trainer_id,
-      })
+      });
     }
-  }, [isEditMode, beneficiaryData, reset])
+  }, [isEditMode, beneficiaryData, reset]);
 
   const onSubmit = async (data: BeneficiaryFormData) => {
-    const transformedData = transformFormDataForAPI(data)
+    const transformedData = transformFormDataForAPI(data);
 
     try {
       if (isEditMode) {
         await updateMutation.mutateAsync({
           id: Number(id),
           data: transformedData,
-        })
+        });
       } else {
-        await createMutation.mutateAsync(transformedData)
+        await createMutation.mutateAsync(transformedData);
       }
-      navigate('/beneficiaries')
+      navigate('/beneficiaries');
     } catch (error) {
       // Error is handled by the mutation
     }
-  }
+  };
 
   if (isEditMode && isLoadingBeneficiary) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <Loader2 className="h-8 w-8 animate-spin" />
       </div>
-    )
+    );
   }
 
-  const canEditStatus = user?.role === 'admin' || user?.role === 'super_admin'
+  const canEditStatus = user?.role === 'admin' || user?.role === 'super_admin';
 
   return (
     <div className="container mx-auto py-6">
@@ -128,13 +138,13 @@ export default function BeneficiaryForm() {
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Beneficiaries
           </button>
-          
+
           <h1 className="text-2xl font-bold">
             {isEditMode ? 'Edit Beneficiary' : 'Add New Beneficiary'}
           </h1>
           <p className="text-muted-foreground">
-            {isEditMode 
-              ? 'Update beneficiary information' 
+            {isEditMode
+              ? 'Update beneficiary information'
               : 'Create a new beneficiary profile'}
           </p>
         </div>
@@ -144,7 +154,7 @@ export default function BeneficiaryForm() {
           {/* Basic Information */}
           <div className="bg-white p-6 rounded-lg shadow space-y-4">
             <h2 className="text-lg font-semibold mb-4">Basic Information</h2>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 label="First Name"
@@ -170,10 +180,7 @@ export default function BeneficiaryForm() {
                 />
               </FormField>
 
-              <FormField
-                label="Email"
-                error={errors.email?.message}
-              >
+              <FormField label="Email" error={errors.email?.message}>
                 <Input
                   {...register('email')}
                   type="email"
@@ -182,10 +189,7 @@ export default function BeneficiaryForm() {
                 />
               </FormField>
 
-              <FormField
-                label="Phone"
-                error={errors.phone?.message}
-              >
+              <FormField label="Phone" error={errors.phone?.message}>
                 <Input
                   {...register('phone')}
                   error={!!errors.phone}
@@ -220,7 +224,7 @@ export default function BeneficiaryForm() {
           {/* Personal Information */}
           <div className="bg-white p-6 rounded-lg shadow space-y-4">
             <h2 className="text-lg font-semibold mb-4">Personal Information</h2>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 label="Date of Birth"
@@ -233,14 +237,8 @@ export default function BeneficiaryForm() {
                 />
               </FormField>
 
-              <FormField
-                label="Gender"
-                error={errors.gender?.message}
-              >
-                <Select
-                  {...register('gender')}
-                  error={!!errors.gender}
-                >
+              <FormField label="Gender" error={errors.gender?.message}>
+                <Select {...register('gender')} error={!!errors.gender}>
                   <option value="">Select gender</option>
                   <option value="male">Male</option>
                   <option value="female">Female</option>
@@ -259,10 +257,7 @@ export default function BeneficiaryForm() {
                 />
               </FormField>
 
-              <FormField
-                label="Birthplace"
-                error={errors.birthplace?.message}
-              >
+              <FormField label="Birthplace" error={errors.birthplace?.message}>
                 <Input
                   {...register('birthplace')}
                   error={!!errors.birthplace}
@@ -275,7 +270,7 @@ export default function BeneficiaryForm() {
           {/* Address */}
           <div className="bg-white p-6 rounded-lg shadow space-y-4">
             <h2 className="text-lg font-semibold mb-4">Address</h2>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 label="Street"
@@ -289,10 +284,7 @@ export default function BeneficiaryForm() {
                 />
               </FormField>
 
-              <FormField
-                label="City"
-                error={errors.address?.city?.message}
-              >
+              <FormField label="City" error={errors.address?.city?.message}>
                 <Input
                   {...register('address.city')}
                   error={!!errors.address?.city}
@@ -337,8 +329,10 @@ export default function BeneficiaryForm() {
 
           {/* Professional Information */}
           <div className="bg-white p-6 rounded-lg shadow space-y-4">
-            <h2 className="text-lg font-semibold mb-4">Professional Information</h2>
-            
+            <h2 className="text-lg font-semibold mb-4">
+              Professional Information
+            </h2>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 label="Employment Status"
@@ -349,19 +343,16 @@ export default function BeneficiaryForm() {
                   error={!!errors.employment_status}
                 >
                   <option value="">Select status</option>
-                  {Object.values(EmploymentStatus).map(status => (
+                  {Object.values(EmploymentStatus).map((status) => (
                     <option key={status} value={status}>
-                      {status.replace(/_/g, ' ').charAt(0).toUpperCase() + 
-                       status.replace(/_/g, ' ').slice(1)}
+                      {status.replace(/_/g, ' ').charAt(0).toUpperCase() +
+                        status.replace(/_/g, ' ').slice(1)}
                     </option>
                   ))}
                 </Select>
               </FormField>
 
-              <FormField
-                label="Job Title"
-                error={errors.job_title?.message}
-              >
+              <FormField label="Job Title" error={errors.job_title?.message}>
                 <Input
                   {...register('job_title')}
                   error={!!errors.job_title}
@@ -369,10 +360,7 @@ export default function BeneficiaryForm() {
                 />
               </FormField>
 
-              <FormField
-                label="Company"
-                error={errors.company?.message}
-              >
+              <FormField label="Company" error={errors.company?.message}>
                 <Input
                   {...register('company')}
                   error={!!errors.company}
@@ -380,10 +368,7 @@ export default function BeneficiaryForm() {
                 />
               </FormField>
 
-              <FormField
-                label="Industry"
-                error={errors.industry?.message}
-              >
+              <FormField label="Industry" error={errors.industry?.message}>
                 <Input
                   {...register('industry')}
                   error={!!errors.industry}
@@ -410,7 +395,7 @@ export default function BeneficiaryForm() {
           {/* Education */}
           <div className="bg-white p-6 rounded-lg shadow space-y-4">
             <h2 className="text-lg font-semibold mb-4">Education</h2>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 label="Education Level"
@@ -421,10 +406,10 @@ export default function BeneficiaryForm() {
                   error={!!errors.education_level}
                 >
                   <option value="">Select level</option>
-                  {Object.values(EducationLevel).map(level => (
+                  {Object.values(EducationLevel).map((level) => (
                     <option key={level} value={level}>
-                      {level.replace(/_/g, ' ').charAt(0).toUpperCase() + 
-                       level.replace(/_/g, ' ').slice(1)}
+                      {level.replace(/_/g, ' ').charAt(0).toUpperCase() +
+                        level.replace(/_/g, ' ').slice(1)}
                     </option>
                   ))}
                 </Select>
@@ -464,11 +449,8 @@ export default function BeneficiaryForm() {
           {/* Skills & Interests */}
           <div className="bg-white p-6 rounded-lg shadow space-y-4">
             <h2 className="text-lg font-semibold mb-4">Skills & Interests</h2>
-            
-            <FormField
-              label="Skills"
-              error={errors.skills?.message}
-            >
+
+            <FormField label="Skills" error={errors.skills?.message}>
               <Controller
                 name="skills"
                 control={control}
@@ -483,10 +465,7 @@ export default function BeneficiaryForm() {
               />
             </FormField>
 
-            <FormField
-              label="Interests"
-              error={errors.interests?.message}
-            >
+            <FormField label="Interests" error={errors.interests?.message}>
               <Controller
                 name="interests"
                 control={control}
@@ -501,10 +480,7 @@ export default function BeneficiaryForm() {
               />
             </FormField>
 
-            <FormField
-              label="Goals"
-              error={errors.goals?.message}
-            >
+            <FormField label="Goals" error={errors.goals?.message}>
               <Controller
                 name="goals"
                 control={control}
@@ -523,18 +499,12 @@ export default function BeneficiaryForm() {
           {/* Management */}
           <div className="bg-white p-6 rounded-lg shadow space-y-4">
             <h2 className="text-lg font-semibold mb-4">Management</h2>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {canEditStatus && (
-                <FormField
-                  label="Status"
-                  error={errors.status?.message}
-                >
-                  <Select
-                    {...register('status')}
-                    error={!!errors.status}
-                  >
-                    {Object.values(BeneficiaryStatus).map(status => (
+                <FormField label="Status" error={errors.status?.message}>
+                  <Select {...register('status')} error={!!errors.status}>
+                    {Object.values(BeneficiaryStatus).map((status) => (
                       <option key={status} value={status}>
                         {status.charAt(0).toUpperCase() + status.slice(1)}
                       </option>
@@ -575,7 +545,11 @@ export default function BeneficiaryForm() {
             </Button>
             <Button
               type="submit"
-              loading={isSubmitting || createMutation.isPending || updateMutation.isPending}
+              loading={
+                isSubmitting ||
+                createMutation.isPending ||
+                updateMutation.isPending
+              }
             >
               <Save className="h-4 w-4 mr-2" />
               {isEditMode ? 'Update Beneficiary' : 'Create Beneficiary'}
@@ -584,5 +558,5 @@ export default function BeneficiaryForm() {
         </form>
       </div>
     </div>
-  )
+  );
 }

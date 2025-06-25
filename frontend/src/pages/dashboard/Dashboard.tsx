@@ -1,15 +1,16 @@
-import React from 'react'
-import { useBeneficiaryStatistics } from '@/hooks/useBeneficiaries'
-import { Users, BookOpen, ClipboardCheck, TrendingUp } from 'lucide-react'
+import { Users, BookOpen, ClipboardCheck, TrendingUp } from 'lucide-react';
+import * as React from 'react';
+
+import { useBeneficiaryStatistics } from '@/hooks/useBeneficiaries';
 
 export default function Dashboard() {
-  const { data: statsData, isLoading } = useBeneficiaryStatistics()
-  const stats = statsData?.data.statistics
+  const { data: statsData, isLoading } = useBeneficiaryStatistics();
+  const stats = statsData?.data.statistics;
 
   return (
     <div className="container mx-auto px-4 py-6">
       <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
-      
+
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <div className="bg-white p-6 rounded-lg shadow">
@@ -21,7 +22,7 @@ export default function Dashboard() {
             <Users className="h-8 w-8 text-primary" />
           </div>
         </div>
-        
+
         <div className="bg-white p-6 rounded-lg shadow">
           <div className="flex items-center justify-between">
             <div>
@@ -31,7 +32,7 @@ export default function Dashboard() {
             <BookOpen className="h-8 w-8 text-primary" />
           </div>
         </div>
-        
+
         <div className="bg-white p-6 rounded-lg shadow">
           <div className="flex items-center justify-between">
             <div>
@@ -41,7 +42,7 @@ export default function Dashboard() {
             <ClipboardCheck className="h-8 w-8 text-primary" />
           </div>
         </div>
-        
+
         <div className="bg-white p-6 rounded-lg shadow">
           <div className="flex items-center justify-between">
             <div>
@@ -52,7 +53,7 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
-      
+
       {/* Quick Actions */}
       <div className="bg-white p-6 rounded-lg shadow">
         <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
@@ -69,5 +70,5 @@ export default function Dashboard() {
         </div>
       </div>
     </div>
-  )
+  );
 }

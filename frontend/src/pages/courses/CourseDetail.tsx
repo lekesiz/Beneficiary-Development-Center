@@ -1,43 +1,49 @@
 /**
  * Course Detail Page
  */
-import React, { useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import { useCourse, useDeleteCourse, useUpdateCourseStatus } from '../../hooks/useCourses';
-import { useAuth } from '../../contexts/AuthContext';
-import { DataTable } from '../../components/ui/DataTable';
-import { Button } from '../../components/ui/Form';
-import { Badge } from '../../components/ui/Badge';
-import { Card } from '../../components/ui/Card';
-import { ConfirmDialog } from '../../components/ui/Modal';
-import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
-import { 
-  getCourseStatusInfo, 
-  getCourseFormatInfo, 
-  getDifficultyLevelInfo,
-  formatCourseDuration 
-} from '../../utils/course';
-import type { CourseSession } from '../../types/course';
 import type { ColumnDef } from '@tanstack/react-table';
-import { 
-  Edit, 
-  Trash2, 
-  ArrowLeft, 
-  Calendar, 
-  Users, 
-  MapPin, 
-  Globe, 
-  Clock, 
-  User, 
-  BookOpen, 
+import {
+  Edit,
+  Trash2,
+  ArrowLeft,
+  Calendar,
+  Users,
+  MapPin,
+  Globe,
+  Clock,
+  User,
+  BookOpen,
   Plus,
   Play,
   Target,
   Award,
   FileText,
   Video,
-  Link as LinkIcon
+  Link as LinkIcon,
 } from 'lucide-react';
+import * as React from 'react';
+import { useState } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+
+import { Badge } from '../../components/ui/Badge';
+import { Card } from '../../components/ui/Card';
+import { DataTable } from '../../components/ui/DataTable';
+import { Button } from '../../components/ui/Form';
+import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
+import { ConfirmDialog } from '../../components/ui/Modal';
+import { useAuth } from '../../contexts/AuthContext';
+import {
+  useCourse,
+  useDeleteCourse,
+  useUpdateCourseStatus,
+} from '../../hooks/useCourses';
+import type { CourseSession } from '../../types/course';
+import {
+  getCourseStatusInfo,
+  getCourseFormatInfo,
+  getDifficultyLevelInfo,
+  formatCourseDuration,
+} from '../../utils/course';
 
 export const CourseDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -54,7 +60,8 @@ export const CourseDetail: React.FC = () => {
   // Permission checks
   const canEdit = (course: any) => {
     if (user?.role === 'admin' || user?.role === 'manager') return true;
-    if (user?.role === 'instructor' && course?.instructor_id === user.id) return true;
+    if (user?.role === 'instructor' && course?.instructor_id === user.id)
+      return true;
     return false;
   };
   const canDelete = user?.role === 'admin';
@@ -87,7 +94,9 @@ export const CourseDetail: React.FC = () => {
         <div className="flex flex-col">
           <span className="font-medium">{row.original.title}</span>
           {row.original.description && (
-            <span className="text-sm text-gray-500">{row.original.description}</span>
+            <span className="text-sm text-gray-500">
+              {row.original.description}
+            </span>
           )}
         </div>
       ),
@@ -97,11 +106,13 @@ export const CourseDetail: React.FC = () => {
       header: 'Tarih',
       cell: ({ row }) => (
         <div className="flex flex-col">
-          <span>{new Date(row.original.session_date).toLocaleDateString('tr-TR')}</span>
+          <span>
+            {new Date(row.original.session_date).toLocaleDateString('tr-TR')}
+          </span>
           <span className="text-sm text-gray-500">
-            {new Date(row.original.session_date).toLocaleTimeString('tr-TR', { 
-              hour: '2-digit', 
-              minute: '2-digit' 
+            {new Date(row.original.session_date).toLocaleTimeString('tr-TR', {
+              hour: '2-digit',
+              minute: '2-digit',
             })}
           </span>
         </div>
@@ -189,7 +200,7 @@ export const CourseDetail: React.FC = () => {
               {course.program_title && (
                 <>
                   <span>•</span>
-                  <Link 
+                  <Link
                     to={`/programs/${course.program_id}`}
                     className="text-blue-600 hover:text-blue-800"
                   >
@@ -232,9 +243,7 @@ export const CourseDetail: React.FC = () => {
           <span>{formatInfo.icon}</span>
           <span>{formatInfo.label}</span>
         </div>
-        <Badge color={difficultyInfo.color}>
-          {difficultyInfo.label}
-        </Badge>
+        <Badge color={difficultyInfo.color}>{difficultyInfo.label}</Badge>
       </div>
 
       {/* Summary Cards */}
@@ -249,7 +258,8 @@ export const CourseDetail: React.FC = () => {
                 {course.participant_count || 0}
               </div>
               <div className="text-sm text-gray-600">
-                {course.max_participants ? `/ ${course.max_participants}` : ''} Katılımcı
+                {course.max_participants ? `/ ${course.max_participants}` : ''}{' '}
+                Katılımcı
               </div>
               <div className="text-xs text-gray-500">
                 {course.available_spots || 0} kişi boş
@@ -264,9 +274,7 @@ export const CourseDetail: React.FC = () => {
               <Clock className="h-5 w-5 text-green-600" />
             </div>
             <div>
-              <div className="text-2xl font-bold">
-                {course.duration_hours}
-              </div>
+              <div className="text-2xl font-bold">{course.duration_hours}</div>
               <div className="text-sm text-gray-600">Saat</div>
               {course.duration_weeks && (
                 <div className="text-xs text-gray-500">
@@ -317,7 +325,7 @@ export const CourseDetail: React.FC = () => {
         <div className="lg:col-span-2">
           <Card className="p-6">
             <h3 className="text-lg font-semibold mb-4">Kurs Bilgileri</h3>
-            
+
             {course.subtitle && (
               <div className="mb-4">
                 <h4 className="font-medium text-gray-900 mb-1">Alt Başlık</h4>
@@ -389,7 +397,9 @@ export const CourseDetail: React.FC = () => {
                 <BookOpen className="h-4 w-4 text-gray-400" />
                 <div>
                   <div className="text-sm font-medium">Sıra</div>
-                  <div className="text-sm text-gray-600">#{course.order_index}</div>
+                  <div className="text-sm text-gray-600">
+                    #{course.order_index}
+                  </div>
                 </div>
               </div>
 
@@ -412,7 +422,8 @@ export const CourseDetail: React.FC = () => {
                     <div className="text-sm font-medium">Değerlendirme</div>
                     <div className="text-sm text-gray-600">
                       {course.assessment_type || 'Var'}
-                      {course.passing_score && ` (Min: ${course.passing_score})`}
+                      {course.passing_score &&
+                        ` (Min: ${course.passing_score})`}
                     </div>
                   </div>
                 </div>
@@ -423,7 +434,7 @@ export const CourseDetail: React.FC = () => {
                   <FileText className="h-4 w-4 text-gray-400" />
                   <div>
                     <div className="text-sm font-medium">İçerik</div>
-                    <a 
+                    <a
                       href={course.content_url}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -441,7 +452,7 @@ export const CourseDetail: React.FC = () => {
                   <Video className="h-4 w-4 text-gray-400" />
                   <div>
                     <div className="text-sm font-medium">Video</div>
-                    <a 
+                    <a
                       href={course.video_url}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -470,7 +481,7 @@ export const CourseDetail: React.FC = () => {
                   <Plus className="h-4 w-4 mr-2" />
                   Oturum Ekle
                 </Button>
-                
+
                 {course.status === 'draft' && (
                   <Button
                     variant="outline"
@@ -482,7 +493,7 @@ export const CourseDetail: React.FC = () => {
                     Yayınla
                   </Button>
                 )}
-                
+
                 {course.status === 'published' && (
                   <Button
                     variant="outline"
@@ -516,7 +527,7 @@ export const CourseDetail: React.FC = () => {
             )}
           </div>
         </div>
-        
+
         <DataTable
           columns={sessionColumns}
           data={course.sessions || []}

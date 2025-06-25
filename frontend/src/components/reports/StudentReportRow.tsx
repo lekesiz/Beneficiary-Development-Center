@@ -1,5 +1,3 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   User,
   TrendingUp,
@@ -11,8 +9,12 @@ import {
   ChevronRight,
   MessageSquare,
   Download,
-  Eye
+  Eye,
 } from 'lucide-react';
+import * as React from 'react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Form';
 import { useAddCoachNote } from '@/hooks/useReportsOverview';
@@ -29,33 +31,49 @@ export const StudentReportRow: React.FC<StudentReportRowProps> = ({
   summary,
   onSelect,
   isSelected,
-  onViewDetails
+  onViewDetails,
 }) => {
   const navigate = useNavigate();
   const [showNoteModal, setShowNoteModal] = useState(false);
   const [noteText, setNoteText] = useState('');
   const addNoteMutation = useAddCoachNote();
-  
+
   const getRiskBadge = () => {
     switch (summary.risk_score) {
       case 'High':
-        return <Badge variant="danger" size="sm">Yüksek Risk</Badge>;
+        return (
+          <Badge variant="danger" size="sm">
+            Yüksek Risk
+          </Badge>
+        );
       case 'Medium':
-        return <Badge variant="warning" size="sm">Orta Risk</Badge>;
+        return (
+          <Badge variant="warning" size="sm">
+            Orta Risk
+          </Badge>
+        );
       case 'Low':
-        return <Badge variant="success" size="sm">Düşük Risk</Badge>;
+        return (
+          <Badge variant="success" size="sm">
+            Düşük Risk
+          </Badge>
+        );
       default:
-        return <Badge variant="outline" size="sm">Bilinmiyor</Badge>;
+        return (
+          <Badge variant="outline" size="sm">
+            Bilinmiyor
+          </Badge>
+        );
     }
   };
-  
+
   const getPerformanceColor = (score: number) => {
     if (score >= 80) return 'text-green-600';
     if (score >= 60) return 'text-blue-600';
     if (score >= 40) return 'text-yellow-600';
     return 'text-red-600';
   };
-  
+
   const getPerformanceIcon = () => {
     if (summary.performance_index >= 70) {
       return <TrendingUp className="h-4 w-4 text-green-600" />;
@@ -64,14 +82,14 @@ export const StudentReportRow: React.FC<StudentReportRowProps> = ({
     }
     return <TrendingDown className="h-4 w-4 text-red-600" />;
   };
-  
+
   const handleAddNote = async () => {
     if (!noteText.trim()) return;
-    
+
     try {
       await addNoteMutation.mutateAsync({
         studentId: summary.student_id,
-        note: noteText
+        note: noteText,
       });
       setNoteText('');
       setShowNoteModal(false);
@@ -79,28 +97,32 @@ export const StudentReportRow: React.FC<StudentReportRowProps> = ({
       console.error('Failed to add note:', error);
     }
   };
-  
+
   const formatLastActivity = (date: string | null) => {
     if (!date) return 'Aktivite yok';
-    
+
     const activityDate = new Date(date);
     const now = new Date();
-    const diffDays = Math.floor((now.getTime() - activityDate.getTime()) / (1000 * 60 * 60 * 24));
-    
+    const diffDays = Math.floor(
+      (now.getTime() - activityDate.getTime()) / (1000 * 60 * 60 * 24)
+    );
+
     if (diffDays === 0) return 'Bugün';
     if (diffDays === 1) return 'Dün';
     if (diffDays < 7) return `${diffDays} gün önce`;
     if (diffDays < 30) return `${Math.floor(diffDays / 7)} hafta önce`;
     return activityDate.toLocaleDateString('tr-TR');
   };
-  
+
   return (
     <>
-      <tr className={`
+      <tr
+        className={`
         hover:bg-gray-50 transition-colors
         ${summary.needs_attention ? 'bg-red-50' : ''}
         ${isSelected ? 'bg-blue-50' : ''}
-      `}>
+      `}
+      >
         {/* Checkbox */}
         <td className="px-6 py-4 whitespace-nowrap">
           <input
@@ -110,7 +132,7 @@ export const StudentReportRow: React.FC<StudentReportRowProps> = ({
             className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
           />
         </td>
-        
+
         {/* Student Info */}
         <td className="px-6 py-4 whitespace-nowrap">
           <div className="flex items-center">
@@ -127,22 +149,24 @@ export const StudentReportRow: React.FC<StudentReportRowProps> = ({
             </div>
           </div>
         </td>
-        
+
         {/* Performance Score */}
         <td className="px-6 py-4 whitespace-nowrap">
           <div className="flex items-center space-x-2">
             {getPerformanceIcon()}
-            <span className={`text-lg font-semibold ${getPerformanceColor(summary.performance_index)}`}>
+            <span
+              className={`text-lg font-semibold ${getPerformanceColor(
+                summary.performance_index
+              )}`}
+            >
               {summary.performance_index}
             </span>
           </div>
         </td>
-        
+
         {/* Risk Level */}
-        <td className="px-6 py-4 whitespace-nowrap">
-          {getRiskBadge()}
-        </td>
-        
+        <td className="px-6 py-4 whitespace-nowrap">{getRiskBadge()}</td>
+
         {/* Progress Summary */}
         <td className="px-6 py-4">
           <div className="text-sm text-gray-900">
@@ -157,7 +181,7 @@ export const StudentReportRow: React.FC<StudentReportRowProps> = ({
             <span>%{summary.completion_rate} tamamlama</span>
           </div>
         </td>
-        
+
         {/* Enrollments */}
         <td className="px-6 py-4 whitespace-nowrap">
           <div className="text-sm text-gray-900">
@@ -169,8 +193,8 @@ export const StudentReportRow: React.FC<StudentReportRowProps> = ({
                       {enrollment.type === 'program' ? 'P:' : 'K:'}
                     </span>
                     <span className="ml-1 text-gray-600">
-                      {enrollment.name.length > 20 
-                        ? enrollment.name.substring(0, 20) + '...' 
+                      {enrollment.name.length > 20
+                        ? enrollment.name.substring(0, 20) + '...'
                         : enrollment.name}
                     </span>
                   </div>
@@ -186,7 +210,7 @@ export const StudentReportRow: React.FC<StudentReportRowProps> = ({
             )}
           </div>
         </td>
-        
+
         {/* Last Activity */}
         <td className="px-6 py-4 whitespace-nowrap">
           <div className="flex items-center text-sm text-gray-500">
@@ -194,7 +218,7 @@ export const StudentReportRow: React.FC<StudentReportRowProps> = ({
             {formatLastActivity(summary.last_activity)}
           </div>
         </td>
-        
+
         {/* Actions */}
         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
           <div className="flex items-center justify-end space-x-2">
@@ -217,7 +241,7 @@ export const StudentReportRow: React.FC<StudentReportRowProps> = ({
           </div>
         </td>
       </tr>
-      
+
       {/* Note Modal */}
       {showNoteModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">

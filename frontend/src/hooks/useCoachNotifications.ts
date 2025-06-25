@@ -1,8 +1,9 @@
-import { useEffect, useState, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import { useEffect, useState, useCallback } from 'react';
 import { io, Socket } from 'socket.io-client';
-import { useAuth } from '@/contexts/AuthContext';
+
 import { toast } from '@/components/ui/Toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 export interface CoachNotification {
   id: string;
@@ -37,17 +38,24 @@ export function useCoachNotifications(): UseCoachNotificationsReturn {
 
   // Initialize Socket.IO connection
   useEffect(() => {
-    if (!user || !token || !['admin', 'manager', 'instructor', 'trainer'].includes(user.role)) {
+    if (
+      !user ||
+      !token ||
+      !['admin', 'manager', 'instructor', 'trainer'].includes(user.role)
+    ) {
       return;
     }
 
-    const socketInstance = io(process.env.REACT_APP_API_URL || 'http://localhost:5000', {
-      auth: {
-        token: token
-      },
-      transports: ['websocket', 'polling'],
-      withCredentials: true
-    });
+    const socketInstance = io(
+      process.env.REACT_APP_API_URL || 'http://localhost:5000',
+      {
+        auth: {
+          token: token,
+        },
+        transports: ['websocket', 'polling'],
+        withCredentials: true,
+      }
+    );
 
     socketInstance.on('connect', () => {
       console.log('Connected to notification service');
@@ -59,36 +67,41 @@ export function useCoachNotifications(): UseCoachNotificationsReturn {
       setIsConnected(false);
     });
 
-    socketInstance.on('coach_notification', (notification: Omit<CoachNotification, 'id' | 'read'>) => {
-      const newNotification: CoachNotification = {
-        ...notification,
-        id: `${notification.type}_${notification.student_id}_${notification.milestone_id}_${Date.now()}`,
-        read: false
-      };
+    socketInstance.on(
+      'coach_notification',
+      (notification: Omit<CoachNotification, 'id' | 'read'>) => {
+        const newNotification: CoachNotification = {
+          ...notification,
+          id: `${notification.type}_${notification.student_id}_${
+            notification.milestone_id
+          }_${Date.now()}`,
+          read: false,
+        };
 
-      setNotifications(prev => [newNotification, ...prev]);
+        setNotifications((prev) => [newNotification, ...prev]);
 
-      // Show toast notification
-      if (notification.type === 'help_request') {
-        toast({
-          title: '🆘 Yardım Talebi',
-          description: `${notification.student_name} "${notification.milestone_title}" için yardım istiyor`,
-          variant: 'warning',
-          duration: 5000
-        });
-      } else if (notification.type === 'milestone_completed') {
-        toast({
-          title: '✅ Milestone Tamamlandı',
-          description: `${notification.student_name} "${notification.milestone_title}" hedefini tamamladı`,
-          variant: 'success',
-          duration: 4000
-        });
+        // Show toast notification
+        if (notification.type === 'help_request') {
+          toast({
+            title: '🆘 Yardım Talebi',
+            description: `${notification.student_name} "${notification.milestone_title}" için yardım istiyor`,
+            variant: 'warning',
+            duration: 5000,
+          });
+        } else if (notification.type === 'milestone_completed') {
+          toast({
+            title: '✅ Milestone Tamamlandı',
+            description: `${notification.student_name} "${notification.milestone_title}" hedefini tamamladı`,
+            variant: 'success',
+            duration: 4000,
+          });
+        }
+
+        // Invalidate relevant queries
+        queryClient.invalidateQueries({ queryKey: ['studentMilestones'] });
+        queryClient.invalidateQueries({ queryKey: ['coachStudents'] });
       }
-
-      // Invalidate relevant queries
-      queryClient.invalidateQueries({ queryKey: ['studentMilestones'] });
-      queryClient.invalidateQueries({ queryKey: ['coachStudents'] });
-    });
+    );
 
     setSocket(socketInstance);
 
@@ -116,26 +129,24 @@ export function useCoachNotifications(): UseCoachNotificationsReturn {
   }, [notifications]);
 
   const markAsRead = useCallback((notificationId: string) => {
-    setNotifications(prev =>
-      prev.map(notif =>
+    setNotifications((prev) =>
+      prev.map((notif) =>
         notif.id === notificationId ? { ...notif, read: true } : notif
       )
     );
   }, []);
 
   const markAllAsRead = useCallback(() => {
-    setNotifications(prev =>
-      prev.map(notif => ({ ...notif, read: true }))
-    );
+    setNotifications((prev) => prev.map((notif) => ({ ...notif, read: true })));
   }, []);
 
   const clearNotification = useCallback((notificationId: string) => {
-    setNotifications(prev =>
-      prev.filter(notif => notif.id !== notificationId)
+    setNotifications((prev) =>
+      prev.filter((notif) => notif.id !== notificationId)
     );
   }, []);
 
-  const unreadCount = notifications.filter(n => !n.read).length;
+  const unreadCount = notifications.filter((n) => !n.read).length;
 
   return {
     notifications,
@@ -143,6 +154,6 @@ export function useCoachNotifications(): UseCoachNotificationsReturn {
     markAsRead,
     markAllAsRead,
     clearNotification,
-    isConnected
+    isConnected,
   };
 }

@@ -1,47 +1,53 @@
 /**
  * Program Detail Page
  */
-import React, { useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import { useProgram, useDeleteProgram, useUpdateProgramStatus } from '../../hooks/usePrograms';
-import { useCourses } from '../../hooks/useCourses';
-import { useAuth } from '../../hooks/useAuth';
-import { DataTable } from '../../components/ui/DataTable';
-import { Button } from '../../components/ui/Button';
-import { Badge } from '../../components/ui/Badge';
-import { Card } from '../../components/ui/Card';
-import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
-import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
-import { 
-  formatProgramDate, 
-  getProgramStatusInfo, 
-  getProgramTypeInfo, 
-  formatProgramPrice 
-} from '../../utils/program';
-import { 
-  getCourseStatusInfo, 
-  getCourseFormatInfo, 
-  getDifficultyLevelInfo 
-} from '../../utils/course';
-import type { Course } from '../../types/course';
 import type { ColumnDef } from '@tanstack/react-table';
-import { 
-  Edit, 
-  Trash2, 
-  ArrowLeft, 
-  Calendar, 
-  Users, 
-  MapPin, 
-  Globe, 
-  DollarSign, 
-  User, 
-  BookOpen, 
+import {
+  Edit,
+  Trash2,
+  ArrowLeft,
+  Calendar,
+  Users,
+  MapPin,
+  Globe,
+  DollarSign,
+  User,
+  BookOpen,
   Plus,
   Eye,
   Clock,
   Target,
-  ArrowUpDown
+  ArrowUpDown,
 } from 'lucide-react';
+import * as React from 'react';
+import { useState } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+
+import { Badge } from '../../components/ui/Badge';
+import { Button } from '../../components/ui/Button';
+import { Card } from '../../components/ui/Card';
+import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
+import { DataTable } from '../../components/ui/DataTable';
+import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
+import { useAuth } from '../../hooks/useAuth';
+import { useCourses } from '../../hooks/useCourses';
+import {
+  useProgram,
+  useDeleteProgram,
+  useUpdateProgramStatus,
+} from '../../hooks/usePrograms';
+import type { Course } from '../../types/course';
+import {
+  getCourseStatusInfo,
+  getCourseFormatInfo,
+  getDifficultyLevelInfo,
+} from '../../utils/course';
+import {
+  formatProgramDate,
+  getProgramStatusInfo,
+  getProgramTypeInfo,
+  formatProgramPrice,
+} from '../../utils/program';
 
 export const ProgramDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -50,7 +56,10 @@ export const ProgramDetail: React.FC = () => {
   const programId = parseInt(id!);
 
   const { data: program, isLoading, error } = useProgram(programId, true);
-  const { data: coursesData } = useCourses({ program_id: programId, per_page: 100 });
+  const { data: coursesData } = useCourses({
+    program_id: programId,
+    per_page: 100,
+  });
   const deleteProgram = useDeleteProgram();
   const updateStatus = useUpdateProgramStatus();
 
@@ -92,7 +101,9 @@ export const ProgramDetail: React.FC = () => {
           >
             {row.original.title}
           </Link>
-          <span className="text-sm text-gray-500">#{row.original.order_index}</span>
+          <span className="text-sm text-gray-500">
+            #{row.original.order_index}
+          </span>
         </div>
       ),
     },
@@ -101,11 +112,7 @@ export const ProgramDetail: React.FC = () => {
       header: 'Durum',
       cell: ({ row }) => {
         const statusInfo = getCourseStatusInfo(row.original.status);
-        return (
-          <Badge color={statusInfo.color}>
-            {statusInfo.label}
-          </Badge>
-        );
+        return <Badge color={statusInfo.color}>{statusInfo.label}</Badge>;
       },
     },
     {
@@ -125,11 +132,11 @@ export const ProgramDetail: React.FC = () => {
       accessorKey: 'difficulty_level',
       header: 'Zorluk',
       cell: ({ row }) => {
-        const difficultyInfo = getDifficultyLevelInfo(row.original.difficulty_level);
+        const difficultyInfo = getDifficultyLevelInfo(
+          row.original.difficulty_level
+        );
         return (
-          <Badge color={difficultyInfo.color}>
-            {difficultyInfo.label}
-          </Badge>
+          <Badge color={difficultyInfo.color}>{difficultyInfo.label}</Badge>
         );
       },
     },
@@ -193,7 +200,9 @@ export const ProgramDetail: React.FC = () => {
             Programlara Dön
           </Button>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">{program.title}</h1>
+            <h1 className="text-2xl font-bold text-gray-900">
+              {program.title}
+            </h1>
             <p className="text-gray-600">#{program.code}</p>
           </div>
         </div>
@@ -272,9 +281,7 @@ export const ProgramDetail: React.FC = () => {
               <Clock className="h-5 w-5 text-purple-600" />
             </div>
             <div>
-              <div className="text-2xl font-bold">
-                {program.duration_days}
-              </div>
+              <div className="text-2xl font-bold">{program.duration_days}</div>
               <div className="text-sm text-gray-600">Gün</div>
             </div>
           </div>
@@ -301,7 +308,7 @@ export const ProgramDetail: React.FC = () => {
         <div className="lg:col-span-2">
           <Card className="p-6">
             <h3 className="text-lg font-semibold mb-4">Program Bilgileri</h3>
-            
+
             {program.description && (
               <div className="mb-6">
                 <h4 className="font-medium text-gray-900 mb-2">Açıklama</h4>
@@ -365,7 +372,9 @@ export const ProgramDetail: React.FC = () => {
                   <MapPin className="h-4 w-4 text-gray-400" />
                   <div>
                     <div className="text-sm font-medium">Konum</div>
-                    <div className="text-sm text-gray-600">{program.location}</div>
+                    <div className="text-sm text-gray-600">
+                      {program.location}
+                    </div>
                   </div>
                 </div>
               )}
@@ -415,24 +424,28 @@ export const ProgramDetail: React.FC = () => {
                   variant="outline"
                   size="sm"
                   className="w-full justify-start"
-                  onClick={() => navigate(`/courses/new?program_id=${program.id}`)}
+                  onClick={() =>
+                    navigate(`/courses/new?program_id=${program.id}`)
+                  }
                 >
                   <Plus className="h-4 w-4 mr-2" />
                   Kurs Ekle
                 </Button>
-                
+
                 {program.course_count && program.course_count > 1 && (
                   <Button
                     variant="outline"
                     size="sm"
                     className="w-full justify-start"
-                    onClick={() => navigate(`/programs/${program.id}/courses/reorder`)}
+                    onClick={() =>
+                      navigate(`/programs/${program.id}/courses/reorder`)
+                    }
                   >
                     <ArrowUpDown className="h-4 w-4 mr-2" />
                     Kurs Sıralaması
                   </Button>
                 )}
-                
+
                 {program.status === 'draft' && (
                   <Button
                     variant="outline"
@@ -444,7 +457,7 @@ export const ProgramDetail: React.FC = () => {
                     Yayınla
                   </Button>
                 )}
-                
+
                 {program.status === 'published' && (
                   <Button
                     variant="outline"
@@ -469,7 +482,9 @@ export const ProgramDetail: React.FC = () => {
             <h3 className="text-lg font-semibold">Program Kursları</h3>
             {canEdit && (
               <Button
-                onClick={() => navigate(`/courses/new?program_id=${program.id}`)}
+                onClick={() =>
+                  navigate(`/courses/new?program_id=${program.id}`)
+                }
                 size="sm"
               >
                 <Plus className="h-4 w-4 mr-2" />
@@ -478,7 +493,7 @@ export const ProgramDetail: React.FC = () => {
             )}
           </div>
         </div>
-        
+
         <DataTable
           columns={courseColumns}
           data={coursesData?.courses || []}

@@ -42,7 +42,14 @@ export interface Question {
   uuid: string;
   evaluation_id: number;
   question_text: string;
-  question_type: 'multiple_choice' | 'true_false' | 'short_answer' | 'essay' | 'matching' | 'ordering' | 'fill_in_blank';
+  question_type:
+    | 'multiple_choice'
+    | 'true_false'
+    | 'short_answer'
+    | 'essay'
+    | 'matching'
+    | 'ordering'
+    | 'fill_in_blank';
   difficulty_level: 'easy' | 'medium' | 'hard';
   points: number;
   order_index: number;
@@ -107,7 +114,14 @@ export interface QuestionBank {
   topic?: string;
   difficulty_level: 'easy' | 'medium' | 'hard';
   question_text: string;
-  question_type: 'multiple_choice' | 'true_false' | 'short_answer' | 'essay' | 'matching' | 'ordering' | 'fill_in_blank';
+  question_type:
+    | 'multiple_choice'
+    | 'true_false'
+    | 'short_answer'
+    | 'essay'
+    | 'matching'
+    | 'ordering'
+    | 'fill_in_blank';
   points: number;
   question_data: Record<string, any>;
   explanation?: string;
@@ -140,11 +154,19 @@ export interface CreateEvaluationRequest {
   tags?: string[];
 }
 
-export interface UpdateEvaluationRequest extends Partial<CreateEvaluationRequest> {}
+export interface UpdateEvaluationRequest
+  extends Partial<CreateEvaluationRequest> {}
 
 export interface CreateQuestionRequest {
   question_text: string;
-  question_type: 'multiple_choice' | 'true_false' | 'short_answer' | 'essay' | 'matching' | 'ordering' | 'fill_in_blank';
+  question_type:
+    | 'multiple_choice'
+    | 'true_false'
+    | 'short_answer'
+    | 'essay'
+    | 'matching'
+    | 'ordering'
+    | 'fill_in_blank';
   difficulty_level?: 'easy' | 'medium' | 'hard';
   points?: number;
   order_index?: number;
@@ -156,7 +178,7 @@ export interface CreateQuestionRequest {
   tags?: string[];
 }
 
-export interface UpdateQuestionRequest extends Partial<CreateQuestionRequest> {}
+export type UpdateQuestionRequest = Partial<CreateQuestionRequest>
 
 export interface SaveResponseRequest {
   question_id: number;
@@ -239,7 +261,7 @@ export const evaluationsApi = {
    */
   getAll: async (filters?: EvaluationFilters): Promise<EvaluationsResponse> => {
     const params = new URLSearchParams();
-    
+
     if (filters) {
       Object.entries(filters).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
@@ -247,7 +269,7 @@ export const evaluationsApi = {
         }
       });
     }
-    
+
     const response = await apiClient.get<EvaluationsResponse>(
       `${EVALUATIONS_BASE_URL}?${params.toString()}`
     );
@@ -257,9 +279,14 @@ export const evaluationsApi = {
   /**
    * Get evaluation by ID
    */
-  getById: async (id: number, includeQuestions = false): Promise<Evaluation> => {
+  getById: async (
+    id: number,
+    includeQuestions = false
+  ): Promise<Evaluation> => {
     const params = includeQuestions ? '?include_questions=true' : '';
-    const response = await apiClient.get<Evaluation>(`${EVALUATIONS_BASE_URL}/${id}${params}`);
+    const response = await apiClient.get<Evaluation>(
+      `${EVALUATIONS_BASE_URL}/${id}${params}`
+    );
     return response.data;
   },
 
@@ -267,15 +294,24 @@ export const evaluationsApi = {
    * Create new evaluation
    */
   create: async (data: CreateEvaluationRequest): Promise<Evaluation> => {
-    const response = await apiClient.post<Evaluation>(EVALUATIONS_BASE_URL, data);
+    const response = await apiClient.post<Evaluation>(
+      EVALUATIONS_BASE_URL,
+      data
+    );
     return response.data;
   },
 
   /**
    * Update evaluation
    */
-  update: async (id: number, data: UpdateEvaluationRequest): Promise<Evaluation> => {
-    const response = await apiClient.put<Evaluation>(`${EVALUATIONS_BASE_URL}/${id}`, data);
+  update: async (
+    id: number,
+    data: UpdateEvaluationRequest
+  ): Promise<Evaluation> => {
+    const response = await apiClient.put<Evaluation>(
+      `${EVALUATIONS_BASE_URL}/${id}`,
+      data
+    );
     return response.data;
   },
 
@@ -290,7 +326,9 @@ export const evaluationsApi = {
    * Activate evaluation
    */
   activate: async (id: number): Promise<Evaluation> => {
-    const response = await apiClient.post<Evaluation>(`${EVALUATIONS_BASE_URL}/${id}/activate`);
+    const response = await apiClient.post<Evaluation>(
+      `${EVALUATIONS_BASE_URL}/${id}/activate`
+    );
     return response.data;
   },
 
@@ -298,7 +336,9 @@ export const evaluationsApi = {
    * Archive evaluation
    */
   archive: async (id: number): Promise<Evaluation> => {
-    const response = await apiClient.post<Evaluation>(`${EVALUATIONS_BASE_URL}/${id}/archive`);
+    const response = await apiClient.post<Evaluation>(
+      `${EVALUATIONS_BASE_URL}/${id}/archive`
+    );
     return response.data;
   },
 
@@ -306,7 +346,9 @@ export const evaluationsApi = {
    * Get evaluation statistics
    */
   getStatistics: async (): Promise<EvaluationStatistics> => {
-    const response = await apiClient.get<EvaluationStatistics>(`${EVALUATIONS_BASE_URL}/statistics`);
+    const response = await apiClient.get<EvaluationStatistics>(
+      `${EVALUATIONS_BASE_URL}/statistics`
+    );
     return response.data;
   },
 
@@ -316,23 +358,38 @@ export const evaluationsApi = {
      * Get all questions for an evaluation
      */
     getAll: async (evaluationId: number): Promise<Question[]> => {
-      const response = await apiClient.get<Question[]>(`${EVALUATIONS_BASE_URL}/${evaluationId}/questions`);
+      const response = await apiClient.get<Question[]>(
+        `${EVALUATIONS_BASE_URL}/${evaluationId}/questions`
+      );
       return response.data;
     },
 
     /**
      * Create new question
      */
-    create: async (evaluationId: number, data: CreateQuestionRequest): Promise<Question> => {
-      const response = await apiClient.post<Question>(`${EVALUATIONS_BASE_URL}/${evaluationId}/questions`, data);
+    create: async (
+      evaluationId: number,
+      data: CreateQuestionRequest
+    ): Promise<Question> => {
+      const response = await apiClient.post<Question>(
+        `${EVALUATIONS_BASE_URL}/${evaluationId}/questions`,
+        data
+      );
       return response.data;
     },
 
     /**
      * Update question
      */
-    update: async (evaluationId: number, questionId: number, data: UpdateQuestionRequest): Promise<Question> => {
-      const response = await apiClient.put<Question>(`${EVALUATIONS_BASE_URL}/${evaluationId}/questions/${questionId}`, data);
+    update: async (
+      evaluationId: number,
+      questionId: number,
+      data: UpdateQuestionRequest
+    ): Promise<Question> => {
+      const response = await apiClient.put<Question>(
+        `${EVALUATIONS_BASE_URL}/${evaluationId}/questions/${questionId}`,
+        data
+      );
       return response.data;
     },
 
@@ -340,19 +397,25 @@ export const evaluationsApi = {
      * Delete question
      */
     delete: async (evaluationId: number, questionId: number): Promise<void> => {
-      await apiClient.delete(`${EVALUATIONS_BASE_URL}/${evaluationId}/questions/${questionId}`);
+      await apiClient.delete(
+        `${EVALUATIONS_BASE_URL}/${evaluationId}/questions/${questionId}`
+      );
     },
 
     /**
      * Reorder question
      */
-    reorder: async (evaluationId: number, questionId: number, orderIndex: number): Promise<Question> => {
+    reorder: async (
+      evaluationId: number,
+      questionId: number,
+      orderIndex: number
+    ): Promise<Question> => {
       const response = await apiClient.post<Question>(
         `${EVALUATIONS_BASE_URL}/${evaluationId}/questions/${questionId}/reorder`,
         { order_index: orderIndex }
       );
       return response.data;
-    }
+    },
   },
 
   // Adaptive evaluation API calls
@@ -360,12 +423,18 @@ export const evaluationsApi = {
     /**
      * Get next question using AI-powered adaptive logic
      */
-    getNextQuestion: async (evaluationId: number, attemptId: number, currentIndex?: number): Promise<AdaptiveQuestionResponse> => {
+    getNextQuestion: async (
+      evaluationId: number,
+      attemptId: number,
+      currentIndex?: number
+    ): Promise<AdaptiveQuestionResponse> => {
       const params = new URLSearchParams({
         attempt_id: attemptId.toString(),
-        ...(currentIndex !== undefined && { current_index: currentIndex.toString() })
+        ...(currentIndex !== undefined && {
+          current_index: currentIndex.toString(),
+        }),
       });
-      
+
       const response = await apiClient.get<AdaptiveQuestionResponse>(
         `${EVALUATIONS_BASE_URL}/${evaluationId}/next-question?${params}`
       );
@@ -375,12 +444,15 @@ export const evaluationsApi = {
     /**
      * Get AI-powered learning insights
      */
-    getLearningInsights: async (evaluationId: number, attemptId: number): Promise<LearningInsights> => {
+    getLearningInsights: async (
+      evaluationId: number,
+      attemptId: number
+    ): Promise<LearningInsights> => {
       const response = await apiClient.get<LearningInsights>(
         `${EVALUATIONS_BASE_URL}/${evaluationId}/attempts/${attemptId}/insights`
       );
       return response.data;
-    }
+    },
   },
 
   // Attempt management
@@ -389,23 +461,35 @@ export const evaluationsApi = {
      * Start new evaluation attempt
      */
     start: async (evaluationId: number): Promise<EvaluationAttempt> => {
-      const response = await apiClient.post<EvaluationAttempt>(`${EVALUATIONS_BASE_URL}/${evaluationId}/attempts`);
+      const response = await apiClient.post<EvaluationAttempt>(
+        `${EVALUATIONS_BASE_URL}/${evaluationId}/attempts`
+      );
       return response.data;
     },
 
     /**
      * Get evaluation attempt
      */
-    getById: async (evaluationId: number, attemptId: number): Promise<EvaluationAttempt> => {
-      const response = await apiClient.get<EvaluationAttempt>(`${EVALUATIONS_BASE_URL}/${evaluationId}/attempts/${attemptId}`);
+    getById: async (
+      evaluationId: number,
+      attemptId: number
+    ): Promise<EvaluationAttempt> => {
+      const response = await apiClient.get<EvaluationAttempt>(
+        `${EVALUATIONS_BASE_URL}/${evaluationId}/attempts/${attemptId}`
+      );
       return response.data;
     },
 
     /**
      * Submit evaluation attempt
      */
-    submit: async (evaluationId: number, attemptId: number): Promise<EvaluationAttempt> => {
-      const response = await apiClient.post<EvaluationAttempt>(`${EVALUATIONS_BASE_URL}/${evaluationId}/attempts/${attemptId}/submit`);
+    submit: async (
+      evaluationId: number,
+      attemptId: number
+    ): Promise<EvaluationAttempt> => {
+      const response = await apiClient.post<EvaluationAttempt>(
+        `${EVALUATIONS_BASE_URL}/${evaluationId}/attempts/${attemptId}/submit`
+      );
       return response.data;
     },
 
@@ -413,21 +497,27 @@ export const evaluationsApi = {
      * Get current user's attempts for an evaluation
      */
     getMy: async (evaluationId: number): Promise<EvaluationAttempt[]> => {
-      const response = await apiClient.get<EvaluationAttempt[]>(`${EVALUATIONS_BASE_URL}/${evaluationId}/my-attempts`);
+      const response = await apiClient.get<EvaluationAttempt[]>(
+        `${EVALUATIONS_BASE_URL}/${evaluationId}/my-attempts`
+      );
       return response.data;
     },
 
     /**
      * Save question response
      */
-    saveResponse: async (evaluationId: number, attemptId: number, data: SaveResponseRequest): Promise<QuestionResponse> => {
+    saveResponse: async (
+      evaluationId: number,
+      attemptId: number,
+      data: SaveResponseRequest
+    ): Promise<QuestionResponse> => {
       const response = await apiClient.post<QuestionResponse>(
         `${EVALUATIONS_BASE_URL}/${evaluationId}/attempts/${attemptId}/responses`,
         data
       );
       return response.data;
-    }
-  }
+    },
+  },
 };
 
 export default evaluationsApi;

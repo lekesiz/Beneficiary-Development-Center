@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import {
   User,
   TrendingUp,
@@ -16,19 +15,38 @@ import {
   BookOpen,
   Activity,
   Zap,
-  Shield
+  Shield,
 } from 'lucide-react';
+import * as React from 'react';
+import { useState } from 'react';
+import {
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  RadarChart,
+  Radar,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
+
+import { Badge } from '@/components/ui/Badge';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Form';
-import { Badge } from '@/components/ui/Badge';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { ProgressBar } from '@/components/ui/ProgressBar';
-import { 
-  useDevelopmentReport, 
+import {
+  useDevelopmentReport,
   useDownloadReport,
-  type DevelopmentReport as DevelopmentReportType 
+  type DevelopmentReport as DevelopmentReportType,
 } from '@/hooks/useReports';
-import { LineChart, Line, BarChart, Bar, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+
 
 interface DevelopmentReportProps {
   userId: number;
@@ -41,14 +59,20 @@ export const DevelopmentReport: React.FC<DevelopmentReportProps> = ({
   userId,
   userName,
   dateRange = 30,
-  onClose
+  onClose,
 }) => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'analysis' | 'recommendations'>('overview');
-  
+  const [activeTab, setActiveTab] = useState<
+    'overview' | 'analysis' | 'recommendations'
+  >('overview');
+
   // Fetch report data
-  const { data: report, isLoading, refetch } = useDevelopmentReport(userId, dateRange);
+  const {
+    data: report,
+    isLoading,
+    refetch,
+  } = useDevelopmentReport(userId, dateRange);
   const downloadMutation = useDownloadReport();
-  
+
   if (isLoading) {
     return (
       <div className="p-6 flex justify-center">
@@ -56,7 +80,7 @@ export const DevelopmentReport: React.FC<DevelopmentReportProps> = ({
       </div>
     );
   }
-  
+
   if (!report) {
     return (
       <div className="p-6 text-center">
@@ -65,7 +89,7 @@ export const DevelopmentReport: React.FC<DevelopmentReportProps> = ({
       </div>
     );
   }
-  
+
   const getRiskBadge = (riskScore: string) => {
     switch (riskScore) {
       case 'Low':
@@ -78,7 +102,7 @@ export const DevelopmentReport: React.FC<DevelopmentReportProps> = ({
         return <Badge>Bilinmiyor</Badge>;
     }
   };
-  
+
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'high':
@@ -91,15 +115,15 @@ export const DevelopmentReport: React.FC<DevelopmentReportProps> = ({
         return 'text-gray-600 bg-gray-50';
     }
   };
-  
+
   const handleDownload = () => {
     downloadMutation.mutate({
       userId,
       days: dateRange,
-      format: 'json'
+      format: 'json',
     });
   };
-  
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -113,7 +137,7 @@ export const DevelopmentReport: React.FC<DevelopmentReportProps> = ({
             Son {dateRange} günlük performans analizi
           </p>
         </div>
-        
+
         <div className="flex items-center space-x-2">
           <Button variant="outline" onClick={() => refetch()}>
             <RefreshCw className="mr-2 h-4 w-4" />
@@ -130,39 +154,49 @@ export const DevelopmentReport: React.FC<DevelopmentReportProps> = ({
           )}
         </div>
       </div>
-      
+
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Tamamlama Oranı</p>
-              <p className="text-2xl font-bold">{report.summary_score.completion_rate}</p>
+              <p className="text-sm font-medium text-gray-600">
+                Tamamlama Oranı
+              </p>
+              <p className="text-2xl font-bold">
+                {report.summary_score.completion_rate}
+              </p>
             </div>
             <CheckCircle className="h-8 w-8 text-green-600 opacity-80" />
           </div>
         </Card>
-        
+
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Performans İndeksi</p>
-              <p className="text-2xl font-bold">{report.summary_score.performance_index}</p>
+              <p className="text-sm font-medium text-gray-600">
+                Performans İndeksi
+              </p>
+              <p className="text-2xl font-bold">
+                {report.summary_score.performance_index}
+              </p>
             </div>
             <Activity className="h-8 w-8 text-blue-600 opacity-80" />
           </div>
         </Card>
-        
+
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Risk Durumu</p>
-              <div className="mt-1">{getRiskBadge(report.summary_score.risk_score)}</div>
+              <div className="mt-1">
+                {getRiskBadge(report.summary_score.risk_score)}
+              </div>
             </div>
             <Shield className="h-8 w-8 text-orange-600 opacity-80" />
           </div>
         </Card>
-        
+
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
@@ -175,14 +209,18 @@ export const DevelopmentReport: React.FC<DevelopmentReportProps> = ({
           </div>
         </Card>
       </div>
-      
+
       {/* Progress Summary */}
       <Card className="p-6 bg-blue-50 border-blue-200">
-        <h3 className="font-semibold text-blue-900 mb-2">Genel Değerlendirme</h3>
+        <h3 className="font-semibold text-blue-900 mb-2">
+          Genel Değerlendirme
+        </h3>
         <p className="text-blue-800">{report.progress_summary}</p>
-        <p className="text-blue-700 text-sm mt-2">{report.summary_score.overall_assessment}</p>
+        <p className="text-blue-700 text-sm mt-2">
+          {report.summary_score.overall_assessment}
+        </p>
       </Card>
-      
+
       {/* Tab Navigation */}
       <div className="border-b border-gray-200">
         <nav className="-mb-px flex space-x-8">
@@ -218,7 +256,7 @@ export const DevelopmentReport: React.FC<DevelopmentReportProps> = ({
           </button>
         </nav>
       </div>
-      
+
       {/* Tab Content */}
       {activeTab === 'overview' && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -229,19 +267,26 @@ export const DevelopmentReport: React.FC<DevelopmentReportProps> = ({
               <ResponsiveContainer width="100%" height={250}>
                 <LineChart data={report.visualization_data.performance_trend}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis 
-                    dataKey="date" 
-                    tickFormatter={(date) => new Date(date).toLocaleDateString('tr-TR', { day: '2-digit', month: 'short' })}
+                  <XAxis
+                    dataKey="date"
+                    tickFormatter={(date) =>
+                      new Date(date).toLocaleDateString('tr-TR', {
+                        day: '2-digit',
+                        month: 'short',
+                      })
+                    }
                   />
                   <YAxis domain={[0, 100]} />
-                  <Tooltip 
-                    labelFormatter={(date) => new Date(date).toLocaleDateString('tr-TR')}
+                  <Tooltip
+                    labelFormatter={(date) =>
+                      new Date(date).toLocaleDateString('tr-TR')
+                    }
                     formatter={(value) => [`${value}%`, 'Puan']}
                   />
-                  <Line 
-                    type="monotone" 
-                    dataKey="score" 
-                    stroke="#3B82F6" 
+                  <Line
+                    type="monotone"
+                    dataKey="score"
+                    stroke="#3B82F6"
                     strokeWidth={2}
                     dot={{ fill: '#3B82F6', r: 4 }}
                   />
@@ -249,25 +294,33 @@ export const DevelopmentReport: React.FC<DevelopmentReportProps> = ({
               </ResponsiveContainer>
             </Card>
           )}
-          
+
           {/* Milestone Progress */}
           {report.visualization_data?.milestone_progress && (
             <Card className="p-6">
-              <h3 className="text-lg font-semibold mb-4">Öğrenme Yolu İlerlemesi</h3>
+              <h3 className="text-lg font-semibold mb-4">
+                Öğrenme Yolu İlerlemesi
+              </h3>
               <div className="space-y-3">
-                {report.visualization_data.milestone_progress.map((milestone, index) => (
-                  <div key={index}>
-                    <div className="flex justify-between text-sm mb-1">
-                      <span className="font-medium truncate pr-2">{milestone.path}</span>
-                      <span className="text-gray-600">{milestone.progress}%</span>
+                {report.visualization_data.milestone_progress.map(
+                  (milestone, index) => (
+                    <div key={index}>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span className="font-medium truncate pr-2">
+                          {milestone.path}
+                        </span>
+                        <span className="text-gray-600">
+                          {milestone.progress}%
+                        </span>
+                      </div>
+                      <ProgressBar value={milestone.progress} />
                     </div>
-                    <ProgressBar value={milestone.progress} />
-                  </div>
-                ))}
+                  )
+                )}
               </div>
             </Card>
           )}
-          
+
           {/* Skill Distribution */}
           {report.visualization_data?.skill_distribution && (
             <Card className="p-6">
@@ -283,34 +336,46 @@ export const DevelopmentReport: React.FC<DevelopmentReportProps> = ({
               </ResponsiveContainer>
             </Card>
           )}
-          
+
           {/* Suggested Interventions */}
           <Card className="p-6">
             <h3 className="text-lg font-semibold mb-4">Önerilen Müdahaleler</h3>
             <div className="space-y-3">
               {report.suggested_interventions.map((intervention, index) => (
-                <div 
+                <div
                   key={index}
-                  className={`p-4 rounded-lg ${getPriorityColor(intervention.priority)}`}
+                  className={`p-4 rounded-lg ${getPriorityColor(
+                    intervention.priority
+                  )}`}
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center space-x-2 mb-1">
-                        <Badge 
+                        <Badge
                           variant={
-                            intervention.priority === 'high' ? 'danger' :
-                            intervention.priority === 'medium' ? 'warning' : 'success'
+                            intervention.priority === 'high'
+                              ? 'danger'
+                              : intervention.priority === 'medium'
+                              ? 'warning'
+                              : 'success'
                           }
                           size="sm"
                         >
-                          {intervention.priority === 'high' ? 'Yüksek' :
-                           intervention.priority === 'medium' ? 'Orta' : 'Düşük'} Öncelik
+                          {intervention.priority === 'high'
+                            ? 'Yüksek'
+                            : intervention.priority === 'medium'
+                            ? 'Orta'
+                            : 'Düşük'}{' '}
+                          Öncelik
                         </Badge>
-                        <span className="text-sm text-gray-600">{intervention.timeline}</span>
+                        <span className="text-sm text-gray-600">
+                          {intervention.timeline}
+                        </span>
                       </div>
                       <p className="font-medium">{intervention.intervention}</p>
                       <p className="text-sm mt-1">
-                        <span className="font-medium">Beklenen Sonuç:</span> {intervention.expected_outcome}
+                        <span className="font-medium">Beklenen Sonuç:</span>{' '}
+                        {intervention.expected_outcome}
                       </p>
                     </div>
                     <Zap className="h-5 w-5 flex-shrink-0 ml-3 opacity-60" />
@@ -321,7 +386,7 @@ export const DevelopmentReport: React.FC<DevelopmentReportProps> = ({
           </Card>
         </div>
       )}
-      
+
       {activeTab === 'analysis' && (
         <div className="space-y-6">
           {/* Strengths */}
@@ -339,7 +404,7 @@ export const DevelopmentReport: React.FC<DevelopmentReportProps> = ({
               ))}
             </div>
           </Card>
-          
+
           {/* Weaknesses */}
           <Card className="p-6">
             <h3 className="text-lg font-semibold mb-4 flex items-center">
@@ -355,7 +420,7 @@ export const DevelopmentReport: React.FC<DevelopmentReportProps> = ({
               ))}
             </div>
           </Card>
-          
+
           {/* Performance Risks */}
           {report.ai_analysis.performance_risks.length > 0 && (
             <Card className="p-6 bg-red-50 border-red-200">
@@ -373,7 +438,7 @@ export const DevelopmentReport: React.FC<DevelopmentReportProps> = ({
               </div>
             </Card>
           )}
-          
+
           {/* Learning Style Analysis */}
           <Card className="p-6">
             <h3 className="text-lg font-semibold mb-4 flex items-center">
@@ -384,7 +449,7 @@ export const DevelopmentReport: React.FC<DevelopmentReportProps> = ({
           </Card>
         </div>
       )}
-      
+
       {activeTab === 'recommendations' && (
         <div className="space-y-6">
           {/* Immediate Actions */}
@@ -395,14 +460,17 @@ export const DevelopmentReport: React.FC<DevelopmentReportProps> = ({
             </h3>
             <div className="space-y-2">
               {report.recommendations.immediate_actions.map((action, index) => (
-                <div key={index} className="flex items-center space-x-3 p-3 bg-red-50 rounded-lg">
+                <div
+                  key={index}
+                  className="flex items-center space-x-3 p-3 bg-red-50 rounded-lg"
+                >
                   <ChevronRight className="h-5 w-5 text-red-600 flex-shrink-0" />
                   <p className="text-red-800">{action}</p>
                 </div>
               ))}
             </div>
           </Card>
-          
+
           {/* Long-term Goals */}
           <Card className="p-6">
             <h3 className="text-lg font-semibold mb-4 flex items-center">
@@ -411,14 +479,17 @@ export const DevelopmentReport: React.FC<DevelopmentReportProps> = ({
             </h3>
             <div className="space-y-2">
               {report.recommendations.long_term_goals.map((goal, index) => (
-                <div key={index} className="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg">
+                <div
+                  key={index}
+                  className="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg"
+                >
                   <Award className="h-5 w-5 text-blue-600 flex-shrink-0" />
                   <p className="text-blue-800">{goal}</p>
                 </div>
               ))}
             </div>
           </Card>
-          
+
           {/* Support Needed */}
           <Card className="p-6">
             <h3 className="text-lg font-semibold mb-4 flex items-center">
@@ -427,14 +498,17 @@ export const DevelopmentReport: React.FC<DevelopmentReportProps> = ({
             </h3>
             <div className="space-y-2">
               {report.recommendations.support_needed.map((support, index) => (
-                <div key={index} className="flex items-center space-x-3 p-3 bg-green-50 rounded-lg">
+                <div
+                  key={index}
+                  className="flex items-center space-x-3 p-3 bg-green-50 rounded-lg"
+                >
                   <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" />
                   <p className="text-green-800">{support}</p>
                 </div>
               ))}
             </div>
           </Card>
-          
+
           {/* Next Evaluation Focus */}
           <Card className="p-6">
             <h3 className="text-lg font-semibold mb-4 flex items-center">
@@ -443,7 +517,10 @@ export const DevelopmentReport: React.FC<DevelopmentReportProps> = ({
             </h3>
             <div className="space-y-2">
               {report.next_evaluation_focus.map((focus, index) => (
-                <div key={index} className="flex items-center space-x-3 p-3 bg-purple-50 rounded-lg">
+                <div
+                  key={index}
+                  className="flex items-center space-x-3 p-3 bg-purple-50 rounded-lg"
+                >
                   <Target className="h-5 w-5 text-purple-600 flex-shrink-0" />
                   <p className="text-purple-800">{focus}</p>
                 </div>
@@ -452,7 +529,7 @@ export const DevelopmentReport: React.FC<DevelopmentReportProps> = ({
           </Card>
         </div>
       )}
-      
+
       {/* Report Metadata */}
       {report.metadata && (
         <Card className="p-4 bg-gray-50">
@@ -460,7 +537,8 @@ export const DevelopmentReport: React.FC<DevelopmentReportProps> = ({
             <div className="flex items-center space-x-4">
               <span>
                 <Calendar className="inline-block h-4 w-4 mr-1" />
-                Oluşturulma: {new Date(report.metadata.generated_at).toLocaleString('tr-TR')}
+                Oluşturulma:{' '}
+                {new Date(report.metadata.generated_at).toLocaleString('tr-TR')}
               </span>
               <span>
                 <User className="inline-block h-4 w-4 mr-1" />

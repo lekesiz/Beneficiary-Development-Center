@@ -1,4 +1,3 @@
-import React from 'react'
 import {
   flexRender,
   getCoreRowModel,
@@ -11,21 +10,29 @@ import {
   ColumnFiltersState,
   VisibilityState,
   PaginationState,
-} from '@tanstack/react-table'
-import { ChevronDown, ChevronUp, ChevronsUpDown, ChevronLeft, ChevronRight } from 'lucide-react'
-import { cn } from '@/lib/utils'
+} from '@tanstack/react-table';
+import {
+  ChevronDown,
+  ChevronUp,
+  ChevronsUpDown,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react';
+import * as React from 'react';
+
+import { cn } from '@/lib/utils';
 
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
-  data: TData[]
-  loading?: boolean
-  pageCount?: number
-  pagination?: PaginationState
-  onPaginationChange?: (pagination: PaginationState) => void
-  sorting?: SortingState
-  onSortingChange?: (sorting: SortingState) => void
-  globalFilter?: string
-  onGlobalFilterChange?: (value: string) => void
+  columns: ColumnDef<TData, TValue>[];
+  data: TData[];
+  loading?: boolean;
+  pageCount?: number;
+  pagination?: PaginationState;
+  onPaginationChange?: (pagination: PaginationState) => void;
+  sorting?: SortingState;
+  onSortingChange?: (sorting: SortingState) => void;
+  globalFilter?: string;
+  onGlobalFilterChange?: (value: string) => void;
 }
 
 export function DataTable<TData, TValue>({
@@ -40,19 +47,29 @@ export function DataTable<TData, TValue>({
   globalFilter,
   onGlobalFilterChange,
 }: DataTableProps<TData, TValue>) {
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
-  const [rowSelection, setRowSelection] = React.useState({})
-  const [internalSorting, setInternalSorting] = React.useState<SortingState>([])
-  const [internalPagination, setInternalPagination] = React.useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: 10,
-  })
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    []
+  );
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = React.useState({});
+  const [internalSorting, setInternalSorting] = React.useState<SortingState>(
+    []
+  );
+  const [internalPagination, setInternalPagination] =
+    React.useState<PaginationState>({
+      pageIndex: 0,
+      pageSize: 10,
+    });
 
   const table = useReactTable({
     data,
     columns,
-    pageCount: pageCount ?? Math.ceil(data.length / (pagination?.pageSize || internalPagination.pageSize)),
+    pageCount:
+      pageCount ??
+      Math.ceil(
+        data.length / (pagination?.pageSize || internalPagination.pageSize)
+      ),
     state: {
       sorting: sorting ?? internalSorting,
       columnFilters,
@@ -72,7 +89,7 @@ export function DataTable<TData, TValue>({
     getSortedRowModel: getSortedRowModel(),
     manualPagination: !!onPaginationChange,
     manualSorting: !!onSortingChange,
-  })
+  });
 
   return (
     <div className="w-full space-y-4">
@@ -140,7 +157,7 @@ export function DataTable<TData, TValue>({
               table.getRowModel().rows.map((row) => (
                 <tr
                   key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
+                  data-state={row.getIsSelected() && 'selected'}
                   className="border-b transition-colors hover:bg-muted/50"
                 >
                   {row.getVisibleCells().map((cell) => (
@@ -170,7 +187,7 @@ export function DataTable<TData, TValue>({
       {/* Pagination */}
       <div className="flex items-center justify-between px-2">
         <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
+          {table.getFilteredSelectedRowModel().rows.length} of{' '}
           {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>
         <div className="flex items-center space-x-6 lg:space-x-8">
@@ -179,7 +196,7 @@ export function DataTable<TData, TValue>({
             <select
               value={table.getState().pagination.pageSize}
               onChange={(e) => {
-                table.setPageSize(Number(e.target.value))
+                table.setPageSize(Number(e.target.value));
               }}
               className="h-8 w-[70px] rounded-md border border-input bg-background px-2 py-1 text-sm"
             >
@@ -191,7 +208,7 @@ export function DataTable<TData, TValue>({
             </select>
           </div>
           <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-            Page {table.getState().pagination.pageIndex + 1} of{" "}
+            Page {table.getState().pagination.pageIndex + 1} of{' '}
             {table.getPageCount()}
           </div>
           <div className="flex items-center space-x-2">
@@ -215,5 +232,5 @@ export function DataTable<TData, TValue>({
         </div>
       </div>
     </div>
-  )
+  );
 }

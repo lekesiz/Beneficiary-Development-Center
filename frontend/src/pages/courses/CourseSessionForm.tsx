@@ -1,34 +1,50 @@
 /**
  * Course Session Form Page (Create/Edit)
  */
-import React from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { useCourse, useAddSession } from '../../hooks/useCourses';
-import { useAuth } from '../../contexts/AuthContext';
-import { Button, Input, Select, Textarea } from '../../components/ui/Form';
-import { Card } from '../../components/ui/Card';
-import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
-import { DatePicker } from '../../components/ui/DatePicker';
-import type { CreateSessionRequest } from '../../types/course';
 import { ArrowLeft, Save, Calendar, MapPin, Globe } from 'lucide-react';
+import * as React from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { useParams, useNavigate } from 'react-router-dom';
+import { z } from 'zod';
+
+import { Card } from '../../components/ui/Card';
+import { DatePicker } from '../../components/ui/DatePicker';
+import { Button, Input, Select, Textarea } from '../../components/ui/Form';
+import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
+import { useAuth } from '../../contexts/AuthContext';
+import { useCourse, useAddSession } from '../../hooks/useCourses';
+import type { CreateSessionRequest } from '../../types/course';
+
 
 // Form validation schema
 const sessionFormSchema = z.object({
-  title: z.string().min(1, 'Oturum adı zorunludur').max(200, 'Oturum adı en fazla 200 karakter olabilir'),
+  title: z
+    .string()
+    .min(1, 'Oturum adı zorunludur')
+    .max(200, 'Oturum adı en fazla 200 karakter olabilir'),
   description: z.string().optional(),
   session_date: z.string().min(1, 'Tarih zorunludur'),
   session_time: z.string().min(1, 'Saat zorunludur'),
-  duration_hours: z.number().min(0.5, 'Süre en az 0.5 saat olmalıdır').max(12, 'Süre en fazla 12 saat olabilir'),
+  duration_hours: z
+    .number()
+    .min(0.5, 'Süre en az 0.5 saat olmalıdır')
+    .max(12, 'Süre en fazla 12 saat olabilir'),
   location: z.string().optional(),
   room_number: z.string().optional(),
   is_online: z.boolean(),
-  online_link: z.string().url('Geçerli bir URL giriniz').optional().or(z.literal('')),
+  online_link: z
+    .string()
+    .url('Geçerli bir URL giriniz')
+    .optional()
+    .or(z.literal('')),
   instructor_id: z.number().optional(),
   is_mandatory: z.boolean(),
-  materials_url: z.string().url('Geçerli bir URL giriniz').optional().or(z.literal('')),
+  materials_url: z
+    .string()
+    .url('Geçerli bir URL giriniz')
+    .optional()
+    .or(z.literal('')),
 });
 
 type SessionFormData = z.infer<typeof sessionFormSchema>;
@@ -39,13 +55,17 @@ export const CourseSessionForm: React.FC = () => {
   const { user } = useAuth();
   const courseIdNum = parseInt(courseId!);
 
-  const { data: course, isLoading: isLoadingCourse } = useCourse(courseIdNum, false);
+  const { data: course, isLoading: isLoadingCourse } = useCourse(
+    courseIdNum,
+    false
+  );
   const addSession = useAddSession();
 
   // Permission checks
   const canEdit = (course: any) => {
     if (user?.role === 'admin' || user?.role === 'manager') return true;
-    if (user?.role === 'instructor' && course?.instructor_id === user.id) return true;
+    if (user?.role === 'instructor' && course?.instructor_id === user.id)
+      return true;
     return false;
   };
 
@@ -69,8 +89,10 @@ export const CourseSessionForm: React.FC = () => {
   // Form submission
   const onSubmit = async (data: SessionFormData) => {
     try {
-      const sessionDateTime = new Date(`${data.session_date}T${data.session_time}`);
-      
+      const sessionDateTime = new Date(
+        `${data.session_date}T${data.session_time}`
+      );
+
       const sessionData: CreateSessionRequest = {
         title: data.title,
         description: data.description || undefined,
@@ -125,7 +147,9 @@ export const CourseSessionForm: React.FC = () => {
           </Button>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Yeni Oturum</h1>
-            <p className="text-gray-600">{course.title} için yeni oturum oluşturun</p>
+            <p className="text-gray-600">
+              {course.title} için yeni oturum oluşturun
+            </p>
           </div>
         </div>
       </div>
@@ -144,21 +168,22 @@ export const CourseSessionForm: React.FC = () => {
                   name="title"
                   control={control}
                   render={({ field }) => (
-                    <Input
-                      {...field}
-                      error={!!errors.title}
-                    />
+                    <Input {...field} error={!!errors.title} />
                   )}
                 />
                 {errors.title && (
-                  <p className="text-sm text-destructive">{errors.title.message}</p>
+                  <p className="text-sm text-destructive">
+                    {errors.title.message}
+                  </p>
                 )}
               </div>
             </div>
 
             <div className="md:col-span-2">
               <div className="space-y-2">
-                <label className="text-sm font-medium leading-none">Açıklama</label>
+                <label className="text-sm font-medium leading-none">
+                  Açıklama
+                </label>
                 <Controller
                   name="description"
                   control={control}
@@ -171,7 +196,9 @@ export const CourseSessionForm: React.FC = () => {
                   )}
                 />
                 {errors.description && (
-                  <p className="text-sm text-destructive">{errors.description.message}</p>
+                  <p className="text-sm text-destructive">
+                    {errors.description.message}
+                  </p>
                 )}
               </div>
             </div>
@@ -202,15 +229,13 @@ export const CourseSessionForm: React.FC = () => {
                 name="session_time"
                 control={control}
                 render={({ field }) => (
-                  <Input
-                    {...field}
-                    type="time"
-                    error={!!errors.session_time}
-                  />
+                  <Input {...field} type="time" error={!!errors.session_time} />
                 )}
               />
               {errors.session_time && (
-                <p className="text-sm text-destructive">{errors.session_time.message}</p>
+                <p className="text-sm text-destructive">
+                  {errors.session_time.message}
+                </p>
               )}
             </div>
 
@@ -229,12 +254,16 @@ export const CourseSessionForm: React.FC = () => {
                     min="0.5"
                     max="12"
                     error={!!errors.duration_hours}
-                    onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                    onChange={(e) =>
+                      field.onChange(parseFloat(e.target.value) || 0)
+                    }
                   />
                 )}
               />
               {errors.duration_hours && (
-                <p className="text-sm text-destructive">{errors.duration_hours.message}</p>
+                <p className="text-sm text-destructive">
+                  {errors.duration_hours.message}
+                </p>
               )}
             </div>
           </div>
@@ -265,7 +294,9 @@ export const CourseSessionForm: React.FC = () => {
             {!watchIsOnline && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium leading-none">Konum</label>
+                  <label className="text-sm font-medium leading-none">
+                    Konum
+                  </label>
                   <Controller
                     name="location"
                     control={control}
@@ -278,12 +309,16 @@ export const CourseSessionForm: React.FC = () => {
                     )}
                   />
                   {errors.location && (
-                    <p className="text-sm text-destructive">{errors.location.message}</p>
+                    <p className="text-sm text-destructive">
+                      {errors.location.message}
+                    </p>
                   )}
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium leading-none">Oda Numarası</label>
+                  <label className="text-sm font-medium leading-none">
+                    Oda Numarası
+                  </label>
                   <Controller
                     name="room_number"
                     control={control}
@@ -296,7 +331,9 @@ export const CourseSessionForm: React.FC = () => {
                     )}
                   />
                   {errors.room_number && (
-                    <p className="text-sm text-destructive">{errors.room_number.message}</p>
+                    <p className="text-sm text-destructive">
+                      {errors.room_number.message}
+                    </p>
                   )}
                 </div>
               </div>
@@ -304,7 +341,9 @@ export const CourseSessionForm: React.FC = () => {
 
             {watchIsOnline && (
               <div className="space-y-2">
-                <label className="text-sm font-medium leading-none">Online Link</label>
+                <label className="text-sm font-medium leading-none">
+                  Online Link
+                </label>
                 <Controller
                   name="online_link"
                   control={control}
@@ -317,7 +356,9 @@ export const CourseSessionForm: React.FC = () => {
                   )}
                 />
                 {errors.online_link && (
-                  <p className="text-sm text-destructive">{errors.online_link.message}</p>
+                  <p className="text-sm text-destructive">
+                    {errors.online_link.message}
+                  </p>
                 )}
               </div>
             )}
@@ -347,7 +388,9 @@ export const CourseSessionForm: React.FC = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium leading-none">Materyal URL</label>
+              <label className="text-sm font-medium leading-none">
+                Materyal URL
+              </label>
               <Controller
                 name="materials_url"
                 control={control}
@@ -360,7 +403,9 @@ export const CourseSessionForm: React.FC = () => {
                 )}
               />
               {errors.materials_url && (
-                <p className="text-sm text-destructive">{errors.materials_url.message}</p>
+                <p className="text-sm text-destructive">
+                  {errors.materials_url.message}
+                </p>
               )}
             </div>
           </div>
@@ -375,10 +420,7 @@ export const CourseSessionForm: React.FC = () => {
           >
             İptal
           </Button>
-          <Button
-            type="submit"
-            disabled={isSubmitting || addSession.isPending}
-          >
+          <Button type="submit" disabled={isSubmitting || addSession.isPending}>
             <Save className="h-4 w-4 mr-2" />
             Oturum Oluştur
           </Button>

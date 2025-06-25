@@ -1,14 +1,15 @@
-import React from 'react'
-import { X } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { X } from 'lucide-react';
+import * as React from 'react';
+
+import { cn } from '@/lib/utils';
 
 interface ModalProps {
-  isOpen: boolean
-  onClose: () => void
-  title?: string
-  children: React.ReactNode
-  className?: string
-  size?: 'sm' | 'md' | 'lg' | 'xl'
+  isOpen: boolean;
+  onClose: () => void;
+  title?: string;
+  children: React.ReactNode;
+  className?: string;
+  size?: 'sm' | 'md' | 'lg' | 'xl';
 }
 
 export const Modal: React.FC<ModalProps> = ({
@@ -19,14 +20,14 @@ export const Modal: React.FC<ModalProps> = ({
   className,
   size = 'md',
 }) => {
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   const sizes = {
     sm: 'max-w-md',
     md: 'max-w-lg',
     lg: 'max-w-2xl',
     xl: 'max-w-4xl',
-  }
+  };
 
   return (
     <>
@@ -64,19 +65,19 @@ export const Modal: React.FC<ModalProps> = ({
         </div>
       </div>
     </>
-  )
-}
+  );
+};
 
 interface ConfirmDialogProps {
-  isOpen: boolean
-  onClose: () => void
-  onConfirm: () => void
-  title: string
-  message: string
-  confirmText?: string
-  cancelText?: string
-  variant?: 'danger' | 'warning' | 'info'
-  loading?: boolean
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  title: string;
+  message: string;
+  confirmText?: string;
+  cancelText?: string;
+  variant?: 'danger' | 'warning' | 'info';
+  loading?: boolean;
 }
 
 export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
@@ -91,10 +92,11 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   loading = false,
 }) => {
   const variants = {
-    danger: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
+    danger:
+      'bg-destructive text-destructive-foreground hover:bg-destructive/90',
     warning: 'bg-yellow-600 text-white hover:bg-yellow-700',
     info: 'bg-primary text-primary-foreground hover:bg-primary/90',
-  }
+  };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="sm">
@@ -125,5 +127,5 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
         </div>
       </div>
     </Modal>
-  )
-}
+  );
+};

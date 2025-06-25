@@ -1,35 +1,42 @@
-import { rest } from 'msw'
-import { mockBeneficiary, mockBeneficiaryList } from './beneficiary'
-import { BeneficiaryListResponse, BeneficiaryStatistics } from '@/types/beneficiary'
+import { rest } from 'msw';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1'
+import {
+  BeneficiaryListResponse,
+  BeneficiaryStatistics,
+} from '@/types/beneficiary';
+
+import { mockBeneficiary, mockBeneficiaryList } from './beneficiary';
+
+
+const API_URL = 'http://localhost:5001/api/v1';
 
 export const handlers = [
   // Get all beneficiaries
   rest.get(`${API_URL}/beneficiaries`, (req, res, ctx) => {
-    const page = Number(req.url.searchParams.get('page')) || 1
-    const perPage = Number(req.url.searchParams.get('per_page')) || 20
-    const search = req.url.searchParams.get('search')
-    const status = req.url.searchParams.get('status')
+    const page = Number(req.url.searchParams.get('page')) || 1;
+    const perPage = Number(req.url.searchParams.get('per_page')) || 20;
+    const search = req.url.searchParams.get('search');
+    const status = req.url.searchParams.get('status');
 
-    let filteredList = [...mockBeneficiaryList]
+    let filteredList = [...mockBeneficiaryList];
 
     // Apply search filter
     if (search) {
-      filteredList = filteredList.filter(b => 
-        b.full_name.toLowerCase().includes(search.toLowerCase()) ||
-        b.email?.toLowerCase().includes(search.toLowerCase())
-      )
+      filteredList = filteredList.filter(
+        (b) =>
+          b.full_name.toLowerCase().includes(search.toLowerCase()) ||
+          b.email?.toLowerCase().includes(search.toLowerCase())
+      );
     }
 
     // Apply status filter
     if (status) {
-      filteredList = filteredList.filter(b => b.status === status)
+      filteredList = filteredList.filter((b) => b.status === status);
     }
 
-    const start = (page - 1) * perPage
-    const end = start + perPage
-    const paginatedList = filteredList.slice(start, end)
+    const start = (page - 1) * perPage;
+    const end = start + perPage;
+    const paginatedList = filteredList.slice(start, end);
 
     const response: BeneficiaryListResponse = {
       beneficiaries: paginatedList,
@@ -39,105 +46,12 @@ export const handlers = [
         total: filteredList.length,
         pages: Math.ceil(filteredList.length / perPage),
       },
-    }
+    };
 
-    return res(ctx.status(200), ctx.json(response))
+    return res(ctx.status(200), ctx.json(response));
   }),
 
-  // Get beneficiary by ID
-  rest.get(`${API_URL}/beneficiaries/:id`, (req, res, ctx) => {
-    const { id } = req.params
-    const beneficiary = mockBeneficiaryList.find(b => b.id === Number(id))
-
-    if (!beneficiary) {
-      return res(
-        ctx.status(404),
-        ctx.json({ error: 'Beneficiary not found' })
-      )
-    }
-
-    return res(
-      ctx.status(200),
-      ctx.json({ beneficiary })
-    )
-  }),
-
-  // Create beneficiary
-  rest.post(`${API_URL}/beneficiaries`, async (req, res, ctx) => {
-    const data = await req.json()
-
-    if (!data.first_name || !data.last_name) {
-      return res(
-        ctx.status(400),
-        ctx.json({ error: 'First name and last name are required' })
-      )
-    }
-
-    const newBeneficiary = {
-      ...mockBeneficiary,
-      id: mockBeneficiaryList.length + 1,
-      ...data,
-      full_name: `${data.first_name} ${data.last_name}`,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    }
-
-    return res(
-      ctx.status(201),
-      ctx.json({
-        message: 'Beneficiary created successfully',
-        beneficiary: newBeneficiary,
-      })
-    )
-  }),
-
-  // Update beneficiary
-  rest.put(`${API_URL}/beneficiaries/:id`, async (req, res, ctx) => {
-    const { id } = req.params
-    const data = await req.json()
-    const beneficiary = mockBeneficiaryList.find(b => b.id === Number(id))
-
-    if (!beneficiary) {
-      return res(
-        ctx.status(404),
-        ctx.json({ error: 'Beneficiary not found' })
-      )
-    }
-
-    const updatedBeneficiary = {
-      ...beneficiary,
-      ...data,
-      updated_at: new Date().toISOString(),
-    }
-
-    return res(
-      ctx.status(200),
-      ctx.json({
-        message: 'Beneficiary updated successfully',
-        beneficiary: updatedBeneficiary,
-      })
-    )
-  }),
-
-  // Delete beneficiary
-  rest.delete(`${API_URL}/beneficiaries/:id`, (req, res, ctx) => {
-    const { id } = req.params
-    const beneficiary = mockBeneficiaryList.find(b => b.id === Number(id))
-
-    if (!beneficiary) {
-      return res(
-        ctx.status(404),
-        ctx.json({ error: 'Beneficiary not found' })
-      )
-    }
-
-    return res(
-      ctx.status(200),
-      ctx.json({ message: 'Beneficiary deleted successfully' })
-    )
-  }),
-
-  // Get statistics
+  // Get statistics (must come before /:id to avoid conflict)
   rest.get(`${API_URL}/beneficiaries/statistics`, (req, res, ctx) => {
     const statistics: BeneficiaryStatistics = {
       total: mockBeneficiaryList.length,
@@ -172,32 +86,104 @@ export const handlers = [
         '46-55': 0,
         '56+': 0,
       },
+    };
+
+    return res(ctx.status(200), ctx.json({ statistics }));
+  }),
+
+  // Get beneficiary by ID
+  rest.get(`${API_URL}/beneficiaries/:id`, (req, res, ctx) => {
+    const { id } = req.params;
+    const beneficiary = mockBeneficiaryList.find((b) => b.id === Number(id));
+
+    if (!beneficiary) {
+      return res(ctx.status(404), ctx.json({ error: 'Beneficiary not found' }));
+    }
+
+    return res(ctx.status(200), ctx.json({ beneficiary }));
+  }),
+
+  // Create beneficiary
+  rest.post(`${API_URL}/beneficiaries`, async (req, res, ctx) => {
+    const data = await req.json();
+
+    if (!data.first_name || !data.last_name) {
+      return res(
+        ctx.status(400),
+        ctx.json({ error: 'First name and last name are required' })
+      );
+    }
+
+    const newBeneficiary = {
+      ...mockBeneficiary,
+      id: mockBeneficiaryList.length + 1,
+      ...data,
+      full_name: `${data.first_name} ${data.last_name}`,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+
+    return res(
+      ctx.status(201),
+      ctx.json({
+        message: 'Beneficiary created successfully',
+        beneficiary: newBeneficiary,
+      })
+    );
+  }),
+
+  // Update beneficiary
+  rest.put(`${API_URL}/beneficiaries/:id`, async (req, res, ctx) => {
+    const { id } = req.params;
+    const data = await req.json();
+    const beneficiary = mockBeneficiaryList.find((b) => b.id === Number(id));
+
+    if (!beneficiary) {
+      return res(ctx.status(404), ctx.json({ error: 'Beneficiary not found' }));
+    }
+
+    const updatedBeneficiary = {
+      ...beneficiary,
+      ...data,
+      updated_at: new Date().toISOString(),
+    };
+
+    return res(
+      ctx.status(200),
+      ctx.json({
+        message: 'Beneficiary updated successfully',
+        beneficiary: updatedBeneficiary,
+      })
+    );
+  }),
+
+  // Delete beneficiary
+  rest.delete(`${API_URL}/beneficiaries/:id`, (req, res, ctx) => {
+    const { id } = req.params;
+    const beneficiary = mockBeneficiaryList.find((b) => b.id === Number(id));
+
+    if (!beneficiary) {
+      return res(ctx.status(404), ctx.json({ error: 'Beneficiary not found' }));
     }
 
     return res(
       ctx.status(200),
-      ctx.json({ statistics })
-    )
+      ctx.json({ message: 'Beneficiary deleted successfully' })
+    );
   }),
 
   // Add note
   rest.post(`${API_URL}/beneficiaries/:id/notes`, async (req, res, ctx) => {
-    const { id } = req.params
-    const { note } = await req.json()
-    const beneficiary = mockBeneficiaryList.find(b => b.id === Number(id))
+    const { id } = req.params;
+    const { note } = await req.json();
+    const beneficiary = mockBeneficiaryList.find((b) => b.id === Number(id));
 
     if (!beneficiary) {
-      return res(
-        ctx.status(404),
-        ctx.json({ error: 'Beneficiary not found' })
-      )
+      return res(ctx.status(404), ctx.json({ error: 'Beneficiary not found' }));
     }
 
     if (!note) {
-      return res(
-        ctx.status(400),
-        ctx.json({ error: 'Note text is required' })
-      )
+      return res(ctx.status(400), ctx.json({ error: 'Note text is required' }));
     }
 
     const updatedBeneficiary = {
@@ -211,7 +197,7 @@ export const handlers = [
           created_at: new Date().toISOString(),
         },
       ],
-    }
+    };
 
     return res(
       ctx.status(200),
@@ -219,33 +205,27 @@ export const handlers = [
         message: 'Note added successfully',
         beneficiary: updatedBeneficiary,
       })
-    )
+    );
   }),
 
   // Add tag
   rest.post(`${API_URL}/beneficiaries/:id/tags`, async (req, res, ctx) => {
-    const { id } = req.params
-    const { tag } = await req.json()
-    const beneficiary = mockBeneficiaryList.find(b => b.id === Number(id))
+    const { id } = req.params;
+    const { tag } = await req.json();
+    const beneficiary = mockBeneficiaryList.find((b) => b.id === Number(id));
 
     if (!beneficiary) {
-      return res(
-        ctx.status(404),
-        ctx.json({ error: 'Beneficiary not found' })
-      )
+      return res(ctx.status(404), ctx.json({ error: 'Beneficiary not found' }));
     }
 
     if (!tag) {
-      return res(
-        ctx.status(400),
-        ctx.json({ error: 'Tag is required' })
-      )
+      return res(ctx.status(400), ctx.json({ error: 'Tag is required' }));
     }
 
     const updatedBeneficiary = {
       ...beneficiary,
       tags: [...new Set([...beneficiary.tags, tag])],
-    }
+    };
 
     return res(
       ctx.status(200),
@@ -253,6 +233,6 @@ export const handlers = [
         message: 'Tag added successfully',
         beneficiary: updatedBeneficiary,
       })
-    )
+    );
   }),
-]
+];

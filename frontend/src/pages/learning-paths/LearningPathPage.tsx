@@ -1,5 +1,3 @@
-import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
   Calendar,
@@ -16,38 +14,42 @@ import {
   Edit3,
   MessageSquare,
   Loader2,
-  AlertCircle
+  AlertCircle,
 } from 'lucide-react';
-import { Card } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Form';
-import { Badge } from '@/components/ui/Badge';
-import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
-import { ProgressBar } from '@/components/ui/ProgressBar';
-import { 
-  useLearningPath, 
-  useAcceptLearningPath,
-  useUpdateLearningPath,
-  useProvideFeedback
-} from '@/hooks/useLearningPath';
-import { useMyDevelopmentReport } from '@/hooks/useReports';
+import * as React from 'react';
+import { useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+
 import { LearningPathAcceptanceFlow } from '@/components/learning-paths/LearningPathAcceptanceFlow';
 import { LearningPathTimeline } from '@/components/learning-paths/LearningPathTimeline';
 import { MilestoneCard } from '@/components/learning-paths/MilestoneCard';
+import { Badge } from '@/components/ui/Badge';
+import { Card } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Form';
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
+import { ProgressBar } from '@/components/ui/ProgressBar';
+import {
+  useLearningPath,
+  useAcceptLearningPath,
+  useUpdateLearningPath,
+  useProvideFeedback,
+} from '@/hooks/useLearningPath';
+import { useMyDevelopmentReport } from '@/hooks/useReports';
 
 export default function LearningPathPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const pathId = parseInt(id!);
-  
+
   const [showAcceptanceFlow, setShowAcceptanceFlow] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  
+
   // React Query hooks
   const { data: learningPath, isLoading, error } = useLearningPath(pathId);
   const acceptMutation = useAcceptLearningPath();
   const updateMutation = useUpdateLearningPath();
   const feedbackMutation = useProvideFeedback();
-  
+
   // Handle acceptance
   const handleAccept = async (customizationNotes?: string) => {
     try {
@@ -57,7 +59,7 @@ export default function LearningPathPage() {
       console.error('Failed to accept learning path:', error);
     }
   };
-  
+
   if (isLoading) {
     return (
       <div className="p-6 flex justify-center">
@@ -65,28 +67,26 @@ export default function LearningPathPage() {
       </div>
     );
   }
-  
+
   if (error || !learningPath) {
     return (
       <div className="p-6">
         <div className="text-center py-12">
           <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
           <p className="text-red-600">Öğrenme planı bulunamadı.</p>
-          <Button
-            onClick={() => navigate('/evaluations')}
-            className="mt-4"
-          >
+          <Button onClick={() => navigate('/evaluations')} className="mt-4">
             Geri Dön
           </Button>
         </div>
       </div>
     );
   }
-  
+
   const isProposed = learningPath.status === 'proposed';
-  const isAccepted = learningPath.status === 'accepted' || learningPath.status === 'in_progress';
+  const isAccepted =
+    learningPath.status === 'accepted' || learningPath.status === 'in_progress';
   const progressPercentage = learningPath.overall_progress || 0;
-  
+
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
       {/* Header */}
@@ -103,10 +103,10 @@ export default function LearningPathPage() {
             <p className="text-gray-600">{learningPath.description}</p>
           </div>
         </div>
-        
+
         <div className="flex items-center space-x-2">
           {isProposed && !showAcceptanceFlow && (
-            <Button 
+            <Button
               onClick={() => setShowAcceptanceFlow(true)}
               className="bg-green-600 hover:bg-green-700"
             >
@@ -124,7 +124,7 @@ export default function LearningPathPage() {
                 <MessageSquare className="mr-2 h-4 w-4" />
                 Geri Bildirim
               </Button>
-              <Button 
+              <Button
                 variant="outline"
                 onClick={() => navigate('/reports/my-development')}
               >
@@ -135,7 +135,7 @@ export default function LearningPathPage() {
           )}
         </div>
       </div>
-      
+
       {/* Acceptance Flow Modal */}
       {showAcceptanceFlow && (
         <LearningPathAcceptanceFlow
@@ -145,7 +145,7 @@ export default function LearningPathPage() {
           isLoading={acceptMutation.isPending}
         />
       )}
-      
+
       {/* Status Banner */}
       {isProposed && (
         <Card className="p-6 bg-blue-50 border-blue-200">
@@ -156,21 +156,24 @@ export default function LearningPathPage() {
                 AI Tarafından Oluşturulan Kişiselleştirilmiş Plan
               </h3>
               <p className="text-blue-700">
-                Bu plan, değerlendirme sonuçlarınıza göre özel olarak hazırlandı. 
-                İnceleyip onayladıktan sonra öğrenmeye başlayabilirsiniz.
+                Bu plan, değerlendirme sonuçlarınıza göre özel olarak
+                hazırlandı. İnceleyip onayladıktan sonra öğrenmeye
+                başlayabilirsiniz.
               </p>
             </div>
           </div>
         </Card>
       )}
-      
+
       {/* Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card className="p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Süre</p>
-              <p className="text-2xl font-bold">{learningPath.duration_weeks} Hafta</p>
+              <p className="text-2xl font-bold">
+                {learningPath.duration_weeks} Hafta
+              </p>
               <p className="text-sm text-gray-500">
                 {learningPath.estimated_hours_per_week} saat/hafta
               </p>
@@ -178,39 +181,47 @@ export default function LearningPathPage() {
             <Calendar className="h-8 w-8 text-blue-600 opacity-80" />
           </div>
         </Card>
-        
+
         <Card className="p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">İlerleme</p>
-              <p className="text-2xl font-bold">{progressPercentage.toFixed(0)}%</p>
+              <p className="text-2xl font-bold">
+                {progressPercentage.toFixed(0)}%
+              </p>
               <p className="text-sm text-gray-500">
-                {learningPath.completed_milestones} / {learningPath.total_milestones} tamamlandı
+                {learningPath.completed_milestones} /{' '}
+                {learningPath.total_milestones} tamamlandı
               </p>
             </div>
             <TrendingUp className="h-8 w-8 text-green-600 opacity-80" />
           </div>
         </Card>
-        
+
         <Card className="p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Öğrenme Stili</p>
               <p className="text-2xl font-bold capitalize">
-                {learningPath.learning_style === 'mixed' ? 'Karma' : learningPath.learning_style}
+                {learningPath.learning_style === 'mixed'
+                  ? 'Karma'
+                  : learningPath.learning_style}
               </p>
-              <p className="text-sm text-gray-500">{learningPath.difficulty_adjustment}</p>
+              <p className="text-sm text-gray-500">
+                {learningPath.difficulty_adjustment}
+              </p>
             </div>
             <Users className="h-8 w-8 text-purple-600 opacity-80" />
           </div>
         </Card>
-        
+
         <Card className="p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Hedef</p>
               <p className="text-lg font-bold">
-                {learningPath.ai_insights_summary?.performance_level || 'Gelişim'}
+                {learningPath.ai_insights_summary?.performance_level ||
+                  'Gelişim'}
               </p>
               <p className="text-sm text-gray-500">Mevcut seviye</p>
             </div>
@@ -218,7 +229,7 @@ export default function LearningPathPage() {
           </div>
         </Card>
       </div>
-      
+
       {/* Main Content */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column - Timeline and Milestones */}
@@ -227,8 +238,8 @@ export default function LearningPathPage() {
           {isAccepted && (
             <Card className="p-6">
               <h3 className="text-lg font-semibold mb-4">Genel İlerleme</h3>
-              <ProgressBar 
-                value={progressPercentage} 
+              <ProgressBar
+                value={progressPercentage}
                 className="mb-2"
                 showLabel
               />
@@ -241,30 +252,38 @@ export default function LearningPathPage() {
                 </div>
                 <div className="text-center">
                   <p className="text-2xl font-bold text-blue-600">
-                    {learningPath.milestones.filter(m => m.status === 'in_progress').length}
+                    {
+                      learningPath.milestones.filter(
+                        (m) => m.status === 'in_progress'
+                      ).length
+                    }
                   </p>
                   <p className="text-sm text-gray-600">Devam Eden</p>
                 </div>
                 <div className="text-center">
                   <p className="text-2xl font-bold text-gray-600">
-                    {learningPath.milestones.filter(m => m.status === 'pending').length}
+                    {
+                      learningPath.milestones.filter(
+                        (m) => m.status === 'pending'
+                      ).length
+                    }
                   </p>
                   <p className="text-sm text-gray-600">Bekleyen</p>
                 </div>
               </div>
             </Card>
           )}
-          
+
           {/* Timeline View */}
           <Card className="p-6">
             <h3 className="text-lg font-semibold mb-4">Öğrenme Takvimi</h3>
-            <LearningPathTimeline 
+            <LearningPathTimeline
               weeklySchedule={learningPath.weekly_schedule}
               milestones={learningPath.milestones}
               startDate={learningPath.start_date}
             />
           </Card>
-          
+
           {/* Milestones */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Öğrenme Hedefleri</h3>
@@ -278,7 +297,7 @@ export default function LearningPathPage() {
             ))}
           </div>
         </div>
-        
+
         {/* Right Column - Resources and Info */}
         <div className="space-y-6">
           {/* Learning Objective */}
@@ -289,7 +308,7 @@ export default function LearningPathPage() {
             </h3>
             <p className="text-gray-700">{learningPath.objective}</p>
           </Card>
-          
+
           {/* Prerequisites */}
           {learningPath.prerequisites.length > 0 && (
             <Card className="p-6">
@@ -304,25 +323,26 @@ export default function LearningPathPage() {
               </ul>
             </Card>
           )}
-          
+
           {/* Success Metrics */}
-          {learningPath.success_metrics && learningPath.success_metrics.length > 0 && (
-            <Card className="p-6">
-              <h3 className="text-lg font-semibold mb-3 flex items-center">
-                <Award className="mr-2 h-5 w-5 text-green-600" />
-                Başarı Kriterleri
-              </h3>
-              <ul className="space-y-2">
-                {learningPath.success_metrics.map((metric, index) => (
-                  <li key={index} className="flex items-start">
-                    <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 mr-2 flex-shrink-0" />
-                    <span className="text-sm text-gray-700">{metric}</span>
-                  </li>
-                ))}
-              </ul>
-            </Card>
-          )}
-          
+          {learningPath.success_metrics &&
+            learningPath.success_metrics.length > 0 && (
+              <Card className="p-6">
+                <h3 className="text-lg font-semibold mb-3 flex items-center">
+                  <Award className="mr-2 h-5 w-5 text-green-600" />
+                  Başarı Kriterleri
+                </h3>
+                <ul className="space-y-2">
+                  {learningPath.success_metrics.map((metric, index) => (
+                    <li key={index} className="flex items-start">
+                      <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 mr-2 flex-shrink-0" />
+                      <span className="text-sm text-gray-700">{metric}</span>
+                    </li>
+                  ))}
+                </ul>
+              </Card>
+            )}
+
           {/* Resources */}
           <Card className="p-6">
             <h3 className="text-lg font-semibold mb-3 flex items-center">
@@ -332,7 +352,9 @@ export default function LearningPathPage() {
             <div className="space-y-4">
               {learningPath.resources.map((category, index) => (
                 <div key={index}>
-                  <h4 className="font-medium text-gray-700 mb-2">{category.category}</h4>
+                  <h4 className="font-medium text-gray-700 mb-2">
+                    {category.category}
+                  </h4>
                   <ul className="space-y-2">
                     {category.items.map((resource, rIndex) => (
                       <li key={rIndex} className="text-sm">
@@ -355,7 +377,7 @@ export default function LearningPathPage() {
               ))}
             </div>
           </Card>
-          
+
           {/* AI Insights Summary */}
           {learningPath.ai_insights_summary && (
             <Card className="p-6">
@@ -371,13 +393,17 @@ export default function LearningPathPage() {
                   </Badge>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Gelişim Alanları</span>
+                  <span className="text-sm text-gray-600">
+                    Gelişim Alanları
+                  </span>
                   <Badge variant="warning">
                     {learningPath.ai_insights_summary.weaknesses_targeted}
                   </Badge>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Performans Seviyesi</span>
+                  <span className="text-sm text-gray-600">
+                    Performans Seviyesi
+                  </span>
                   <Badge variant="primary">
                     {learningPath.ai_insights_summary.performance_level}
                   </Badge>

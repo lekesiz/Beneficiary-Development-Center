@@ -1,5 +1,3 @@
-import React from 'react';
-import { Link, Outlet, useLocation } from 'react-router-dom';
 import {
   Users,
   BookOpen,
@@ -9,10 +7,13 @@ import {
   LogOut,
   Menu,
   X,
-  Home
+  Home,
 } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
+import * as React from 'react';
+import { Link, Outlet, useLocation } from 'react-router-dom';
+
 import NotificationCenter from '@/components/coach/NotificationCenter';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function CoachLayout() {
   const location = useLocation();
@@ -25,7 +26,7 @@ export default function CoachLayout() {
     { name: 'Programlar', href: '/coach/programs', icon: BookOpen },
     { name: 'Raporlar', href: '/coach/reports', icon: TrendingUp },
     { name: 'Takvim', href: '/coach/calendar', icon: Calendar },
-    { name: 'Ayarlar', href: '/coach/settings', icon: Settings }
+    { name: 'Ayarlar', href: '/coach/settings', icon: Settings },
   ];
 
   const isActive = (path: string) => location.pathname.startsWith(path);
@@ -41,21 +42,27 @@ export default function CoachLayout() {
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                 className="p-2 rounded-md text-gray-400 lg:hidden"
               >
-                {isSidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                {isSidebarOpen ? (
+                  <X className="h-6 w-6" />
+                ) : (
+                  <Menu className="h-6 w-6" />
+                )}
               </button>
               <h1 className="ml-2 text-xl font-semibold text-gray-900">
                 BDC Koç Paneli
               </h1>
             </div>
-            
+
             <div className="flex items-center space-x-4">
               {/* Notification Center */}
               <NotificationCenter />
-              
+
               {/* User Menu */}
               <div className="flex items-center">
                 <div className="mr-3 text-right">
-                  <p className="text-sm font-medium text-gray-900">{user?.name}</p>
+                  <p className="text-sm font-medium text-gray-900">
+                    {user?.name}
+                  </p>
                   <p className="text-xs text-gray-500">{user?.role}</p>
                 </div>
                 <button
@@ -95,7 +102,9 @@ export default function CoachLayout() {
                   >
                     <Icon
                       className={`${
-                        isActive(item.href) ? 'text-white' : 'text-gray-400 group-hover:text-white'
+                        isActive(item.href)
+                          ? 'text-white'
+                          : 'text-gray-400 group-hover:text-white'
                       } mr-3 flex-shrink-0 h-6 w-6`}
                     />
                     {item.name}

@@ -1,4 +1,5 @@
-import React from 'react';
+import * as React from 'react';
+
 import { Input } from './Form';
 
 interface DatePickerProps extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -23,9 +24,7 @@ export const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
           error={!!error}
           ref={ref}
         />
-        {error && (
-          <p className="text-sm text-destructive">{error}</p>
-        )}
+        {error && <p className="text-sm text-destructive">{error}</p>}
       </div>
     );
   }

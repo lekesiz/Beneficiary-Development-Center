@@ -1,28 +1,29 @@
-import React from 'react'
-import { Outlet, NavLink, useNavigate } from 'react-router-dom'
-import { 
-  Users, 
-  BookOpen, 
+import {
+  Users,
+  BookOpen,
   GraduationCap,
-  ClipboardCheck, 
-  BarChart3, 
-  Settings, 
+  ClipboardCheck,
+  BarChart3,
+  Settings,
   LogOut,
   Menu,
   X,
-  Home
-} from 'lucide-react'
-import { useAuth } from '@/contexts/AuthContext'
+  Home,
+} from 'lucide-react';
+import * as React from 'react';
+import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+
+import { useAuth } from '@/contexts/AuthContext';
 
 const DashboardLayout: React.FC = () => {
-  const { user, logout } = useAuth()
-  const navigate = useNavigate()
-  const [sidebarOpen, setSidebarOpen] = React.useState(false)
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const [sidebarOpen, setSidebarOpen] = React.useState(false);
 
   const handleLogout = () => {
-    logout()
-    navigate('/login')
-  }
+    logout();
+    navigate('/login');
+  };
 
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: Home },
@@ -32,7 +33,7 @@ const DashboardLayout: React.FC = () => {
     { name: 'Evaluations', href: '/evaluations', icon: ClipboardCheck },
     { name: 'Reports', href: '/reports', icon: BarChart3 },
     { name: 'Settings', href: '/settings', icon: Settings },
-  ]
+  ];
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -54,10 +55,7 @@ const DashboardLayout: React.FC = () => {
           {/* Logo */}
           <div className="flex h-16 items-center justify-between px-4 border-b">
             <h2 className="text-lg font-semibold">BDC Platform</h2>
-            <button
-              onClick={() => setSidebarOpen(false)}
-              className="lg:hidden"
-            >
+            <button onClick={() => setSidebarOpen(false)} className="lg:hidden">
               <X className="h-6 w-6" />
             </button>
           </div>
@@ -113,10 +111,7 @@ const DashboardLayout: React.FC = () => {
         {/* Top bar */}
         <header className="bg-white shadow-sm">
           <div className="flex h-16 items-center justify-between px-4">
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="lg:hidden"
-            >
+            <button onClick={() => setSidebarOpen(true)} className="lg:hidden">
               <Menu className="h-6 w-6" />
             </button>
             <div className="flex-1" />
@@ -130,7 +125,7 @@ const DashboardLayout: React.FC = () => {
         </main>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default DashboardLayout
+export default DashboardLayout;

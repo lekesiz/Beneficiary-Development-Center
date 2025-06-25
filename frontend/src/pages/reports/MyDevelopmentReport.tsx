@@ -1,19 +1,21 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Calendar } from 'lucide-react';
-import { Button } from '@/components/ui/Form';
+import * as React from 'react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import { DevelopmentReport } from '@/components/reports/DevelopmentReport';
+import { Button } from '@/components/ui/Form';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function MyDevelopmentReport() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [dateRange, setDateRange] = useState(30);
-  
+
   if (!user) {
     return null;
   }
-  
+
   return (
     <div className="p-6 max-w-7xl mx-auto">
       {/* Header */}
@@ -27,10 +29,12 @@ export default function MyDevelopmentReport() {
           </button>
           <div>
             <h1 className="text-2xl font-bold">Gelişim Raporum</h1>
-            <p className="text-gray-600">Kişisel performans ve öğrenme analizi</p>
+            <p className="text-gray-600">
+              Kişisel performans ve öğrenme analizi
+            </p>
           </div>
         </div>
-        
+
         {/* Date Range Selector */}
         <div className="flex items-center space-x-2">
           <Calendar className="h-5 w-5 text-gray-500" />
@@ -46,7 +50,7 @@ export default function MyDevelopmentReport() {
           </select>
         </div>
       </div>
-      
+
       {/* Development Report Component */}
       <DevelopmentReport
         userId={user.id}

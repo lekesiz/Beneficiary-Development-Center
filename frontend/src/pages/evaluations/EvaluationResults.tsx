@@ -1,12 +1,10 @@
-import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { 
-  ArrowLeft, 
-  Trophy, 
-  Target, 
-  Clock, 
-  CheckCircle, 
-  XCircle, 
+import {
+  ArrowLeft,
+  Trophy,
+  Target,
+  Clock,
+  CheckCircle,
+  XCircle,
   RotateCcw,
   Download,
   Share2,
@@ -15,18 +13,22 @@ import {
   Star,
   AlertCircle,
   Brain,
-  FileText
+  FileText,
 } from 'lucide-react';
-import { Card } from '@/components/ui/Card';
+import * as React from 'react';
+import { useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+
+import { LearningInsights } from '@/components/evaluations/LearningInsights';
 import { Badge } from '@/components/ui/Badge';
+import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Form';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
-import { 
+import {
   useEvaluation,
   useEvaluationAttempt,
-  useMyEvaluationAttempts
+  useMyEvaluationAttempts,
 } from '@/hooks/useEvaluations';
-import { LearningInsights } from '@/components/evaluations/LearningInsights';
 import { useCreateLearningPath } from '@/hooks/useLearningPath';
 
 // Result Card Component
@@ -44,9 +46,7 @@ const ResultCard: React.FC<{
         <p className={`text-3xl font-bold ${color}`}>{value}</p>
         {subtitle && <p className="text-sm text-gray-500">{subtitle}</p>}
       </div>
-      <div className={`${color} opacity-80`}>
-        {icon}
-      </div>
+      <div className={`${color} opacity-80`}>{icon}</div>
     </div>
   </Card>
 );
@@ -60,22 +60,29 @@ const QuestionReview: React.FC<{
   const isCorrect = response?.is_correct;
   const pointsEarned = response?.points_earned || 0;
   const maxPoints = question.points;
-  
+
   return (
     <Card className="p-6 space-y-4">
       <div className="flex items-start justify-between">
         <div className="flex items-center space-x-3">
-          <div className={`
+          <div
+            className={`
             w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold
-            ${isCorrect ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}
-          `}>
+            ${
+              isCorrect
+                ? 'bg-green-100 text-green-700'
+                : 'bg-red-100 text-red-700'
+            }
+          `}
+          >
             {index + 1}
           </div>
           <div>
             <h3 className="font-medium">{question.question_text}</h3>
             <div className="flex items-center space-x-2 mt-1">
               <Badge variant="outline">
-                {question.question_type === 'multiple_choice' && 'Çoktan Seçmeli'}
+                {question.question_type === 'multiple_choice' &&
+                  'Çoktan Seçmeli'}
                 {question.question_type === 'true_false' && 'Doğru/Yanlış'}
                 {question.question_type === 'short_answer' && 'Kısa Cevap'}
                 {question.question_type === 'essay' && 'Kompozisyon'}
@@ -86,7 +93,7 @@ const QuestionReview: React.FC<{
             </div>
           </div>
         </div>
-        
+
         <div className="flex items-center space-x-2">
           {isCorrect ? (
             <CheckCircle className="h-6 w-6 text-green-600" />
@@ -95,32 +102,44 @@ const QuestionReview: React.FC<{
           )}
         </div>
       </div>
-      
+
       {/* Question Details */}
       <div className="space-y-3">
         {/* User Response */}
         <div>
-          <h4 className="text-sm font-medium text-gray-700 mb-2">Sizin Cevabınız:</h4>
+          <h4 className="text-sm font-medium text-gray-700 mb-2">
+            Sizin Cevabınız:
+          </h4>
           <div className="p-3 bg-gray-50 rounded-lg">
             {question.question_type === 'multiple_choice' && (
-              <p>{response?.response_data?.selected_option || 'Cevaplanmadı'}</p>
+              <p>
+                {response?.response_data?.selected_option || 'Cevaplanmadı'}
+              </p>
             )}
             {question.question_type === 'true_false' && (
-              <p>{response?.response_data?.selected_option ? 'Doğru' : 'Yanlış'}</p>
+              <p>
+                {response?.response_data?.selected_option ? 'Doğru' : 'Yanlış'}
+              </p>
             )}
-            {(question.question_type === 'short_answer' || question.question_type === 'essay') && (
+            {(question.question_type === 'short_answer' ||
+              question.question_type === 'essay') && (
               <p>{response?.response_data?.text || 'Cevaplanmadı'}</p>
             )}
           </div>
         </div>
-        
+
         {/* Correct Answer (for objective questions) */}
-        {(question.question_type === 'multiple_choice' || question.question_type === 'true_false') && (
+        {(question.question_type === 'multiple_choice' ||
+          question.question_type === 'true_false') && (
           <div>
-            <h4 className="text-sm font-medium text-gray-700 mb-2">Doğru Cevap:</h4>
+            <h4 className="text-sm font-medium text-gray-700 mb-2">
+              Doğru Cevap:
+            </h4>
             <div className="p-3 bg-green-50 rounded-lg">
               {question.question_type === 'multiple_choice' && (
-                <p className="text-green-800">{question.question_data.correct_answer}</p>
+                <p className="text-green-800">
+                  {question.question_data.correct_answer}
+                </p>
               )}
               {question.question_type === 'true_false' && (
                 <p className="text-green-800">
@@ -130,21 +149,25 @@ const QuestionReview: React.FC<{
             </div>
           </div>
         )}
-        
+
         {/* Explanation */}
         {question.explanation && (
           <div>
-            <h4 className="text-sm font-medium text-gray-700 mb-2">Açıklama:</h4>
+            <h4 className="text-sm font-medium text-gray-700 mb-2">
+              Açıklama:
+            </h4>
             <div className="p-3 bg-blue-50 rounded-lg">
               <p className="text-blue-800 text-sm">{question.explanation}</p>
             </div>
           </div>
         )}
-        
+
         {/* AI Feedback */}
         {response?.ai_feedback && (
           <div>
-            <h4 className="text-sm font-medium text-gray-700 mb-2">AI Geri Bildirimi:</h4>
+            <h4 className="text-sm font-medium text-gray-700 mb-2">
+              AI Geri Bildirimi:
+            </h4>
             <div className="p-3 bg-purple-50 rounded-lg">
               <p className="text-purple-800 text-sm">{response.ai_feedback}</p>
             </div>
@@ -161,17 +184,17 @@ const PerformanceChart: React.FC<{
     correct: number;
     incorrect: number;
     unanswered: number;
-  }
+  };
 }> = ({ data }) => {
   const total = data.correct + data.incorrect + data.unanswered;
   const correctPercentage = (data.correct / total) * 100;
   const incorrectPercentage = (data.incorrect / total) * 100;
   const unansweredPercentage = (data.unanswered / total) * 100;
-  
+
   return (
     <Card className="p-6">
       <h3 className="text-lg font-semibold mb-4">Soru Analizi</h3>
-      
+
       {/* Progress bars */}
       <div className="space-y-4">
         <div>
@@ -180,40 +203,40 @@ const PerformanceChart: React.FC<{
             <span>{correctPercentage.toFixed(1)}%</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
-            <div 
-              className="bg-green-600 h-2 rounded-full" 
+            <div
+              className="bg-green-600 h-2 rounded-full"
               style={{ width: `${correctPercentage}%` }}
             />
           </div>
         </div>
-        
+
         <div>
           <div className="flex justify-between text-sm mb-1">
             <span>Yanlış ({data.incorrect})</span>
             <span>{incorrectPercentage.toFixed(1)}%</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
-            <div 
-              className="bg-red-600 h-2 rounded-full" 
+            <div
+              className="bg-red-600 h-2 rounded-full"
               style={{ width: `${incorrectPercentage}%` }}
             />
           </div>
         </div>
-        
+
         <div>
           <div className="flex justify-between text-sm mb-1">
             <span>Cevaplanmayan ({data.unanswered})</span>
             <span>{unansweredPercentage.toFixed(1)}%</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
-            <div 
-              className="bg-gray-600 h-2 rounded-full" 
+            <div
+              className="bg-gray-600 h-2 rounded-full"
               style={{ width: `${unansweredPercentage}%` }}
             />
           </div>
         </div>
       </div>
-      
+
       {/* Legend */}
       <div className="flex justify-center space-x-6 mt-6">
         <div className="flex items-center space-x-2">
@@ -243,7 +266,7 @@ const Recommendations: React.FC<{
       <Star className="mr-2 h-5 w-5 text-yellow-600" />
       Öneriler
     </h3>
-    
+
     <div className="space-y-4">
       {performance.percentage_score >= 85 && (
         <div className="p-4 bg-green-50 rounded-lg">
@@ -253,16 +276,17 @@ const Recommendations: React.FC<{
           </p>
         </div>
       )}
-      
-      {performance.percentage_score >= 70 && performance.percentage_score < 85 && (
-        <div className="p-4 bg-blue-50 rounded-lg">
-          <p className="text-blue-800 font-medium">👍 İyi Performans</p>
-          <p className="text-blue-700 text-sm mt-1">
-            Başarılı bir sonuç. Biraz daha çalışmayla mükemmel olabilirsiniz.
-          </p>
-        </div>
-      )}
-      
+
+      {performance.percentage_score >= 70 &&
+        performance.percentage_score < 85 && (
+          <div className="p-4 bg-blue-50 rounded-lg">
+            <p className="text-blue-800 font-medium">👍 İyi Performans</p>
+            <p className="text-blue-700 text-sm mt-1">
+              Başarılı bir sonuç. Biraz daha çalışmayla mükemmel olabilirsiniz.
+            </p>
+          </div>
+        )}
+
       {performance.percentage_score < 70 && (
         <div className="p-4 bg-orange-50 rounded-lg">
           <p className="text-orange-800 font-medium">💪 Gelişim Alanları</p>
@@ -271,13 +295,18 @@ const Recommendations: React.FC<{
           </p>
         </div>
       )}
-      
+
       {weakAreas.length > 0 && (
         <div>
-          <h4 className="font-medium text-gray-700 mb-2">Güçlendirilmesi Gereken Alanlar:</h4>
+          <h4 className="font-medium text-gray-700 mb-2">
+            Güçlendirilmesi Gereken Alanlar:
+          </h4>
           <ul className="space-y-1">
             {weakAreas.map((area, index) => (
-              <li key={index} className="text-sm text-gray-600 flex items-center">
+              <li
+                key={index}
+                className="text-sm text-gray-600 flex items-center"
+              >
                 <div className="w-2 h-2 bg-orange-400 rounded-full mr-2" />
                 {area}
               </li>
@@ -285,7 +314,7 @@ const Recommendations: React.FC<{
           </ul>
         </div>
       )}
-      
+
       <div className="pt-4 border-t">
         <h4 className="font-medium text-gray-700 mb-2">Önerilen Aksiyonlar:</h4>
         <ul className="space-y-2 text-sm text-gray-600">
@@ -311,33 +340,43 @@ export default function EvaluationResults() {
   const { id, attemptId } = useParams<{ id: string; attemptId: string }>();
   const navigate = useNavigate();
   const [showQuestionReview, setShowQuestionReview] = useState(false);
-  const [activeTab, setActiveTab] = useState<'overview' | 'insights' | 'review'>('overview');
-  
+  const [activeTab, setActiveTab] = useState<
+    'overview' | 'insights' | 'review'
+  >('overview');
+
   const evaluationId = parseInt(id!);
   const attemptIdNum = parseInt(attemptId!);
-  
+
   // Learning path mutation
   const createLearningPathMutation = useCreateLearningPath();
-  
+
   // React Query hooks
-  const { data: evaluation, isLoading: evaluationLoading } = useEvaluation(evaluationId);
-  const { data: attempt, isLoading: attemptLoading } = useEvaluationAttempt(evaluationId, attemptIdNum);
+  const { data: evaluation, isLoading: evaluationLoading } =
+    useEvaluation(evaluationId);
+  const { data: attempt, isLoading: attemptLoading } = useEvaluationAttempt(
+    evaluationId,
+    attemptIdNum
+  );
   const { data: allAttempts } = useMyEvaluationAttempts(evaluationId);
-  
+
   // Calculate performance metrics
   const performanceData = React.useMemo(() => {
     if (!attempt || !attempt.responses) return null;
-    
-    const correct = attempt.responses.filter(r => r.is_correct === true).length;
-    const incorrect = attempt.responses.filter(r => r.is_correct === false).length;
+
+    const correct = attempt.responses.filter(
+      (r) => r.is_correct === true
+    ).length;
+    const incorrect = attempt.responses.filter(
+      (r) => r.is_correct === false
+    ).length;
     const unanswered = attempt.total_questions - attempt.responses.length;
-    
+
     return { correct, incorrect, unanswered };
   }, [attempt]);
-  
+
   // Mock weak areas calculation
   const weakAreas = ['Matematik - Toplama İşlemleri', 'Türkçe - Gramer'];
-  
+
   if (evaluationLoading || attemptLoading) {
     return (
       <div className="p-6 flex justify-center">
@@ -345,7 +384,7 @@ export default function EvaluationResults() {
       </div>
     );
   }
-  
+
   if (!evaluation || !attempt) {
     return (
       <div className="p-6">
@@ -362,23 +401,26 @@ export default function EvaluationResults() {
       </div>
     );
   }
-  
+
   const isPassed = attempt.passed;
-  const canRetake = evaluation.max_attempts > 1 && allAttempts && allAttempts.length < evaluation.max_attempts;
-  
+  const canRetake =
+    evaluation.max_attempts > 1 &&
+    allAttempts &&
+    allAttempts.length < evaluation.max_attempts;
+
   // Handle create learning path
   const handleCreateLearningPath = async () => {
     try {
       const result = await createLearningPathMutation.mutateAsync({
         evaluationId,
-        attemptId: attemptIdNum
+        attemptId: attemptIdNum,
       });
       navigate(`/learning-paths/${result.id}`);
     } catch (error) {
       console.error('Failed to create learning path:', error);
     }
   };
-  
+
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
       {/* Header */}
@@ -391,13 +433,16 @@ export default function EvaluationResults() {
             <ArrowLeft className="h-5 w-5" />
           </button>
           <div>
-            <h1 className="text-2xl font-bold">{evaluation.title} - Sonuçlar</h1>
+            <h1 className="text-2xl font-bold">
+              {evaluation.title} - Sonuçlar
+            </h1>
             <p className="text-gray-600">
-              {new Date(attempt.completed_at!).toLocaleString('tr-TR')} tarihinde tamamlandı
+              {new Date(attempt.completed_at!).toLocaleString('tr-TR')}{' '}
+              tarihinde tamamlandı
             </p>
           </div>
         </div>
-        
+
         <div className="flex items-center space-x-2">
           <Button variant="outline">
             <Download className="mr-2 h-4 w-4" />
@@ -408,7 +453,9 @@ export default function EvaluationResults() {
             Paylaş
           </Button>
           {canRetake && (
-            <Button onClick={() => navigate(`/evaluations/${evaluationId}/take`)}>
+            <Button
+              onClick={() => navigate(`/evaluations/${evaluationId}/take`)}
+            >
               <RotateCcw className="mr-2 h-4 w-4" />
               Tekrar Dene
             </Button>
@@ -424,7 +471,7 @@ export default function EvaluationResults() {
           value={`${attempt.score_earned.toFixed(1)} / ${attempt.total_points}`}
           color={isPassed ? 'text-green-600' : 'text-red-600'}
         />
-        
+
         <ResultCard
           icon={<Target className="h-8 w-8" />}
           title="Yüzde Skoru"
@@ -432,7 +479,7 @@ export default function EvaluationResults() {
           subtitle={isPassed ? 'Geçti' : 'Kaldı'}
           color={isPassed ? 'text-green-600' : 'text-red-600'}
         />
-        
+
         <ResultCard
           icon={<Clock className="h-8 w-8" />}
           title="Süre"
@@ -440,7 +487,7 @@ export default function EvaluationResults() {
           subtitle={`${attempt.questions_answered} / ${attempt.total_questions} cevaplanmış`}
           color="text-blue-600"
         />
-        
+
         <ResultCard
           icon={<BarChart3 className="h-8 w-8" />}
           title="Deneme"
@@ -451,7 +498,11 @@ export default function EvaluationResults() {
       </div>
 
       {/* Pass/Fail Status */}
-      <Card className={`p-6 ${isPassed ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
+      <Card
+        className={`p-6 ${
+          isPassed ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
+        }`}
+      >
         <div className="flex items-center justify-center space-x-3">
           {isPassed ? (
             <CheckCircle className="h-8 w-8 text-green-600" />
@@ -459,11 +510,18 @@ export default function EvaluationResults() {
             <XCircle className="h-8 w-8 text-red-600" />
           )}
           <div className="text-center">
-            <h2 className={`text-2xl font-bold ${isPassed ? 'text-green-800' : 'text-red-800'}`}>
-              {isPassed ? 'Tebrikler! Başarılı oldunuz.' : 'Maalesef başarısız oldunuz.'}
+            <h2
+              className={`text-2xl font-bold ${
+                isPassed ? 'text-green-800' : 'text-red-800'
+              }`}
+            >
+              {isPassed
+                ? 'Tebrikler! Başarılı oldunuz.'
+                : 'Maalesef başarısız oldunuz.'}
             </h2>
             <p className={`${isPassed ? 'text-green-700' : 'text-red-700'}`}>
-              Geçme puanı: {attempt.passing_score}% | Sizin puanınız: {attempt.percentage_score.toFixed(1)}%
+              Geçme puanı: {attempt.passing_score}% | Sizin puanınız:{' '}
+              {attempt.percentage_score.toFixed(1)}%
             </p>
           </div>
         </div>
@@ -517,58 +575,68 @@ export default function EvaluationResults() {
       {/* Tab Content */}
       {activeTab === 'overview' && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Performance Analysis */}
-        <div className="lg:col-span-2 space-y-6">
-          {performanceData && <PerformanceChart data={performanceData} />}
-        </div>
+          {/* Performance Analysis */}
+          <div className="lg:col-span-2 space-y-6">
+            {performanceData && <PerformanceChart data={performanceData} />}
+          </div>
 
-        {/* Right Sidebar */}
-        <div className="space-y-6">
-          <Recommendations
-            performance={attempt}
-            weakAreas={weakAreas}
-          />
-          
-          {/* Attempt History */}
-          {allAttempts && allAttempts.length > 1 && (
-            <Card className="p-6">
-              <h3 className="text-lg font-semibold mb-4 flex items-center">
-                <TrendingUp className="mr-2 h-5 w-5 text-blue-600" />
-                Deneme Geçmişi
-              </h3>
-              
-              <div className="space-y-3">
-                {allAttempts.map((att, index) => (
-                  <div key={att.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                    <div>
-                      <p className="font-medium">Deneme {att.attempt_number}</p>
-                      <p className="text-sm text-gray-600">
-                        {new Date(att.completed_at!).toLocaleDateString('tr-TR')}
-                      </p>
+          {/* Right Sidebar */}
+          <div className="space-y-6">
+            <Recommendations performance={attempt} weakAreas={weakAreas} />
+
+            {/* Attempt History */}
+            {allAttempts && allAttempts.length > 1 && (
+              <Card className="p-6">
+                <h3 className="text-lg font-semibold mb-4 flex items-center">
+                  <TrendingUp className="mr-2 h-5 w-5 text-blue-600" />
+                  Deneme Geçmişi
+                </h3>
+
+                <div className="space-y-3">
+                  {allAttempts.map((att, index) => (
+                    <div
+                      key={att.id}
+                      className="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+                    >
+                      <div>
+                        <p className="font-medium">
+                          Deneme {att.attempt_number}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          {new Date(att.completed_at!).toLocaleDateString(
+                            'tr-TR'
+                          )}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p
+                          className={`font-bold ${
+                            att.passed ? 'text-green-600' : 'text-red-600'
+                          }`}
+                        >
+                          {att.percentage_score.toFixed(1)}%
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          {att.passed ? 'Geçti' : 'Kaldı'}
+                        </p>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className={`font-bold ${att.passed ? 'text-green-600' : 'text-red-600'}`}>
-                        {att.percentage_score.toFixed(1)}%
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        {att.passed ? 'Geçti' : 'Kaldı'}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </Card>
-          )}
-        </div>
-      </div>
+                  ))}
+                </div>
+              </Card>
+            )}
+          </div>
         </div>
       )}
 
       {/* Insights Tab */}
       {activeTab === 'insights' && (
         <div className="space-y-6">
-          <LearningInsights evaluationId={evaluationId} attemptId={attemptIdNum} />
-          
+          <LearningInsights
+            evaluationId={evaluationId}
+            attemptId={attemptIdNum}
+          />
+
           {/* Create Learning Path Button */}
           <Card className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
             <div className="flex items-center justify-between">
@@ -579,7 +647,8 @@ export default function EvaluationResults() {
                     Kişiselleştirilmiş Öğrenme Planı Oluştur
                   </h3>
                   <p className="text-blue-700">
-                    AI, performansınıza göre size özel bir öğrenme planı hazırlayacak
+                    AI, performansınıza göre size özel bir öğrenme planı
+                    hazırlayacak
                   </p>
                 </div>
               </div>
@@ -622,7 +691,9 @@ export default function EvaluationResults() {
             <Card className="p-6">
               <div className="text-center py-8">
                 <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600">Henüz cevaplanmış soru bulunmuyor.</p>
+                <p className="text-gray-600">
+                  Henüz cevaplanmış soru bulunmuyor.
+                </p>
               </div>
             </Card>
           )}
@@ -646,15 +717,11 @@ const QuestionResponse: React.FC<{
     points: 2,
     explanation: 'Bu sorunun açıklaması burada yer alacak.',
     question_data: {
-      correct_answer: 'Doğru cevap seçeneği'
-    }
+      correct_answer: 'Doğru cevap seçeneği',
+    },
   };
-  
+
   return (
-    <QuestionReview
-      question={mockQuestion}
-      response={response}
-      index={index}
-    />
+    <QuestionReview question={mockQuestion} response={response} index={index} />
   );
 };

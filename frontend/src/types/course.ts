@@ -5,7 +5,7 @@
 export enum CourseStatus {
   DRAFT = 'draft',
   PUBLISHED = 'published',
-  ARCHIVED = 'archived'
+  ARCHIVED = 'archived',
 }
 
 export enum CourseFormat {
@@ -14,14 +14,14 @@ export enum CourseFormat {
   PRACTICAL = 'practical',
   ONLINE = 'online',
   SELF_PACED = 'self_paced',
-  HYBRID = 'hybrid'
+  HYBRID = 'hybrid',
 }
 
 export enum DifficultyLevel {
   BEGINNER = 'beginner',
   INTERMEDIATE = 'intermediate',
   ADVANCED = 'advanced',
-  EXPERT = 'expert'
+  EXPERT = 'expert',
 }
 
 export interface Course {
@@ -59,11 +59,11 @@ export interface Course {
   created_by: number;
   created_at: string;
   updated_at: string;
-  
+
   // Computed fields
   total_duration_hours: number;
   is_available: boolean;
-  
+
   // Related data (when include_related=true)
   participant_count?: number;
   available_spots?: number;
@@ -96,10 +96,10 @@ export interface CourseSession {
   recording_url?: string;
   created_at: string;
   updated_at: string;
-  
+
   // Computed fields
   end_time?: string;
-  
+
   // Related data
   instructor_name?: string;
   attendance_count?: number;
@@ -136,7 +136,7 @@ export interface CreateCourseRequest {
   instructor_id?: number;
 }
 
-export interface UpdateCourseRequest extends Partial<Omit<CreateCourseRequest, 'program_id'>> {}
+export type UpdateCourseRequest = Partial<Omit<CreateCourseRequest, 'program_id'>>
 
 export interface CourseFilters {
   page?: number;

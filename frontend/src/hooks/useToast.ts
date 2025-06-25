@@ -5,16 +5,19 @@
 import { useCallback } from 'react';
 
 export const useToast = () => {
-  const toast = useCallback((message: string, type: 'success' | 'error' | 'info' = 'info') => {
-    // Simple console log for now - replace with actual toast library
-    console.log(`[${type.toUpperCase()}] ${message}`);
-    
-    // You can integrate with libraries like:
-    // - react-hot-toast
-    // - react-toastify
-    // - sonner
-    // etc.
-  }, []);
+  const toast = useCallback(
+    (message: string, type: 'success' | 'error' | 'info' = 'info') => {
+      // Simple console log for now - replace with actual toast library
+      console.log(`[${type.toUpperCase()}] ${message}`);
+
+      // You can integrate with libraries like:
+      // - react-hot-toast
+      // - react-toastify
+      // - sonner
+      // etc.
+    },
+    []
+  );
 
   return {
     success: (message: string) => toast(message, 'success'),

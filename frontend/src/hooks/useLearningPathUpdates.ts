@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
 import { api } from '@/lib/api';
 
 export interface SuggestedMilestone {
@@ -23,7 +24,11 @@ export interface SuggestedMilestone {
 export interface LearningPathUpdate {
   id: number;
   learning_path_id: number;
-  update_type: 'add_milestone' | 'reorder' | 'obsolete_milestone' | 'modify_milestone';
+  update_type:
+    | 'add_milestone'
+    | 'reorder'
+    | 'obsolete_milestone'
+    | 'modify_milestone';
   source: 'ai' | 'system' | 'manual';
   suggested_milestones: SuggestedMilestone[];
   milestone_updates: Record<string, any>;
@@ -45,12 +50,16 @@ export function useSuggestLearningPathUpdates() {
 
   return useMutation({
     mutationFn: async (studentId: number) => {
-      const response = await api.post(`/api/learning-paths/students/${studentId}/suggest-updates`);
+      const response = await api.post(
+        `/api/learning-paths/students/${studentId}/suggest-updates`
+      );
       return response.data;
     },
     onSuccess: (data, studentId) => {
       // Invalidate student's learning paths
-      queryClient.invalidateQueries({ queryKey: ['studentLearningPaths', studentId] });
+      queryClient.invalidateQueries({
+        queryKey: ['studentLearningPaths', studentId],
+      });
     },
   });
 }
@@ -61,7 +70,9 @@ export function usePendingLearningPathUpdates(learningPathId: number | null) {
     queryKey: ['learningPathUpdates', 'pending', learningPathId],
     queryFn: async () => {
       if (!learningPathId) return null;
-      const response = await api.get(`/api/learning-paths/${learningPathId}/pending-updates`);
+      const response = await api.get(
+        `/api/learning-paths/${learningPathId}/pending-updates`
+      );
       return response.data;
     },
     enabled: !!learningPathId,
@@ -74,13 +85,17 @@ export function useApproveLearningPathUpdate() {
 
   return useMutation({
     mutationFn: async (updateId: number) => {
-      const response = await api.post(`/api/learning-paths/updates/${updateId}/approve`);
+      const response = await api.post(
+        `/api/learning-paths/updates/${updateId}/approve`
+      );
       return response.data;
     },
     onSuccess: (data) => {
       // Invalidate related queries
       queryClient.invalidateQueries({ queryKey: ['learningPathUpdates'] });
-      queryClient.invalidateQueries({ queryKey: ['learningPath', data.update.learning_path_id] });
+      queryClient.invalidateQueries({
+        queryKey: ['learningPath', data.update.learning_path_id],
+      });
     },
   });
 }
@@ -90,10 +105,19 @@ export function useRejectLearningPathUpdate() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ updateId, reason }: { updateId: number; reason: string }) => {
-      const response = await api.post(`/api/learning-paths/updates/${updateId}/reject`, {
-        reason,
-      });
+    mutationFn: async ({
+      updateId,
+      reason,
+    }: {
+      updateId: number;
+      reason: string;
+    }) => {
+      const response = await api.post(
+        `/api/learning-paths/updates/${updateId}/reject`,
+        {
+          reason,
+        }
+      );
       return response.data;
     },
     onSuccess: (data) => {
@@ -109,13 +133,17 @@ export function useApplyLearningPathUpdate() {
 
   return useMutation({
     mutationFn: async (updateId: number) => {
-      const response = await api.post(`/api/learning-paths/updates/${updateId}/apply`);
+      const response = await api.post(
+        `/api/learning-paths/updates/${updateId}/apply`
+      );
       return response.data;
     },
     onSuccess: (data) => {
       // Invalidate related queries
       queryClient.invalidateQueries({ queryKey: ['learningPathUpdates'] });
-      queryClient.invalidateQueries({ queryKey: ['learningPath', data.learning_path.id] });
+      queryClient.invalidateQueries({
+        queryKey: ['learningPath', data.learning_path.id],
+      });
     },
   });
 }
@@ -127,7 +155,7 @@ export function useStudentLearningPaths(studentId: number | null) {
     queryFn: async () => {
       if (!studentId) return null;
       const response = await api.get('/api/learning-paths/my-paths', {
-        params: { user_id: studentId, status: 'accepted,in_progress' }
+        params: { user_id: studentId, status: 'accepted,in_progress' },
       });
       return response.data;
     },

@@ -1,7 +1,7 @@
 /**
  * Programs API client
  */
-import { apiClient } from './client';
+import type { Course } from '../types/course';
 import type {
   Program,
   CreateProgramRequest,
@@ -9,9 +9,10 @@ import type {
   ProgramFilters,
   ProgramsResponse,
   ProgramStatistics,
-  CreateCourseInProgramRequest
+  CreateCourseInProgramRequest,
 } from '../types/program';
-import type { Course } from '../types/course';
+
+import { apiClient } from './client';
 
 const PROGRAMS_BASE_URL = '/programs';
 
@@ -21,7 +22,7 @@ export const programsApi = {
    */
   getAll: async (filters?: ProgramFilters): Promise<ProgramsResponse> => {
     const params = new URLSearchParams();
-    
+
     if (filters) {
       Object.entries(filters).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
@@ -29,7 +30,7 @@ export const programsApi = {
         }
       });
     }
-    
+
     const response = await apiClient.get<ProgramsResponse>(
       `${PROGRAMS_BASE_URL}?${params.toString()}`
     );
@@ -41,7 +42,9 @@ export const programsApi = {
    */
   getById: async (id: number, includeCourses = false): Promise<Program> => {
     const params = includeCourses ? '?include_courses=true' : '';
-    const response = await apiClient.get<Program>(`${PROGRAMS_BASE_URL}/${id}${params}`);
+    const response = await apiClient.get<Program>(
+      `${PROGRAMS_BASE_URL}/${id}${params}`
+    );
     return response.data;
   },
 
@@ -57,7 +60,10 @@ export const programsApi = {
    * Update program
    */
   update: async (id: number, data: UpdateProgramRequest): Promise<Program> => {
-    const response = await apiClient.put<Program>(`${PROGRAMS_BASE_URL}/${id}`, data);
+    const response = await apiClient.put<Program>(
+      `${PROGRAMS_BASE_URL}/${id}`,
+      data
+    );
     return response.data;
   },
 
@@ -82,7 +88,10 @@ export const programsApi = {
   /**
    * Add course to program
    */
-  addCourse: async (programId: number, courseData: CreateCourseInProgramRequest): Promise<Course> => {
+  addCourse: async (
+    programId: number,
+    courseData: CreateCourseInProgramRequest
+  ): Promise<Course> => {
     const response = await apiClient.post<Course>(
       `${PROGRAMS_BASE_URL}/${programId}/courses`,
       courseData
@@ -94,9 +103,11 @@ export const programsApi = {
    * Get program statistics
    */
   getStatistics: async (): Promise<ProgramStatistics> => {
-    const response = await apiClient.get<ProgramStatistics>(`${PROGRAMS_BASE_URL}/statistics`);
+    const response = await apiClient.get<ProgramStatistics>(
+      `${PROGRAMS_BASE_URL}/statistics`
+    );
     return response.data;
-  }
+  },
 };
 
 export default programsApi;

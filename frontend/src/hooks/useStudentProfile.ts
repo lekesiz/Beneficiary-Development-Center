@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
 import { api } from '@/lib/api';
 
 export interface StudentInfo {
@@ -165,25 +166,28 @@ export function useAddCoachNote() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ 
-      studentId, 
-      note, 
-      category = 'general' 
-    }: { 
-      studentId: number; 
-      note: string; 
+    mutationFn: async ({
+      studentId,
+      note,
+      category = 'general',
+    }: {
+      studentId: number;
+      note: string;
       category?: string;
     }) => {
-      const response = await api.post(`/api/reports/profile/${studentId}/notes`, {
-        note,
-        category
-      });
+      const response = await api.post(
+        `/api/reports/profile/${studentId}/notes`,
+        {
+          note,
+          category,
+        }
+      );
       return response.data;
     },
     onSuccess: (data, variables) => {
       // Invalidate student profile to refresh notes
-      queryClient.invalidateQueries({ 
-        queryKey: ['studentProfile', variables.studentId] 
+      queryClient.invalidateQueries({
+        queryKey: ['studentProfile', variables.studentId],
       });
     },
   });
@@ -192,31 +196,36 @@ export function useAddCoachNote() {
 // Export student profile
 export function useExportStudentProfile() {
   return useMutation({
-    mutationFn: async ({ 
-      studentId, 
-      format = 'json' 
-    }: { 
-      studentId: number; 
+    mutationFn: async ({
+      studentId,
+      format = 'json',
+    }: {
+      studentId: number;
       format?: 'json' | 'pdf';
     }) => {
       const response = await api.get(
         `/api/reports/profile/${studentId}/export`,
         {
           params: { format },
-          responseType: 'blob'
+          responseType: 'blob',
         }
       );
-      
+
       // Create download link
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', `student_profile_${studentId}_${new Date().toISOString().split('T')[0]}.${format}`);
+      link.setAttribute(
+        'download',
+        `student_profile_${studentId}_${
+          new Date().toISOString().split('T')[0]
+        }.${format}`
+      );
       document.body.appendChild(link);
       link.click();
       link.remove();
       window.URL.revokeObjectURL(url);
-      
+
       return response.data;
     },
   });
@@ -228,7 +237,9 @@ export function useProfileRecommendations(studentId: number | null) {
     queryKey: ['profileRecommendations', studentId],
     queryFn: async () => {
       if (!studentId) return null;
-      const response = await api.get(`/api/reports/profile/${studentId}/recommendations`);
+      const response = await api.get(
+        `/api/reports/profile/${studentId}/recommendations`
+      );
       return response.data as ProfileRecommendations;
     },
     enabled: !!studentId,

@@ -2,9 +2,11 @@
  * Drag and Drop List Component
  * A simple drag-and-drop reordering component
  */
-import React, { useState } from 'react';
-import { cn } from '@/lib/utils';
 import { GripVertical } from 'lucide-react';
+import * as React from 'react';
+import { useState } from 'react';
+
+import { cn } from '@/lib/utils';
 
 interface DragDropItem {
   id: string | number;
@@ -26,7 +28,9 @@ export const DragDropList: React.FC<DragDropListProps> = ({
   disabled = false,
 }) => {
   const [draggedItem, setDraggedItem] = useState<string | number | null>(null);
-  const [dragOverItem, setDragOverItem] = useState<string | number | null>(null);
+  const [dragOverItem, setDragOverItem] = useState<string | number | null>(
+    null
+  );
 
   const handleDragStart = (e: React.DragEvent, id: string | number) => {
     if (disabled) return;
@@ -56,8 +60,8 @@ export const DragDropList: React.FC<DragDropListProps> = ({
       return;
     }
 
-    const draggedIndex = items.findIndex(item => item.id === draggedItem);
-    const targetIndex = items.findIndex(item => item.id === targetId);
+    const draggedIndex = items.findIndex((item) => item.id === draggedItem);
+    const targetIndex = items.findIndex((item) => item.id === targetId);
 
     if (draggedIndex === -1 || targetIndex === -1) {
       setDraggedItem(null);
@@ -103,9 +107,7 @@ export const DragDropList: React.FC<DragDropListProps> = ({
               <GripVertical className="h-5 w-5" />
             </div>
           )}
-          <div className="flex-1">
-            {item.content}
-          </div>
+          <div className="flex-1">{item.content}</div>
           <div className="ml-2 text-sm text-gray-500 font-mono">
             #{index + 1}
           </div>

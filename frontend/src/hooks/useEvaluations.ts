@@ -3,6 +3,7 @@
  */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
+
 import { evaluationsApi } from '../api/evaluations';
 import type {
   Evaluation,
@@ -11,22 +12,26 @@ import type {
   EvaluationFilters,
   CreateQuestionRequest,
   UpdateQuestionRequest,
-  SaveResponseRequest
+  SaveResponseRequest,
 } from '../types/evaluation';
 
 // Query Keys
 export const evaluationQueryKeys = {
   all: ['evaluations'] as const,
   lists: () => [...evaluationQueryKeys.all, 'list'] as const,
-  list: (filters?: EvaluationFilters) => [...evaluationQueryKeys.lists(), filters] as const,
+  list: (filters?: EvaluationFilters) =>
+    [...evaluationQueryKeys.lists(), filters] as const,
   details: () => [...evaluationQueryKeys.all, 'detail'] as const,
-  detail: (id: number, includeQuestions?: boolean) => 
+  detail: (id: number, includeQuestions?: boolean) =>
     [...evaluationQueryKeys.details(), id, includeQuestions] as const,
-  questions: (evaluationId: number) => [...evaluationQueryKeys.all, 'questions', evaluationId] as const,
-  attempts: (evaluationId: number) => [...evaluationQueryKeys.all, 'attempts', evaluationId] as const,
-  attempt: (evaluationId: number, attemptId: number) => 
+  questions: (evaluationId: number) =>
+    [...evaluationQueryKeys.all, 'questions', evaluationId] as const,
+  attempts: (evaluationId: number) =>
+    [...evaluationQueryKeys.all, 'attempts', evaluationId] as const,
+  attempt: (evaluationId: number, attemptId: number) =>
     [...evaluationQueryKeys.attempts(evaluationId), attemptId] as const,
-  myAttempts: (evaluationId: number) => [...evaluationQueryKeys.all, 'my-attempts', evaluationId] as const,
+  myAttempts: (evaluationId: number) =>
+    [...evaluationQueryKeys.all, 'my-attempts', evaluationId] as const,
   statistics: () => [...evaluationQueryKeys.all, 'statistics'] as const,
 };
 
@@ -91,7 +96,10 @@ export const useMyEvaluationAttempts = (evaluationId: number) => {
 /**
  * Hook to get evaluation attempt details
  */
-export const useEvaluationAttempt = (evaluationId: number, attemptId: number) => {
+export const useEvaluationAttempt = (
+  evaluationId: number,
+  attemptId: number
+) => {
   return useQuery({
     queryKey: evaluationQueryKeys.attempt(evaluationId, attemptId),
     queryFn: () => evaluationsApi.attempts.getById(evaluationId, attemptId),
@@ -111,30 +119,34 @@ export const useCreateEvaluation = () => {
     onSuccess: (newEvaluation) => {
       // Invalidate and refetch evaluations list
       queryClient.invalidateQueries({ queryKey: evaluationQueryKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: evaluationQueryKeys.statistics() });
-      
+      queryClient.invalidateQueries({
+        queryKey: evaluationQueryKeys.statistics(),
+      });
+
       // Invalidate related course/program details
       if (newEvaluation.course_id) {
-        queryClient.invalidateQueries({ 
-          queryKey: ['courses', 'detail', newEvaluation.course_id] 
+        queryClient.invalidateQueries({
+          queryKey: ['courses', 'detail', newEvaluation.course_id],
         });
       }
       if (newEvaluation.program_id) {
-        queryClient.invalidateQueries({ 
-          queryKey: ['programs', 'detail', newEvaluation.program_id] 
+        queryClient.invalidateQueries({
+          queryKey: ['programs', 'detail', newEvaluation.program_id],
         });
       }
-      
+
       // Add to cache
       queryClient.setQueryData(
         evaluationQueryKeys.detail(newEvaluation.id),
         newEvaluation
       );
-      
+
       toast.success('Değerlendirme başarıyla oluşturuldu');
     },
     onError: (error: any) => {
-      const message = error.response?.data?.message || 'Değerlendirme oluşturulurken hata oluştu';
+      const message =
+        error.response?.data?.message ||
+        'Değerlendirme oluşturulurken hata oluştu';
       toast.error(message);
     },
   });
@@ -155,27 +167,31 @@ export const useUpdateEvaluation = () => {
         evaluationQueryKeys.detail(updatedEvaluation.id),
         updatedEvaluation
       );
-      
+
       // Invalidate lists to refresh
       queryClient.invalidateQueries({ queryKey: evaluationQueryKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: evaluationQueryKeys.statistics() });
-      
+      queryClient.invalidateQueries({
+        queryKey: evaluationQueryKeys.statistics(),
+      });
+
       // Invalidate related course/program details
       if (updatedEvaluation.course_id) {
-        queryClient.invalidateQueries({ 
-          queryKey: ['courses', 'detail', updatedEvaluation.course_id] 
+        queryClient.invalidateQueries({
+          queryKey: ['courses', 'detail', updatedEvaluation.course_id],
         });
       }
       if (updatedEvaluation.program_id) {
-        queryClient.invalidateQueries({ 
-          queryKey: ['programs', 'detail', updatedEvaluation.program_id] 
+        queryClient.invalidateQueries({
+          queryKey: ['programs', 'detail', updatedEvaluation.program_id],
         });
       }
-      
+
       toast.success('Değerlendirme başarıyla güncellendi');
     },
     onError: (error: any) => {
-      const message = error.response?.data?.message || 'Değerlendirme güncellenirken hata oluştu';
+      const message =
+        error.response?.data?.message ||
+        'Değerlendirme güncellenirken hata oluştu';
       toast.error(message);
     },
   });
@@ -191,21 +207,28 @@ export const useDeleteEvaluation = () => {
     mutationFn: (id: number) => evaluationsApi.delete(id),
     onSuccess: (_, deletedId) => {
       // Remove from cache
-      queryClient.removeQueries({ queryKey: evaluationQueryKeys.detail(deletedId) });
-      queryClient.removeQueries({ queryKey: evaluationQueryKeys.questions(deletedId) });
-      
+      queryClient.removeQueries({
+        queryKey: evaluationQueryKeys.detail(deletedId),
+      });
+      queryClient.removeQueries({
+        queryKey: evaluationQueryKeys.questions(deletedId),
+      });
+
       // Invalidate lists
       queryClient.invalidateQueries({ queryKey: evaluationQueryKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: evaluationQueryKeys.statistics() });
-      
+      queryClient.invalidateQueries({
+        queryKey: evaluationQueryKeys.statistics(),
+      });
+
       // Invalidate courses and programs to refresh evaluation counts
       queryClient.invalidateQueries({ queryKey: ['courses'] });
       queryClient.invalidateQueries({ queryKey: ['programs'] });
-      
+
       toast.success('Değerlendirme başarıyla silindi');
     },
     onError: (error: any) => {
-      const message = error.response?.data?.message || 'Değerlendirme silinirken hata oluştu';
+      const message =
+        error.response?.data?.message || 'Değerlendirme silinirken hata oluştu';
       toast.error(message);
     },
   });
@@ -225,15 +248,19 @@ export const useActivateEvaluation = () => {
         evaluationQueryKeys.detail(updatedEvaluation.id),
         updatedEvaluation
       );
-      
+
       // Invalidate lists
       queryClient.invalidateQueries({ queryKey: evaluationQueryKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: evaluationQueryKeys.statistics() });
-      
+      queryClient.invalidateQueries({
+        queryKey: evaluationQueryKeys.statistics(),
+      });
+
       toast.success('Değerlendirme aktifleştirildi');
     },
     onError: (error: any) => {
-      const message = error.response?.data?.message || 'Değerlendirme aktifleştirilirken hata oluştu';
+      const message =
+        error.response?.data?.message ||
+        'Değerlendirme aktifleştirilirken hata oluştu';
       toast.error(message);
     },
   });
@@ -253,15 +280,19 @@ export const useArchiveEvaluation = () => {
         evaluationQueryKeys.detail(updatedEvaluation.id),
         updatedEvaluation
       );
-      
+
       // Invalidate lists
       queryClient.invalidateQueries({ queryKey: evaluationQueryKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: evaluationQueryKeys.statistics() });
-      
+      queryClient.invalidateQueries({
+        queryKey: evaluationQueryKeys.statistics(),
+      });
+
       toast.success('Değerlendirme arşivlendi');
     },
     onError: (error: any) => {
-      const message = error.response?.data?.message || 'Değerlendirme arşivlenirken hata oluştu';
+      const message =
+        error.response?.data?.message ||
+        'Değerlendirme arşivlenirken hata oluştu';
       toast.error(message);
     },
   });
@@ -274,19 +305,29 @@ export const useCreateQuestion = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ evaluationId, data }: { evaluationId: number; data: CreateQuestionRequest }) =>
-      evaluationsApi.questions.create(evaluationId, data),
+    mutationFn: ({
+      evaluationId,
+      data,
+    }: {
+      evaluationId: number;
+      data: CreateQuestionRequest;
+    }) => evaluationsApi.questions.create(evaluationId, data),
     onSuccess: (newQuestion, { evaluationId }) => {
       // Invalidate questions list
-      queryClient.invalidateQueries({ queryKey: evaluationQueryKeys.questions(evaluationId) });
-      
+      queryClient.invalidateQueries({
+        queryKey: evaluationQueryKeys.questions(evaluationId),
+      });
+
       // Invalidate evaluation details to refresh totals
-      queryClient.invalidateQueries({ queryKey: evaluationQueryKeys.detail(evaluationId) });
-      
+      queryClient.invalidateQueries({
+        queryKey: evaluationQueryKeys.detail(evaluationId),
+      });
+
       toast.success('Soru başarıyla eklendi');
     },
     onError: (error: any) => {
-      const message = error.response?.data?.message || 'Soru eklenirken hata oluştu';
+      const message =
+        error.response?.data?.message || 'Soru eklenirken hata oluştu';
       toast.error(message);
     },
   });
@@ -299,22 +340,31 @@ export const useUpdateQuestion = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ evaluationId, questionId, data }: { 
-      evaluationId: number; 
-      questionId: number; 
-      data: UpdateQuestionRequest 
+    mutationFn: ({
+      evaluationId,
+      questionId,
+      data,
+    }: {
+      evaluationId: number;
+      questionId: number;
+      data: UpdateQuestionRequest;
     }) => evaluationsApi.questions.update(evaluationId, questionId, data),
     onSuccess: (updatedQuestion, { evaluationId }) => {
       // Invalidate questions list
-      queryClient.invalidateQueries({ queryKey: evaluationQueryKeys.questions(evaluationId) });
-      
+      queryClient.invalidateQueries({
+        queryKey: evaluationQueryKeys.questions(evaluationId),
+      });
+
       // Invalidate evaluation details to refresh totals
-      queryClient.invalidateQueries({ queryKey: evaluationQueryKeys.detail(evaluationId) });
-      
+      queryClient.invalidateQueries({
+        queryKey: evaluationQueryKeys.detail(evaluationId),
+      });
+
       toast.success('Soru başarıyla güncellendi');
     },
     onError: (error: any) => {
-      const message = error.response?.data?.message || 'Soru güncellenirken hata oluştu';
+      const message =
+        error.response?.data?.message || 'Soru güncellenirken hata oluştu';
       toast.error(message);
     },
   });
@@ -327,19 +377,29 @@ export const useDeleteQuestion = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ evaluationId, questionId }: { evaluationId: number; questionId: number }) =>
-      evaluationsApi.questions.delete(evaluationId, questionId),
+    mutationFn: ({
+      evaluationId,
+      questionId,
+    }: {
+      evaluationId: number;
+      questionId: number;
+    }) => evaluationsApi.questions.delete(evaluationId, questionId),
     onSuccess: (_, { evaluationId }) => {
       // Invalidate questions list
-      queryClient.invalidateQueries({ queryKey: evaluationQueryKeys.questions(evaluationId) });
-      
+      queryClient.invalidateQueries({
+        queryKey: evaluationQueryKeys.questions(evaluationId),
+      });
+
       // Invalidate evaluation details to refresh totals
-      queryClient.invalidateQueries({ queryKey: evaluationQueryKeys.detail(evaluationId) });
-      
+      queryClient.invalidateQueries({
+        queryKey: evaluationQueryKeys.detail(evaluationId),
+      });
+
       toast.success('Soru başarıyla silindi');
     },
     onError: (error: any) => {
-      const message = error.response?.data?.message || 'Soru silinirken hata oluştu';
+      const message =
+        error.response?.data?.message || 'Soru silinirken hata oluştu';
       toast.error(message);
     },
   });
@@ -352,19 +412,28 @@ export const useReorderQuestion = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ evaluationId, questionId, orderIndex }: { 
-      evaluationId: number; 
-      questionId: number; 
-      orderIndex: number 
-    }) => evaluationsApi.questions.reorder(evaluationId, questionId, orderIndex),
+    mutationFn: ({
+      evaluationId,
+      questionId,
+      orderIndex,
+    }: {
+      evaluationId: number;
+      questionId: number;
+      orderIndex: number;
+    }) =>
+      evaluationsApi.questions.reorder(evaluationId, questionId, orderIndex),
     onSuccess: (_, { evaluationId }) => {
       // Invalidate questions list
-      queryClient.invalidateQueries({ queryKey: evaluationQueryKeys.questions(evaluationId) });
-      
+      queryClient.invalidateQueries({
+        queryKey: evaluationQueryKeys.questions(evaluationId),
+      });
+
       toast.success('Soru sırası güncellendi');
     },
     onError: (error: any) => {
-      const message = error.response?.data?.message || 'Soru sırası güncellenirken hata oluştu';
+      const message =
+        error.response?.data?.message ||
+        'Soru sırası güncellenirken hata oluştu';
       toast.error(message);
     },
   });
@@ -377,21 +446,26 @@ export const useStartEvaluationAttempt = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (evaluationId: number) => evaluationsApi.attempts.start(evaluationId),
+    mutationFn: (evaluationId: number) =>
+      evaluationsApi.attempts.start(evaluationId),
     onSuccess: (newAttempt, evaluationId) => {
       // Add to cache
       queryClient.setQueryData(
         evaluationQueryKeys.attempt(evaluationId, newAttempt.id),
         newAttempt
       );
-      
+
       // Invalidate my attempts list
-      queryClient.invalidateQueries({ queryKey: evaluationQueryKeys.myAttempts(evaluationId) });
-      
+      queryClient.invalidateQueries({
+        queryKey: evaluationQueryKeys.myAttempts(evaluationId),
+      });
+
       toast.success('Değerlendirme başlatıldı');
     },
     onError: (error: any) => {
-      const message = error.response?.data?.message || 'Değerlendirme başlatılırken hata oluştu';
+      const message =
+        error.response?.data?.message ||
+        'Değerlendirme başlatılırken hata oluştu';
       toast.error(message);
     },
   });
@@ -404,22 +478,31 @@ export const useSubmitEvaluationAttempt = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ evaluationId, attemptId }: { evaluationId: number; attemptId: number }) =>
-      evaluationsApi.attempts.submit(evaluationId, attemptId),
+    mutationFn: ({
+      evaluationId,
+      attemptId,
+    }: {
+      evaluationId: number;
+      attemptId: number;
+    }) => evaluationsApi.attempts.submit(evaluationId, attemptId),
     onSuccess: (submittedAttempt, { evaluationId, attemptId }) => {
       // Update cached attempt
       queryClient.setQueryData(
         evaluationQueryKeys.attempt(evaluationId, attemptId),
         submittedAttempt
       );
-      
+
       // Invalidate my attempts list
-      queryClient.invalidateQueries({ queryKey: evaluationQueryKeys.myAttempts(evaluationId) });
-      
+      queryClient.invalidateQueries({
+        queryKey: evaluationQueryKeys.myAttempts(evaluationId),
+      });
+
       toast.success('Değerlendirme tamamlandı');
     },
     onError: (error: any) => {
-      const message = error.response?.data?.message || 'Değerlendirme tamamlanırken hata oluştu';
+      const message =
+        error.response?.data?.message ||
+        'Değerlendirme tamamlanırken hata oluştu';
       toast.error(message);
     },
   });
@@ -432,19 +515,24 @@ export const useSaveQuestionResponse = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ evaluationId, attemptId, data }: { 
-      evaluationId: number; 
-      attemptId: number; 
-      data: SaveResponseRequest 
+    mutationFn: ({
+      evaluationId,
+      attemptId,
+      data,
+    }: {
+      evaluationId: number;
+      attemptId: number;
+      data: SaveResponseRequest;
     }) => evaluationsApi.attempts.saveResponse(evaluationId, attemptId, data),
     onSuccess: (_, { evaluationId, attemptId }) => {
       // Invalidate attempt details to refresh responses
-      queryClient.invalidateQueries({ 
-        queryKey: evaluationQueryKeys.attempt(evaluationId, attemptId) 
+      queryClient.invalidateQueries({
+        queryKey: evaluationQueryKeys.attempt(evaluationId, attemptId),
       });
     },
     onError: (error: any) => {
-      const message = error.response?.data?.message || 'Cevap kaydedilirken hata oluştu';
+      const message =
+        error.response?.data?.message || 'Cevap kaydedilirken hata oluştu';
       toast.error(message);
     },
   });

@@ -53,6 +53,11 @@ const StudentProfile = lazy(() => import('@/pages/coach/StudentProfile'));
 const Profile = lazy(() => import('@/pages/settings/Profile'));
 const Settings = lazy(() => import('@/pages/settings/Settings'));
 
+// Error pages
+const NotFound = lazy(() => import('@/pages/errors/NotFound'));
+const Unauthorized = lazy(() => import('@/pages/errors/Unauthorized'));
+const ServerError = lazy(() => import('@/pages/errors/ServerError'));
+
 // Protected Route component
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -79,7 +84,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     );
 
     if (!hasRequiredRole) {
-      return <Navigate to="/unauthorized" replace />;
+      return <Navigate to="/403" replace />;
     }
   }
 
@@ -182,6 +187,11 @@ const AppRoutes: React.FC = () => {
           <Route path="/settings" element={<Settings />} />
         </Route>
 
+        {/* Error routes */}
+        <Route path="/404" element={<NotFound />} />
+        <Route path="/403" element={<Unauthorized />} />
+        <Route path="/500" element={<ServerError />} />
+
         {/* Catch all */}
         <Route
           path="/"
@@ -189,7 +199,7 @@ const AppRoutes: React.FC = () => {
             <Navigate to={isAuthenticated ? '/dashboard' : '/login'} replace />
           }
         />
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Suspense>
   );

@@ -1,5 +1,5 @@
-import React from 'react'
+import * as React from 'react';
 
 export default function Profile() {
-  return <div>Profile page - To be implemented</div>
+  return <div>Profile page - To be implemented</div>;
 }

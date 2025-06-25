@@ -1,12 +1,13 @@
-import React from 'react'
-import { cn } from '@/lib/utils'
+import * as React from 'react';
+
+import { cn } from '@/lib/utils';
 
 interface FormFieldProps {
-  label: string
-  error?: string
-  required?: boolean
-  children: React.ReactNode
-  className?: string
+  label: string;
+  error?: string;
+  required?: boolean;
+  children: React.ReactNode;
+  className?: string;
 }
 
 export const FormField: React.FC<FormFieldProps> = ({
@@ -23,15 +24,13 @@ export const FormField: React.FC<FormFieldProps> = ({
         {required && <span className="text-destructive ml-1">*</span>}
       </label>
       {children}
-      {error && (
-        <p className="text-sm text-destructive">{error}</p>
-      )}
+      {error && <p className="text-sm text-destructive">{error}</p>}
     </div>
-  )
-}
+  );
+};
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  error?: boolean
+  error?: boolean;
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
@@ -46,13 +45,14 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         ref={ref}
         {...props}
       />
-    )
+    );
   }
-)
-Input.displayName = 'Input'
+);
+Input.displayName = 'Input';
 
-interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
-  error?: boolean
+interface TextareaProps
+  extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+  error?: boolean;
 }
 
 export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
@@ -67,13 +67,13 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
         ref={ref}
         {...props}
       />
-    )
+    );
   }
-)
-Textarea.displayName = 'Textarea'
+);
+Textarea.displayName = 'Textarea';
 
 interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
-  error?: boolean
+  error?: boolean;
 }
 
 export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
@@ -90,32 +90,45 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
       >
         {children}
       </select>
-    )
+    );
   }
-)
-Select.displayName = 'Select'
+);
+Select.displayName = 'Select';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'destructive' | 'outline' | 'ghost'
-  size?: 'sm' | 'md' | 'lg'
-  loading?: boolean
+  variant?: 'primary' | 'secondary' | 'destructive' | 'outline' | 'ghost';
+  size?: 'sm' | 'md' | 'lg';
+  loading?: boolean;
 }
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant = 'primary', size = 'md', loading, children, disabled, ...props }, ref) => {
+  (
+    {
+      className,
+      variant = 'primary',
+      size = 'md',
+      loading,
+      children,
+      disabled,
+      ...props
+    },
+    ref
+  ) => {
     const variants = {
       primary: 'bg-primary text-primary-foreground hover:bg-primary/90',
       secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
-      destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
-      outline: 'border border-input bg-background hover:bg-accent hover:text-accent-foreground',
+      destructive:
+        'bg-destructive text-destructive-foreground hover:bg-destructive/90',
+      outline:
+        'border border-input bg-background hover:bg-accent hover:text-accent-foreground',
       ghost: 'hover:bg-accent hover:text-accent-foreground',
-    }
+    };
 
     const sizes = {
       sm: 'h-9 px-3 text-sm',
       md: 'h-10 px-4 py-2',
       lg: 'h-11 px-8',
-    }
+    };
 
     return (
       <button
@@ -153,7 +166,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         )}
         {children}
       </button>
-    )
+    );
   }
-)
-Button.displayName = 'Button'
+);
+Button.displayName = 'Button';

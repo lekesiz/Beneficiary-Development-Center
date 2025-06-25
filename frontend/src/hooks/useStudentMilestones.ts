@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
 import { api } from '@/lib/api';
 
 export interface MilestoneActivity {
@@ -49,7 +50,9 @@ export function useStartMilestone() {
 
   return useMutation({
     mutationFn: async (milestoneId: number) => {
-      const response = await api.post(`/api/learning-paths/milestones/${milestoneId}/start`);
+      const response = await api.post(
+        `/api/learning-paths/milestones/${milestoneId}/start`
+      );
       return response.data;
     },
     onSuccess: () => {
@@ -64,7 +67,9 @@ export function useCompleteMilestone() {
 
   return useMutation({
     mutationFn: async (milestoneId: number) => {
-      const response = await api.post(`/api/learning-paths/milestones/${milestoneId}/complete`);
+      const response = await api.post(
+        `/api/learning-paths/milestones/${milestoneId}/complete`
+      );
       return response.data;
     },
     onSuccess: () => {
@@ -78,15 +83,22 @@ export function useUpdateMilestoneProgress() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ milestoneId, progress, completedActivities }: {
+    mutationFn: async ({
+      milestoneId,
+      progress,
+      completedActivities,
+    }: {
       milestoneId: number;
       progress: number;
       completedActivities?: number[];
     }) => {
-      const response = await api.patch(`/api/learning-paths/milestones/${milestoneId}/progress`, {
-        progress,
-        completed_activities: completedActivities,
-      });
+      const response = await api.patch(
+        `/api/learning-paths/milestones/${milestoneId}/progress`,
+        {
+          progress,
+          completed_activities: completedActivities,
+        }
+      );
       return response.data;
     },
     onSuccess: () => {
@@ -100,13 +112,19 @@ export function useRequestHelp() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ milestoneId, message }: {
+    mutationFn: async ({
+      milestoneId,
+      message,
+    }: {
       milestoneId: number;
       message: string;
     }) => {
-      const response = await api.post(`/api/learning-paths/milestones/${milestoneId}/help`, {
-        message,
-      });
+      const response = await api.post(
+        `/api/learning-paths/milestones/${milestoneId}/help`,
+        {
+          message,
+        }
+      );
       return response.data;
     },
     onSuccess: () => {
@@ -121,7 +139,9 @@ export function useMilestoneDetails(milestoneId: number | null) {
     queryKey: ['milestoneDetails', milestoneId],
     queryFn: async () => {
       if (!milestoneId) return null;
-      const response = await api.get(`/api/learning-paths/milestones/${milestoneId}`);
+      const response = await api.get(
+        `/api/learning-paths/milestones/${milestoneId}`
+      );
       return response.data.milestone as StudentMilestone;
     },
     enabled: !!milestoneId,
@@ -133,11 +153,16 @@ export function useCompleteActivity() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ milestoneId, activityIndex }: {
+    mutationFn: async ({
+      milestoneId,
+      activityIndex,
+    }: {
       milestoneId: number;
       activityIndex: number;
     }) => {
-      const response = await api.post(`/api/learning-paths/milestones/${milestoneId}/activities/${activityIndex}/complete`);
+      const response = await api.post(
+        `/api/learning-paths/milestones/${milestoneId}/activities/${activityIndex}/complete`
+      );
       return response.data;
     },
     onSuccess: () => {

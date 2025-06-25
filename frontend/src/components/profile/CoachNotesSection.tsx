@@ -1,15 +1,10 @@
-import React, { useState } from 'react';
-import { 
-  MessageSquare, 
-  Plus, 
-  Edit2, 
-  Trash2, 
-  Save,
-  X
-} from 'lucide-react';
+import { MessageSquare, Plus, Edit2, Trash2, Save, X } from 'lucide-react';
+import * as React from 'react';
+import { useState } from 'react';
+
+import { Badge } from '@/components/ui/Badge';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Form';
-import { Badge } from '@/components/ui/Badge';
 import { useAddCoachNote } from '@/hooks/useStudentProfile';
 import { formatDate } from '@/utils/date';
 
@@ -27,22 +22,25 @@ interface CoachNotesSectionProps {
   notes: CoachNote[];
 }
 
-export default function CoachNotesSection({ studentId, notes }: CoachNotesSectionProps) {
+export default function CoachNotesSection({
+  studentId,
+  notes,
+}: CoachNotesSectionProps) {
   const [isAddingNote, setIsAddingNote] = useState(false);
   const [newNote, setNewNote] = useState('');
   const [newCategory, setNewCategory] = useState<string>('general');
   const addNoteMutation = useAddCoachNote();
-  
+
   const handleAddNote = async () => {
     if (!newNote.trim()) return;
-    
+
     try {
       await addNoteMutation.mutateAsync({
         studentId,
         note: newNote,
-        category: newCategory
+        category: newCategory,
       });
-      
+
       setNewNote('');
       setNewCategory('general');
       setIsAddingNote(false);
@@ -50,25 +48,33 @@ export default function CoachNotesSection({ studentId, notes }: CoachNotesSectio
       console.error('Failed to add note:', error);
     }
   };
-  
+
   const getCategoryBadgeVariant = (category: string) => {
     switch (category) {
-      case 'academic': return 'primary';
-      case 'behavioral': return 'warning';
-      case 'other': return 'secondary';
-      default: return 'default';
+      case 'academic':
+        return 'primary';
+      case 'behavioral':
+        return 'warning';
+      case 'other':
+        return 'secondary';
+      default:
+        return 'default';
     }
   };
-  
+
   const getCategoryLabel = (category: string) => {
     switch (category) {
-      case 'academic': return 'Akademik';
-      case 'behavioral': return 'Davranışsal';
-      case 'other': return 'Diğer';
-      default: return 'Genel';
+      case 'academic':
+        return 'Akademik';
+      case 'behavioral':
+        return 'Davranışsal';
+      case 'other':
+        return 'Diğer';
+      default:
+        return 'Genel';
     }
   };
-  
+
   return (
     <Card className="p-6">
       <div className="flex items-center justify-between mb-4">
@@ -77,16 +83,13 @@ export default function CoachNotesSection({ studentId, notes }: CoachNotesSectio
           Koç Notları
         </h3>
         {!isAddingNote && (
-          <Button
-            size="sm"
-            onClick={() => setIsAddingNote(true)}
-          >
+          <Button size="sm" onClick={() => setIsAddingNote(true)}>
             <Plus className="mr-2 h-4 w-4" />
             Not Ekle
           </Button>
         )}
       </div>
-      
+
       {/* Add Note Form */}
       {isAddingNote && (
         <div className="mb-6 p-4 bg-gray-50 rounded-lg">
@@ -106,7 +109,7 @@ export default function CoachNotesSection({ studentId, notes }: CoachNotesSectio
                 <option value="other">Diğer</option>
               </select>
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Not
@@ -119,7 +122,7 @@ export default function CoachNotesSection({ studentId, notes }: CoachNotesSectio
                 placeholder="Öğrenci hakkında gözlem veya öneri yazın..."
               />
             </div>
-            
+
             <div className="flex justify-end space-x-2">
               <Button
                 variant="outline"
@@ -145,7 +148,7 @@ export default function CoachNotesSection({ studentId, notes }: CoachNotesSectio
           </div>
         </div>
       )}
-      
+
       {/* Notes List */}
       {notes.length > 0 ? (
         <div className="space-y-3">
@@ -154,8 +157,8 @@ export default function CoachNotesSection({ studentId, notes }: CoachNotesSectio
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center mb-2">
-                    <Badge 
-                      variant={getCategoryBadgeVariant(note.category)} 
+                    <Badge
+                      variant={getCategoryBadgeVariant(note.category)}
                       size="sm"
                     >
                       {getCategoryLabel(note.category)}
@@ -164,7 +167,9 @@ export default function CoachNotesSection({ studentId, notes }: CoachNotesSectio
                       {formatDate(note.created_at)}
                     </span>
                   </div>
-                  <p className="text-gray-700 whitespace-pre-wrap">{note.note}</p>
+                  <p className="text-gray-700 whitespace-pre-wrap">
+                    {note.note}
+                  </p>
                 </div>
                 {/* In a real app, you'd add edit/delete functionality here */}
               </div>

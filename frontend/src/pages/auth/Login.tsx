@@ -1,4 +1,4 @@
-import React from 'react'
+import * as React from 'react';
 
 export default function Login() {
   return (
@@ -6,5 +6,5 @@ export default function Login() {
       <h2 className="text-xl font-bold mb-4">Login</h2>
       <p>Login page - To be implemented</p>
     </div>
-  )
+  );
 }

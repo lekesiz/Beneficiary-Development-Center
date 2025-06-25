@@ -1,8 +1,29 @@
-export type LearningPathStatus = 'draft' | 'proposed' | 'accepted' | 'in_progress' | 'completed' | 'cancelled';
-export type MilestoneStatus = 'pending' | 'in_progress' | 'completed' | 'skipped';
-export type LearningStyle = 'visual' | 'auditory' | 'kinesthetic' | 'reading' | 'mixed';
+export type LearningPathStatus =
+  | 'draft'
+  | 'proposed'
+  | 'accepted'
+  | 'in_progress'
+  | 'completed'
+  | 'cancelled';
+export type MilestoneStatus =
+  | 'pending'
+  | 'in_progress'
+  | 'completed'
+  | 'skipped';
+export type LearningStyle =
+  | 'visual'
+  | 'auditory'
+  | 'kinesthetic'
+  | 'reading'
+  | 'mixed';
 export type DifficultyAdjustment = 'easy' | 'balanced' | 'challenging';
-export type ResourceType = 'video' | 'article' | 'exercise' | 'book' | 'course' | 'video_series';
+export type ResourceType =
+  | 'video'
+  | 'article'
+  | 'exercise'
+  | 'book'
+  | 'course'
+  | 'video_series';
 export type ActivityType = 'practice' | 'study' | 'project';
 
 export interface LearningResource {

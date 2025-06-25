@@ -1,5 +1,5 @@
-import React from 'react';
 import { X, CheckCircle, AlertCircle, Info, AlertTriangle } from 'lucide-react';
+import * as React from 'react';
 
 export interface ToastProps {
   id?: string;
@@ -14,41 +14,43 @@ const variantStyles = {
   default: {
     container: 'bg-white border-gray-200',
     icon: null,
-    iconColor: ''
+    iconColor: '',
   },
   success: {
     container: 'bg-green-50 border-green-200',
     icon: CheckCircle,
-    iconColor: 'text-green-600'
+    iconColor: 'text-green-600',
   },
   warning: {
     container: 'bg-yellow-50 border-yellow-200',
     icon: AlertTriangle,
-    iconColor: 'text-yellow-600'
+    iconColor: 'text-yellow-600',
   },
   danger: {
     container: 'bg-red-50 border-red-200',
     icon: AlertCircle,
-    iconColor: 'text-red-600'
+    iconColor: 'text-red-600',
   },
   info: {
     container: 'bg-blue-50 border-blue-200',
     icon: Info,
-    iconColor: 'text-blue-600'
-  }
+    iconColor: 'text-blue-600',
+  },
 };
 
 export const Toast: React.FC<ToastProps> = ({
   title,
   description,
   variant = 'default',
-  onClose
+  onClose,
 }) => {
   const styles = variantStyles[variant];
   const Icon = styles.icon;
 
   return (
-    <div className={`max-w-sm w-full shadow-lg rounded-lg pointer-events-auto border ${styles.container}`}>
+    <div
+      className={`max-w-sm w-full shadow-lg rounded-lg pointer-events-auto border ${styles.container}`}
+    >
       <div className="p-4">
         <div className="flex items-start">
           {Icon && (
@@ -80,7 +82,9 @@ export const Toast: React.FC<ToastProps> = ({
 };
 
 // Toast container component
-export const ToastContainer: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const ToastContainer: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   return (
     <div className="fixed inset-0 z-50 pointer-events-none flex items-end px-4 py-6 sm:items-start sm:p-6">
       <div className="w-full flex flex-col items-center space-y-4 sm:items-end">
@@ -96,15 +100,19 @@ interface ToastContextType {
   removeToast: (id: string) => void;
 }
 
-const ToastContext = React.createContext<ToastContextType | undefined>(undefined);
+const ToastContext = React.createContext<ToastContextType | undefined>(
+  undefined
+);
 
-export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [toasts, setToasts] = React.useState<ToastProps[]>([]);
 
   const addToast = React.useCallback((toast: Omit<ToastProps, 'id'>) => {
     const id = Date.now().toString();
     const newToast = { ...toast, id };
-    
+
     setToasts((prev) => [...prev, newToast]);
 
     // Auto remove after duration

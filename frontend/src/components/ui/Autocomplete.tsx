@@ -1,6 +1,10 @@
-import React, { useState } from 'react';
-import { Input } from './Form';
+import * as React from 'react';
+import { useState } from 'react';
+
 import { cn } from '@/lib/utils';
+
+import { Input } from './Form';
+
 
 interface AutocompleteOption {
   value: string | number;
@@ -29,10 +33,10 @@ export const Autocomplete: React.FC<AutocompleteProps> = ({
   const [isOpen, setIsOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');
 
-  const selectedOption = options.find(option => option.value === value);
+  const selectedOption = options.find((option) => option.value === value);
   const displayValue = selectedOption ? selectedOption.label : '';
 
-  const filteredOptions = options.filter(option =>
+  const filteredOptions = options.filter((option) =>
     option.label.toLowerCase().includes(searchValue.toLowerCase())
   );
 
@@ -56,11 +60,9 @@ export const Autocomplete: React.FC<AutocompleteProps> = ({
   return (
     <div className="relative space-y-2">
       {label && (
-        <label className="text-sm font-medium leading-none">
-          {label}
-        </label>
+        <label className="text-sm font-medium leading-none">{label}</label>
       )}
-      
+
       <div className="relative">
         <Input
           value={isOpen ? searchValue : displayValue}
@@ -71,7 +73,7 @@ export const Autocomplete: React.FC<AutocompleteProps> = ({
           disabled={disabled}
           autoComplete="off"
         />
-        
+
         {value && (
           <button
             type="button"
@@ -101,9 +103,7 @@ export const Autocomplete: React.FC<AutocompleteProps> = ({
         </div>
       )}
 
-      {error && (
-        <p className="text-sm text-destructive">{error}</p>
-      )}
+      {error && <p className="text-sm text-destructive">{error}</p>}
     </div>
   );
 };

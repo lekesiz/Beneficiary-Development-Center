@@ -1,5 +1,3 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   Bell,
   X,
@@ -9,11 +7,15 @@ import {
   AlertCircle,
   ExternalLink,
   Trash2,
-  Check
+  Check,
 } from 'lucide-react';
-import { useCoachNotifications } from '@/hooks/useCoachNotifications';
+import * as React from 'react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Form';
+import { useCoachNotifications } from '@/hooks/useCoachNotifications';
 import { formatDistanceToNow } from '@/utils/date';
 
 export default function NotificationCenter() {
@@ -25,7 +27,7 @@ export default function NotificationCenter() {
     markAsRead,
     markAllAsRead,
     clearNotification,
-    isConnected
+    isConnected,
   } = useCoachNotifications();
 
   const handleNotificationClick = (notification: any) => {
@@ -47,22 +49,22 @@ export default function NotificationCenter() {
 
   const getPriorityBadge = (priority?: string) => {
     if (!priority) return null;
-    
+
     const variants = {
       high: 'danger',
       medium: 'warning',
-      low: 'default'
+      low: 'default',
     } as const;
-    
+
     const labels = {
       high: 'Yüksek',
       medium: 'Orta',
-      low: 'Düşük'
+      low: 'Düşük',
     };
-    
+
     return (
-      <Badge 
-        variant={variants[priority as keyof typeof variants] || 'default'} 
+      <Badge
+        variant={variants[priority as keyof typeof variants] || 'default'}
         size="sm"
       >
         {labels[priority as keyof typeof labels] || priority}
@@ -93,11 +95,11 @@ export default function NotificationCenter() {
       {isOpen && (
         <>
           {/* Backdrop */}
-          <div 
-            className="fixed inset-0 z-40" 
+          <div
+            className="fixed inset-0 z-40"
             onClick={() => setIsOpen(false)}
           />
-          
+
           {/* Dropdown Panel */}
           <div className="absolute right-0 mt-2 w-96 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
             {/* Header */}
@@ -151,18 +153,25 @@ export default function NotificationCenter() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between">
-                            <div 
+                            <div
                               className="flex-1"
-                              onClick={() => handleNotificationClick(notification)}
+                              onClick={() =>
+                                handleNotificationClick(notification)
+                              }
                             >
-                              <p className={`text-sm ${!notification.read ? 'font-semibold' : 'font-medium'}`}>
+                              <p
+                                className={`text-sm ${
+                                  !notification.read
+                                    ? 'font-semibold'
+                                    : 'font-medium'
+                                }`}
+                              >
                                 {notification.student_name}
                               </p>
                               <p className="text-sm text-gray-600 mt-1">
-                                {notification.type === 'help_request' 
+                                {notification.type === 'help_request'
                                   ? `"${notification.milestone_title}" için yardım istiyor`
-                                  : `"${notification.milestone_title}" hedefini tamamladı`
-                                }
+                                  : `"${notification.milestone_title}" hedefini tamamladı`}
                               </p>
                               {notification.message && (
                                 <p className="text-sm text-gray-500 mt-1 italic">
@@ -174,7 +183,8 @@ export default function NotificationCenter() {
                                   <Clock className="h-3 w-3 mr-1" />
                                   {formatDistanceToNow(notification.timestamp)}
                                 </span>
-                                {notification.priority && getPriorityBadge(notification.priority)}
+                                {notification.priority &&
+                                  getPriorityBadge(notification.priority)}
                                 {notification.path_completed && (
                                   <Badge variant="success" size="sm">
                                     Yol Tamamlandı

@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import {
   Target,
   Clock,
@@ -11,11 +10,14 @@ import {
   Lock,
   Star,
   MessageSquare,
-  Edit3
+  Edit3,
 } from 'lucide-react';
+import * as React from 'react';
+import { useState } from 'react';
+
+import { Badge } from '@/components/ui/Badge';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Form';
-import { Badge } from '@/components/ui/Badge';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { useUpdateMilestoneProgress } from '@/hooks/useLearningPath';
 import type { LearningMilestone } from '@/types/learning-path';
@@ -29,12 +31,12 @@ interface MilestoneCardProps {
 export const MilestoneCard: React.FC<MilestoneCardProps> = ({
   milestone,
   pathId,
-  isPathAccepted
+  isPathAccepted,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [showProgressModal, setShowProgressModal] = useState(false);
   const updateProgressMutation = useUpdateMilestoneProgress();
-  
+
   const getStatusIcon = () => {
     switch (milestone.status) {
       case 'completed':
@@ -42,12 +44,16 @@ export const MilestoneCard: React.FC<MilestoneCardProps> = ({
       case 'in_progress':
         return <PlayCircle className="h-5 w-5 text-blue-600" />;
       case 'pending':
-        return isPathAccepted ? <Circle className="h-5 w-5 text-gray-400" /> : <Lock className="h-5 w-5 text-gray-400" />;
+        return isPathAccepted ? (
+          <Circle className="h-5 w-5 text-gray-400" />
+        ) : (
+          <Lock className="h-5 w-5 text-gray-400" />
+        );
       default:
         return <Circle className="h-5 w-5 text-gray-400" />;
     }
   };
-  
+
   const getStatusColor = () => {
     switch (milestone.status) {
       case 'completed':
@@ -58,20 +64,20 @@ export const MilestoneCard: React.FC<MilestoneCardProps> = ({
         return 'bg-white border-gray-200';
     }
   };
-  
+
   const handleProgressUpdate = async (newProgress: number) => {
     try {
       await updateProgressMutation.mutateAsync({
         pathId,
         milestoneId: milestone.id,
-        progress: newProgress
+        progress: newProgress,
       });
       setShowProgressModal(false);
     } catch (error) {
       console.error('Failed to update progress:', error);
     }
   };
-  
+
   return (
     <Card className={`p-6 transition-all ${getStatusColor()}`}>
       {/* Header */}
@@ -84,7 +90,7 @@ export const MilestoneCard: React.FC<MilestoneCardProps> = ({
               <Badge variant="outline">Hafta {milestone.week_number}</Badge>
             </div>
             <p className="text-gray-600">{milestone.description}</p>
-            
+
             {/* Progress */}
             {milestone.status !== 'pending' && (
               <div className="mt-3">
@@ -97,15 +103,19 @@ export const MilestoneCard: React.FC<MilestoneCardProps> = ({
             )}
           </div>
         </div>
-        
+
         <button
           onClick={() => setIsExpanded(!isExpanded)}
           className="p-2 hover:bg-gray-100 rounded-md ml-4"
         >
-          {isExpanded ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
+          {isExpanded ? (
+            <ChevronUp className="h-5 w-5" />
+          ) : (
+            <ChevronDown className="h-5 w-5" />
+          )}
         </button>
       </div>
-      
+
       {/* Metadata */}
       <div className="flex items-center space-x-4 text-sm text-gray-600 mb-4">
         <div className="flex items-center space-x-1">
@@ -123,15 +133,12 @@ export const MilestoneCard: React.FC<MilestoneCardProps> = ({
           </div>
         )}
       </div>
-      
+
       {/* Action Buttons */}
       {isPathAccepted && (
         <div className="flex items-center space-x-2">
           {milestone.status === 'pending' && (
-            <Button
-              size="sm"
-              onClick={() => handleProgressUpdate(10)}
-            >
+            <Button size="sm" onClick={() => handleProgressUpdate(10)}>
               <PlayCircle className="mr-2 h-4 w-4" />
               Başla
             </Button>
@@ -146,10 +153,7 @@ export const MilestoneCard: React.FC<MilestoneCardProps> = ({
                 <Edit3 className="mr-2 h-4 w-4" />
                 İlerleme Güncelle
               </Button>
-              <Button
-                size="sm"
-                onClick={() => handleProgressUpdate(100)}
-              >
+              <Button size="sm" onClick={() => handleProgressUpdate(100)}>
                 <CheckCircle className="mr-2 h-4 w-4" />
                 Tamamla
               </Button>
@@ -161,14 +165,16 @@ export const MilestoneCard: React.FC<MilestoneCardProps> = ({
               <span className="font-medium">Tamamlandı</span>
               {milestone.completed_at && (
                 <span className="text-sm text-gray-500">
-                  ({new Date(milestone.completed_at).toLocaleDateString('tr-TR')})
+                  (
+                  {new Date(milestone.completed_at).toLocaleDateString('tr-TR')}
+                  )
                 </span>
               )}
             </div>
           )}
         </div>
       )}
-      
+
       {/* Expanded Content */}
       {isExpanded && (
         <div className="mt-6 pt-6 border-t space-y-4">
@@ -179,7 +185,7 @@ export const MilestoneCard: React.FC<MilestoneCardProps> = ({
               <p className="text-gray-600">{milestone.objective}</p>
             </div>
           )}
-          
+
           {/* Activities */}
           {milestone.activities.length > 0 && (
             <div>
@@ -192,13 +198,20 @@ export const MilestoneCard: React.FC<MilestoneCardProps> = ({
                     </div>
                     <div className="flex-1">
                       <p className="font-medium">{activity.title}</p>
-                      <p className="text-sm text-gray-600">{activity.description}</p>
+                      <p className="text-sm text-gray-600">
+                        {activity.description}
+                      </p>
                       <div className="flex items-center space-x-2 mt-1">
                         <Badge variant="outline" size="sm">
-                          {activity.type === 'practice' ? 'Pratik' : 
-                           activity.type === 'study' ? 'Çalışma' : 'Proje'}
+                          {activity.type === 'practice'
+                            ? 'Pratik'
+                            : activity.type === 'study'
+                            ? 'Çalışma'
+                            : 'Proje'}
                         </Badge>
-                        <span className="text-xs text-gray-500">{activity.duration}</span>
+                        <span className="text-xs text-gray-500">
+                          {activity.duration}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -206,14 +219,17 @@ export const MilestoneCard: React.FC<MilestoneCardProps> = ({
               </div>
             </div>
           )}
-          
+
           {/* Resources */}
           {milestone.resources.length > 0 && (
             <div>
               <h4 className="font-medium text-gray-700 mb-2">Kaynaklar</h4>
               <div className="space-y-2">
                 {milestone.resources.map((resource, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
+                  <div
+                    key={index}
+                    className="flex items-center justify-between p-3 bg-gray-50 rounded-md"
+                  >
                     <div className="flex items-center space-x-3">
                       <BookOpen className="h-5 w-5 text-gray-500" />
                       <div>
@@ -225,13 +241,19 @@ export const MilestoneCard: React.FC<MilestoneCardProps> = ({
                         >
                           {resource.title}
                         </a>
-                        <p className="text-sm text-gray-600">{resource.description}</p>
+                        <p className="text-sm text-gray-600">
+                          {resource.description}
+                        </p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <Badge variant="outline" size="sm">{resource.type}</Badge>
+                      <Badge variant="outline" size="sm">
+                        {resource.type}
+                      </Badge>
                       {resource.duration && (
-                        <p className="text-xs text-gray-500 mt-1">{resource.duration}</p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          {resource.duration}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -239,11 +261,13 @@ export const MilestoneCard: React.FC<MilestoneCardProps> = ({
               </div>
             </div>
           )}
-          
+
           {/* Assessment Criteria */}
           {milestone.assessment_criteria.length > 0 && (
             <div>
-              <h4 className="font-medium text-gray-700 mb-2">Değerlendirme Kriterleri</h4>
+              <h4 className="font-medium text-gray-700 mb-2">
+                Değerlendirme Kriterleri
+              </h4>
               <ul className="space-y-1">
                 {milestone.assessment_criteria.map((criteria, index) => (
                   <li key={index} className="flex items-start space-x-2">
@@ -254,24 +278,30 @@ export const MilestoneCard: React.FC<MilestoneCardProps> = ({
               </ul>
             </div>
           )}
-          
+
           {/* User Notes */}
           {milestone.user_notes && (
             <div className="p-4 bg-yellow-50 rounded-md">
               <div className="flex items-start space-x-2">
                 <MessageSquare className="h-5 w-5 text-yellow-600 flex-shrink-0" />
                 <div>
-                  <h4 className="font-medium text-yellow-900 mb-1">Notlarınız</h4>
-                  <p className="text-sm text-yellow-800">{milestone.user_notes}</p>
+                  <h4 className="font-medium text-yellow-900 mb-1">
+                    Notlarınız
+                  </h4>
+                  <p className="text-sm text-yellow-800">
+                    {milestone.user_notes}
+                  </p>
                 </div>
               </div>
             </div>
           )}
-          
+
           {/* Difficulty Rating */}
           {milestone.difficulty_rating && (
             <div className="flex items-center space-x-2">
-              <span className="text-sm text-gray-600">Zorluk Değerlendirmesi:</span>
+              <span className="text-sm text-gray-600">
+                Zorluk Değerlendirmesi:
+              </span>
               <div className="flex items-center space-x-1">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <Star
@@ -288,7 +318,7 @@ export const MilestoneCard: React.FC<MilestoneCardProps> = ({
           )}
         </div>
       )}
-      
+
       {/* Progress Update Modal */}
       {showProgressModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
