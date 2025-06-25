@@ -25,15 +25,71 @@ const DashboardLayout: React.FC = () => {
     navigate('/login');
   };
 
-  const navigation = [
-    { name: 'Dashboard', href: '/dashboard', icon: Home },
-    { name: 'Beneficiaries', href: '/beneficiaries', icon: Users },
-    { name: 'Programs', href: '/programs', icon: BookOpen },
-    { name: 'Courses', href: '/courses', icon: GraduationCap },
-    { name: 'Evaluations', href: '/evaluations', icon: ClipboardCheck },
-    { name: 'Reports', href: '/reports', icon: BarChart3 },
-    { name: 'Settings', href: '/settings', icon: Settings },
+  // Define navigation items with role-based access control
+  const allNavigationItems = [
+    { 
+      name: 'Dashboard', 
+      href: '/dashboard', 
+      icon: Home,
+      requiredRoles: [] // Accessible to all authenticated users
+    },
+    { 
+      name: 'Beneficiaries', 
+      href: '/beneficiaries', 
+      icon: Users,
+      requiredRoles: ['admin', 'manager', 'trainer', 'instructor']
+    },
+    { 
+      name: 'Programs', 
+      href: '/programs', 
+      icon: BookOpen,
+      requiredRoles: ['admin', 'manager', 'instructor']
+    },
+    { 
+      name: 'Courses', 
+      href: '/courses', 
+      icon: GraduationCap,
+      requiredRoles: ['admin', 'manager', 'instructor']
+    },
+    { 
+      name: 'Evaluations', 
+      href: '/evaluations', 
+      icon: ClipboardCheck,
+      requiredRoles: ['admin', 'manager', 'instructor', 'student']
+    },
+    { 
+      name: 'Reports', 
+      href: '/reports', 
+      icon: BarChart3,
+      requiredRoles: ['admin', 'manager', 'instructor', 'trainer', 'student']
+    },
+    { 
+      name: 'Settings', 
+      href: '/settings', 
+      icon: Settings,
+      requiredRoles: [] // Accessible to all authenticated users
+    },
   ];
+
+  // Filter navigation based on user roles
+  const getUserRole = () => {
+    return user?.role || user?.primaryRole || 'student';
+  };
+
+  const getUserRoles = () => {
+    if (user?.roles && Array.isArray(user.roles)) {
+      return user.roles.map(role => typeof role === 'string' ? role : role.name);
+    }
+    return [getUserRole()];
+  };
+
+  const hasRequiredRole = (requiredRoles: string[]) => {
+    if (requiredRoles.length === 0) return true; // No restrictions
+    const userRoles = getUserRoles();
+    return requiredRoles.some(role => userRoles.includes(role));
+  };
+
+  const navigation = allNavigationItems.filter(item => hasRequiredRole(item.requiredRoles));
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -92,7 +148,7 @@ const DashboardLayout: React.FC = () => {
                 <p className="text-sm font-medium text-gray-700">
                   {user?.first_name} {user?.last_name}
                 </p>
-                <p className="text-xs text-gray-500">{user?.role}</p>
+                <p className="text-xs text-gray-500">{getUserRole()}</p>
               </div>
             </div>
             <button
