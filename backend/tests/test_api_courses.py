@@ -140,7 +140,7 @@ class TestCourseAPI:
         response = client.get(f"/api/v1/programs/{sample_program.id}/courses", headers=admin_headers)
 
         assert response.status_code == 200
-        data = response.json
+        data = response.get_json()
         assert data["courses"] == []
         assert data["pagination"]["total"] == 0
 
@@ -149,7 +149,7 @@ class TestCourseAPI:
         response = client.get(f"/api/v1/programs/{sample_program.id}/courses", headers=admin_headers)
 
         assert response.status_code == 200
-        data = response.json
+        data = response.get_json()
         assert len(data["courses"]) == 6  # sample_course + 5 from multiple_courses
         assert data["pagination"]["total"] == 6
 
@@ -162,13 +162,13 @@ class TestCourseAPI:
         # Filter by status
         response = client.get(f"/api/v1/programs/{sample_program.id}/courses?status=published", headers=admin_headers)
         assert response.status_code == 200
-        data = response.json
+        data = response.get_json()
         assert all(c["status"] == "published" for c in data["courses"])
 
         # Filter by format
         response = client.get(f"/api/v1/programs/{sample_program.id}/courses?format=online", headers=admin_headers)
         assert response.status_code == 200
-        data = response.json
+        data = response.get_json()
         assert all(c["format"] == "online" for c in data["courses"])
 
         # Filter by difficulty
@@ -176,7 +176,7 @@ class TestCourseAPI:
             f"/api/v1/programs/{sample_program.id}/courses?difficulty=beginner", headers=admin_headers
         )
         assert response.status_code == 200
-        data = response.json
+        data = response.get_json()
         assert all(c["difficulty_level"] == "beginner" for c in data["courses"])
 
     def test_get_courses_search(self, client, admin_headers, sample_program, multiple_courses):
@@ -184,7 +184,7 @@ class TestCourseAPI:
         response = client.get(f"/api/v1/programs/{sample_program.id}/courses?search=Python", headers=admin_headers)
 
         assert response.status_code == 200
-        data = response.json
+        data = response.get_json()
         assert len(data["courses"]) == 1
         assert "Python" in data["courses"][0]["title"]
 
@@ -193,7 +193,7 @@ class TestCourseAPI:
         response = client.get(f"/api/v1/programs/{sample_program.id}/courses/{sample_course.id}", headers=admin_headers)
 
         assert response.status_code == 200
-        data = response.json
+        data = response.get_json()
         assert data["id"] == sample_course.id
         assert data["title"] == "Introduction to Python"
         assert data["program_id"] == sample_program.id
@@ -230,7 +230,7 @@ class TestCourseAPI:
         response = client.post(f"/api/v1/programs/{sample_program.id}/courses", json=course_data, headers=admin_headers)
 
         assert response.status_code == 201
-        data = response.json
+        data = response.get_json()
         assert data["title"] == "New Course"
         assert data["code"] is not None  # Auto-generated
         assert data["order_index"] == 0  # First course in program
@@ -273,7 +273,7 @@ class TestCourseAPI:
         )
 
         assert response.status_code == 200
-        data = response.json
+        data = response.get_json()
         assert data["title"] == "Updated Python Course"
         assert data["duration_hours"] == 50
         assert data["max_participants"] == 30
@@ -352,7 +352,7 @@ class TestCourseAPI:
         )
 
         assert response.status_code == 200
-        data = response.json
+        data = response.get_json()
 
         # Verify new order
         reordered = sorted(data["courses"][:3], key=lambda x: x["order_index"])
@@ -369,7 +369,7 @@ class TestCourseAPI:
         )
 
         assert response.status_code == 201
-        data = response.json
+        data = response.get_json()
         assert data["title"] == "Python Course Copy"
         assert data["id"] != sample_course.id
         assert data["code"] != sample_course.code
@@ -402,7 +402,7 @@ class TestCourseAPI:
         )
 
         assert response.status_code == 201
-        data = response.json
+        data = response.get_json()
         assert data["program_id"] == new_program.id
 
     def test_get_course_statistics(self, client, admin_headers, sample_program, sample_course, multiple_courses):
@@ -410,7 +410,7 @@ class TestCourseAPI:
         response = client.get(f"/api/v1/programs/{sample_program.id}/courses/statistics", headers=admin_headers)
 
         assert response.status_code == 200
-        data = response.json
+        data = response.get_json()
         assert data["total_courses"] == 6
         assert "status_breakdown" in data
         assert "format_breakdown" in data
@@ -422,7 +422,7 @@ class TestCourseAPI:
         response = client.get(f"/api/v1/programs/{sample_program.id}/courses?page=1&per_page=3", headers=admin_headers)
 
         assert response.status_code == 200
-        data = response.json
+        data = response.get_json()
         assert len(data["courses"]) == 3
         assert data["pagination"]["page"] == 1
         assert data["pagination"]["per_page"] == 3
@@ -435,7 +435,7 @@ class TestCourseAPI:
         )
 
         assert response.status_code == 200
-        data = response.json
+        data = response.get_json()
         assert all(c["instructor_id"] == instructor_user.id for c in data["courses"])
 
     def test_course_with_assessment(self, client, admin_headers, sample_program, sample_course):
@@ -443,7 +443,7 @@ class TestCourseAPI:
         response = client.get(f"/api/v1/programs/{sample_program.id}/courses/{sample_course.id}", headers=admin_headers)
 
         assert response.status_code == 200
-        data = response.json
+        data = response.get_json()
         assert data["has_assessment"] is True
         assert data["assessment_type"] == "quiz"
         assert data["passing_score"] == 70.0

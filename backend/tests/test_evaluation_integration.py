@@ -41,15 +41,24 @@ def client(app):
 def admin_user(app):
     """Create admin user."""
     with app.app_context():
+        from app.models.user import Role
+        
+        # Create or get admin role
+        admin_role = db.session.query(Role).filter_by(name=Role.ADMIN).first()
+        if not admin_role:
+            admin_role = Role(name=Role.ADMIN, permissions=Role.get_default_permissions(Role.ADMIN))
+            db.session.add(admin_role)
+            db.session.commit()
+        
         user = User(
             email="admin@test.com",
             first_name="Admin",
             last_name="User",
-            role="admin",
             tenant_id=1,
             is_active=True,
             password_hash="hashed_password",
         )
+        user.roles.append(admin_role)
         db.session.add(user)
         db.session.commit()
         return user
@@ -59,15 +68,24 @@ def admin_user(app):
 def instructor_user(app):
     """Create instructor user."""
     with app.app_context():
+        from app.models.user import Role
+        
+        # Create or get trainer role
+        trainer_role = db.session.query(Role).filter_by(name=Role.TRAINER).first()
+        if not trainer_role:
+            trainer_role = Role(name=Role.TRAINER, permissions=Role.get_default_permissions(Role.TRAINER))
+            db.session.add(trainer_role)
+            db.session.commit()
+        
         user = User(
             email="instructor@test.com",
             first_name="Instructor",
             last_name="User",
-            role="instructor",
             tenant_id=1,
             is_active=True,
             password_hash="hashed_password",
         )
+        user.roles.append(trainer_role)
         db.session.add(user)
         db.session.commit()
         return user
@@ -77,26 +95,62 @@ def instructor_user(app):
 def student_user(app):
     """Create student user."""
     with app.app_context():
+        from app.models.user import Role
+        
+        # Create or get student role
+        student_role = db.session.query(Role).filter_by(name=Role.STUDENT).first()
+        if not student_role:
+            student_role = Role(name=Role.STUDENT, permissions=Role.get_default_permissions(Role.STUDENT))
+            db.session.add(student_role)
+            db.session.commit()
+        
         user = User(
             email="student@test.com",
             first_name="Student",
             last_name="User",
-            role="student",
             tenant_id=1,
             is_active=True,
             password_hash="hashed_password",
         )
+        user.roles.append(student_role)
         db.session.add(user)
         db.session.commit()
         return user
 
 
+@pytest.fixture  
+def sample_program(app, admin_user):
+    """Create sample program."""
+    with app.app_context():
+        from datetime import datetime, timedelta
+        # Refresh admin_user to ensure it's attached to current session
+        admin_user = db.session.merge(admin_user)
+        program = Program(
+            title="Test Program",
+            description="Test program description", 
+            start_date=datetime.utcnow(),
+            end_date=datetime.utcnow() + timedelta(days=30),
+            tenant_id=1,
+            created_by=admin_user.id
+        )
+        db.session.add(program)
+        db.session.commit()
+        return program
+
+
 @pytest.fixture
-def sample_course(app, admin_user):
+def sample_course(app, admin_user, sample_program):
     """Create sample course."""
     with app.app_context():
+        # Refresh objects to ensure they're attached to current session
+        admin_user = db.session.merge(admin_user)
+        sample_program = db.session.merge(sample_program)
         course = Course(
-            title="Test Course", description="Test course description", tenant_id=1, created_by=admin_user.id
+            title="Test Course", 
+            description="Test course description", 
+            program_id=sample_program.id,
+            tenant_id=1, 
+            created_by=admin_user.id
         )
         db.session.add(course)
         db.session.commit()
@@ -107,6 +161,9 @@ def sample_course(app, admin_user):
 def sample_evaluation(app, admin_user, sample_course):
     """Create sample evaluation."""
     with app.app_context():
+        # Refresh objects to ensure they're attached to current session
+        admin_user = db.session.merge(admin_user)
+        sample_course = db.session.merge(sample_course)
         evaluation = Evaluation(
             title="Test Evaluation",
             description="Test evaluation description",
@@ -127,6 +184,8 @@ def sample_evaluation(app, admin_user, sample_course):
 def sample_question(app, sample_evaluation):
     """Create sample question."""
     with app.app_context():
+        # Refresh evaluation to ensure it's attached to current session
+        sample_evaluation = db.session.merge(sample_evaluation)
         question = Question(
             evaluation_id=sample_evaluation.id,
             question_text="What is 2 + 2?",
@@ -151,6 +210,10 @@ class TestEvaluationIntegration:
     def test_evaluation_lifecycle(self, app, admin_user, sample_course):
         """Test complete evaluation lifecycle"""
         with app.app_context():
+            # Refresh objects to ensure they're attached to current session
+            admin_user = db.session.merge(admin_user)
+            sample_course = db.session.merge(sample_course)
+            
             # Create evaluation
             evaluation = Evaluation(
                 title="Integration Test Evaluation",

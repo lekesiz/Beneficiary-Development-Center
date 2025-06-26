@@ -94,5 +94,75 @@ class RateLimitError(BaseError):
         super().__init__(message, code)
 
 
+class ConflictError(BaseError):
+    """Raised when there's a resource conflict."""
+
+    def __init__(self, message, code="CONFLICT"):
+        super().__init__(message, code)
+
+
+class ServiceUnavailableError(BaseError):
+    """Raised when service is temporarily unavailable."""
+
+    def __init__(self, message, code="SERVICE_UNAVAILABLE"):
+        super().__init__(message, code)
+
+
+class PayloadTooLargeError(BaseError):
+    """Raised when request payload is too large."""
+
+    def __init__(self, message, code="PAYLOAD_TOO_LARGE"):
+        super().__init__(message, code)
+
+
+class MethodNotAllowedError(BaseError):
+    """Raised when HTTP method is not allowed."""
+
+    def __init__(self, message, code="METHOD_NOT_ALLOWED"):
+        super().__init__(message, code)
+
+
+class TimeoutError(BaseError):
+    """Raised when operation times out."""
+
+    def __init__(self, message, code="TIMEOUT"):
+        super().__init__(message, code)
+
+
+class BusinessLogicError(BaseError):
+    """Raised when business logic validation fails."""
+
+    def __init__(self, message, code="BUSINESS_LOGIC_ERROR"):
+        super().__init__(message, code)
+
+
+class InvalidStateError(BaseError):
+    """Raised when resource is in invalid state for operation."""
+
+    def __init__(self, message, code="INVALID_STATE"):
+        super().__init__(message, code)
+
+
+class ResourceLockedError(BaseError):
+    """Raised when resource is locked and cannot be modified."""
+
+    def __init__(self, message, code="RESOURCE_LOCKED"):
+        super().__init__(message, code)
+
+
+class QuotaExceededError(BaseError):
+    """Raised when user exceeds their quota."""
+
+    def __init__(self, message, code="QUOTA_EXCEEDED"):
+        super().__init__(message, code)
+
+
+class MaintenanceModeError(BaseError):
+    """Raised when system is in maintenance mode."""
+
+    def __init__(self, message, code="MAINTENANCE_MODE"):
+        super().__init__(message, code)
+
+
 # Alias for backward compatibility
 APIException = BaseError

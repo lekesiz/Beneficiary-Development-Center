@@ -259,7 +259,7 @@ function useDynamicBreadcrumbData() {
             const data = await queryClient.fetchQuery({
               queryKey: cacheKey,
               queryFn: async () => {
-                const { apiClient } = await import('../api/client');
+                const apiClient = (await import('../api/client')).default;
                 const response = await apiClient.get(`/api/learning-paths/${idsToFetch.learningPathId}`);
                 return response.data;
               },

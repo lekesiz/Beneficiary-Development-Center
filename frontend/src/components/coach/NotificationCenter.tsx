@@ -97,6 +97,10 @@ export default function NotificationCenter() {
           <div
             className="fixed inset-0 z-40"
             onClick={() => setIsOpen(false)}
+            onKeyDown={(e) => e.key === 'Escape' && setIsOpen(false)}
+            role="button"
+            tabIndex={0}
+            aria-label="Close notifications"
           />
 
           {/* Dropdown Panel */}

@@ -225,10 +225,11 @@ class Program(TenantBaseModel):
         if "program_type" in data and data["program_type"]:
             data["program_type"] = data["program_type"].value
 
-        # Convert dates to ISO format
+        # Convert dates to ISO format (only if they're not already strings)
         for date_field in ["start_date", "end_date", "enrollment_start", "enrollment_end"]:
             if date_field in data and data[date_field]:
-                data[date_field] = data[date_field].isoformat()
+                if hasattr(data[date_field], 'isoformat'):
+                    data[date_field] = data[date_field].isoformat()
 
         # Add related data if requested
         if include_related:

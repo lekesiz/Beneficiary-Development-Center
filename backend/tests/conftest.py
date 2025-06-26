@@ -162,6 +162,15 @@ def admin_user(db_session, test_tenant):
 @pytest.fixture
 def manager_user(db_session, test_tenant):
     """Create manager user."""
+    from app.models.user import Role
+    
+    # Create or get admin role (manager gets admin permissions)
+    admin_role = db_session.query(Role).filter_by(name=Role.ADMIN).first()
+    if not admin_role:
+        admin_role = Role(name=Role.ADMIN, permissions=Role.get_default_permissions(Role.ADMIN))
+        db_session.add(admin_role)
+        db_session.commit()
+    
     user = User(
         email="manager@test.com",
         password_hash=generate_password_hash("password123"),
@@ -170,6 +179,7 @@ def manager_user(db_session, test_tenant):
         tenant_id=test_tenant.id,
         is_active=True,
     )
+    user.roles.append(admin_role)
     user.set_password("password123")  # Ensure password is set properly
     db_session.add(user)
     db_session.commit()
@@ -180,6 +190,15 @@ def manager_user(db_session, test_tenant):
 @pytest.fixture
 def instructor_user(db_session, test_tenant):
     """Create instructor user."""
+    from app.models.user import Role
+    
+    # Create or get trainer role
+    trainer_role = db_session.query(Role).filter_by(name=Role.TRAINER).first()
+    if not trainer_role:
+        trainer_role = Role(name=Role.TRAINER, permissions=Role.get_default_permissions(Role.TRAINER))
+        db_session.add(trainer_role)
+        db_session.commit()
+    
     user = User(
         email="instructor@test.com",
         password_hash=generate_password_hash("password123"),
@@ -188,6 +207,7 @@ def instructor_user(db_session, test_tenant):
         tenant_id=test_tenant.id,
         is_active=True,
     )
+    user.roles.append(trainer_role)
     user.set_password("password123")  # Ensure password is set properly
     db_session.add(user)
     db_session.commit()
@@ -198,6 +218,15 @@ def instructor_user(db_session, test_tenant):
 @pytest.fixture
 def staff_user(db_session, test_tenant):
     """Create staff user."""
+    from app.models.user import Role
+    
+    # Create or get trainer role (staff gets trainer permissions)
+    trainer_role = db_session.query(Role).filter_by(name=Role.TRAINER).first()
+    if not trainer_role:
+        trainer_role = Role(name=Role.TRAINER, permissions=Role.get_default_permissions(Role.TRAINER))
+        db_session.add(trainer_role)
+        db_session.commit()
+    
     user = User(
         email="staff@test.com",
         password_hash=generate_password_hash("password123"),
@@ -206,6 +235,7 @@ def staff_user(db_session, test_tenant):
         tenant_id=test_tenant.id,
         is_active=True,
     )
+    user.roles.append(trainer_role)
     user.set_password("password123")  # Ensure password is set properly
     db_session.add(user)
     db_session.commit()
@@ -216,6 +246,15 @@ def staff_user(db_session, test_tenant):
 @pytest.fixture
 def trainer_user(db_session, test_tenant):
     """Create trainer user."""
+    from app.models.user import Role
+    
+    # Create or get trainer role
+    trainer_role = db_session.query(Role).filter_by(name=Role.TRAINER).first()
+    if not trainer_role:
+        trainer_role = Role(name=Role.TRAINER, permissions=Role.get_default_permissions(Role.TRAINER))
+        db_session.add(trainer_role)
+        db_session.commit()
+    
     user = User(
         email="trainer@test.com",
         password_hash=generate_password_hash("Test123!@#"),
@@ -224,6 +263,7 @@ def trainer_user(db_session, test_tenant):
         tenant_id=test_tenant.id,
         is_active=True,
     )
+    user.roles.append(trainer_role)
     db_session.add(user)
     db_session.commit()
     db_session.refresh(user)
@@ -233,6 +273,15 @@ def trainer_user(db_session, test_tenant):
 @pytest.fixture
 def student_user(db_session, test_tenant):
     """Create student user."""
+    from app.models.user import Role
+    
+    # Create or get student role
+    student_role = db_session.query(Role).filter_by(name=Role.STUDENT).first()
+    if not student_role:
+        student_role = Role(name=Role.STUDENT, permissions=Role.get_default_permissions(Role.STUDENT))
+        db_session.add(student_role)
+        db_session.commit()
+    
     user = User(
         email="student@test.com",
         password_hash=generate_password_hash("Test123!@#"),
@@ -241,6 +290,7 @@ def student_user(db_session, test_tenant):
         tenant_id=test_tenant.id,
         is_active=True,
     )
+    user.roles.append(student_role)
     db_session.add(user)
     db_session.commit()
     db_session.refresh(user)

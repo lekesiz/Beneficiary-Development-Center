@@ -129,12 +129,12 @@ def register():
         return jsonify({"message": message}), 400
 
     # Check if tenant exists
-    tenant = Tenant.query.get(data["tenant_id"])
+    tenant = db.session.get(Tenant, data["tenant_id"])
     if not tenant or not tenant.is_active:
         return jsonify({"message": "Invalid tenant"}), 400
 
     # Check if email already exists for this tenant
-    existing_user = User.query.filter_by(email=data["email"], tenant_id=data["tenant_id"]).first()
+    existing_user = db.session.query(User).filter_by(email=data["email"], tenant_id=data["tenant_id"]).first()
 
     if existing_user:
         return jsonify({"message": "Email already registered"}), 409
@@ -304,7 +304,7 @@ def login():
         return jsonify({"message": "Tenant ID is required"}), 400
 
     # Find user
-    user = User.query.filter_by(email=data["email"], tenant_id=int(tenant_id)).first()
+    user = db.session.query(User).filter_by(email=data["email"], tenant_id=int(tenant_id)).first()
 
     if not user:
         log_security_event(
@@ -411,7 +411,7 @@ def refresh():
     identity = get_jwt_identity()
 
     # Get user
-    user = User.query.get(identity)
+    user = db.session.get(User, identity)
     if not user or not user.is_active:
         return jsonify({"message": "Invalid user"}), 401
 
@@ -497,7 +497,7 @@ def forgot_password():
         return jsonify({"message": "Tenant ID is required"}), 400
 
     # Find user
-    user = User.query.filter_by(email=data["email"], tenant_id=int(tenant_id)).first()
+    user = db.session.query(User).filter_by(email=data["email"], tenant_id=int(tenant_id)).first()
 
     # Always return success to prevent email enumeration
     if user and user.is_active:
@@ -571,7 +571,7 @@ def verify_email(token):
 def get_current_user():
     """Get current user information."""
     user_id = get_jwt_identity()
-    user = User.query.get(user_id)
+    user = db.session.get(User, user_id)
 
     if not user:
         return jsonify({"message": "User not found"}), 404
@@ -584,7 +584,7 @@ def get_current_user():
 def change_password():
     """Change user password."""
     user_id = get_jwt_identity()
-    user = User.query.get(user_id)
+    user = db.session.get(User, user_id)
 
     if not user:
         return jsonify({"message": "User not found"}), 404

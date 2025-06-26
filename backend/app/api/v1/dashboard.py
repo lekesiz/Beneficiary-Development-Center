@@ -8,6 +8,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.core.database import get_db
 from app.models.learning_path import LearningPath, MilestoneProgress
 from app.models.user import User
+from app.extensions import db
 
 dashboard_bp = Blueprint("dashboard", __name__, url_prefix="/api/dashboard")
 
@@ -17,7 +18,7 @@ dashboard_bp = Blueprint("dashboard", __name__, url_prefix="/api/dashboard")
 def get_student_dashboard():
     """Get student dashboard data."""
     user_id = get_jwt_identity()
-    user = User.query.get(user_id)
+    user = db.session.get(User, user_id)
     db = get_db()
 
     try:

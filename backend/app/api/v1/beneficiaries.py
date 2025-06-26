@@ -17,7 +17,7 @@ def get_beneficiaries():
     """Get all beneficiaries with pagination and filters."""
     # Get current user
     current_user_id = get_jwt_identity()
-    db = next(get_db())
+    db = get_db()
     current_user = db.query(User).get(current_user_id)
 
     # Get query parameters
@@ -77,7 +77,7 @@ def get_beneficiaries():
 def get_beneficiary(beneficiary_id):
     """Get beneficiary by ID."""
     current_user_id = get_jwt_identity()
-    db = next(get_db())
+    db = get_db()
     current_user = db.query(User).get(current_user_id)
 
     try:
@@ -101,7 +101,7 @@ def get_beneficiary(beneficiary_id):
 def get_beneficiary_by_uuid(uuid):
     """Get beneficiary by UUID."""
     current_user_id = get_jwt_identity()
-    db = next(get_db())
+    db = get_db()
     current_user = db.query(User).get(current_user_id)
 
     try:
@@ -128,7 +128,7 @@ def get_beneficiary_by_uuid(uuid):
 def create_beneficiary():
     """Create a new beneficiary."""
     current_user_id = get_jwt_identity()
-    db = next(get_db())
+    db = get_db()
     current_user = db.query(User).get(current_user_id)
 
     # Validate request data
@@ -165,7 +165,7 @@ def create_beneficiary():
 def update_beneficiary(beneficiary_id):
     """Update beneficiary."""
     current_user_id = get_jwt_identity()
-    db = next(get_db())
+    db = get_db()
     current_user = db.query(User).get(current_user_id)
 
     # Validate request data
@@ -206,7 +206,7 @@ def update_beneficiary(beneficiary_id):
 def delete_beneficiary(beneficiary_id):
     """Delete beneficiary (soft delete)."""
     current_user_id = get_jwt_identity()
-    db = next(get_db())
+    db = get_db()
     current_user = db.query(User).get(current_user_id)
 
     try:
@@ -232,7 +232,7 @@ def delete_beneficiary(beneficiary_id):
 def add_note(beneficiary_id):
     """Add note to beneficiary."""
     current_user_id = get_jwt_identity()
-    db = next(get_db())
+    db = get_db()
     current_user = db.query(User).get(current_user_id)
 
     # Validate request data
@@ -266,7 +266,7 @@ def add_note(beneficiary_id):
 def add_tag(beneficiary_id):
     """Add tag to beneficiary."""
     current_user_id = get_jwt_identity()
-    db = next(get_db())
+    db = get_db()
     current_user = db.query(User).get(current_user_id)
 
     # Validate request data
@@ -300,7 +300,7 @@ def add_tag(beneficiary_id):
 def remove_tag(beneficiary_id, tag):
     """Remove tag from beneficiary."""
     current_user_id = get_jwt_identity()
-    db = next(get_db())
+    db = get_db()
     current_user = db.query(User).get(current_user_id)
 
     try:
@@ -328,7 +328,7 @@ def remove_tag(beneficiary_id, tag):
 def get_statistics():
     """Get beneficiary statistics."""
     current_user_id = get_jwt_identity()
-    db = next(get_db())
+    db = get_db()
     current_user = db.query(User).get(current_user_id)
 
     try:
@@ -349,7 +349,7 @@ def get_statistics():
 def assign_trainer(beneficiary_id):
     """Assign trainer to beneficiary."""
     current_user_id = get_jwt_identity()
-    db = next(get_db())
+    db = get_db()
     current_user = db.query(User).get(current_user_id)
 
     # Validate request data

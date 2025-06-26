@@ -10,6 +10,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.models.user import User
 from app.core.database import get_db
 from app.core.exceptions import ValidationError
+from app.extensions import db
 import io
 import json
 from datetime import datetime
@@ -27,7 +28,7 @@ def get_development_report(user_id: int):
     - days: Number of days to include in the report (default: 30)
     """
     user_id = get_jwt_identity()
-    user = User.query.get(user_id)
+    user = db.session.get(User, user_id)
     db = get_db()
 
     # Get date range from query params
@@ -55,7 +56,7 @@ def get_batch_development_reports():
     }
     """
     user_id = get_jwt_identity()
-    user = User.query.get(user_id)
+    user = db.session.get(User, user_id)
     db = get_db()
     data = request.get_json()
 
@@ -87,7 +88,7 @@ def download_development_report(user_id: int):
     - format: File format (json or pdf) - currently only json is supported
     """
     user_id = get_jwt_identity()
-    user = User.query.get(user_id)
+    user = db.session.get(User, user_id)
     db = get_db()
 
     # Get parameters
@@ -126,7 +127,7 @@ def get_my_development_report():
     - days: Number of days to include in the report (default: 30)
     """
     user_id = get_jwt_identity()
-    user = User.query.get(user_id)
+    user = db.session.get(User, user_id)
     db = get_db()
 
     # Get date range from query params
@@ -149,7 +150,7 @@ def get_insights_summary():
     This is a lighter version of the full development report.
     """
     user_id = get_jwt_identity()
-    user = User.query.get(user_id)
+    user = db.session.get(User, user_id)
     db = get_db()
 
     # Generate full report
@@ -196,7 +197,7 @@ def get_reports_overview():
     - sort_desc: Sort descending (true/false)
     """
     user_id = get_jwt_identity()
-    user = User.query.get(user_id)
+    user = db.session.get(User, user_id)
     db = get_db()
 
     # Get filters from query params
@@ -234,7 +235,7 @@ def add_coach_note(student_id: int):
     }
     """
     user_id = get_jwt_identity()
-    user = User.query.get(user_id)
+    user = db.session.get(User, user_id)
     db = get_db()
     data = request.get_json()
 
@@ -263,7 +264,7 @@ def export_reports_batch():
     }
     """
     user_id = get_jwt_identity()
-    user = User.query.get(user_id)
+    user = db.session.get(User, user_id)
     db = get_db()
     data = request.get_json()
 
@@ -314,7 +315,7 @@ def get_student_profile(student_id: int):
     - Recommendations
     """
     user_id = get_jwt_identity()
-    user = User.query.get(user_id)
+    user = db.session.get(User, user_id)
     db = get_db()
 
     # Get student profile
@@ -339,7 +340,7 @@ def add_profile_note(student_id: int):
     }
     """
     user_id = get_jwt_identity()
-    user = User.query.get(user_id)
+    user = db.session.get(User, user_id)
     db = get_db()
     data = request.get_json()
 
@@ -369,7 +370,7 @@ def export_student_profile(student_id: int):
     - format: Export format (json/pdf) - currently only json is supported
     """
     user_id = get_jwt_identity()
-    user = User.query.get(user_id)
+    user = db.session.get(User, user_id)
     db = get_db()
 
     export_format = request.args.get("format", "json")
@@ -404,7 +405,7 @@ def get_profile_recommendations(student_id: int):
     Get specific recommendations for next evaluation and learning activities.
     """
     user_id = get_jwt_identity()
-    user = User.query.get(user_id)
+    user = db.session.get(User, user_id)
     db = get_db()
 
     # Get profile to extract recommendations

@@ -16,8 +16,9 @@ import * as React from 'react';
 import { useState } from 'react';
 
 import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import { Button , TextArea } from '@/components/ui/Form';
+import { Textarea } from '@/components/ui/Form';
 import type { LearningPath } from '@/types/learning-path';
 
 interface LearningPathAcceptanceFlowProps {
@@ -344,7 +345,7 @@ export const LearningPathAcceptanceFlow: React.FC<
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Özelleştirme Notları (İsteğe Bağlı)
                 </label>
-                <TextArea
+                <Textarea
                   value={customizationNotes}
                   onChange={(e) => setCustomizationNotes(e.target.value)}
                   placeholder="Planla ilgili özel istekleriniz veya notlarınız varsa buraya yazabilirsiniz..."

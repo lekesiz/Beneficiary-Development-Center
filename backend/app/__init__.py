@@ -71,8 +71,17 @@ def register_blueprints(app):
     from app.api.v1.auth import auth_bp
     from app.api.v1.users import users_bp
     from app.api.v1.beneficiaries import bp as beneficiaries_bp
+    
+    # Import enhanced blueprints (replacing old ones)
+    # from app.api.v1.enhanced_programs import bp as programs_bp
+    # from app.api.v1.enhanced_courses import bp as courses_bp
+    # from app.api.v1.enhanced_evaluations import bp as evaluations_bp
+    
+    # Old blueprints (commented out - now using enhanced versions)
     from app.api.v1.programs import bp as programs_bp
+    from app.api.v1.courses import bp as courses_bp
     from app.api.v1.evaluations import evaluations_bp
+    
     from app.api.v1.ai import ai_bp
     from app.api.health import health_bp
 
@@ -84,8 +93,17 @@ def register_blueprints(app):
     app.register_blueprint(auth_bp, url_prefix="/api/v1/auth")
     app.register_blueprint(users_bp, url_prefix="/api/v1/users")
     app.register_blueprint(beneficiaries_bp, url_prefix="/api/v1/beneficiaries")
+    
+    # Enhanced blueprints with proper URL prefixes
     app.register_blueprint(programs_bp, url_prefix="/api/v1/programs")
+    # Register courses under programs route (RESTful nested resource)
+    app.register_blueprint(courses_bp, url_prefix="/api/v1/programs/<int:program_id>/courses")
+    # Also register the courses adapter for backward compatibility
+    # TODO: Remove this once all tests and frontend are updated
+    from app.api.v1.courses_adapter import bp as courses_adapter_bp
+    app.register_blueprint(courses_adapter_bp, url_prefix="/api/v1/courses")
     app.register_blueprint(evaluations_bp, url_prefix="/api/v1/evaluations")
+    
     app.register_blueprint(ai_bp, url_prefix="/api/v1/ai")
 
     # Initialize Swagger documentation
@@ -96,28 +114,35 @@ def register_blueprints(app):
 
 def register_error_handlers(app):
     """Register error handlers."""
-    from app.core.exceptions import APIException, ValidationError
+    # Use the new comprehensive error handling system
+    from app.core.error_handlers import register_error_handlers as register_enhanced_error_handlers
+    
+    # Register all enhanced error handlers
+    register_enhanced_error_handlers(app)
+    
+    # Keep the old error handlers commented for reference
+    # from app.core.exceptions import APIException, ValidationError
 
-    @app.errorhandler(APIException)
-    def handle_api_exception(error):
-        """Handle API exceptions."""
-        return error.to_dict(), error.status_code
+    # @app.errorhandler(APIException)
+    # def handle_api_exception(error):
+    #     """Handle API exceptions."""
+    #     return error.to_dict(), error.status_code
 
-    @app.errorhandler(ValidationError)
-    def handle_validation_error(error):
-        """Handle validation errors."""
-        return {"message": str(error), "errors": error.errors}, 400
+    # @app.errorhandler(ValidationError)
+    # def handle_validation_error(error):
+    #     """Handle validation errors."""
+    #     return {"message": str(error), "errors": error.errors}, 400
 
-    @app.errorhandler(404)
-    def handle_not_found(error):
-        """Handle 404 errors."""
-        return {"message": "Resource not found"}, 404
+    # @app.errorhandler(404)
+    # def handle_not_found(error):
+    #     """Handle 404 errors."""
+    #     return {"message": "Resource not found"}, 404
 
-    @app.errorhandler(500)
-    def handle_internal_error(error):
-        """Handle 500 errors."""
-        db.session.rollback()
-        return {"message": "Internal server error"}, 500
+    # @app.errorhandler(500)
+    # def handle_internal_error(error):
+    #     """Handle 500 errors."""
+    #     db.session.rollback()
+    #     return {"message": "Internal server error"}, 500
 
 
 def register_jwt_callbacks(jwt_manager):

@@ -253,11 +253,11 @@ export default function TakeEvaluation() {
   const evaluationId = parseInt(id!);
 
   // Check if we should render adaptive version
-  const { data: evaluation, isLoading: checkLoading } =
+  const { data: evaluationData, isLoading: checkLoading } =
     useEvaluation(evaluationId);
 
   // If evaluation is adaptive, render adaptive component
-  if (!checkLoading && evaluation?.is_adaptive) {
+  if (!checkLoading && evaluationData?.is_adaptive) {
     return <TakeEvaluationAdaptive />;
   }
 

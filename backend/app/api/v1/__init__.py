@@ -1,7 +1,7 @@
 """API v1 blueprint initialization."""
 
 from flask import Blueprint
-from app.api.v1 import auth, beneficiaries, programs, evaluations, learning_paths, reports, dashboard, chat, users
+from app.api.v1 import auth, beneficiaries, evaluations, learning_paths, reports, dashboard, chat, users
 
 # Create main API v1 blueprint
 api_v1_bp = Blueprint("api_v1", __name__)
@@ -9,7 +9,7 @@ api_v1_bp = Blueprint("api_v1", __name__)
 api_v1_bp.register_blueprint(auth.auth_bp, url_prefix="/auth")
 api_v1_bp.register_blueprint(users.users_bp, url_prefix="/users")
 api_v1_bp.register_blueprint(beneficiaries.bp, url_prefix="/beneficiaries")
-api_v1_bp.register_blueprint(programs.bp, url_prefix="/programs")
+# programs blueprint is now registered separately as enhanced_programs in app/__init__.py
 api_v1_bp.register_blueprint(evaluations.evaluations_bp)
 api_v1_bp.register_blueprint(learning_paths.learning_paths_bp)
 api_v1_bp.register_blueprint(reports.reports_bp)

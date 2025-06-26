@@ -2,8 +2,10 @@
 
 from sqlalchemy import Column, String, Boolean, Integer, DateTime, JSON
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import relationship
 import uuid
 from app.models.base import BaseModel
+from app.extensions import db
 
 
 class Tenant(BaseModel):
@@ -42,6 +44,9 @@ class Tenant(BaseModel):
 
     # Features and limits
     features = Column(JSON, default=dict)
+    
+    # Relationships
+    users = relationship("User", back_populates="tenant")
 
     def __init__(self, **kwargs):
         """Initialize tenant with default settings."""
@@ -88,14 +93,14 @@ class Tenant(BaseModel):
         """Check if tenant can add more users."""
         from app.models.user import User
 
-        current_users = User.query.filter_by(tenant_id=self.id, is_active=True).count()
+        current_users = db.session.query(User).filter_by(tenant_id=self.id, is_active=True).count()
         return current_users < self.max_users
 
     def can_add_beneficiary(self):
         """Check if tenant can add more beneficiaries."""
         from app.models.beneficiary import Beneficiary
 
-        current_beneficiaries = Beneficiary.query.filter_by(tenant_id=self.id, status="active").count()
+        current_beneficiaries = db.session.query(Beneficiary).filter_by(tenant_id=self.id, status="active").count()
         return current_beneficiaries < self.max_beneficiaries
 
     def get_usage_stats(self):
@@ -107,15 +112,15 @@ class Tenant(BaseModel):
 
         return {
             "users": {
-                "current": User.query.filter_by(tenant_id=self.id, is_active=True).count(),
+                "current": db.session.query(User).filter_by(tenant_id=self.id, is_active=True).count(),
                 "max": self.max_users,
             },
             "beneficiaries": {
-                "current": Beneficiary.query.filter_by(tenant_id=self.id, status="active").count(),
+                "current": db.session.query(Beneficiary).filter_by(tenant_id=self.id, status="active").count(),
                 "max": self.max_beneficiaries,
             },
-            "programs": Program.query.filter_by(tenant_id=self.id, is_active=True).count(),
-            "evaluations": Evaluation.query.filter_by(tenant_id=self.id, is_active=True).count(),
+            "programs": db.session.query(Program).filter_by(tenant_id=self.id, is_active=True).count(),
+            "evaluations": db.session.query(Evaluation).filter_by(tenant_id=self.id, is_active=True).count(),
         }
 
     def update_settings(self, settings_dict):

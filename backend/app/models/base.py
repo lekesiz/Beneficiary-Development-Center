@@ -14,12 +14,8 @@ class Base:
 
     id = Column(Integer, primary_key=True)
 
-    @classmethod
-    def query(cls) -> Query:
-        """Return query object."""
-        from app.extensions import db
-
-        return db.session.query(cls)
+    # Removed custom query method to avoid conflicts with modern SQLAlchemy
+    # Use db.session.query(Model) instead
 
     def save(self, commit=True):
         """Save the record."""
@@ -53,7 +49,8 @@ class Base:
         for column in self.__table__.columns:
             if column.name not in exclude:
                 value = getattr(self, column.name)
-                if isinstance(value, datetime):
+                # Handle datetime conversion
+                if value is not None and hasattr(value, 'isoformat'):
                     value = value.isoformat()
                 data[column.name] = value
 
@@ -68,12 +65,18 @@ class Base:
     @classmethod
     def get_by_id(cls, record_id):
         """Get record by ID."""
-        return cls.query.get(record_id)
+        from app.extensions import db
+        return db.session.get(cls, record_id)
 
     @classmethod
     def get_or_404(cls, record_id):
         """Get record by ID or raise 404."""
-        return cls.query.get_or_404(record_id)
+        from app.extensions import db
+        result = db.session.get(cls, record_id)
+        if not result:
+            from flask import abort
+            abort(404)
+        return result
 
     def __repr__(self):
         """String representation."""
@@ -148,13 +151,8 @@ class _TenantBaseModelMixin(Base, TimestampMixin, TenantMixin):
 
     __abstract__ = True
 
-    @classmethod
-    def query(cls):
-        """Return tenant-filtered query."""
-        from app.extensions import db
-
-        query = TenantQuery(cls, session=db.session)
-        return query._apply_tenant_filter()
+    # Removed custom query method to avoid conflicts with modern SQLAlchemy
+    # Use db.session.query(Model) instead
 
 
 # Import db from extensions to avoid circular imports

@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import { vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 import { usersApi } from '@/api/users';
 

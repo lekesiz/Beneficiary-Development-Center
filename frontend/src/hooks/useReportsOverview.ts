@@ -1,7 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { API_BASE_URL } from '@/config/api';
-import { apiClient } from '@/lib/api-client';
+import apiClient from '@/api/client';
 
 export interface StudentReportSummary {
   student_id: number;

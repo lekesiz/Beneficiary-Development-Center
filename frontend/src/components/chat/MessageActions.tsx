@@ -2,7 +2,7 @@ import { Reply, Edit2, Trash2, Copy } from 'lucide-react';
 import React from 'react';
 
 import { Button } from '@/components/ui/Button';
-import { useUpdateMessage, useDeleteMessage } from '@/hooks/useChat';
+import { useDeleteMessage } from '@/hooks/useChat';
 import type { Message } from '@/types/chat';
 
 interface MessageActionsProps {

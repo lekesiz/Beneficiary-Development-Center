@@ -65,7 +65,14 @@ export const ChatLayout: React.FC = () => {
           isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
-        <div className="absolute inset-0 bg-black/50" onClick={() => setIsMobileSidebarOpen(false)} />
+        <div 
+          className="absolute inset-0 bg-black/50" 
+          onClick={() => setIsMobileSidebarOpen(false)}
+          onKeyDown={(e) => e.key === 'Escape' && setIsMobileSidebarOpen(false)}
+          role="button"
+          tabIndex={0}
+          aria-label="Close sidebar"
+        />
         <div className="relative w-80 h-full bg-white dark:bg-gray-800">
           <ConversationList
             selectedId={selectedConversationId}
@@ -134,3 +141,5 @@ export const ChatLayout: React.FC = () => {
     </div>
   );
 };
+
+export default ChatLayout;

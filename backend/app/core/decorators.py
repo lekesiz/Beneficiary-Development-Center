@@ -63,7 +63,7 @@ def tenant_required(f):
     return decorated_function
 
 
-def rate_limit(max_requests=100, window_seconds=3600):
+def rate_limit(calls=100, period=3600):
     """Rate limiting decorator (to be implemented with Redis)."""
 
     def decorator(f):
@@ -172,4 +172,25 @@ def check_role(allowed_roles):
 
         return decorated_function
 
+    return decorator
+
+
+def audit_log(action=None):
+    """Decorator to log audit trail for important actions."""
+    
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            # TODO: Implement audit logging
+            # For now, just pass through
+            # In production, this would log:
+            # - User ID
+            # - Action performed
+            # - Timestamp
+            # - Request details
+            # - Response status
+            return f(*args, **kwargs)
+        
+        return decorated_function
+    
     return decorator

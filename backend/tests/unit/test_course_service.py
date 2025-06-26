@@ -29,7 +29,7 @@ class TestCourseService:
     @pytest.fixture
     def admin_user(self):
         """Create admin user."""
-        user = Mock(spec=User)
+        user = Mock()
         user.id = 1
         user.role = "admin"
         user.full_name = "Admin User"
@@ -38,7 +38,7 @@ class TestCourseService:
     @pytest.fixture
     def manager_user(self):
         """Create manager user."""
-        user = Mock(spec=User)
+        user = Mock()
         user.id = 2
         user.role = "manager"
         user.full_name = "Manager User"
@@ -47,7 +47,7 @@ class TestCourseService:
     @pytest.fixture
     def instructor_user(self):
         """Create instructor user."""
-        user = Mock(spec=User)
+        user = Mock()
         user.id = 3
         user.role = "instructor"
         user.full_name = "Instructor User"
@@ -56,7 +56,7 @@ class TestCourseService:
     @pytest.fixture
     def staff_user(self):
         """Create staff user."""
-        user = Mock(spec=User)
+        user = Mock()
         user.id = 4
         user.role = "staff"
         user.full_name = "Staff User"
@@ -65,7 +65,7 @@ class TestCourseService:
     @pytest.fixture
     def sample_program(self):
         """Create sample program."""
-        program = Mock(spec=Program)
+        program = Mock()
         program.id = 1
         program.tenant_id = 1
         program.code = "TRA-202401-A1B2"
@@ -79,7 +79,7 @@ class TestCourseService:
     @pytest.fixture
     def sample_course(self, sample_program, instructor_user):
         """Create sample course."""
-        course = Mock(spec=Course)
+        course = Mock()
         course.id = 1
         course.tenant_id = 1
         course.program_id = sample_program.id
@@ -116,7 +116,7 @@ class TestCourseService:
     def test_get_all_courses(self, service, mock_db, admin_user):
         """Test getting all courses."""
         # Setup
-        courses = [Mock(spec=Course) for _ in range(3)]
+        courses = [Mock() for _ in range(3)]
         mock_query = Mock()
         mock_query.filter.return_value = mock_query
         mock_query.order_by.return_value = mock_query
@@ -135,7 +135,7 @@ class TestCourseService:
     def test_get_all_with_filters(self, service, mock_db, admin_user):
         """Test getting courses with filters."""
         # Setup
-        courses = [Mock(spec=Course)]
+        courses = [Mock()]
         mock_query = Mock()
         mock_query.filter.return_value = mock_query
         mock_query.order_by.return_value = mock_query
@@ -161,32 +161,34 @@ class TestCourseService:
         # Verify filters were applied
         assert mock_query.filter.call_count >= 6  # All filters applied
 
-    def test_get_by_id_success(self, service, mock_db, admin_user, sample_course):
+    def test_get_by_id_success(self, service, mock_db, admin_user, sample_course, sample_program):
         """Test getting course by ID successfully."""
-        # Setup
+        # Setup - need to handle the options() chain
         mock_query = Mock()
+        mock_query.options.return_value = mock_query
         mock_query.filter.return_value = mock_query
         mock_query.first.return_value = sample_course
         mock_db.query.return_value = mock_query
 
-        # Execute
-        result = service.get_by_id(1, sample_course.id, admin_user)
+        # Execute - use the 4-parameter version
+        result = service.get_by_id(1, sample_program.id, sample_course.id, admin_user)
 
         # Assert
         assert result == sample_course
         mock_db.query.assert_called_with(Course)
 
-    def test_get_by_id_not_found(self, service, mock_db, admin_user):
+    def test_get_by_id_not_found(self, service, mock_db, admin_user, sample_program):
         """Test getting non-existent course."""
-        # Setup
+        # Setup - need to handle the options() chain
         mock_query = Mock()
+        mock_query.options.return_value = mock_query
         mock_query.filter.return_value = mock_query
         mock_query.first.return_value = None
         mock_db.query.return_value = mock_query
 
-        # Execute & Assert
+        # Execute & Assert - use the 4-parameter version
         with pytest.raises(NotFoundError):
-            service.get_by_id(1, 999, admin_user)
+            service.get_by_id(1, sample_program.id, 999, admin_user)
 
     def test_create_course_success(self, service, mock_db, admin_user, sample_program):
         """Test creating course successfully."""
@@ -208,7 +210,7 @@ class TestCourseService:
             "max_participants": 15,
         }
 
-        created_course = Mock(spec=Course)
+        created_course = Mock()
         created_course.id = 2
         created_course.code = "CRS-202401-NEW1"
 
@@ -268,8 +270,11 @@ class TestCourseService:
             service.create(1, data, staff_user)
 
     def test_create_course_as_instructor(self, service, mock_db, instructor_user, sample_program):
-        """Test creating course as instructor."""
+        """Test creating course as instructor who is coordinator."""
         # Setup
+        # Make instructor the coordinator
+        sample_program.coordinator_id = instructor_user.id
+        
         mock_query = Mock()
         mock_query.filter.return_value = mock_query
         mock_query.first.return_value = sample_program
@@ -278,7 +283,7 @@ class TestCourseService:
 
         data = {"program_id": sample_program.id, "title": "Instructor Course"}
 
-        created_course = Mock(spec=Course)
+        created_course = Mock()
 
         with patch("app.services.course_service.Course") as MockCourse:
             MockCourse.return_value = created_course
@@ -292,10 +297,11 @@ class TestCourseService:
             call_args = MockCourse.call_args[1]
             assert call_args["instructor_id"] == instructor_user.id
 
-    def test_update_course_success(self, service, mock_db, admin_user, sample_course):
+    def test_update_course_success(self, service, mock_db, admin_user, sample_course, sample_program):
         """Test updating course successfully."""
-        # Setup
+        # Setup - need to handle the options() chain
         mock_query = Mock()
+        mock_query.options.return_value = mock_query
         mock_query.filter.return_value = mock_query
         mock_query.first.return_value = sample_course
         mock_db.query.return_value = mock_query
@@ -311,11 +317,12 @@ class TestCourseService:
         mock_db.commit.assert_called_once()
         mock_db.refresh.assert_called_once_with(sample_course)
 
-    def test_update_course_instructor_own(self, service, mock_db, instructor_user, sample_course):
+    def test_update_course_instructor_own(self, service, mock_db, instructor_user, sample_course, sample_program):
         """Test instructor updating their own course."""
         # Setup
         sample_course.instructor_id = instructor_user.id
         mock_query = Mock()
+        mock_query.options.return_value = mock_query
         mock_query.filter.return_value = mock_query
         mock_query.first.return_value = sample_course
         mock_db.query.return_value = mock_query
@@ -328,11 +335,12 @@ class TestCourseService:
         # Assert
         assert sample_course.title == "Updated by Instructor"
 
-    def test_update_course_instructor_other(self, service, mock_db, instructor_user, sample_course):
+    def test_update_course_instructor_other(self, service, mock_db, instructor_user, sample_course, sample_program):
         """Test instructor trying to update another instructor's course."""
         # Setup
         sample_course.instructor_id = 999  # Different instructor
         mock_query = Mock()
+        mock_query.options.return_value = mock_query
         mock_query.filter.return_value = mock_query
         mock_query.first.return_value = sample_course
         mock_db.query.return_value = mock_query
@@ -340,21 +348,23 @@ class TestCourseService:
         update_data = {"title": "Updated"}
 
         # Execute & Assert
-        with pytest.raises(ForbiddenError, match="You can only update courses you instruct"):
+        with pytest.raises(ForbiddenError, match="You can only access courses you teach"):
             service.update(1, sample_course.id, update_data, instructor_user)
 
-    def test_delete_course_success(self, service, mock_db, admin_user, sample_course):
+    def test_delete_course_success(self, service, mock_db, admin_user, sample_course, sample_program):
         """Test deleting course successfully."""
         # Setup
         sample_course.progress_records = []  # No progress records
-        sample_course.program_id = 1
+        sample_course.program_id = sample_program.id
         sample_course.order_index = 2
 
         # Other courses to reorder
-        other_course = Mock(spec=Course)
+        other_course = Mock()
         other_course.order_index = 3
 
+        # Need to handle different query patterns
         mock_query = Mock()
+        mock_query.options.return_value = mock_query
         mock_query.filter.return_value = mock_query
         mock_query.first.return_value = sample_course
         mock_query.all.return_value = [other_course]
@@ -369,13 +379,14 @@ class TestCourseService:
         assert other_course.order_index == 2  # Reordered
         mock_db.commit.assert_called_once()
 
-    def test_delete_course_with_progress(self, service, mock_db, admin_user, sample_course):
+    def test_delete_course_with_progress(self, service, mock_db, admin_user, sample_course, sample_program):
         """Test deleting course with progress records."""
         # Setup
-        progress = Mock(spec=CourseProgress)
+        progress = Mock()
         sample_course.progress_records = [progress]
 
         mock_query = Mock()
+        mock_query.options.return_value = mock_query
         mock_query.filter.return_value = mock_query
         mock_query.first.return_value = sample_course
         mock_db.query.return_value = mock_query
@@ -384,10 +395,11 @@ class TestCourseService:
         with pytest.raises(BadRequestError, match="Cannot delete course with"):
             service.delete(1, sample_course.id, admin_user)
 
-    def test_add_session_success(self, service, mock_db, admin_user, sample_course):
+    def test_add_session_success(self, service, mock_db, admin_user, sample_course, sample_program):
         """Test adding session to course."""
         # Setup
         mock_query = Mock()
+        mock_query.options.return_value = mock_query
         mock_query.filter.return_value = mock_query
         mock_query.first.return_value = sample_course
         mock_db.query.return_value = mock_query
@@ -404,13 +416,22 @@ class TestCourseService:
 
     def test_duplicate_course_success(self, service, mock_db, admin_user, sample_course, sample_program):
         """Test duplicating course successfully."""
-        # Setup
-        mock_query = Mock()
-        mock_query.filter.return_value = mock_query
-        mock_query.first.side_effect = [sample_course, sample_program]
-        mock_db.query.return_value = mock_query
+        # Setup - need to handle two different queries
+        # First query gets the course (with options)
+        mock_query1 = Mock()
+        mock_query1.options.return_value = mock_query1
+        mock_query1.filter.return_value = mock_query1
+        mock_query1.first.return_value = sample_course
+        
+        # Second query gets the target program (without options)
+        mock_query2 = Mock()
+        mock_query2.filter.return_value = mock_query2
+        mock_query2.first.return_value = sample_program
+        
+        # Alternate between the two query mocks
+        mock_db.query.side_effect = [mock_query1, mock_query2]
 
-        new_course = Mock(spec=Course)
+        new_course = Mock()
         new_course.code = "CRS-202401-COPY"
         sample_course.duplicate.return_value = new_course
 
@@ -419,14 +440,15 @@ class TestCourseService:
 
         # Assert
         assert result == new_course
-        sample_course.duplicate.assert_called_once_with(sample_program.id)
+        sample_course.duplicate.assert_called_once_with(new_program_id=sample_program.id)
         mock_db.add.assert_called_once_with(new_course)
         mock_db.commit.assert_called_once()
 
-    def test_reorder_course_success(self, service, mock_db, admin_user, sample_course):
+    def test_reorder_course_success(self, service, mock_db, admin_user, sample_course, sample_program):
         """Test reordering course successfully."""
         # Setup
         mock_query = Mock()
+        mock_query.options.return_value = mock_query
         mock_query.filter.return_value = mock_query
         mock_query.first.return_value = sample_course
         mock_db.query.return_value = mock_query
@@ -444,7 +466,7 @@ class TestCourseService:
         # Setup
         courses = []
         for i in range(10):
-            course = Mock(spec=Course)
+            course = Mock()
             course.status = CourseStatus.PUBLISHED if i < 6 else CourseStatus.DRAFT
             course.format = CourseFormat.ONLINE if i < 4 else CourseFormat.LECTURE
             course.difficulty_level = DifficultyLevel.BEGINNER if i < 5 else DifficultyLevel.INTERMEDIATE
@@ -478,7 +500,7 @@ class TestCourseService:
     def test_get_statistics_instructor(self, service, mock_db, instructor_user):
         """Test getting statistics as instructor (only own courses)."""
         # Setup
-        own_course = Mock(spec=Course)
+        own_course = Mock()
         own_course.instructor_id = instructor_user.id
         own_course.status = CourseStatus.PUBLISHED
         own_course.format = CourseFormat.ONLINE

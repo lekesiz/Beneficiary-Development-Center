@@ -16,7 +16,8 @@ import { Autocomplete } from '../../components/ui/Autocomplete';
 import { Badge } from '../../components/ui/Badge';
 import { Card } from '../../components/ui/Card';
 import { DatePicker } from '../../components/ui/DatePicker';
-import { Button, Input, Select, Textarea } from '../../components/ui/Form';
+import { Button, Select, Textarea } from '../../components/ui/Form';
+import { Input } from '../../components/ui/Input';
 import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
 import {
   PROGRAM_STATUS_OPTIONS,
@@ -376,7 +377,7 @@ export const ProgramForm: React.FC = () => {
                 <DatePicker
                   {...field}
                   label={`${t('programs.form.fields.startDate')} *`}
-                  error={errors.start_date?.message}
+                  error={errors.start_date?.message || undefined}
                 />
               )}
             />
@@ -388,7 +389,7 @@ export const ProgramForm: React.FC = () => {
                 <DatePicker
                   {...field}
                   label={`${t('programs.form.fields.endDate')} *`}
-                  error={errors.end_date?.message}
+                  error={errors.end_date?.message || undefined}
                 />
               )}
             />
@@ -400,7 +401,7 @@ export const ProgramForm: React.FC = () => {
                 <DatePicker
                   {...field}
                   label={t('programs.form.fields.enrollmentStart')}
-                  error={errors.enrollment_start?.message}
+                  error={errors.enrollment_start?.message || undefined}
                 />
               )}
             />
@@ -412,7 +413,7 @@ export const ProgramForm: React.FC = () => {
                 <DatePicker
                   {...field}
                   label={t('programs.form.fields.enrollmentEnd')}
-                  error={errors.enrollment_end?.message}
+                  error={errors.enrollment_end?.message || undefined}
                 />
               )}
             />

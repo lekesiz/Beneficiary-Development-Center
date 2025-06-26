@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
-import { api } from '@/lib/api';
+import apiClient from '@/api/client';
 
 export interface DashboardStats {
   overall_progress: number;
@@ -38,7 +38,7 @@ export function useStudentDashboard() {
   return useQuery({
     queryKey: ['studentDashboard'],
     queryFn: async () => {
-      const response = await api.get('/api/dashboard/student');
+      const response = await apiClient.get('/api/dashboard/student');
       return response.data as StudentDashboard;
     },
   });

@@ -4,7 +4,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 
-import { api } from '../api/client';
+import apiClient from '@/api/client';
 import type { CourseSession } from '../types/course';
 
 interface SessionWithCourse extends CourseSession {
@@ -52,7 +52,7 @@ export const useSessions = (params: UseSessionsParams = {}) => {
         queryParams.append('program_id', params.program_id.toString());
       }
       
-      const response = await api.get(`/sessions?${queryParams.toString()}`);
+      const response = await apiClient.get(`/sessions?${queryParams.toString()}`);
       return response.data.sessions;
     },
   });
@@ -78,7 +78,7 @@ export const useCourseSessions = (
         queryParams.append('include_cancelled', params.include_cancelled.toString());
       }
       
-      const response = await api.get(
+      const response = await apiClient.get(
         `/programs/${programId}/courses/${courseId}/sessions?${queryParams.toString()}`
       );
       return response.data.sessions;

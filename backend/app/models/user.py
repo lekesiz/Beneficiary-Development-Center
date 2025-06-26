@@ -145,6 +145,7 @@ class User(TenantBaseModel):
     api_key_created_at = Column(DateTime)
 
     # Relationships
+    tenant = relationship("Tenant", foreign_keys="User.tenant_id")
     roles = relationship(
         "Role",
         secondary=user_roles,

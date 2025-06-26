@@ -107,6 +107,42 @@ class ProgramService(BaseService[Program]):
         logger.info(f"Retrieved {len(programs)} programs for tenant {tenant_id}")
         return programs
 
+    def count(self, tenant_id: int, filters: Optional[Dict[str, Any]] = None) -> int:
+        """
+        Count programs with filters.
+        
+        Args:
+            tenant_id: Tenant ID
+            filters: Optional filters
+            
+        Returns:
+            Count of programs
+        """
+        query = self.db.query(Program).filter(
+            Program.tenant_id == tenant_id,
+            Program.deleted_at == None
+        )
+        
+        if filters:
+            # Apply same filters as get_all
+            if filters.get('status'):
+                query = query.filter(Program.status == filters['status'])
+            if filters.get('program_type'):
+                query = query.filter(Program.program_type == filters['program_type'])
+            if filters.get('search'):
+                search_filter = or_(
+                    Program.title.ilike(f"%{filters['search']}%"),
+                    Program.description.ilike(f"%{filters['search']}%"),
+                    Program.code.ilike(f"%{filters['search']}%"),
+                )
+                query = query.filter(search_filter)
+            if filters.get('upcoming_only'):
+                query = query.filter(Program.start_date > datetime.now())
+            if filters.get('active_only'):
+                query = query.filter(Program.status == ProgramStatus.ACTIVE)
+                
+        return query.count()
+
     def get_by_id(self, tenant_id: int, program_id: int, user: User) -> Program:
         """
         Get a program by ID.
@@ -176,8 +212,8 @@ class ProgramService(BaseService[Program]):
             ForbiddenError: If user doesn't have permission
         """
         # Check permissions
-        if user.role not in ["admin", "manager"]:
-            raise ForbiddenError("Only admins and managers can create programs")
+        if user.role not in ["super_admin", "admin"]:
+            raise ForbiddenError("Only admins can create programs")
 
         # Validate dates
         start_date = data.get("start_date")
@@ -248,8 +284,8 @@ class ProgramService(BaseService[Program]):
         program = self.get_by_id(tenant_id, program_id, user)
 
         # Check permissions
-        if user.role not in ["admin", "manager"]:
-            raise ForbiddenError("Only admins and managers can update programs")
+        if user.role not in ["super_admin", "admin"]:
+            raise ForbiddenError("Only admins can update programs")
 
         # Validate dates if provided
         start_date = data.get("start_date", program.start_date)
@@ -305,7 +341,7 @@ class ProgramService(BaseService[Program]):
         program = self.get_by_id(tenant_id, program_id, user)
 
         # Check permissions
-        if user.role != "admin":
+        if user.role not in ["super_admin", "admin"]:
             raise ForbiddenError("Only admins can delete programs")
 
         # Check for active enrollments
@@ -342,8 +378,8 @@ class ProgramService(BaseService[Program]):
         program = self.get_by_id(tenant_id, program_id, user)
 
         # Check permissions
-        if user.role not in ["admin", "manager"]:
-            raise ForbiddenError("Only admins and managers can update program status")
+        if user.role not in ["super_admin", "admin"]:
+            raise ForbiddenError("Only admins can update program status")
 
         try:
             program.update_status(new_status)
@@ -378,10 +414,28 @@ class ProgramService(BaseService[Program]):
         program = self.get_by_id(tenant_id, program_id, user)
 
         # Check permissions
-        if user.role not in ["admin", "manager"]:
-            raise ForbiddenError("Only admins and managers can add courses")
+        user_roles = [role.name for role in user.roles]
+        if not any(role in ["super_admin", "admin"] for role in user_roles):
+            raise ForbiddenError("Only admins can add courses")
 
         # Create course
+        from app.models.course import CourseFormat, DifficultyLevel
+        
+        # Convert string enum values to proper enum instances
+        if "format" in course_data and isinstance(course_data["format"], str):
+            try:
+                course_data["format"] = CourseFormat(course_data["format"])
+            except ValueError:
+                # If the format is invalid, use default
+                course_data["format"] = CourseFormat.LECTURE
+                
+        if "difficulty_level" in course_data and isinstance(course_data["difficulty_level"], str):
+            try:
+                course_data["difficulty_level"] = DifficultyLevel(course_data["difficulty_level"])
+            except ValueError:
+                # If the difficulty level is invalid, use default
+                course_data["difficulty_level"] = DifficultyLevel.BEGINNER
+        
         course = Course(tenant_id=tenant_id, program_id=program.id, created_by=user.id, **course_data)
 
         program.courses.append(course)
@@ -403,8 +457,8 @@ class ProgramService(BaseService[Program]):
             Statistics dictionary
         """
         # Check permissions
-        if user.role not in ["admin", "manager"]:
-            raise ForbiddenError("Only admins and managers can view statistics")
+        if user.role not in ["super_admin", "admin", "trainer"]:
+            raise ForbiddenError("Only admins and trainers can view statistics")
 
         # Total programs by status
         status_counts = (

@@ -43,10 +43,10 @@ export default function StudentDashboard() {
       {/* Welcome Header */}
       <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-6 text-white">
         <h1 className="text-2xl font-bold mb-2">
-          Hoş geldin, {user?.name}! 👋
+          Welcome, {user?.fullName}! 👋
         </h1>
         <p className="text-blue-100">
-          Öğrenme yolculuğuna devam etmeye hazır mısın?
+          Ready to continue your learning journey?
         </p>
       </div>
 
@@ -56,7 +56,7 @@ export default function StudentDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">
-                Genel İlerleme
+                Overall Progress
               </p>
               <p className="text-2xl font-bold">
                 {dashboard.stats.overall_progress}%
@@ -74,11 +74,11 @@ export default function StudentDashboard() {
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Tamamlanan</p>
+              <p className="text-sm font-medium text-gray-600">Completed</p>
               <p className="text-2xl font-bold">
                 {dashboard.stats.completed_milestones}
               </p>
-              <p className="text-xs text-gray-500">Hedef</p>
+              <p className="text-xs text-gray-500">Milestones</p>
             </div>
             <Award className="h-8 w-8 text-green-600 opacity-80" />
           </div>
@@ -87,11 +87,11 @@ export default function StudentDashboard() {
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Bu Hafta</p>
+              <p className="text-sm font-medium text-gray-600">This Week</p>
               <p className="text-2xl font-bold">
                 {dashboard.stats.weekly_hours}s
               </p>
-              <p className="text-xs text-gray-500">Çalışma</p>
+              <p className="text-xs text-gray-500">Study Hours</p>
             </div>
             <Clock className="h-8 w-8 text-purple-600 opacity-80" />
           </div>
@@ -100,11 +100,11 @@ export default function StudentDashboard() {
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Aktif Yol</p>
+              <p className="text-sm font-medium text-gray-600">Active Paths</p>
               <p className="text-2xl font-bold">
                 {dashboard.stats.active_paths}
               </p>
-              <p className="text-xs text-gray-500">Program</p>
+              <p className="text-xs text-gray-500">Programs</p>
             </div>
             <Target className="h-8 w-8 text-orange-600 opacity-80" />
           </div>
@@ -117,7 +117,7 @@ export default function StudentDashboard() {
           <div className="flex items-start">
             <AlertCircle className="h-5 w-5 text-yellow-600 mr-3 mt-0.5" />
             <div className="flex-1">
-              <h3 className="font-semibold text-yellow-800 mb-2">Dikkat!</h3>
+              <h3 className="font-semibold text-yellow-800 mb-2">Attention!</h3>
               <ul className="space-y-1">
                 {dashboard.alerts.map((alert, index) => (
                   <li key={index} className="text-sm text-gray-700">
@@ -145,7 +145,7 @@ export default function StudentDashboard() {
           <Card className="p-6">
             <h3 className="text-lg font-semibold mb-4 flex items-center">
               <Calendar className="mr-2 h-5 w-5" />
-              Yaklaşan Değerlendirmeler
+              Upcoming Evaluations
             </h3>
             {dashboard.upcoming_evaluations.length > 0 ? (
               <div className="space-y-3">
@@ -167,7 +167,7 @@ export default function StudentDashboard() {
               </div>
             ) : (
               <p className="text-gray-500 text-sm">
-                Yaklaşan değerlendirme yok
+                No upcoming evaluations
               </p>
             )}
           </Card>
@@ -176,7 +176,7 @@ export default function StudentDashboard() {
           <Card className="p-6">
             <h3 className="text-lg font-semibold mb-4 flex items-center">
               <Award className="mr-2 h-5 w-5" />
-              Son Başarılar
+              Recent Achievements
             </h3>
             {dashboard.recent_achievements.length > 0 ? (
               <div className="space-y-3">
@@ -198,13 +198,13 @@ export default function StudentDashboard() {
                 ))}
               </div>
             ) : (
-              <p className="text-gray-500 text-sm">Henüz başarı kazanılmadı</p>
+              <p className="text-gray-500 text-sm">No achievements earned yet</p>
             )}
           </Card>
 
           {/* Quick Actions */}
           <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4">Hızlı İşlemler</h3>
+            <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
             <div className="space-y-2">
               <Button
                 variant="outline"
@@ -213,7 +213,7 @@ export default function StudentDashboard() {
                 onClick={() => navigate('/courses')}
               >
                 <BookOpen className="mr-2 h-4 w-4" />
-                Kurslara Göz At
+                Browse Courses
               </Button>
               <Button
                 variant="outline"
@@ -222,7 +222,7 @@ export default function StudentDashboard() {
                 onClick={() => navigate('/evaluations')}
               >
                 <Target className="mr-2 h-4 w-4" />
-                Değerlendirmeler
+                Evaluations
               </Button>
               <Button
                 variant="outline"
@@ -231,7 +231,7 @@ export default function StudentDashboard() {
                 onClick={() => navigate('/profile')}
               >
                 <TrendingUp className="mr-2 h-4 w-4" />
-                İlerleme Raporum
+                My Progress Report
               </Button>
             </div>
           </Card>

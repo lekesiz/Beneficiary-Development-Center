@@ -79,15 +79,15 @@ class TestProgramsAPI:
             json={"email": email, "password": password, "tenant_id": self.tenant.id}
         )
         if response.status_code != 200:
-            raise Exception(f"Login failed: {response.json}")
-        return response.json["access_token"]
+            raise Exception(f"Login failed: {response.get_json()}")
+        return response.get_json()["access_token"]
 
     def test_get_all_programs(self):
         """Test getting all programs."""
         response = self.client.get("/api/v1/programs", headers={"Authorization": f"Bearer {self.admin_token}"})
 
         assert response.status_code == 200
-        data = response.json
+        data = response.get_json()
         assert "programs" in data
         assert "pagination" in data
         assert len(data["programs"]) == 3
@@ -101,7 +101,7 @@ class TestProgramsAPI:
         )
 
         assert response.status_code == 200
-        data = response.json
+        data = response.get_json()
         assert len(data["programs"]) == 1
         assert data["programs"][0]["status"] == "published"
 
@@ -111,7 +111,7 @@ class TestProgramsAPI:
         )
 
         assert response.status_code == 200
-        data = response.json
+        data = response.get_json()
         assert len(data["programs"]) == 1
         assert data["programs"][0]["program_type"] == "workshop"
 
@@ -121,7 +121,7 @@ class TestProgramsAPI:
         )
 
         assert response.status_code == 200
-        data = response.json
+        data = response.get_json()
         assert len(data["programs"]) == 1
         assert "Python" in data["programs"][0]["title"]
 
@@ -132,7 +132,7 @@ class TestProgramsAPI:
         )
 
         assert response.status_code == 200
-        data = response.json
+        data = response.get_json()
         assert len(data["programs"]) == 2
         assert data["pagination"]["page"] == 1
         assert data["pagination"]["per_page"] == 2
@@ -146,7 +146,7 @@ class TestProgramsAPI:
         )
 
         assert response.status_code == 200
-        data = response.json
+        data = response.get_json()
         assert data["id"] == self.program1.id
         assert data["title"] == "Python Programming"
         assert "enrollment_count" in data
@@ -160,7 +160,7 @@ class TestProgramsAPI:
         )
 
         assert response.status_code == 200
-        data = response.json
+        data = response.get_json()
         assert "courses" in data
         assert isinstance(data["courses"], list)
 
@@ -174,7 +174,7 @@ class TestProgramsAPI:
     def test_create_program_admin(self):
         """Test creating program as admin."""
         program_data = {
-            "title": "New Training Program",
+            "title": "Advanced Training Program",
             "description": "A new program",
             "program_type": "training",
             "start_date": (date.today() + timedelta(days=45)).isoformat(),
@@ -185,6 +185,7 @@ class TestProgramsAPI:
             "max_participants": 25,
             "location": "Online",
             "is_online": True,
+            "online_link": "https://zoom.us/j/123456789",
             "price": 50000,  # 500.00 EUR
             "currency": "EUR",
             "tags": ["python", "programming", "beginner"],
@@ -195,8 +196,8 @@ class TestProgramsAPI:
         )
 
         assert response.status_code == 201
-        data = response.json
-        assert data["title"] == "New Training Program"
+        data = response.get_json()
+        assert data["title"] == "Advanced Training Program"
         assert data["code"].startswith("TRA-")
         assert data["status"] == "draft"
         assert data["is_enrollment_open"] is False  # Draft status
@@ -254,8 +255,8 @@ class TestProgramsAPI:
     def test_update_program(self):
         """Test updating program."""
         update_data = {
-            "title": "Updated Python Programming",
-            "description": "Updated description",
+            "title": "Enhanced Python Programming",
+            "description": "Enhanced description",
             "max_participants": 25,
             "tags": ["python", "advanced"],
         }
@@ -267,9 +268,9 @@ class TestProgramsAPI:
         )
 
         assert response.status_code == 200
-        data = response.json
-        assert data["title"] == "Updated Python Programming"
-        assert data["description"] == "Updated description"
+        data = response.get_json()
+        assert data["title"] == "Enhanced Python Programming"
+        assert data["description"] == "Enhanced description"
         assert data["max_participants"] == 25
         assert "python" in data["tags"]
         assert "advanced" in data["tags"]
@@ -310,7 +311,7 @@ class TestProgramsAPI:
     def test_delete_program_forbidden(self):
         """Test deleting program with insufficient permissions."""
         response = self.client.delete(
-            f"/api/v1/programs/{self.program1.id}", headers={"Authorization": f"Bearer {self.manager_token}"}
+            f"/api/v1/programs/{self.program1.id}", headers={"Authorization": f"Bearer {self.staff_token}"}
         )
 
         assert response.status_code == 403
@@ -356,7 +357,7 @@ class TestProgramsAPI:
         )
 
         assert response.status_code == 201
-        data = response.json
+        data = response.get_json()
         assert data["title"] == "Introduction to Python"
         assert data["program_id"] == self.program1.id
         assert data["code"].startswith("CRS-")
@@ -378,7 +379,7 @@ class TestProgramsAPI:
         )
 
         assert response.status_code == 200
-        data = response.json
+        data = response.get_json()
         assert "total_programs" in data
         assert "status_breakdown" in data
         assert "type_breakdown" in data

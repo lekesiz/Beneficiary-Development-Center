@@ -12,7 +12,7 @@ class TestUserPreferences:
 
     def test_get_user_preferences_success(self, client, auth_headers):
         """Test getting user preferences successfully."""
-        with patch('app.api.v1.users.User.query.get') as mock_get:
+        with patch('app.extensions.db.session.get') as mock_get:
             # Mock user with preferences
             mock_user = MagicMock(spec=User)
             mock_user.preferences = {
@@ -46,7 +46,7 @@ class TestUserPreferences:
 
     def test_get_user_preferences_with_defaults(self, client, auth_headers):
         """Test getting user preferences returns defaults when not set."""
-        with patch('app.api.v1.users.User.query.get') as mock_get:
+        with patch('app.extensions.db.session.get') as mock_get:
             # Mock user without preferences
             mock_user = MagicMock(spec=User)
             mock_user.preferences = {}
@@ -65,7 +65,7 @@ class TestUserPreferences:
 
     def test_get_user_preferences_user_not_found(self, client, auth_headers):
         """Test getting preferences when user not found."""
-        with patch('app.api.v1.users.User.query.get') as mock_get:
+        with patch('app.extensions.db.session.get') as mock_get:
             mock_get.return_value = None
 
             response = client.get('/api/v1/users/me/preferences', headers=auth_headers)
@@ -76,7 +76,7 @@ class TestUserPreferences:
 
     def test_update_user_preferences_success(self, client, auth_headers, db_session):
         """Test updating user preferences successfully."""
-        with patch('app.api.v1.users.User.query.get') as mock_get, \
+        with patch('app.extensions.db.session.get') as mock_get, \
              patch('app.api.v1.users.db.session.query') as mock_query, \
              patch('app.api.v1.users.db.session.commit') as mock_commit, \
              patch('app.api.v1.users.log_user_action') as mock_log:
@@ -138,7 +138,7 @@ class TestUserPreferences:
 
     def test_update_user_preferences_invalid_format(self, client, auth_headers):
         """Test updating preferences with invalid format."""
-        with patch('app.api.v1.users.User.query.get') as mock_get:
+        with patch('app.extensions.db.session.get') as mock_get:
             mock_user = MagicMock(spec=User)
             mock_get.return_value = mock_user
 
@@ -158,7 +158,7 @@ class TestUserPreferences:
 
     def test_update_user_preferences_user_not_found(self, client, auth_headers):
         """Test updating preferences when user not found."""
-        with patch('app.api.v1.users.User.query.get') as mock_get:
+        with patch('app.extensions.db.session.get') as mock_get:
             mock_get.return_value = None
 
             request_data = {
@@ -181,7 +181,7 @@ class TestUserPreferences:
 
     def test_update_user_preferences_database_error(self, client, auth_headers):
         """Test handling database error during preference update."""
-        with patch('app.api.v1.users.User.query.get') as mock_get, \
+        with patch('app.extensions.db.session.get') as mock_get, \
              patch('app.api.v1.users.db.session.query') as mock_query:
             
             mock_user = MagicMock(spec=User)

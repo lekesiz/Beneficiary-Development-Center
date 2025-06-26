@@ -200,6 +200,19 @@ def create_program():
         # Validate request data
         data = program_schema.load(request.json)
 
+        # Convert string enum values to actual enums
+        if 'program_type' in data and isinstance(data['program_type'], str):
+            try:
+                data['program_type'] = ProgramType(data['program_type'])
+            except ValueError:
+                return jsonify({"error": f"Invalid program_type: {data['program_type']}"}), 400
+        
+        if 'status' in data and isinstance(data['status'], str):
+            try:
+                data['status'] = ProgramStatus(data['status'])
+            except ValueError:
+                return jsonify({"error": f"Invalid status: {data['status']}"}), 400
+
         # Create program
         service = ProgramService(db.session)
         program = service.create(tenant_id, data, user)
@@ -235,6 +248,19 @@ def update_program(program_id):
 
         # Validate request data
         data = program_schema.load(request.json, partial=True)
+
+        # Convert string enum values to actual enums
+        if 'program_type' in data and isinstance(data['program_type'], str):
+            try:
+                data['program_type'] = ProgramType(data['program_type'])
+            except ValueError:
+                return jsonify({"error": f"Invalid program_type: {data['program_type']}"}), 400
+        
+        if 'status' in data and isinstance(data['status'], str):
+            try:
+                data['status'] = ProgramStatus(data['status'])
+            except ValueError:
+                return jsonify({"error": f"Invalid status: {data['status']}"}), 400
 
         # Update program
         service = ProgramService(db.session)

@@ -120,6 +120,9 @@ class CourseResponseSchema(CourseBaseSchema):
     instructor_name = fields.String(dump_only=True)
     program_title = fields.String(dump_only=True)
     program_code = fields.String(dump_only=True)
+    
+    # Optional related data
+    sessions = fields.List(fields.Dict(), dump_only=True, load_default=None)
 
 
 class CourseListSchema(Schema):

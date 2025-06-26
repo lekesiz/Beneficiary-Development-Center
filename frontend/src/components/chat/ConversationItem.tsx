@@ -1,4 +1,4 @@
-import { formatDistanceToNow , tr } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns';
 import { Pin, VolumeX } from 'lucide-react';
 import React from 'react';
 
@@ -25,14 +25,14 @@ export const ConversationItem: React.FC<ConversationItemProps> = ({
     if (conversation.type === 'direct') {
       const otherUser = conversation.participants.find(p => p.id !== currentUserId);
       return {
-        name: otherUser?.fullName || 'Kullanıcı',
+        name: otherUser?.fullName || 'User',
         avatar: otherUser?.avatarUrl,
         fallback: otherUser?.fullName || 'K',
         isOnline: otherUser?.isOnline,
       };
     }
     return {
-      name: conversation.name || 'Grup Sohbeti',
+      name: conversation.name || 'Group Chat',
       avatar: conversation.avatarUrl,
       fallback: conversation.name || 'G',
       isOnline: false,
@@ -43,16 +43,16 @@ export const ConversationItem: React.FC<ConversationItemProps> = ({
 
   // Format last message
   const getLastMessagePreview = () => {
-    if (!conversation.lastMessage) return 'Henüz mesaj yok';
+    if (!conversation.lastMessage) return 'No messages yet';
     
     const isSentByMe = conversation.lastMessage.sender.id === currentUserId;
-    const prefix = isSentByMe ? 'Sen: ' : `${conversation.lastMessage.sender.firstName}: `;
+    const prefix = isSentByMe ? 'You: ' : `${conversation.lastMessage.sender.firstName}: `;
     
     if (conversation.lastMessage.type === 'image') {
-      return `${prefix}📷 Fotoğraf`;
+      return `${prefix}📷 Photo`;
     }
     if (conversation.lastMessage.type === 'file') {
-      return `${prefix}📎 Dosya`;
+      return `${prefix}📎 File`;
     }
     
     const maxLength = 50;
@@ -67,6 +67,10 @@ export const ConversationItem: React.FC<ConversationItemProps> = ({
         isSelected && 'bg-gray-100 dark:bg-gray-700'
       )}
       onClick={onClick}
+      onKeyDown={(e) => e.key === 'Enter' && onClick()}
+      role="button"
+      tabIndex={0}
+      aria-label={`Select conversation with ${displayInfo.name}`}
     >
       {/* Avatar */}
       <div className="relative flex-shrink-0">
@@ -101,8 +105,7 @@ export const ConversationItem: React.FC<ConversationItemProps> = ({
           {conversation.lastMessageAt && (
             <span className="text-xs text-gray-500 dark:text-gray-400 flex-shrink-0">
               {formatDistanceToNow(new Date(conversation.lastMessageAt), {
-                addSuffix: true,
-                locale: tr,
+                addSuffix: true
               })}
             </span>
           )}

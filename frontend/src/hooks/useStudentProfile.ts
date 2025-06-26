@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { api } from '@/lib/api';
+import apiClient from '@/api/client';
 
 export interface StudentInfo {
   id: number;
@@ -153,7 +153,7 @@ export function useStudentProfile(studentId: number | null) {
     queryKey: ['studentProfile', studentId],
     queryFn: async () => {
       if (!studentId) return null;
-      const response = await api.get(`/api/reports/profile/${studentId}`);
+      const response = await apiClient.get(`/api/reports/profile/${studentId}`);
       return response.data as StudentProfile;
     },
     enabled: !!studentId,
@@ -175,7 +175,7 @@ export function useAddCoachNote() {
       note: string;
       category?: string;
     }) => {
-      const response = await api.post(
+      const response = await apiClient.post(
         `/api/reports/profile/${studentId}/notes`,
         {
           note,
@@ -203,7 +203,7 @@ export function useExportStudentProfile() {
       studentId: number;
       format?: 'json' | 'pdf';
     }) => {
-      const response = await api.get(
+      const response = await apiClient.get(
         `/api/reports/profile/${studentId}/export`,
         {
           params: { format },
@@ -237,7 +237,7 @@ export function useProfileRecommendations(studentId: number | null) {
     queryKey: ['profileRecommendations', studentId],
     queryFn: async () => {
       if (!studentId) return null;
-      const response = await api.get(
+      const response = await apiClient.get(
         `/api/reports/profile/${studentId}/recommendations`
       );
       return response.data as ProfileRecommendations;

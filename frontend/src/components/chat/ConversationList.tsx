@@ -33,7 +33,6 @@ export const ConversationList: React.FC<ConversationListProps> = ({
 
   const handleNewConversation = () => {
     // TODO: Open new conversation modal
-    console.log('New conversation');
   };
 
   if (error) {

@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { apiClient } from '@/api/client';
+import apiClient from '@/api/client';
 import type {
   LearningPath,
   LearningMilestone,

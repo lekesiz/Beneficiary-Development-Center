@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { api } from '@/lib/api';
+import apiClient from '@/api/client';
 
 export interface SuggestedMilestone {
   title: string;
@@ -50,7 +50,7 @@ export function useSuggestLearningPathUpdates() {
 
   return useMutation({
     mutationFn: async (studentId: number) => {
-      const response = await api.post(
+      const response = await apiClient.post(
         `/api/learning-paths/students/${studentId}/suggest-updates`
       );
       return response.data;
@@ -70,7 +70,7 @@ export function usePendingLearningPathUpdates(learningPathId: number | null) {
     queryKey: ['learningPathUpdates', 'pending', learningPathId],
     queryFn: async () => {
       if (!learningPathId) return null;
-      const response = await api.get(
+      const response = await apiClient.get(
         `/api/learning-paths/${learningPathId}/pending-updates`
       );
       return response.data;
@@ -85,7 +85,7 @@ export function useApproveLearningPathUpdate() {
 
   return useMutation({
     mutationFn: async (updateId: number) => {
-      const response = await api.post(
+      const response = await apiClient.post(
         `/api/learning-paths/updates/${updateId}/approve`
       );
       return response.data;
@@ -112,7 +112,7 @@ export function useRejectLearningPathUpdate() {
       updateId: number;
       reason: string;
     }) => {
-      const response = await api.post(
+      const response = await apiClient.post(
         `/api/learning-paths/updates/${updateId}/reject`,
         {
           reason,
@@ -133,7 +133,7 @@ export function useApplyLearningPathUpdate() {
 
   return useMutation({
     mutationFn: async (updateId: number) => {
-      const response = await api.post(
+      const response = await apiClient.post(
         `/api/learning-paths/updates/${updateId}/apply`
       );
       return response.data;
@@ -154,7 +154,7 @@ export function useStudentLearningPaths(studentId: number | null) {
     queryKey: ['studentLearningPaths', studentId],
     queryFn: async () => {
       if (!studentId) return null;
-      const response = await api.get('/api/learning-paths/my-paths', {
+      const response = await apiClient.get('/api/learning-paths/my-paths', {
         params: { user_id: studentId, status: 'accepted,in_progress' },
       });
       return response.data;

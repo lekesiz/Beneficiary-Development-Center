@@ -134,6 +134,8 @@ class TestingConfig(Config):
     JWT_COOKIE_SECURE = False
     # SQLite doesn't support these options
     SQLALCHEMY_ENGINE_OPTIONS = {}
+    # Disable rate limiting for tests
+    RATELIMIT_ENABLED = False
 
 
 class ProductionConfig(Config):

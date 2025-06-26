@@ -133,7 +133,7 @@ def update_user_preferences():
     try:
         # Get current user
         user_id = get_jwt_identity()
-        user = User.query.get(user_id)
+        user = db.session.get(User, user_id)
         
         if not user:
             return jsonify({"message": "User not found"}), 404
@@ -225,7 +225,7 @@ def get_user_preferences():
     try:
         # Get current user
         user_id = get_jwt_identity()
-        user = User.query.get(user_id)
+        user = db.session.get(User, user_id)
         
         if not user:
             return jsonify({"message": "User not found"}), 404

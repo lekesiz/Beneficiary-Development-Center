@@ -33,12 +33,17 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
       case 'image':
         return (
           <div className="max-w-sm">
-            <img
-              src={message.attachments?.[0]?.url}
-              alt="Shared image"
-              className="rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
+            <button
+              className="p-0 border-0 bg-transparent cursor-pointer"
               onClick={() => window.open(message.attachments?.[0]?.url, '_blank')}
-            />
+              aria-label="Click to view image in new window"
+            >
+              <img
+                src={message.attachments?.[0]?.url}
+                alt="Message attachment"
+                className="rounded-lg hover:opacity-90 transition-opacity"
+              />
+            </button>
           </div>
         );
       
@@ -169,7 +174,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                 'text-xs ml-2',
                 isOwnMessage ? 'text-blue-100' : 'text-gray-500 dark:text-gray-400'
               )}>
-                (düzenlendi)
+                (edited)
               </span>
             )}
           </div>

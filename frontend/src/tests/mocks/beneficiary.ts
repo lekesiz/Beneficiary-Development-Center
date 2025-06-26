@@ -121,8 +121,8 @@ export const mockBeneficiaryList = [
     full_name: 'Bob Johnson',
     email: 'bob.johnson@example.com',
     status: BeneficiaryStatus.COMPLETED,
-    assigned_trainer_id: null,
-    assigned_trainer_name: null,
+    assigned_trainer_id: undefined,
+    assigned_trainer_name: undefined,
   },
 ];
 

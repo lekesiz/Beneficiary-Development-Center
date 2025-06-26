@@ -24,7 +24,7 @@ from app.models.course import Course
 class TestEvaluationAPI:
     """Test evaluation API endpoints"""
 
-    def test_create_evaluation(self, client, auth_headers_admin, test_program, test_course):
+    def test_create_evaluation(self, client, admin_headers, test_program, test_course):
         """Test creating a new evaluation"""
         data = {
             "title": "Test Evaluation",
@@ -41,7 +41,7 @@ class TestEvaluationAPI:
         }
 
         response = client.post(
-            "/api/v1/evaluations", data=json.dumps(data), headers=auth_headers_admin, content_type="application/json"
+            "/api/v1/evaluations", data=json.dumps(data), headers=admin_headers, content_type="application/json"
         )
 
         assert response.status_code == 201
@@ -51,10 +51,10 @@ class TestEvaluationAPI:
         assert result["total_questions"] == 0
         assert result["total_points"] == 0.0
 
-    def test_list_evaluations(self, client, auth_headers_admin, test_evaluations):
+    def test_list_evaluations(self, client, admin_headers, test_evaluations):
         """Test listing evaluations with filtering"""
         # Test basic listing
-        response = client.get("/api/v1/evaluations", headers=auth_headers_admin)
+        response = client.get("/api/v1/evaluations", headers=admin_headers)
         assert response.status_code == 200
         result = json.loads(response.data)
         assert "evaluations" in result
@@ -62,21 +62,21 @@ class TestEvaluationAPI:
         assert len(result["evaluations"]) > 0
 
         # Test filtering by status
-        response = client.get("/api/v1/evaluations?status=active", headers=auth_headers_admin)
+        response = client.get("/api/v1/evaluations?status=active", headers=admin_headers)
         assert response.status_code == 200
         result = json.loads(response.data)
         for evaluation in result["evaluations"]:
             assert evaluation["status"] == "active"
 
         # Test search
-        response = client.get("/api/v1/evaluations?search=Test", headers=auth_headers_admin)
+        response = client.get("/api/v1/evaluations?search=Test", headers=admin_headers)
         assert response.status_code == 200
         result = json.loads(response.data)
         assert len(result["evaluations"]) > 0
 
-    def test_get_evaluation(self, client, auth_headers_admin, test_evaluation):
+    def test_get_evaluation(self, client, admin_headers, test_evaluation):
         """Test getting a single evaluation"""
-        response = client.get(f"/api/v1/evaluations/{test_evaluation.id}", headers=auth_headers_admin)
+        response = client.get(f"/api/v1/evaluations/{test_evaluation.id}", headers=admin_headers)
         assert response.status_code == 200
         result = json.loads(response.data)
         assert result["id"] == test_evaluation.id
@@ -84,20 +84,20 @@ class TestEvaluationAPI:
 
         # Test with include_questions
         response = client.get(
-            f"/api/v1/evaluations/{test_evaluation.id}?include_questions=true", headers=auth_headers_admin
+            f"/api/v1/evaluations/{test_evaluation.id}?include_questions=true", headers=admin_headers
         )
         assert response.status_code == 200
         result = json.loads(response.data)
         assert "questions" in result
 
-    def test_update_evaluation(self, client, auth_headers_admin, test_evaluation):
+    def test_update_evaluation(self, client, admin_headers, test_evaluation):
         """Test updating an evaluation"""
         data = {"title": "Updated Evaluation Title", "description": "Updated description", "passing_score": 80}
 
         response = client.put(
             f"/api/v1/evaluations/{test_evaluation.id}",
             data=json.dumps(data),
-            headers=auth_headers_admin,
+            headers=admin_headers,
             content_type="application/json",
         )
 
@@ -107,30 +107,30 @@ class TestEvaluationAPI:
         assert result["description"] == data["description"]
         assert result["passing_score"] == data["passing_score"]
 
-    def test_delete_evaluation(self, client, auth_headers_admin, test_evaluation):
+    def test_delete_evaluation(self, client, admin_headers, test_evaluation):
         """Test deleting an evaluation"""
-        response = client.delete(f"/api/v1/evaluations/{test_evaluation.id}", headers=auth_headers_admin)
+        response = client.delete(f"/api/v1/evaluations/{test_evaluation.id}", headers=admin_headers)
         assert response.status_code == 200
         result = json.loads(response.data)
         assert result["message"] == "Evaluation deleted successfully"
 
-    def test_activate_evaluation(self, client, auth_headers_admin, test_evaluation_with_questions):
+    def test_activate_evaluation(self, client, admin_headers, test_evaluation_with_questions):
         """Test activating an evaluation"""
         response = client.put(
-            f"/api/v1/evaluations/{test_evaluation_with_questions.id}/activate", headers=auth_headers_admin
+            f"/api/v1/evaluations/{test_evaluation_with_questions.id}/activate", headers=admin_headers
         )
         assert response.status_code == 200
         result = json.loads(response.data)
         assert result["status"] == "active"
 
-    def test_archive_evaluation(self, client, auth_headers_admin, test_evaluation):
+    def test_archive_evaluation(self, client, admin_headers, test_evaluation):
         """Test archiving an evaluation"""
-        response = client.put(f"/api/v1/evaluations/{test_evaluation.id}/archive", headers=auth_headers_admin)
+        response = client.put(f"/api/v1/evaluations/{test_evaluation.id}/archive", headers=admin_headers)
         assert response.status_code == 200
         result = json.loads(response.data)
         assert result["status"] == "archived"
 
-    def test_add_question(self, client, auth_headers_admin, test_evaluation):
+    def test_add_question(self, client, admin_headers, test_evaluation):
         """Test adding a question to an evaluation"""
         data = {
             "question_text": "What is the capital of France?",
@@ -144,7 +144,7 @@ class TestEvaluationAPI:
         response = client.post(
             f"/api/v1/evaluations/{test_evaluation.id}/questions",
             data=json.dumps(data),
-            headers=auth_headers_admin,
+            headers=admin_headers,
             content_type="application/json",
         )
 
@@ -154,14 +154,14 @@ class TestEvaluationAPI:
         assert result["question_type"] == data["question_type"]
         assert result["points"] == data["points"]
 
-    def test_update_question(self, client, auth_headers_admin, test_question):
+    def test_update_question(self, client, admin_headers, test_question):
         """Test updating a question"""
         data = {"question_text": "Updated question text", "points": 15}
 
         response = client.put(
             f"/api/v1/evaluations/questions/{test_question.id}",
             data=json.dumps(data),
-            headers=auth_headers_admin,
+            headers=admin_headers,
             content_type="application/json",
         )
 
@@ -170,9 +170,9 @@ class TestEvaluationAPI:
         assert result["question_text"] == data["question_text"]
         assert result["points"] == data["points"]
 
-    def test_delete_question(self, client, auth_headers_admin, test_question):
+    def test_delete_question(self, client, admin_headers, test_question):
         """Test deleting a question"""
-        response = client.delete(f"/api/v1/evaluations/questions/{test_question.id}", headers=auth_headers_admin)
+        response = client.delete(f"/api/v1/evaluations/questions/{test_question.id}", headers=admin_headers)
         assert response.status_code == 200
         result = json.loads(response.data)
         assert result["message"] == "Question deleted successfully"
@@ -242,10 +242,10 @@ class TestEvaluationAPI:
         assert isinstance(result, list)
         assert len(result) > 0
 
-    def test_get_evaluation_statistics(self, client, auth_headers_admin, test_evaluation_with_attempts):
+    def test_get_evaluation_statistics(self, client, admin_headers, test_evaluation_with_attempts):
         """Test getting evaluation statistics"""
         response = client.get(
-            f"/api/v1/evaluations/{test_evaluation_with_attempts.id}/statistics", headers=auth_headers_admin
+            f"/api/v1/evaluations/{test_evaluation_with_attempts.id}/statistics", headers=admin_headers
         )
 
         assert response.status_code == 200

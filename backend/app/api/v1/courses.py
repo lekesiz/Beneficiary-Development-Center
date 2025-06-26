@@ -191,6 +191,25 @@ def create_course(program_id):
         # Validate request data
         data = course_create_schema.load(request.json)
 
+        # Convert string enum values to actual enums
+        if 'status' in data and isinstance(data['status'], str):
+            try:
+                data['status'] = CourseStatus(data['status'])
+            except ValueError:
+                return jsonify({"error": f"Invalid status: {data['status']}"}), 400
+        
+        if 'format' in data and isinstance(data['format'], str):
+            try:
+                data['format'] = CourseFormat(data['format'])
+            except ValueError:
+                return jsonify({"error": f"Invalid format: {data['format']}"}), 400
+        
+        if 'difficulty_level' in data and isinstance(data['difficulty_level'], str):
+            try:
+                data['difficulty_level'] = DifficultyLevel(data['difficulty_level'])
+            except ValueError:
+                return jsonify({"error": f"Invalid difficulty_level: {data['difficulty_level']}"}), 400
+
         # Create course
         service = CourseService(db.session)
         course = service.create(tenant_id, program_id, data, user)
@@ -228,6 +247,25 @@ def update_course(program_id, course_id):
 
         # Validate request data
         data = course_update_schema.load(request.json)
+
+        # Convert string enum values to actual enums
+        if 'status' in data and isinstance(data['status'], str):
+            try:
+                data['status'] = CourseStatus(data['status'])
+            except ValueError:
+                return jsonify({"error": f"Invalid status: {data['status']}"}), 400
+        
+        if 'format' in data and isinstance(data['format'], str):
+            try:
+                data['format'] = CourseFormat(data['format'])
+            except ValueError:
+                return jsonify({"error": f"Invalid format: {data['format']}"}), 400
+        
+        if 'difficulty_level' in data and isinstance(data['difficulty_level'], str):
+            try:
+                data['difficulty_level'] = DifficultyLevel(data['difficulty_level'])
+            except ValueError:
+                return jsonify({"error": f"Invalid difficulty_level: {data['difficulty_level']}"}), 400
 
         # Update course
         service = CourseService(db.session)

@@ -41,10 +41,10 @@ const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
   } as const;
 
   const labels = {
-    draft: 'Taslak',
-    active: 'Aktif',
-    archived: 'Arşivlenmiş',
-    completed: 'Tamamlanmış',
+    draft: 'Draft',
+    active: 'Active',
+    archived: 'Archived',
+    completed: 'Completed',
   };
 
   return (
@@ -57,13 +57,13 @@ const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
 // Question type badge
 const QuestionTypeBadge: React.FC<{ type: string }> = ({ type }) => {
   const labels = {
-    multiple_choice: 'Çoktan Seçmeli',
-    true_false: 'Doğru/Yanlış',
-    short_answer: 'Kısa Cevap',
-    essay: 'Kompozisyon',
-    matching: 'Eşleştirme',
-    ordering: 'Sıralama',
-    fill_in_blank: 'Boşluk Doldurma',
+    multiple_choice: 'Multiple Choice',
+    true_false: 'True/False',
+    short_answer: 'Short Answer',
+    essay: 'Essay',
+    matching: 'Matching',
+    ordering: 'Ordering',
+    fill_in_blank: 'Fill in the Blank',
   };
 
   return (
@@ -82,9 +82,9 @@ const DifficultyBadge: React.FC<{ level: string }> = ({ level }) => {
   } as const;
 
   const labels = {
-    easy: 'Kolay',
-    medium: 'Orta',
-    hard: 'Zor',
+    easy: 'Easy',
+    medium: 'Medium',
+    hard: 'Hard',
   };
 
   return (
@@ -112,7 +112,7 @@ const QuestionCard: React.FC<{
           </span>
           <QuestionTypeBadge type={question.question_type} />
           <DifficultyBadge level={question.difficulty_level} />
-          <span className="text-sm text-gray-500">{question.points} puan</span>
+          <span className="text-sm text-gray-500">{question.points} points</span>
         </div>
 
         <div className="relative">
@@ -133,7 +133,7 @@ const QuestionCard: React.FC<{
                 className="flex items-center w-full px-3 py-2 text-sm hover:bg-gray-100"
               >
                 <Edit className="mr-2 h-3 w-3" />
-                Düzenle
+                Edit
               </button>
               <button
                 onClick={() => {
@@ -143,7 +143,7 @@ const QuestionCard: React.FC<{
                 className="flex items-center w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50"
               >
                 <Trash2 className="mr-2 h-3 w-3" />
-                Sil
+                Delete
               </button>
             </div>
           )}
@@ -184,9 +184,9 @@ const QuestionCard: React.FC<{
         {question.question_type === 'true_false' && (
           <div className="ml-4">
             <span className="text-sm text-gray-600">
-              Doğru cevap:
+              Correct answer:
               <span className="ml-1 font-medium text-green-600">
-                {question.question_data.correct_answer ? 'Doğru' : 'Yanlış'}
+                {question.question_data.correct_answer ? 'True' : 'False'}
               </span>
             </span>
           </div>
@@ -195,7 +195,7 @@ const QuestionCard: React.FC<{
         {question.explanation && (
           <div className="mt-3 p-3 bg-blue-50 rounded-md">
             <p className="text-sm text-blue-800">
-              <strong>Açıklama:</strong> {question.explanation}
+              <strong>Explanation:</strong> {question.explanation}
             </p>
           </div>
         )}
@@ -258,12 +258,12 @@ export default function EvaluationDetail() {
       <div className="p-6">
         <div className="text-center py-12">
           <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-          <p className="text-red-600">Değerlendirme yüklenirken hata oluştu.</p>
+          <p className="text-red-600">Error loading evaluation.</p>
           <button
             onClick={() => navigate('/evaluations')}
             className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
           >
-            Geri Dön
+            Go Back
           </button>
         </div>
       </div>
@@ -287,7 +287,7 @@ export default function EvaluationDetail() {
               <StatusBadge status={evaluation.status} />
               <span className="text-sm text-gray-500">
                 {new Date(evaluation.created_at).toLocaleDateString('tr-TR')}{' '}
-                tarihinde oluşturuldu
+                created on
               </span>
             </div>
           </div>
@@ -302,8 +302,8 @@ export default function EvaluationDetail() {
             >
               <Play className="mr-2 h-4 w-4" />
               {activateMutation.isPending
-                ? 'Aktifleştiriliyor...'
-                : 'Aktifleştir'}
+                ? 'Activating...'
+                : 'Activate'}
             </button>
           )}
 
@@ -314,7 +314,7 @@ export default function EvaluationDetail() {
               className="flex items-center px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 disabled:opacity-50"
             >
               <Archive className="mr-2 h-4 w-4" />
-              {archiveMutation.isPending ? 'Arşivleniyor...' : 'Arşivle'}
+              {archiveMutation.isPending ? 'Archiving...' : 'Archive'}
             </button>
           )}
 
@@ -332,7 +332,7 @@ export default function EvaluationDetail() {
             className="flex items-center px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50"
           >
             <Trash2 className="mr-2 h-4 w-4" />
-            {deleteMutation.isPending ? 'Siliniyor...' : 'Sil'}
+            {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
           </button>
         </div>
       </div>
@@ -343,18 +343,18 @@ export default function EvaluationDetail() {
         <div className="lg:col-span-2 space-y-6">
           {/* Basic Information */}
           <Card className="p-6">
-            <h2 className="text-lg font-semibold mb-4">Genel Bilgiler</h2>
+            <h2 className="text-lg font-semibold mb-4">General Information</h2>
 
             {evaluation.description && (
               <div className="mb-4">
-                <h3 className="font-medium text-gray-700 mb-2">Açıklama</h3>
+                <h3 className="font-medium text-gray-700 mb-2">Description</h3>
                 <p className="text-gray-600">{evaluation.description}</p>
               </div>
             )}
 
             {evaluation.instructions && (
               <div className="mb-4">
-                <h3 className="font-medium text-gray-700 mb-2">Talimatlar</h3>
+                <h3 className="font-medium text-gray-700 mb-2">Instructions</h3>
                 <div className="p-3 bg-blue-50 rounded-md">
                   <p className="text-blue-800">{evaluation.instructions}</p>
                 </div>
@@ -364,7 +364,7 @@ export default function EvaluationDetail() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
               <div className="text-center">
                 <FileText className="h-8 w-8 text-blue-600 mx-auto mb-2" />
-                <p className="text-sm text-gray-600">Soru Sayısı</p>
+                <p className="text-sm text-gray-600">Number of Questions</p>
                 <p className="text-lg font-semibold">
                   {evaluation.total_questions}
                 </p>
@@ -374,7 +374,7 @@ export default function EvaluationDetail() {
                 <div className="h-8 w-8 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
                   <span className="text-green-600 font-bold text-sm">P</span>
                 </div>
-                <p className="text-sm text-gray-600">Toplam Puan</p>
+                <p className="text-sm text-gray-600">Total Points</p>
                 <p className="text-lg font-semibold">
                   {evaluation.total_points}
                 </p>
@@ -384,7 +384,7 @@ export default function EvaluationDetail() {
                 <div className="h-8 w-8 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-2">
                   <span className="text-yellow-600 font-bold text-sm">%</span>
                 </div>
-                <p className="text-sm text-gray-600">Geçme Puanı</p>
+                <p className="text-sm text-gray-600">Passing Score</p>
                 <p className="text-lg font-semibold">
                   {evaluation.passing_score}%
                 </p>
@@ -392,7 +392,7 @@ export default function EvaluationDetail() {
 
               <div className="text-center">
                 <Clock className="h-8 w-8 text-purple-600 mx-auto mb-2" />
-                <p className="text-sm text-gray-600">Süre</p>
+                <p className="text-sm text-gray-600">Duration</p>
                 <p className="text-lg font-semibold">
                   {evaluation.duration_display}
                 </p>
@@ -404,7 +404,7 @@ export default function EvaluationDetail() {
           <Card className="p-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg font-semibold">
-                Sorular ({questions?.length || 0})
+                Questions ({questions?.length || 0})
               </h2>
               <button
                 onClick={() =>
@@ -413,7 +413,7 @@ export default function EvaluationDetail() {
                 className="flex items-center px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm"
               >
                 <Plus className="mr-1 h-4 w-4" />
-                Soru Ekle
+                Add Question
               </button>
             </div>
 
@@ -442,14 +442,14 @@ export default function EvaluationDetail() {
             ) : (
               <div className="text-center py-8">
                 <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-500">Henüz soru eklenmemiş</p>
+                <p className="text-gray-500">No questions added yet</p>
                 <button
                   onClick={() =>
                     navigate(`/evaluations/${evaluationId}/questions/create`)
                   }
                   className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
                 >
-                  İlk Soruyu Ekle
+                  Add First Question
                 </button>
               </div>
             )}
@@ -460,16 +460,16 @@ export default function EvaluationDetail() {
         <div className="space-y-6">
           {/* Settings */}
           <Card className="p-6">
-            <h2 className="text-lg font-semibold mb-4">Ayarlar</h2>
+            <h2 className="text-lg font-semibold mb-4">Settings</h2>
 
             <div className="space-y-3">
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Maksimum Deneme</span>
+                <span className="text-sm text-gray-600">Maximum Attempts</span>
                 <span className="font-medium">{evaluation.max_attempts}</span>
               </div>
 
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Soruları Karıştır</span>
+                <span className="text-sm text-gray-600">Shuffle Questions</span>
                 <span className="font-medium">
                   {evaluation.shuffle_questions ? (
                     <CheckCircle className="h-4 w-4 text-green-600" />
@@ -481,7 +481,7 @@ export default function EvaluationDetail() {
 
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-600">
-                  Sonuçları Hemen Göster
+                  Show Results Immediately
                 </span>
                 <span className="font-medium">
                   {evaluation.show_results_immediately ? (
@@ -494,7 +494,7 @@ export default function EvaluationDetail() {
 
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-600">
-                  İncelemeye İzin Ver
+                  Allow Review
                 </span>
                 <span className="font-medium">
                   {evaluation.allow_review ? (
@@ -509,20 +509,20 @@ export default function EvaluationDetail() {
 
           {/* Availability */}
           <Card className="p-6">
-            <h2 className="text-lg font-semibold mb-4">Kullanılabilirlik</h2>
+            <h2 className="text-lg font-semibold mb-4">Availability</h2>
 
             <div className="space-y-3">
               <div className="flex items-center space-x-2">
                 <Badge
                   variant={evaluation.is_available ? 'success' : 'secondary'}
                 >
-                  {evaluation.is_available ? 'Mevcut' : 'Mevcut Değil'}
+                  {evaluation.is_available ? 'Available' : 'Not Available'}
                 </Badge>
               </div>
 
               {evaluation.available_from && (
                 <div>
-                  <span className="text-sm text-gray-600">Başlangıç:</span>
+                  <span className="text-sm text-gray-600">Start:</span>
                   <p className="font-medium">
                     {new Date(evaluation.available_from).toLocaleString(
                       'tr-TR'
@@ -533,7 +533,7 @@ export default function EvaluationDetail() {
 
               {evaluation.available_until && (
                 <div>
-                  <span className="text-sm text-gray-600">Bitiş:</span>
+                  <span className="text-sm text-gray-600">End:</span>
                   <p className="font-medium">
                     {new Date(evaluation.available_until).toLocaleString(
                       'tr-TR'
@@ -547,7 +547,7 @@ export default function EvaluationDetail() {
           {/* Course/Program Info */}
           {(evaluation.course_title || evaluation.program_title) && (
             <Card className="p-6">
-              <h2 className="text-lg font-semibold mb-4">Bağlı Olduğu</h2>
+              <h2 className="text-lg font-semibold mb-4">Related To</h2>
 
               <div className="space-y-2">
                 {evaluation.program_title && (
@@ -573,19 +573,18 @@ export default function EvaluationDetail() {
       <Modal
         isOpen={deleteModal.isOpen}
         onClose={() => setDeleteModal({ isOpen: false })}
-        title="Soruyu Sil"
+        title="Delete Question"
       >
         <div className="space-y-4">
           <p>
-            Bu soruyu silmek istediğinizden emin misiniz? Bu işlem geri
-            alınamaz.
+            Are you sure you want to delete this question? This action cannot be undone.
           </p>
           <div className="flex justify-end space-x-2">
             <button
               onClick={() => setDeleteModal({ isOpen: false })}
               className="px-4 py-2 border rounded-md hover:bg-gray-50"
             >
-              İptal
+              Cancel
             </button>
             <button
               onClick={() => {

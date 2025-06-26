@@ -90,7 +90,7 @@ export const CourseDetail: React.FC = () => {
   const sessionColumns: ColumnDef<CourseSession>[] = [
     {
       accessorKey: 'title',
-      header: 'Oturum Adı',
+      header: 'Session Name',
       cell: ({ row }) => (
         <div className="flex flex-col">
           <span className="font-medium">{row.original.title}</span>
@@ -104,7 +104,7 @@ export const CourseDetail: React.FC = () => {
     },
     {
       accessorKey: 'session_date',
-      header: 'Tarih',
+      header: 'Date',
       cell: ({ row }) => (
         <div className="flex flex-col">
           <span>
@@ -121,12 +121,12 @@ export const CourseDetail: React.FC = () => {
     },
     {
       accessorKey: 'duration_hours',
-      header: 'Süre',
-      cell: ({ row }) => `${row.original.duration_hours}sa`,
+      header: 'Duration',
+      cell: ({ row }) => `${row.original.duration_hours}h`,
     },
     {
       accessorKey: 'location',
-      header: 'Konum',
+      header: 'Location',
       cell: ({ row }) => (
         <div className="flex items-center space-x-2">
           {row.original.is_online ? (
@@ -145,21 +145,21 @@ export const CourseDetail: React.FC = () => {
     },
     {
       accessorKey: 'instructor_name',
-      header: 'Eğitmen',
+      header: 'Instructor',
       cell: ({ row }) => row.original.instructor_name || '-',
     },
     {
       accessorKey: 'is_cancelled',
-      header: 'Durum',
+      header: 'Status',
       cell: ({ row }) => (
         <Badge color={row.original.is_cancelled ? 'red' : 'green'}>
-          {row.original.is_cancelled ? 'İptal' : 'Aktif'}
+          {row.original.is_cancelled ? 'Cancelled' : 'Active'}
         </Badge>
       ),
     },
     {
       id: 'actions',
-      header: 'İşlemler',
+      header: 'Actions',
       cell: ({ row }) => (
         <div className="flex items-center gap-2">
           {!row.original.is_cancelled && (
@@ -189,7 +189,7 @@ export const CourseDetail: React.FC = () => {
     return (
       <Card className="p-6">
         <div className="text-center text-red-600">
-          Kurs bulunamadı veya yüklenirken hata oluştu.
+          Course not found or error loading.
         </div>
       </Card>
     );
@@ -210,7 +210,7 @@ export const CourseDetail: React.FC = () => {
             onClick={() => navigate('/courses')}
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Kurslara Dön
+            Back to Courses
           </Button>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">{course.title}</h1>
@@ -237,7 +237,7 @@ export const CourseDetail: React.FC = () => {
               onClick={() => navigate(`/courses/${course.id}/edit`)}
             >
               <Edit className="h-4 w-4 mr-2" />
-              Düzenle
+              Edit
             </Button>
           )}
           {canDelete && (
@@ -247,7 +247,7 @@ export const CourseDetail: React.FC = () => {
               className="text-red-600 hover:text-red-800"
             >
               <Trash2 className="h-4 w-4 mr-2" />
-              Sil
+              Delete
             </Button>
           )}
         </div>
@@ -278,10 +278,10 @@ export const CourseDetail: React.FC = () => {
               </div>
               <div className="text-sm text-gray-600">
                 {course.max_participants ? `/ ${course.max_participants}` : ''}{' '}
-                Katılımcı
+                Participants
               </div>
               <div className="text-xs text-gray-500">
-                {course.available_spots || 0} kişi boş
+                {course.available_spots || 0} spots available
               </div>
             </div>
           </div>
@@ -294,10 +294,10 @@ export const CourseDetail: React.FC = () => {
             </div>
             <div>
               <div className="text-2xl font-bold">{course.duration_hours}</div>
-              <div className="text-sm text-gray-600">Saat</div>
+              <div className="text-sm text-gray-600">Hours</div>
               {course.duration_weeks && (
                 <div className="text-xs text-gray-500">
-                  {course.duration_weeks} hafta
+                  {course.duration_weeks} weeks
                 </div>
               )}
             </div>
@@ -313,7 +313,7 @@ export const CourseDetail: React.FC = () => {
               <div className="text-2xl font-bold">
                 {course.session_count || 0}
               </div>
-              <div className="text-sm text-gray-600">Oturum</div>
+              <div className="text-sm text-gray-600">Sessions</div>
             </div>
           </div>
         </Card>
@@ -327,10 +327,10 @@ export const CourseDetail: React.FC = () => {
               <div className="text-2xl font-bold">
                 {Math.round(course.completion_rate || 0)}%
               </div>
-              <div className="text-sm text-gray-600">Tamamlama</div>
+              <div className="text-sm text-gray-600">Completion</div>
               {course.average_score && (
                 <div className="text-xs text-gray-500">
-                  Ort. Puan: {Math.round(course.average_score)}
+                  Avg. Score: {Math.round(course.average_score)}
                 </div>
               )}
             </div>
@@ -343,25 +343,25 @@ export const CourseDetail: React.FC = () => {
         {/* Main Info */}
         <div className="lg:col-span-2">
           <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4">Kurs Bilgileri</h3>
+            <h3 className="text-lg font-semibold mb-4">Course Information</h3>
 
             {course.subtitle && (
               <div className="mb-4">
-                <h4 className="font-medium text-gray-900 mb-1">Alt Başlık</h4>
+                <h4 className="font-medium text-gray-900 mb-1">Subtitle</h4>
                 <p className="text-gray-600">{course.subtitle}</p>
               </div>
             )}
 
             {course.description && (
               <div className="mb-6">
-                <h4 className="font-medium text-gray-900 mb-2">Açıklama</h4>
+                <h4 className="font-medium text-gray-900 mb-2">Description</h4>
                 <p className="text-gray-600">{course.description}</p>
               </div>
             )}
 
             {course.objectives && course.objectives.length > 0 && (
               <div className="mb-6">
-                <h4 className="font-medium text-gray-900 mb-2">Hedefler</h4>
+                <h4 className="font-medium text-gray-900 mb-2">Objectives</h4>
                 <ul className="list-disc list-inside space-y-1 text-gray-600">
                   {course.objectives.map((objective, index) => (
                     <li key={index}>{objective}</li>
@@ -372,7 +372,7 @@ export const CourseDetail: React.FC = () => {
 
             {course.prerequisites && course.prerequisites.length > 0 && (
               <div className="mb-6">
-                <h4 className="font-medium text-gray-900 mb-2">Ön Koşullar</h4>
+                <h4 className="font-medium text-gray-900 mb-2">Prerequisites</h4>
                 <ul className="list-disc list-inside space-y-1 text-gray-600">
                   {course.prerequisites.map((prerequisite, index) => (
                     <li key={index}>{prerequisite}</li>
@@ -383,7 +383,7 @@ export const CourseDetail: React.FC = () => {
 
             {course.materials && course.materials.length > 0 && (
               <div className="mb-6">
-                <h4 className="font-medium text-gray-900 mb-2">Materyaller</h4>
+                <h4 className="font-medium text-gray-900 mb-2">Materials</h4>
                 <ul className="list-disc list-inside space-y-1 text-gray-600">
                   {course.materials.map((material, index) => (
                     <li key={index}>{material}</li>
@@ -394,7 +394,7 @@ export const CourseDetail: React.FC = () => {
 
             {course.tags && course.tags.length > 0 && (
               <div>
-                <h4 className="font-medium text-gray-900 mb-2">Etiketler</h4>
+                <h4 className="font-medium text-gray-900 mb-2">Tags</h4>
                 <div className="flex flex-wrap gap-2">
                   {course.tags.map((tag, index) => (
                     <Badge key={index} variant="outline">
@@ -410,12 +410,12 @@ export const CourseDetail: React.FC = () => {
         {/* Side Info */}
         <div className="space-y-4">
           <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4">Detaylar</h3>
+            <h3 className="text-lg font-semibold mb-4">Details</h3>
             <div className="space-y-4">
               <div className="flex items-center space-x-3">
                 <BookOpen className="h-4 w-4 text-gray-400" />
                 <div>
-                  <div className="text-sm font-medium">Sıra</div>
+                  <div className="text-sm font-medium">Order</div>
                   <div className="text-sm text-gray-600">
                     #{course.order_index}
                   </div>
@@ -426,7 +426,7 @@ export const CourseDetail: React.FC = () => {
                 <div className="flex items-center space-x-3">
                   <User className="h-4 w-4 text-gray-400" />
                   <div>
-                    <div className="text-sm font-medium">Eğitmen</div>
+                    <div className="text-sm font-medium">Instructor</div>
                     <div className="text-sm text-gray-600">
                       {course.instructor_name}
                     </div>
@@ -438,9 +438,9 @@ export const CourseDetail: React.FC = () => {
                 <div className="flex items-center space-x-3">
                   <Award className="h-4 w-4 text-gray-400" />
                   <div>
-                    <div className="text-sm font-medium">Değerlendirme</div>
+                    <div className="text-sm font-medium">Assessment</div>
                     <div className="text-sm text-gray-600">
-                      {course.assessment_type || 'Var'}
+                      {course.assessment_type || 'Yes'}
                       {course.passing_score &&
                         ` (Min: ${course.passing_score})`}
                     </div>
@@ -452,7 +452,7 @@ export const CourseDetail: React.FC = () => {
                 <div className="flex items-center space-x-3">
                   <FileText className="h-4 w-4 text-gray-400" />
                   <div>
-                    <div className="text-sm font-medium">İçerik</div>
+                    <div className="text-sm font-medium">Content</div>
                     <a
                       href={course.content_url}
                       target="_blank"
@@ -460,7 +460,7 @@ export const CourseDetail: React.FC = () => {
                       className="text-sm text-blue-600 hover:text-blue-800"
                     >
                       <LinkIcon className="h-3 w-3 inline mr-1" />
-                      İçeriği Görüntüle
+                      View Content
                     </a>
                   </div>
                 </div>
@@ -478,7 +478,7 @@ export const CourseDetail: React.FC = () => {
                       className="text-sm text-blue-600 hover:text-blue-800"
                     >
                       <Play className="h-3 w-3 inline mr-1" />
-                      Videoyu İzle
+                      Watch Video
                     </a>
                   </div>
                 </div>
@@ -489,7 +489,7 @@ export const CourseDetail: React.FC = () => {
           {/* Quick Actions */}
           {canEdit(course) && (
             <Card className="p-6">
-              <h3 className="text-lg font-semibold mb-4">Hızlı İşlemler</h3>
+              <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
               <div className="space-y-2">
                 <Button
                   variant="outline"
@@ -498,7 +498,7 @@ export const CourseDetail: React.FC = () => {
                   onClick={() => navigate(`/courses/${course.id}/sessions/new`)}
                 >
                   <Plus className="h-4 w-4 mr-2" />
-                  Oturum Ekle
+                  Add Session
                 </Button>
 
                 {course.status === 'draft' && (
@@ -509,7 +509,7 @@ export const CourseDetail: React.FC = () => {
                     onClick={() => handleStatusUpdate('published')}
                     disabled={updateStatus.isPending}
                   >
-                    Yayınla
+                    Publish
                   </Button>
                 )}
 
@@ -521,7 +521,7 @@ export const CourseDetail: React.FC = () => {
                     onClick={() => handleStatusUpdate('archived')}
                     disabled={updateStatus.isPending}
                   >
-                    Arşivle
+                    Archive
                   </Button>
                 )}
               </div>
@@ -534,7 +534,7 @@ export const CourseDetail: React.FC = () => {
       <Card>
         <div className="p-6 border-b">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold">Kurs Oturumları</h3>
+            <h3 className="text-lg font-semibold">Course Sessions</h3>
             {canEdit(course) && (
               <Button
                 onClick={() => navigate(`/courses/${course.id}/sessions/new`)}
@@ -565,10 +565,10 @@ export const CourseDetail: React.FC = () => {
         isOpen={deleteConfirm}
         onClose={() => setDeleteConfirm(false)}
         onConfirm={handleDelete}
-        title="Kursu Sil"
-        message={`"${course.title}" kursunu silmek istediğinizden emin misiniz? Bu işlem geri alınamaz ve kursa bağlı tüm oturumlar da silinecektir.`}
-        confirmText="Sil"
-        cancelText="İptal"
+        title="Delete Course"
+        message={`Are you sure you want to delete "${course.title}"? This action cannot be undone and all sessions linked to this course will also be deleted.`}
+        confirmText="Delete"
+        cancelText="Cancel"
         loading={deleteCourse.isPending}
       />
     </div>

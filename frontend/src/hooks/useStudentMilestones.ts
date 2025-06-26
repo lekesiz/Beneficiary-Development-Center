@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { api } from '@/lib/api';
+import apiClient from '@/api/client';
 
 export interface MilestoneActivity {
   title: string;
@@ -38,7 +38,7 @@ export function useStudentMilestones() {
   return useQuery({
     queryKey: ['studentMilestones'],
     queryFn: async () => {
-      const response = await api.get('/api/learning-paths/student/milestones');
+      const response = await apiClient.get('/api/learning-paths/student/milestones');
       return response.data.milestones as StudentMilestone[];
     },
   });
@@ -50,7 +50,7 @@ export function useStartMilestone() {
 
   return useMutation({
     mutationFn: async (milestoneId: number) => {
-      const response = await api.post(
+      const response = await apiClient.post(
         `/api/learning-paths/milestones/${milestoneId}/start`
       );
       return response.data;
@@ -67,7 +67,7 @@ export function useCompleteMilestone() {
 
   return useMutation({
     mutationFn: async (milestoneId: number) => {
-      const response = await api.post(
+      const response = await apiClient.post(
         `/api/learning-paths/milestones/${milestoneId}/complete`
       );
       return response.data;
@@ -92,7 +92,7 @@ export function useUpdateMilestoneProgress() {
       progress: number;
       completedActivities?: number[];
     }) => {
-      const response = await api.patch(
+      const response = await apiClient.patch(
         `/api/learning-paths/milestones/${milestoneId}/progress`,
         {
           progress,
@@ -119,7 +119,7 @@ export function useRequestHelp() {
       milestoneId: number;
       message: string;
     }) => {
-      const response = await api.post(
+      const response = await apiClient.post(
         `/api/learning-paths/milestones/${milestoneId}/help`,
         {
           message,
@@ -139,7 +139,7 @@ export function useMilestoneDetails(milestoneId: number | null) {
     queryKey: ['milestoneDetails', milestoneId],
     queryFn: async () => {
       if (!milestoneId) return null;
-      const response = await api.get(
+      const response = await apiClient.get(
         `/api/learning-paths/milestones/${milestoneId}`
       );
       return response.data.milestone as StudentMilestone;
@@ -160,7 +160,7 @@ export function useCompleteActivity() {
       milestoneId: number;
       activityIndex: number;
     }) => {
-      const response = await api.post(
+      const response = await apiClient.post(
         `/api/learning-paths/milestones/${milestoneId}/activities/${activityIndex}/complete`
       );
       return response.data;
