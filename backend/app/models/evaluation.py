@@ -1,6 +1,7 @@
 """
 Evaluation models for the BDC application
 """
+
 import uuid
 from datetime import datetime
 from enum import Enum
@@ -42,18 +43,19 @@ class AttemptStatus(Enum):
 
 class Evaluation(TenantBaseModel):
     """Evaluation model for assessments and tests"""
-    __tablename__ = 'evaluations'
+
+    __tablename__ = "evaluations"
 
     uuid = Column(UUID(as_uuid=True), default=uuid.uuid4, unique=True, nullable=False)
     title = Column(String(200), nullable=False)
     description = Column(Text)
     instructions = Column(Text)
-    
+
     # Relationships
-    course_id = Column(Integer, ForeignKey('courses.id'), nullable=True)
-    program_id = Column(Integer, ForeignKey('programs.id'), nullable=True)
-    created_by = Column(Integer, ForeignKey('users.id'), nullable=False)
-    
+    course_id = Column(Integer, ForeignKey("courses.id"), nullable=True)
+    program_id = Column(Integer, ForeignKey("programs.id"), nullable=True)
+    created_by = Column(Integer, ForeignKey("users.id"), nullable=False)
+
     # Settings
     status = Column(SQLEnum(EvaluationStatus), default=EvaluationStatus.DRAFT, nullable=False)
     total_questions = Column(Integer, default=0)
@@ -65,15 +67,15 @@ class Evaluation(TenantBaseModel):
     show_results_immediately = Column(Boolean, default=True)
     allow_review = Column(Boolean, default=True)
     is_adaptive = Column(Boolean, default=False)  # AI-powered adaptive mode
-    
+
     # Dates
     available_from = Column(DateTime)
     available_until = Column(DateTime)
-    
+
     # Metadata
     evaluation_metadata = Column(JSON, default=dict)
     tags = Column(JSON, default=list)
-    
+
     # Computed properties
     @property
     def is_available(self):
@@ -86,7 +88,7 @@ class Evaluation(TenantBaseModel):
         if self.available_until and now > self.available_until:
             return False
         return True
-    
+
     @property
     def duration_display(self):
         """Display time limit in human readable format"""
@@ -97,47 +99,48 @@ class Evaluation(TenantBaseModel):
         if hours:
             return f"{hours}h {minutes}m" if minutes else f"{hours}h"
         return f"{minutes}m"
-    
+
     # Relationships
     course = relationship("Course", back_populates="evaluations")
     program = relationship("Program", back_populates="evaluations")
-    creator = relationship("User", foreign_keys=[created_by])
+    creator = relationship("User", foreign_keys=[created_by], back_populates="created_evaluations")
     questions = relationship("Question", back_populates="evaluation", cascade="all, delete-orphan")
     attempts = relationship("EvaluationAttempt", back_populates="evaluation", cascade="all, delete-orphan")
+    learning_paths = relationship("LearningPath", back_populates="evaluation")
 
     def to_dict(self, exclude=None, include_related=False):
         """Convert to dictionary."""
         exclude = exclude or []
         data = {}
-        
+
         # Add all columns
         for column in self.__table__.columns:
             if column.name not in exclude:
                 value = getattr(self, column.name)
-                if hasattr(value, 'value'):  # Enum
+                if hasattr(value, "value"):  # Enum
                     data[column.name] = value.value
-                elif hasattr(value, 'isoformat'):  # DateTime
+                elif hasattr(value, "isoformat"):  # DateTime
                     data[column.name] = value.isoformat()
                 else:
                     data[column.name] = value
-        
+
         # Add computed properties
-        data['is_available'] = self.is_available
-        data['duration_display'] = self.duration_display
-        
+        data["is_available"] = self.is_available
+        data["duration_display"] = self.duration_display
+
         # Add related data if requested
         if include_related:
             if self.course:
-                data['course_title'] = self.course.title
+                data["course_title"] = self.course.title
             if self.program:
-                data['program_title'] = self.program.title
+                data["program_title"] = self.program.title
             if self.creator:
-                data['creator_name'] = self.creator.full_name
-        
+                data["creator_name"] = self.creator.full_name
+
         # Convert UUID to string
-        if 'uuid' in data:
-            data['uuid'] = str(data['uuid'])
-        
+        if "uuid" in data:
+            data["uuid"] = str(data["uuid"])
+
         return data
 
     def __repr__(self):
@@ -146,11 +149,12 @@ class Evaluation(TenantBaseModel):
 
 class Question(TenantBaseModel):
     """Question model for evaluation questions"""
-    __tablename__ = 'questions'
+
+    __tablename__ = "questions"
 
     uuid = Column(UUID(as_uuid=True), default=uuid.uuid4, unique=True, nullable=False)
-    evaluation_id = Column(Integer, ForeignKey('evaluations.id'), nullable=False)
-    
+    evaluation_id = Column(Integer, ForeignKey("evaluations.id"), nullable=False)
+
     # Question content
     question_text = Column(Text, nullable=False)
     question_type = Column(SQLEnum(QuestionType), nullable=False)
@@ -158,19 +162,19 @@ class Question(TenantBaseModel):
     difficulty_score = Column(Float, default=0.0)  # IRT difficulty parameter (-3 to 3)
     points = Column(Float, default=1.0)
     order_index = Column(Integer, default=0)
-    
+
     # Question data (options, correct answers, etc.)
     question_data = Column(JSON, default=dict)  # Flexible data structure for different question types
-    
+
     # Settings
     is_required = Column(Boolean, default=True)
     explanation = Column(Text)  # Explanation shown after answering
     hints = Column(JSON, default=list)
-    
+
     # Metadata
     question_metadata = Column(JSON, default=dict)
     tags = Column(JSON, default=list)
-    
+
     # Relationships
     evaluation = relationship("Evaluation", back_populates="questions")
     responses = relationship("QuestionResponse", back_populates="question", cascade="all, delete-orphan")
@@ -179,22 +183,22 @@ class Question(TenantBaseModel):
         """Convert to dictionary."""
         exclude = exclude or []
         data = {}
-        
+
         # Add all columns
         for column in self.__table__.columns:
             if column.name not in exclude:
                 value = getattr(self, column.name)
-                if hasattr(value, 'value'):  # Enum
+                if hasattr(value, "value"):  # Enum
                     data[column.name] = value.value
-                elif hasattr(value, 'isoformat'):  # DateTime
+                elif hasattr(value, "isoformat"):  # DateTime
                     data[column.name] = value.isoformat()
                 else:
                     data[column.name] = value
-        
+
         # Convert UUID to string
-        if 'uuid' in data:
-            data['uuid'] = str(data['uuid'])
-        
+        if "uuid" in data:
+            data["uuid"] = str(data["uuid"])
+
         return data
 
     def __repr__(self):
@@ -203,21 +207,22 @@ class Question(TenantBaseModel):
 
 class EvaluationAttempt(TenantBaseModel):
     """User attempts at evaluations"""
-    __tablename__ = 'evaluation_attempts'
+
+    __tablename__ = "evaluation_attempts"
 
     uuid = Column(UUID(as_uuid=True), default=uuid.uuid4, unique=True, nullable=False)
-    evaluation_id = Column(Integer, ForeignKey('evaluations.id'), nullable=False)
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
-    
+    evaluation_id = Column(Integer, ForeignKey("evaluations.id"), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+
     # Attempt details
     attempt_number = Column(Integer, default=1)
     status = Column(SQLEnum(AttemptStatus), default=AttemptStatus.IN_PROGRESS)
-    
+
     # Timing
     started_at = Column(DateTime, default=datetime.utcnow)
     completed_at = Column(DateTime)
     time_spent_minutes = Column(Integer)
-    
+
     # Scoring
     total_questions = Column(Integer, default=0)
     questions_answered = Column(Integer, default=0)
@@ -225,14 +230,14 @@ class EvaluationAttempt(TenantBaseModel):
     score_earned = Column(Float, default=0.0)
     percentage_score = Column(Float, default=0.0)
     passed = Column(Boolean, default=False)
-    
+
     # Settings at time of attempt (snapshot)
     time_limit_minutes = Column(Integer)
     passing_score = Column(Float)
-    
+
     # Additional data
     attempt_metadata = Column(JSON, default=dict)
-    
+
     @property
     def duration_display(self):
         """Display time spent in human readable format"""
@@ -243,55 +248,56 @@ class EvaluationAttempt(TenantBaseModel):
         if hours:
             return f"{hours}h {minutes}m" if minutes else f"{hours}h"
         return f"{minutes}m"
-    
+
     @property
     def is_completed(self):
         """Check if attempt is completed"""
         return self.status == AttemptStatus.COMPLETED
-    
+
     @property
     def is_in_progress(self):
         """Check if attempt is in progress"""
         return self.status == AttemptStatus.IN_PROGRESS
-    
+
     # Relationships
     evaluation = relationship("Evaluation", back_populates="attempts")
-    user = relationship("User")
+    user = relationship("User", back_populates="evaluation_attempts")
     # beneficiary = relationship("Beneficiary", back_populates="evaluation_attempts")
     responses = relationship("QuestionResponse", back_populates="attempt", cascade="all, delete-orphan")
+    learning_paths = relationship("LearningPath", back_populates="evaluation_attempt")
 
     def to_dict(self, exclude=None, include_related=False):
         """Convert to dictionary."""
         exclude = exclude or []
         data = {}
-        
+
         # Add all columns
         for column in self.__table__.columns:
             if column.name not in exclude:
                 value = getattr(self, column.name)
-                if hasattr(value, 'value'):  # Enum
+                if hasattr(value, "value"):  # Enum
                     data[column.name] = value.value
-                elif hasattr(value, 'isoformat'):  # DateTime
+                elif hasattr(value, "isoformat"):  # DateTime
                     data[column.name] = value.isoformat()
                 else:
                     data[column.name] = value
-        
+
         # Add computed properties
-        data['duration_display'] = self.duration_display
-        data['is_completed'] = self.is_completed
-        data['is_in_progress'] = self.is_in_progress
-        
+        data["duration_display"] = self.duration_display
+        data["is_completed"] = self.is_completed
+        data["is_in_progress"] = self.is_in_progress
+
         # Add related data if requested
         if include_related:
             if self.user:
-                data['user_name'] = self.user.full_name
+                data["user_name"] = self.user.full_name
             if self.evaluation:
-                data['evaluation_title'] = self.evaluation.title
-        
+                data["evaluation_title"] = self.evaluation.title
+
         # Convert UUID to string
-        if 'uuid' in data:
-            data['uuid'] = str(data['uuid'])
-        
+        if "uuid" in data:
+            data["uuid"] = str(data["uuid"])
+
         return data
 
     def __repr__(self):
@@ -300,28 +306,29 @@ class EvaluationAttempt(TenantBaseModel):
 
 class QuestionResponse(TenantBaseModel):
     """User responses to questions"""
-    __tablename__ = 'question_responses'
+
+    __tablename__ = "question_responses"
 
     uuid = Column(UUID(as_uuid=True), default=uuid.uuid4, unique=True, nullable=False)
-    attempt_id = Column(Integer, ForeignKey('evaluation_attempts.id'), nullable=False)
-    question_id = Column(Integer, ForeignKey('questions.id'), nullable=False)
-    
+    attempt_id = Column(Integer, ForeignKey("evaluation_attempts.id"), nullable=False)
+    question_id = Column(Integer, ForeignKey("questions.id"), nullable=False)
+
     # Response data
     response_data = Column(JSON, default=dict)  # Flexible structure for different answer types
     is_correct = Column(Boolean)
     points_earned = Column(Float, default=0.0)
-    
+
     # Timing
     time_spent_seconds = Column(Integer)
     answered_at = Column(DateTime, default=datetime.utcnow)
-    
+
     # AI feedback
     ai_feedback = Column(Text)
     ai_score = Column(Float)
-    
+
     # Metadata
     response_metadata = Column(JSON, default=dict)
-    
+
     # Relationships
     attempt = relationship("EvaluationAttempt", back_populates="responses")
     question = relationship("Question", back_populates="responses")
@@ -330,22 +337,22 @@ class QuestionResponse(TenantBaseModel):
         """Convert to dictionary."""
         exclude = exclude or []
         data = {}
-        
+
         # Add all columns
         for column in self.__table__.columns:
             if column.name not in exclude:
                 value = getattr(self, column.name)
-                if hasattr(value, 'value'):  # Enum
+                if hasattr(value, "value"):  # Enum
                     data[column.name] = value.value
-                elif hasattr(value, 'isoformat'):  # DateTime
+                elif hasattr(value, "isoformat"):  # DateTime
                     data[column.name] = value.isoformat()
                 else:
                     data[column.name] = value
-        
+
         # Convert UUID to string
-        if 'uuid' in data:
-            data['uuid'] = str(data['uuid'])
-        
+        if "uuid" in data:
+            data["uuid"] = str(data["uuid"])
+
         return data
 
     def __repr__(self):
@@ -354,59 +361,60 @@ class QuestionResponse(TenantBaseModel):
 
 class QuestionBank(TenantBaseModel):
     """Question bank for reusable questions"""
-    __tablename__ = 'question_banks'
+
+    __tablename__ = "question_banks"
 
     uuid = Column(UUID(as_uuid=True), default=uuid.uuid4, unique=True, nullable=False)
     title = Column(String(200), nullable=False)
     description = Column(Text)
-    
+
     # Categorization
     subject = Column(String(100))
     topic = Column(String(100))
     difficulty_level = Column(SQLEnum(DifficultyLevel), default=DifficultyLevel.MEDIUM)
-    
+
     # Question content
     question_text = Column(Text, nullable=False)
     question_type = Column(SQLEnum(QuestionType), nullable=False)
     points = Column(Float, default=1.0)
-    
+
     # Question data (options, correct answers, etc.)
     question_data = Column(JSON, default=dict)
     explanation = Column(Text)
     hints = Column(JSON, default=list)
-    
+
     # Usage tracking
     usage_count = Column(Integer, default=0)
     last_used_at = Column(DateTime)
-    
+
     # Metadata
-    created_by = Column(Integer, ForeignKey('users.id'), nullable=False)
+    created_by = Column(Integer, ForeignKey("users.id"), nullable=False)
     question_metadata = Column(JSON, default=dict)
     tags = Column(JSON, default=list)
-    
+
     # Relationships
-    creator = relationship("User", foreign_keys=[created_by])
+    creator = relationship("User", foreign_keys=[created_by], back_populates="created_questions")
 
     def to_dict(self, exclude=None):
         """Convert to dictionary."""
         exclude = exclude or []
         data = {}
-        
+
         # Add all columns
         for column in self.__table__.columns:
             if column.name not in exclude:
                 value = getattr(self, column.name)
-                if hasattr(value, 'value'):  # Enum
+                if hasattr(value, "value"):  # Enum
                     data[column.name] = value.value
-                elif hasattr(value, 'isoformat'):  # DateTime
+                elif hasattr(value, "isoformat"):  # DateTime
                     data[column.name] = value.isoformat()
                 else:
                     data[column.name] = value
-        
+
         # Convert UUID to string
-        if 'uuid' in data:
-            data['uuid'] = str(data['uuid'])
-        
+        if "uuid" in data:
+            data["uuid"] = str(data["uuid"])
+
         return data
 
     def __repr__(self):

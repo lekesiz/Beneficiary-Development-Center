@@ -1,10 +1,42 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import * as authContext from '@/contexts/AuthContext';
 
 import DashboardLayout from '../DashboardLayout';
+
+// Mock Breadcrumbs component
+vi.mock('@/components/common/Breadcrumbs', () => ({
+  Breadcrumbs: () => <div data-testid="breadcrumbs">Breadcrumbs</div>,
+}));
+
+// Mock react-i18next
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => {
+      const translations: Record<string, string> = {
+        'navigation.dashboard': 'Dashboard',
+        'navigation.beneficiaries': 'Beneficiaries',
+        'navigation.programs': 'Programs',
+        'navigation.courses': 'Courses',
+        'navigation.sessions': 'Sessions',
+        'navigation.evaluations': 'Evaluations',
+        'navigation.learningPaths': 'Learning Paths',
+        'navigation.chat': 'Chat',
+        'navigation.reports': 'Reports',
+        'navigation.settings': 'Settings',
+        'navigation.logout': 'Logout',
+      };
+      return translations[key] || key;
+    },
+    i18n: {
+      language: 'en',
+      changeLanguage: vi.fn(),
+    },
+  }),
+}));
 
 // Mock react-router-dom
 const mockNavigate = vi.fn();
@@ -15,11 +47,25 @@ vi.mock('react-router-dom', async () => {
     ...actual,
     Outlet: () => <div data-testid="outlet">Main Content</div>,
     useNavigate: () => mockNavigate,
+    useMatches: () => [],
+    useLocation: () => ({ pathname: '/dashboard' }),
   };
 });
 
 const renderWithRouter = (component: React.ReactElement) => {
-  return render(<BrowserRouter>{component}</BrowserRouter>);
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+      },
+    },
+  });
+  
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>{component}</BrowserRouter>
+    </QueryClientProvider>
+  );
 };
 
 describe('DashboardLayout', () => {
@@ -49,7 +95,10 @@ describe('DashboardLayout', () => {
     expect(screen.getByText('Beneficiaries')).toBeInTheDocument();
     expect(screen.getByText('Programs')).toBeInTheDocument();
     expect(screen.getByText('Courses')).toBeInTheDocument();
+    expect(screen.getByText('Sessions')).toBeInTheDocument();
     expect(screen.getByText('Evaluations')).toBeInTheDocument();
+    expect(screen.getByText('Learning Paths')).toBeInTheDocument();
+    expect(screen.getByText('Chat')).toBeInTheDocument();
     expect(screen.getByText('Reports')).toBeInTheDocument();
     expect(screen.getByText('Settings')).toBeInTheDocument();
   });
@@ -74,7 +123,10 @@ describe('DashboardLayout', () => {
     expect(screen.queryByText('Beneficiaries')).not.toBeInTheDocument();
     expect(screen.queryByText('Programs')).not.toBeInTheDocument();
     expect(screen.queryByText('Courses')).not.toBeInTheDocument();
+    expect(screen.getByText('Sessions')).toBeInTheDocument();
     expect(screen.getByText('Evaluations')).toBeInTheDocument();
+    expect(screen.getByText('Learning Paths')).toBeInTheDocument();
+    expect(screen.getByText('Chat')).toBeInTheDocument();
     expect(screen.getByText('Reports')).toBeInTheDocument();
     expect(screen.getByText('Settings')).toBeInTheDocument();
   });
@@ -99,7 +151,10 @@ describe('DashboardLayout', () => {
     expect(screen.getByText('Beneficiaries')).toBeInTheDocument();
     expect(screen.queryByText('Programs')).not.toBeInTheDocument();
     expect(screen.queryByText('Courses')).not.toBeInTheDocument();
+    expect(screen.getByText('Sessions')).toBeInTheDocument();
     expect(screen.queryByText('Evaluations')).not.toBeInTheDocument();
+    expect(screen.getByText('Learning Paths')).toBeInTheDocument();
+    expect(screen.getByText('Chat')).toBeInTheDocument();
     expect(screen.getByText('Reports')).toBeInTheDocument();
     expect(screen.getByText('Settings')).toBeInTheDocument();
   });
@@ -124,7 +179,10 @@ describe('DashboardLayout', () => {
     expect(screen.getByText('Beneficiaries')).toBeInTheDocument();
     expect(screen.getByText('Programs')).toBeInTheDocument();
     expect(screen.getByText('Courses')).toBeInTheDocument();
+    expect(screen.getByText('Sessions')).toBeInTheDocument();
     expect(screen.getByText('Evaluations')).toBeInTheDocument();
+    expect(screen.getByText('Learning Paths')).toBeInTheDocument();
+    expect(screen.getByText('Chat')).toBeInTheDocument();
     expect(screen.getByText('Reports')).toBeInTheDocument();
     expect(screen.getByText('Settings')).toBeInTheDocument();
   });

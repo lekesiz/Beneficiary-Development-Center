@@ -39,6 +39,22 @@ export interface UserPreferences {
   theme: 'light' | 'dark' | 'system';
   emailFrequency: 'daily' | 'weekly' | 'monthly' | 'never';
   timezone: string;
+  notifications?: {
+    email: {
+      new_message: boolean;
+      appointment_reminder: boolean;
+      evaluation_completed: boolean;
+      course_enrollment: boolean;
+      program_update: boolean;
+    };
+    in_app: {
+      new_message: boolean;
+      appointment_reminder: boolean;
+      evaluation_completed: boolean;
+      course_enrollment: boolean;
+      program_update: boolean;
+    };
+  };
 }
 
 export interface NotificationSettings {

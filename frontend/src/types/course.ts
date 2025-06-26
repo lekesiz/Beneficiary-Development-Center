@@ -147,6 +147,8 @@ export interface CourseFilters {
   difficulty?: DifficultyLevel;
   search?: string;
   instructor_id?: number;
+  sort_by?: string;
+  sort_order?: 'asc' | 'desc';
 }
 
 export interface CoursesResponse {

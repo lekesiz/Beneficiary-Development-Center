@@ -2,7 +2,6 @@
  * Course utility functions
  */
 import { format } from 'date-fns';
-import { tr } from 'date-fns/locale';
 
 import {
   COURSE_STATUS_OPTIONS,
@@ -71,14 +70,14 @@ export const getAssessmentTypeInfo = (type: string) => {
 export const formatCourseDuration = (hours: number) => {
   if (hours < 1) {
     const minutes = Math.round(hours * 60);
-    return `${minutes} dakika`;
+    return `${minutes} minute${minutes !== 1 ? 's' : ''}`;
   }
 
-  if (hours === 1) return '1 saat';
-  if (hours < 24) return `${hours} saat`;
+  if (hours === 1) return '1 hour';
+  if (hours < 24) return `${hours} hours`;
 
   const days = Math.round(hours / 24);
-  return `${days} gün`;
+  return `${days} day${days !== 1 ? 's' : ''}`;
 };
 
 /**
@@ -88,7 +87,7 @@ export const formatCourseTotalDuration = (course: Course) => {
   const hourText = formatCourseDuration(course.total_duration_hours);
 
   if (course.duration_weeks && course.duration_weeks > 1) {
-    return `${hourText} (${course.duration_weeks} hafta)`;
+    return `${hourText} (${course.duration_weeks} weeks)`;
   }
 
   return hourText;
@@ -127,9 +126,9 @@ export const isCourseAvailable = (course: Course) => {
 export const getCourseAvailableSpotsText = (course: Course) => {
   const available = course.available_spots || 0;
 
-  if (available === 0) return 'Yer kalmadı';
-  if (available === 1) return '1 yer kaldı';
-  return `${available} yer kaldı`;
+  if (available === 0) return 'No spots left';
+  if (available === 1) return '1 spot left';
+  return `${available} spots left`;
 };
 
 /**
@@ -145,7 +144,7 @@ export const getCourseDifficultyScore = (level: DifficultyLevel) => {
  */
 export const formatPrerequisites = (prerequisites: string[]) => {
   if (!prerequisites || prerequisites.length === 0) {
-    return 'Ön koşul yok';
+    return 'No prerequisites';
   }
 
   if (prerequisites.length === 1) {
@@ -154,7 +153,7 @@ export const formatPrerequisites = (prerequisites: string[]) => {
 
   return (
     prerequisites.slice(0, -1).join(', ') +
-    ' ve ' +
+    ' and ' +
     prerequisites[prerequisites.length - 1]
   );
 };
@@ -204,10 +203,10 @@ export const formatSessionDate = (dateString: string, includeTime = true) => {
   const date = new Date(dateString);
 
   if (includeTime) {
-    return format(date, 'dd MMMM yyyy, HH:mm', { locale: tr });
+    return format(date, 'dd MMMM yyyy, HH:mm');
   }
 
-  return format(date, 'dd MMMM yyyy', { locale: tr });
+  return format(date, 'dd MMMM yyyy');
 };
 
 /**
@@ -223,7 +222,7 @@ export const sortCourses = (
 
     switch (sortBy) {
       case 'title':
-        comparison = a.title.localeCompare(b.title, 'tr');
+        comparison = a.title.localeCompare(b.title);
         break;
       case 'order_index':
         comparison = a.order_index - b.order_index;

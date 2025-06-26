@@ -6,9 +6,12 @@ import { ArrowLeft, Save, X, Plus } from 'lucide-react';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
+import { toast } from 'react-hot-toast';
 import { useParams, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
+import { useTranslation } from 'react-i18next';
 
+import { FormSkeleton } from '../../components/common/FormSkeleton';
 import { Autocomplete } from '../../components/ui/Autocomplete';
 import { Badge } from '../../components/ui/Badge';
 import { Card } from '../../components/ui/Card';
@@ -25,6 +28,7 @@ import {
   useCreateProgram,
   useUpdateProgram,
 } from '../../hooks/usePrograms';
+import { programFormSchema, type ProgramFormData } from '../../schemas/programForm';
 import { ProgramType, ProgramStatus } from '../../types/program';
 import type {
   CreateProgramRequest,
@@ -32,81 +36,22 @@ import type {
 } from '../../types/program';
 
 
-// Form validation schema
-const programFormSchema = z
-  .object({
-    title: z
-      .string()
-      .min(1, 'Program adı zorunludur')
-      .max(200, 'Program adı en fazla 200 karakter olabilir'),
-    code: z.string().optional(),
-    description: z.string().optional(),
-    objectives: z.array(z.string()).optional(),
-    program_type: z.nativeEnum(ProgramType).optional(),
-    status: z.nativeEnum(ProgramStatus).optional(),
-    start_date: z.string().min(1, 'Başlangıç tarihi zorunludur'),
-    end_date: z.string().min(1, 'Bitiş tarihi zorunludur'),
-    enrollment_start: z.string().optional(),
-    enrollment_end: z.string().optional(),
-    min_participants: z
-      .number()
-      .min(1, 'Minimum katılımcı sayısı en az 1 olmalıdır')
-      .optional(),
-    max_participants: z
-      .number()
-      .min(1, 'Maksimum katılımcı sayısı en az 1 olmalıdır'),
-    location: z.string().optional(),
-    is_online: z.boolean().optional(),
-    is_hybrid: z.boolean().optional(),
-    online_link: z
-      .string()
-      .url('Geçerli bir URL giriniz')
-      .optional()
-      .or(z.literal('')),
-    price: z.number().min(0, 'Ücret 0 veya daha büyük olmalıdır').optional(),
-    currency: z.string().optional(),
-    tags: z.array(z.string()).optional(),
-    coordinator_id: z.number().optional(),
-  })
-  .refine(
-    (data) => {
-      if (data.end_date && data.start_date) {
-        return new Date(data.end_date) > new Date(data.start_date);
-      }
-      return true;
-    },
-    {
-      message: 'Bitiş tarihi başlangıç tarihinden sonra olmalıdır',
-      path: ['end_date'],
-    }
-  )
-  .refine(
-    (data) => {
-      if (data.min_participants && data.max_participants) {
-        return data.max_participants >= data.min_participants;
-      }
-      return true;
-    },
-    {
-      message: 'Maksimum katılımcı sayısı minimum sayıdan az olamaz',
-      path: ['max_participants'],
-    }
-  );
-
-type ProgramFormData = z.infer<typeof programFormSchema>;
+// Remove the duplicate schema definition as we're importing it from schemas/program.ts
 
 export const ProgramForm: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useTranslation();
   const isEdit = !!id;
   const programId = isEdit ? parseInt(id!) : null;
 
   // Fetch program data for edit
-  const { data: program, isLoading: isLoadingProgram } = useProgram(
-    programId,
+  const { data: programResponse, isLoading: isLoadingProgram } = useProgram(
+    programId!,
     !!programId
   );
+  const program = programResponse?.program;
 
   // Mutations
   const createProgram = useCreateProgram();
@@ -236,12 +181,14 @@ export const ProgramForm: React.FC = () => {
 
       if (isEdit && programId) {
         await updateProgram.mutateAsync({ id: programId, data: formData });
-        navigate(`/programs/${programId}`);
+        toast.success(t('programs.form.messages.updateSuccess'));
+        navigate('/programs');
       } else {
-        const newProgram = await createProgram.mutateAsync(
+        await createProgram.mutateAsync(
           formData as CreateProgramRequest
         );
-        navigate(`/programs/${newProgram.id}`);
+        toast.success(t('programs.form.messages.createSuccess'));
+        navigate('/programs');
       }
     } catch (error) {
       // Error handled by mutations
@@ -252,18 +199,14 @@ export const ProgramForm: React.FC = () => {
     return (
       <Card className="p-6">
         <div className="text-center text-red-600">
-          Bu sayfaya erişim yetkiniz bulunmamaktadır.
+          {t('programs.form.messages.noPermission')}
         </div>
       </Card>
     );
   }
 
   if (isEdit && isLoadingProgram) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <LoadingSpinner size="lg" />
-      </div>
-    );
+    return <FormSkeleton sections={4} fieldsPerSection={6} />;
   }
 
   return (
@@ -277,16 +220,16 @@ export const ProgramForm: React.FC = () => {
             onClick={() => navigate('/programs')}
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Programlara Dön
+            {t('common.backTo', { target: t('programs.title') })}
           </Button>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">
-              {isEdit ? 'Program Düzenle' : 'Yeni Program'}
+              {isEdit ? t('programs.form.editProgram') : t('programs.form.newProgram')}
             </h1>
             <p className="text-gray-600">
               {isEdit
-                ? 'Program bilgilerini güncelleyin'
-                : 'Yeni bir program oluşturun'}
+                ? t('programs.form.updateDescription')
+                : t('programs.form.createDescription')}
             </p>
           </div>
         </div>
@@ -295,12 +238,12 @@ export const ProgramForm: React.FC = () => {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* Basic Information */}
         <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Temel Bilgiler</h3>
+          <h3 className="text-lg font-semibold mb-4">{t('programs.form.sections.basicInfo')}</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="md:col-span-2">
               <div className="space-y-2">
                 <label className="text-sm font-medium leading-none">
-                  Program Adı <span className="text-destructive">*</span>
+                  {t('programs.form.fields.title')} <span className="text-destructive">*</span>
                 </label>
                 <Controller
                   name="title"
@@ -326,7 +269,7 @@ export const ProgramForm: React.FC = () => {
 
             <div className="space-y-2">
               <label className="text-sm font-medium leading-none">
-                Program Kodu
+                {t('programs.form.fields.code')}
               </label>
               <Controller
                 name="code"
@@ -335,7 +278,7 @@ export const ProgramForm: React.FC = () => {
                   <Input
                     {...field}
                     error={!!errors.code}
-                    placeholder="Otomatik oluşturulur"
+                    placeholder={t('programs.form.fields.codePlaceholder')}
                   />
                 )}
               />
@@ -348,7 +291,7 @@ export const ProgramForm: React.FC = () => {
 
             <div className="space-y-2">
               <label className="text-sm font-medium leading-none">
-                Program Türü
+                {t('programs.form.fields.type')}
               </label>
               <Controller
                 name="program_type"
@@ -373,7 +316,7 @@ export const ProgramForm: React.FC = () => {
             {canSetStatus && (
               <div className="space-y-2">
                 <label className="text-sm font-medium leading-none">
-                  Durum
+                  {t('programs.form.fields.status')}
                 </label>
                 <Controller
                   name="status"
@@ -399,7 +342,7 @@ export const ProgramForm: React.FC = () => {
             <div className="md:col-span-2">
               <div className="space-y-2">
                 <label className="text-sm font-medium leading-none">
-                  Açıklama
+                  {t('programs.form.fields.description')}
                 </label>
                 <Controller
                   name="description"
@@ -424,7 +367,7 @@ export const ProgramForm: React.FC = () => {
 
         {/* Dates and Capacity */}
         <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Tarihler ve Kapasite</h3>
+          <h3 className="text-lg font-semibold mb-4">{t('programs.form.sections.datesCapacity')}</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Controller
               name="start_date"
@@ -432,7 +375,7 @@ export const ProgramForm: React.FC = () => {
               render={({ field }) => (
                 <DatePicker
                   {...field}
-                  label="Başlangıç Tarihi *"
+                  label={`${t('programs.form.fields.startDate')} *`}
                   error={errors.start_date?.message}
                 />
               )}
@@ -444,7 +387,7 @@ export const ProgramForm: React.FC = () => {
               render={({ field }) => (
                 <DatePicker
                   {...field}
-                  label="Bitiş Tarihi *"
+                  label={`${t('programs.form.fields.endDate')} *`}
                   error={errors.end_date?.message}
                 />
               )}
@@ -456,7 +399,7 @@ export const ProgramForm: React.FC = () => {
               render={({ field }) => (
                 <DatePicker
                   {...field}
-                  label="Kayıt Başlangıcı"
+                  label={t('programs.form.fields.enrollmentStart')}
                   error={errors.enrollment_start?.message}
                 />
               )}
@@ -468,7 +411,7 @@ export const ProgramForm: React.FC = () => {
               render={({ field }) => (
                 <DatePicker
                   {...field}
-                  label="Kayıt Bitişi"
+                  label={t('programs.form.fields.enrollmentEnd')}
                   error={errors.enrollment_end?.message}
                 />
               )}
@@ -481,7 +424,7 @@ export const ProgramForm: React.FC = () => {
                 <Input
                   {...field}
                   type="number"
-                  label="Minimum Katılımcı"
+                  label={t('programs.form.fields.minParticipants')}
                   error={errors.min_participants?.message}
                   onChange={(e) =>
                     field.onChange(parseInt(e.target.value) || 0)
@@ -497,7 +440,7 @@ export const ProgramForm: React.FC = () => {
                 <Input
                   {...field}
                   type="number"
-                  label="Maksimum Katılımcı *"
+                  label={`${t('programs.form.fields.maxParticipants')} *`}
                   error={errors.max_participants?.message}
                   onChange={(e) =>
                     field.onChange(parseInt(e.target.value) || 0)
@@ -510,7 +453,7 @@ export const ProgramForm: React.FC = () => {
 
         {/* Location and Online */}
         <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Konum ve Format</h3>
+          <h3 className="text-lg font-semibold mb-4">{t('programs.form.sections.locationFormat')}</h3>
           <div className="space-y-4">
             <div className="flex items-center space-x-4">
               <Controller
@@ -524,7 +467,7 @@ export const ProgramForm: React.FC = () => {
                       onChange={field.onChange}
                       className="rounded border-gray-300"
                     />
-                    <span>Online Program</span>
+                    <span>{t('programs.form.fields.onlineProgram')}</span>
                   </label>
                 )}
               />
@@ -540,7 +483,7 @@ export const ProgramForm: React.FC = () => {
                       onChange={field.onChange}
                       className="rounded border-gray-300"
                     />
-                    <span>Hibrit Program</span>
+                    <span>{t('programs.form.fields.hybridProgram')}</span>
                   </label>
                 )}
               />
@@ -553,9 +496,9 @@ export const ProgramForm: React.FC = () => {
                 render={({ field }) => (
                   <Input
                     {...field}
-                    label="Konum"
+                    label={t('programs.form.fields.location')}
                     error={errors.location?.message}
-                    placeholder="Program konumu"
+                    placeholder={t('programs.form.fields.locationPlaceholder')}
                   />
                 )}
               />
@@ -568,7 +511,7 @@ export const ProgramForm: React.FC = () => {
                 render={({ field }) => (
                   <Input
                     {...field}
-                    label="Online Link"
+                    label={t('programs.form.fields.onlineLink')}
                     error={errors.online_link?.message}
                     placeholder="https://..."
                   />
@@ -580,7 +523,7 @@ export const ProgramForm: React.FC = () => {
 
         {/* Price */}
         <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Ücretlendirme</h3>
+          <h3 className="text-lg font-semibold mb-4">{t('programs.form.sections.pricing')}</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Controller
               name="price"
@@ -590,7 +533,7 @@ export const ProgramForm: React.FC = () => {
                   {...field}
                   type="number"
                   step="0.01"
-                  label="Ücret"
+                  label={t('programs.form.fields.price')}
                   error={errors.price?.message}
                   onChange={(e) =>
                     field.onChange(parseFloat(e.target.value) || 0)
@@ -601,16 +544,16 @@ export const ProgramForm: React.FC = () => {
 
             <div className="space-y-2">
               <label className="text-sm font-medium leading-none">
-                Para Birimi
+                {t('programs.form.fields.currency')}
               </label>
               <Controller
                 name="currency"
                 control={control}
                 render={({ field }) => (
                   <Select {...field} error={!!errors.currency}>
-                    <option value="TRY">TRY - Türk Lirası</option>
-                    <option value="USD">USD - ABD Doları</option>
-                    <option value="EUR">EUR - Euro</option>
+                    <option value="TRY">{t('currency.try')}</option>
+                    <option value="USD">{t('currency.usd')}</option>
+                    <option value="EUR">{t('currency.eur')}</option>
                   </Select>
                 )}
               />
@@ -625,13 +568,13 @@ export const ProgramForm: React.FC = () => {
 
         {/* Objectives */}
         <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Program Hedefleri</h3>
+          <h3 className="text-lg font-semibold mb-4">{t('programs.form.sections.objectives')}</h3>
           <div className="space-y-4">
             <div className="flex space-x-2">
               <Input
                 value={newObjective}
                 onChange={(e) => setNewObjective(e.target.value)}
-                placeholder="Yeni hedef ekleyin"
+                placeholder={t('programs.form.fields.addObjective')}
                 onKeyPress={(e) =>
                   e.key === 'Enter' && (e.preventDefault(), addObjective())
                 }
@@ -670,13 +613,13 @@ export const ProgramForm: React.FC = () => {
 
         {/* Tags */}
         <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Etiketler</h3>
+          <h3 className="text-lg font-semibold mb-4">{t('programs.form.sections.tags')}</h3>
           <div className="space-y-4">
             <div className="flex space-x-2">
               <Input
                 value={newTag}
                 onChange={(e) => setNewTag(e.target.value)}
-                placeholder="Yeni etiket ekleyin"
+                placeholder={t('programs.form.fields.addTag')}
                 onKeyPress={(e) =>
                   e.key === 'Enter' && (e.preventDefault(), addTag())
                 }
@@ -718,7 +661,7 @@ export const ProgramForm: React.FC = () => {
             variant="outline"
             onClick={() => navigate('/programs')}
           >
-            İptal
+            {t('common.cancel')}
           </Button>
           <Button
             type="submit"
@@ -727,7 +670,7 @@ export const ProgramForm: React.FC = () => {
             }
           >
             <Save className="h-4 w-4 mr-2" />
-            {isEdit ? 'Güncelle' : 'Oluştur'}
+            {isEdit ? t('common.update') : t('common.create')}
           </Button>
         </div>
       </form>

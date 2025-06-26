@@ -101,6 +101,8 @@ export interface ProgramFilters {
   search?: string;
   upcoming_only?: boolean;
   active_only?: boolean;
+  sort_by?: string;
+  sort_order?: 'asc' | 'desc';
 }
 
 export interface ProgramsResponse {

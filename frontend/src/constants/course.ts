@@ -4,49 +4,49 @@
 import { CourseStatus, CourseFormat, DifficultyLevel } from '../types/course';
 
 export const COURSE_STATUS_OPTIONS = [
-  { value: CourseStatus.DRAFT, label: 'Taslak', color: 'gray' },
-  { value: CourseStatus.PUBLISHED, label: 'Yayınlandı', color: 'green' },
-  { value: CourseStatus.ARCHIVED, label: 'Arşivlendi', color: 'gray' },
+  { value: CourseStatus.DRAFT, label: 'Draft', color: 'gray' },
+  { value: CourseStatus.PUBLISHED, label: 'Published', color: 'green' },
+  { value: CourseStatus.ARCHIVED, label: 'Archived', color: 'gray' },
 ];
 
 export const COURSE_FORMAT_OPTIONS = [
-  { value: CourseFormat.LECTURE, label: 'Ders', icon: '👨‍🏫' },
-  { value: CourseFormat.WORKSHOP, label: 'Atölye', icon: '🔨' },
-  { value: CourseFormat.PRACTICAL, label: 'Pratik', icon: '⚡' },
+  { value: CourseFormat.LECTURE, label: 'Lecture', icon: '👨‍🏫' },
+  { value: CourseFormat.WORKSHOP, label: 'Workshop', icon: '🔨' },
+  { value: CourseFormat.PRACTICAL, label: 'Practical', icon: '⚡' },
   { value: CourseFormat.ONLINE, label: 'Online', icon: '💻' },
-  { value: CourseFormat.SELF_PACED, label: 'Kendi Hızında', icon: '🎯' },
-  { value: CourseFormat.HYBRID, label: 'Hibrit', icon: '🔄' },
+  { value: CourseFormat.SELF_PACED, label: 'Self-paced', icon: '🎯' },
+  { value: CourseFormat.HYBRID, label: 'Hybrid', icon: '🔄' },
 ];
 
 export const DIFFICULTY_LEVEL_OPTIONS = [
   {
     value: DifficultyLevel.BEGINNER,
-    label: 'Başlangıç',
+    label: 'Beginner',
     color: 'green',
     order: 1,
   },
   {
     value: DifficultyLevel.INTERMEDIATE,
-    label: 'Orta',
+    label: 'Intermediate',
     color: 'yellow',
     order: 2,
   },
   {
     value: DifficultyLevel.ADVANCED,
-    label: 'İleri',
+    label: 'Advanced',
     color: 'orange',
     order: 3,
   },
-  { value: DifficultyLevel.EXPERT, label: 'Uzman', color: 'red', order: 4 },
+  { value: DifficultyLevel.EXPERT, label: 'Expert', color: 'red', order: 4 },
 ];
 
 export const ASSESSMENT_TYPE_OPTIONS = [
   { value: 'quiz', label: 'Quiz', icon: '❓' },
-  { value: 'project', label: 'Proje', icon: '🚀' },
-  { value: 'presentation', label: 'Sunum', icon: '📊' },
-  { value: 'exam', label: 'Sınav', icon: '📝' },
-  { value: 'assignment', label: 'Ödev', icon: '📋' },
-  { value: 'portfolio', label: 'Portfolyo', icon: '💼' },
+  { value: 'project', label: 'Project', icon: '🚀' },
+  { value: 'presentation', label: 'Presentation', icon: '📊' },
+  { value: 'exam', label: 'Exam', icon: '📝' },
+  { value: 'assignment', label: 'Assignment', icon: '📋' },
+  { value: 'portfolio', label: 'Portfolio', icon: '💼' },
 ];
 
 export const COURSE_DEFAULTS = {

@@ -4,27 +4,27 @@
 import { ProgramStatus, ProgramType } from '../types/program';
 
 export const PROGRAM_STATUS_OPTIONS = [
-  { value: ProgramStatus.DRAFT, label: 'Taslak', color: 'gray' },
-  { value: ProgramStatus.PUBLISHED, label: 'Yayınlandı', color: 'blue' },
-  { value: ProgramStatus.ACTIVE, label: 'Aktif', color: 'green' },
-  { value: ProgramStatus.COMPLETED, label: 'Tamamlandı', color: 'purple' },
-  { value: ProgramStatus.ARCHIVED, label: 'Arşivlendi', color: 'gray' },
+  { value: ProgramStatus.DRAFT, label: 'Draft', color: 'gray' },
+  { value: ProgramStatus.PUBLISHED, label: 'Published', color: 'blue' },
+  { value: ProgramStatus.ACTIVE, label: 'Active', color: 'green' },
+  { value: ProgramStatus.COMPLETED, label: 'Completed', color: 'purple' },
+  { value: ProgramStatus.ARCHIVED, label: 'Archived', color: 'gray' },
 ];
 
 export const PROGRAM_TYPE_OPTIONS = [
-  { value: ProgramType.TRAINING, label: 'Eğitim', icon: '🎓' },
-  { value: ProgramType.WORKSHOP, label: 'Atölye', icon: '🔨' },
-  { value: ProgramType.CERTIFICATION, label: 'Sertifika', icon: '📜' },
+  { value: ProgramType.TRAINING, label: 'Training', icon: '🎓' },
+  { value: ProgramType.WORKSHOP, label: 'Workshop', icon: '🔨' },
+  { value: ProgramType.CERTIFICATION, label: 'Certification', icon: '📜' },
   { value: ProgramType.BOOTCAMP, label: 'Bootcamp', icon: '⚡' },
-  { value: ProgramType.MENTORSHIP, label: 'Mentorluk', icon: '🤝' },
-  { value: ProgramType.OTHER, label: 'Diğer', icon: '📋' },
+  { value: ProgramType.MENTORSHIP, label: 'Mentorship', icon: '🤝' },
+  { value: ProgramType.OTHER, label: 'Other', icon: '📋' },
 ];
 
 export const CURRENCY_OPTIONS = [
   { value: 'EUR', label: 'Euro (€)', symbol: '€' },
-  { value: 'USD', label: 'Dolar ($)', symbol: '$' },
-  { value: 'TRY', label: 'Türk Lirası (₺)', symbol: '₺' },
-  { value: 'GBP', label: 'İngiliz Sterlini (£)', symbol: '£' },
+  { value: 'USD', label: 'Dollar ($)', symbol: '$' },
+  { value: 'TRY', label: 'Turkish Lira (₺)', symbol: '₺' },
+  { value: 'GBP', label: 'British Pound (£)', symbol: '£' },
 ];
 
 export const PROGRAM_DEFAULTS = {

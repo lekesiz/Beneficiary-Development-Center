@@ -12,6 +12,7 @@ import { z } from 'zod';
 import { Badge } from '../../components/ui/Badge';
 import { Card } from '../../components/ui/Card';
 import { DatePicker } from '../../components/ui/DatePicker';
+import { FileUpload } from '../../components/ui/FileUpload';
 import { Button, Input, Select, Textarea } from '../../components/ui/Form';
 import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
 import {
@@ -25,6 +26,12 @@ import {
   useCreateCourse,
   useUpdateCourse,
 } from '../../hooks/useCourses';
+import { 
+  useCourseMaterialUpload, 
+  useCourseMediaUpload,
+  useFilesByEntity,
+  useDeleteFile 
+} from '../../hooks/useFiles';
 import { usePrograms } from '../../hooks/usePrograms';
 import {
   CourseFormat,
@@ -127,6 +134,19 @@ export const CourseForm: React.FC = () => {
   // Mutations
   const createCourse = useCreateCourse();
   const updateCourse = useUpdateCourse();
+  const courseMaterialUpload = useCourseMaterialUpload();
+  const courseMediaUpload = useCourseMediaUpload();
+  const deleteFile = useDeleteFile();
+
+  // File queries
+  const { data: courseMaterials = [] } = useFilesByEntity(
+    'course_material',
+    courseId?.toString() || ''
+  );
+  const { data: courseMedia = [] } = useFilesByEntity(
+    'course_media',
+    courseId?.toString() || ''
+  );
 
   // State
   const [objectives, setObjectives] = useState<string[]>([]);
@@ -258,6 +278,73 @@ export const CourseForm: React.FC = () => {
   // Remove tag
   const removeTag = (index: number) => {
     setTags(tags.filter((_, i) => i !== index));
+  };
+
+  // File upload handlers
+  const handleMaterialUpload = async (files: File[]) => {
+    if (!courseId) return [];
+    
+    const results = [];
+    for (const file of files) {
+      try {
+        const result = await courseMaterialUpload.mutateAsync({
+          file,
+          courseId: courseId.toString(),
+        });
+        results.push({
+          id: result.id,
+          name: result.originalName,
+          size: result.size,
+          type: result.mimetype,
+          url: result.url,
+        });
+      } catch (error) {
+        console.error('Failed to upload material:', error);
+        results.push({
+          id: `error-${Date.now()}`,
+          name: file.name,
+          size: file.size,
+          type: file.type,
+          error: 'Upload failed',
+        });
+      }
+    }
+    return results;
+  };
+
+  const handleMediaUpload = async (files: File[]) => {
+    if (!courseId) return [];
+    
+    try {
+      const results = await courseMediaUpload.mutateAsync({
+        files,
+        courseId: courseId.toString(),
+      });
+      return results.map(result => ({
+        id: result.id,
+        name: result.originalName,
+        size: result.size,
+        type: result.mimetype,
+        url: result.url,
+      }));
+    } catch (error) {
+      console.error('Failed to upload media:', error);
+      return files.map(file => ({
+        id: `error-${Date.now()}`,
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        error: 'Upload failed',
+      }));
+    }
+  };
+
+  const handleFileRemove = async (fileId: string) => {
+    try {
+      await deleteFile.mutateAsync(fileId);
+    } catch (error) {
+      console.error('Failed to delete file:', error);
+    }
   };
 
   // Form submission
@@ -745,6 +832,84 @@ export const CourseForm: React.FC = () => {
             </div>
           </div>
         </Card>
+
+        {/* File Uploads */}
+        {isEdit && courseId && (
+          <>
+            <Card className="p-6">
+              <h3 className="text-lg font-semibold mb-4">Kurs Materyalleri</h3>
+              <p className="text-sm text-gray-600 mb-4">
+                PDF, DOC, PPT ve diğer belge formatlarını yükleyebilirsiniz.
+              </p>
+              <FileUpload
+                onUpload={handleMaterialUpload}
+                onRemove={handleFileRemove}
+                maxFiles={10}
+                maxSize={50 * 1024 * 1024} // 50MB
+                acceptedTypes={[
+                  'application/pdf',
+                  'application/msword',
+                  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                  'application/vnd.ms-powerpoint',
+                  'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+                  'text/plain',
+                  'application/zip',
+                  'application/x-rar-compressed',
+                ]}
+                uploadedFiles={courseMaterials.map(file => ({
+                  id: file.id,
+                  name: file.name,
+                  size: file.size,
+                  type: file.type,
+                  url: file.url,
+                }))}
+                className="w-full"
+              />
+            </Card>
+
+            <Card className="p-6">
+              <h3 className="text-lg font-semibold mb-4">Medya Dosyaları</h3>
+              <p className="text-sm text-gray-600 mb-4">
+                Video, ses ve resim dosyalarını yükleyebilirsiniz.
+              </p>
+              <FileUpload
+                onUpload={handleMediaUpload}
+                onRemove={handleFileRemove}
+                maxFiles={20}
+                maxSize={200 * 1024 * 1024} // 200MB
+                acceptedTypes={[
+                  'image/*',
+                  'video/*',
+                  'audio/*',
+                ]}
+                uploadedFiles={courseMedia.map(file => ({
+                  id: file.id,
+                  name: file.name,
+                  size: file.size,
+                  type: file.type,
+                  url: file.url,
+                }))}
+                className="w-full"
+              />
+            </Card>
+          </>
+        )}
+
+        {!isEdit && (
+          <Card className="p-6 bg-blue-50 border-blue-200">
+            <div className="flex items-start space-x-3">
+              <Info className="h-5 w-5 text-blue-600 mt-0.5" />
+              <div>
+                <h4 className="font-medium text-blue-900">
+                  Dosya Yükleme
+                </h4>
+                <p className="text-sm text-blue-700 mt-1">
+                  Kurs oluşturduktan sonra materyaller ve medya dosyalarını yükleyebileceksiniz.
+                </p>
+              </div>
+            </div>
+          </Card>
+        )}
 
         {/* Assessment */}
         <Card className="p-6">

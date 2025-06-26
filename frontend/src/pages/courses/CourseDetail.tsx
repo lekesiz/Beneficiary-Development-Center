@@ -31,6 +31,7 @@ import { DataTable } from '../../components/ui/DataTable';
 import { Button } from '../../components/ui/Form';
 import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
 import { ConfirmDialog } from '../../components/ui/Modal';
+import { CalendarButton } from '../../components/ui/CalendarButton';
 import { useAuth } from '../../contexts/AuthContext';
 import {
   useCourse,
@@ -154,6 +155,24 @@ export const CourseDetail: React.FC = () => {
         <Badge color={row.original.is_cancelled ? 'red' : 'green'}>
           {row.original.is_cancelled ? 'İptal' : 'Aktif'}
         </Badge>
+      ),
+    },
+    {
+      id: 'actions',
+      header: 'İşlemler',
+      cell: ({ row }) => (
+        <div className="flex items-center gap-2">
+          {!row.original.is_cancelled && (
+            <CalendarButton
+              session={row.original}
+              courseTitle={course?.title || ''}
+              programId={course?.program_id || 0}
+              courseId={courseId}
+              size="sm"
+              variant="ghost"
+            />
+          )}
+        </div>
       ),
     },
   ];

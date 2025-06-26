@@ -63,6 +63,7 @@ python-decouple==3.8
 # Monitoring and Logging
 sentry-sdk[flask]==1.38.0
 flask-limiter==3.5.0
+python-json-logger==2.0.7
 
 # File handling
 python-magic==0.4.27

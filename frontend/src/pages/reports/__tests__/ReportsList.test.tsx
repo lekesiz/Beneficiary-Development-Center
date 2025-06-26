@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useNavigate } from 'react-router-dom';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 import * as authContext from '@/contexts/AuthContext';
 import { renderWithProviders } from '@/tests/utils/test-utils';

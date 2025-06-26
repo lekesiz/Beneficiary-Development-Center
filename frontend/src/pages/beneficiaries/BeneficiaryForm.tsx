@@ -4,7 +4,9 @@ import * as React from 'react';
 import { useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
+import { FileUpload } from '@/components/ui/FileUpload';
 import {
   FormField,
   Input,
@@ -20,6 +22,11 @@ import {
   useUpdateBeneficiary,
 } from '@/hooks/useBeneficiaries';
 import {
+  useBeneficiaryDocumentUpload,
+  useFilesByEntity,
+  useDeleteFile,
+} from '@/hooks/useFiles';
+import {
   beneficiaryFormSchema,
   BeneficiaryFormData,
   transformFormDataForAPI,
@@ -34,6 +41,7 @@ export default function BeneficiaryForm() {
   const navigate = useNavigate();
   const { id } = useParams();
   const { user } = useAuth();
+  const { t } = useTranslation();
   const isEditMode = !!id;
 
   // Queries and mutations
@@ -41,6 +49,14 @@ export default function BeneficiaryForm() {
     useBeneficiary(Number(id), isEditMode);
   const createMutation = useCreateBeneficiary();
   const updateMutation = useUpdateBeneficiary();
+  const documentUpload = useBeneficiaryDocumentUpload();
+  const deleteFile = useDeleteFile();
+
+  // File queries
+  const { data: beneficiaryDocuments = [] } = useFilesByEntity(
+    'beneficiary_document',
+    id || ''
+  );
 
   // Form setup
   const {
@@ -98,6 +114,46 @@ export default function BeneficiaryForm() {
     }
   }, [isEditMode, beneficiaryData, reset]);
 
+  // File upload handlers
+  const handleDocumentUpload = async (files: File[]) => {
+    if (!id) return [];
+    
+    const results = [];
+    for (const file of files) {
+      try {
+        const result = await documentUpload.mutateAsync({
+          file,
+          beneficiaryId: id,
+        });
+        results.push({
+          id: result.id,
+          name: result.originalName,
+          size: result.size,
+          type: result.mimetype,
+          url: result.url,
+        });
+      } catch (error) {
+        console.error('Failed to upload document:', error);
+        results.push({
+          id: `error-${Date.now()}`,
+          name: file.name,
+          size: file.size,
+          type: file.type,
+          error: 'Upload failed',
+        });
+      }
+    }
+    return results;
+  };
+
+  const handleFileRemove = async (fileId: string) => {
+    try {
+      await deleteFile.mutateAsync(fileId);
+    } catch (error) {
+      console.error('Failed to delete file:', error);
+    }
+  };
+
   const onSubmit = async (data: BeneficiaryFormData) => {
     const transformedData = transformFormDataForAPI(data);
 
@@ -136,16 +192,16 @@ export default function BeneficiaryForm() {
             className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-4"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Beneficiaries
+            {t('beneficiaries.form.backToBeneficiaries')}
           </button>
 
           <h1 className="text-2xl font-bold">
-            {isEditMode ? 'Edit Beneficiary' : 'Add New Beneficiary'}
+            {isEditMode ? t('beneficiaries.form.editBeneficiary') : t('beneficiaries.form.addNewBeneficiary')}
           </h1>
           <p className="text-muted-foreground">
             {isEditMode
-              ? 'Update beneficiary information'
-              : 'Create a new beneficiary profile'}
+              ? t('beneficiaries.form.updateDescription')
+              : t('beneficiaries.form.createDescription')}
           </p>
         </div>
 
@@ -153,69 +209,69 @@ export default function BeneficiaryForm() {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
           {/* Basic Information */}
           <div className="bg-white p-6 rounded-lg shadow space-y-4">
-            <h2 className="text-lg font-semibold mb-4">Basic Information</h2>
+            <h2 className="text-lg font-semibold mb-4">{t('beneficiaries.form.sections.basicInfo')}</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
-                label="First Name"
+                label={t('beneficiaries.form.fields.firstName')}
                 required
                 error={errors.first_name?.message}
               >
                 <Input
                   {...register('first_name')}
                   error={!!errors.first_name}
-                  placeholder="John"
+                  placeholder={t('beneficiaries.form.placeholders.firstName')}
                 />
               </FormField>
 
               <FormField
-                label="Last Name"
+                label={t('beneficiaries.form.fields.lastName')}
                 required
                 error={errors.last_name?.message}
               >
                 <Input
                   {...register('last_name')}
                   error={!!errors.last_name}
-                  placeholder="Doe"
+                  placeholder={t('beneficiaries.form.placeholders.lastName')}
                 />
               </FormField>
 
-              <FormField label="Email" error={errors.email?.message}>
+              <FormField label={t('beneficiaries.form.fields.email')} error={errors.email?.message}>
                 <Input
                   {...register('email')}
                   type="email"
                   error={!!errors.email}
-                  placeholder="john.doe@example.com"
+                  placeholder={t('beneficiaries.form.placeholders.email')}
                 />
               </FormField>
 
-              <FormField label="Phone" error={errors.phone?.message}>
+              <FormField label={t('beneficiaries.form.fields.phone')} error={errors.phone?.message}>
                 <Input
                   {...register('phone')}
                   error={!!errors.phone}
-                  placeholder="+33 1 23 45 67 89"
+                  placeholder={t('beneficiaries.form.placeholders.phone')}
                 />
               </FormField>
 
               <FormField
-                label="Mobile Phone"
+                label={t('beneficiaries.form.fields.mobilePhone')}
                 error={errors.mobile_phone?.message}
               >
                 <Input
                   {...register('mobile_phone')}
                   error={!!errors.mobile_phone}
-                  placeholder="+33 6 12 34 56 78"
+                  placeholder={t('beneficiaries.form.placeholders.mobilePhone')}
                 />
               </FormField>
 
               <FormField
-                label="External ID"
+                label={t('beneficiaries.form.fields.externalId')}
                 error={errors.external_id?.message}
               >
                 <Input
                   {...register('external_id')}
                   error={!!errors.external_id}
-                  placeholder="External system ID"
+                  placeholder={t('beneficiaries.form.placeholders.externalId')}
                 />
               </FormField>
             </div>
@@ -223,11 +279,11 @@ export default function BeneficiaryForm() {
 
           {/* Personal Information */}
           <div className="bg-white p-6 rounded-lg shadow space-y-4">
-            <h2 className="text-lg font-semibold mb-4">Personal Information</h2>
+            <h2 className="text-lg font-semibold mb-4">{t('beneficiaries.form.sections.personalInfo')}</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
-                label="Date of Birth"
+                label={t('beneficiaries.form.fields.dateOfBirth')}
                 error={errors.date_of_birth?.message}
               >
                 <Input
@@ -237,31 +293,31 @@ export default function BeneficiaryForm() {
                 />
               </FormField>
 
-              <FormField label="Gender" error={errors.gender?.message}>
+              <FormField label={t('beneficiaries.form.fields.gender')} error={errors.gender?.message}>
                 <Select {...register('gender')} error={!!errors.gender}>
-                  <option value="">Select gender</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                  <option value="other">Other</option>
+                  <option value="">{t('beneficiaries.form.fields.selectGender')}</option>
+                  <option value="male">{t('beneficiaries.gender.male')}</option>
+                  <option value="female">{t('beneficiaries.gender.female')}</option>
+                  <option value="other">{t('beneficiaries.gender.other')}</option>
                 </Select>
               </FormField>
 
               <FormField
-                label="Nationality"
+                label={t('beneficiaries.form.fields.nationality')}
                 error={errors.nationality?.message}
               >
                 <Input
                   {...register('nationality')}
                   error={!!errors.nationality}
-                  placeholder="French"
+                  placeholder={t('beneficiaries.form.placeholders.nationality')}
                 />
               </FormField>
 
-              <FormField label="Birthplace" error={errors.birthplace?.message}>
+              <FormField label={t('beneficiaries.form.fields.birthplace')} error={errors.birthplace?.message}>
                 <Input
                   {...register('birthplace')}
                   error={!!errors.birthplace}
-                  placeholder="Paris, France"
+                  placeholder={t('beneficiaries.form.placeholders.birthplace')}
                 />
               </FormField>
             </div>
@@ -269,59 +325,59 @@ export default function BeneficiaryForm() {
 
           {/* Address */}
           <div className="bg-white p-6 rounded-lg shadow space-y-4">
-            <h2 className="text-lg font-semibold mb-4">Address</h2>
+            <h2 className="text-lg font-semibold mb-4">{t('beneficiaries.form.sections.address')}</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
-                label="Street"
+                label={t('beneficiaries.form.fields.street')}
                 error={errors.address?.street?.message}
                 className="md:col-span-2"
               >
                 <Input
                   {...register('address.street')}
                   error={!!errors.address?.street}
-                  placeholder="123 Main Street"
+                  placeholder={t('beneficiaries.form.placeholders.street')}
                 />
               </FormField>
 
-              <FormField label="City" error={errors.address?.city?.message}>
+              <FormField label={t('beneficiaries.form.fields.city')} error={errors.address?.city?.message}>
                 <Input
                   {...register('address.city')}
                   error={!!errors.address?.city}
-                  placeholder="Paris"
+                  placeholder={t('beneficiaries.form.placeholders.city')}
                 />
               </FormField>
 
               <FormField
-                label="State/Region"
+                label={t('beneficiaries.form.fields.state')}
                 error={errors.address?.state?.message}
               >
                 <Input
                   {...register('address.state')}
                   error={!!errors.address?.state}
-                  placeholder="Île-de-France"
+                  placeholder={t('beneficiaries.form.placeholders.state')}
                 />
               </FormField>
 
               <FormField
-                label="Postal Code"
+                label={t('beneficiaries.form.fields.postalCode')}
                 error={errors.address?.postal_code?.message}
               >
                 <Input
                   {...register('address.postal_code')}
                   error={!!errors.address?.postal_code}
-                  placeholder="75001"
+                  placeholder={t('beneficiaries.form.placeholders.postalCode')}
                 />
               </FormField>
 
               <FormField
-                label="Country"
+                label={t('beneficiaries.form.fields.country')}
                 error={errors.address?.country?.message}
               >
                 <Input
                   {...register('address.country')}
                   error={!!errors.address?.country}
-                  placeholder="France"
+                  placeholder={t('beneficiaries.form.placeholders.country')}
                 />
               </FormField>
             </div>
@@ -330,19 +386,19 @@ export default function BeneficiaryForm() {
           {/* Professional Information */}
           <div className="bg-white p-6 rounded-lg shadow space-y-4">
             <h2 className="text-lg font-semibold mb-4">
-              Professional Information
+              {t('beneficiaries.form.sections.professionalInfo')}
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
-                label="Employment Status"
+                label={t('beneficiaries.form.fields.employmentStatus')}
                 error={errors.employment_status?.message}
               >
                 <Select
                   {...register('employment_status')}
                   error={!!errors.employment_status}
                 >
-                  <option value="">Select status</option>
+                  <option value="">{t('beneficiaries.form.fields.selectStatus')}</option>
                   {Object.values(EmploymentStatus).map((status) => (
                     <option key={status} value={status}>
                       {status.replace(/_/g, ' ').charAt(0).toUpperCase() +
@@ -352,32 +408,32 @@ export default function BeneficiaryForm() {
                 </Select>
               </FormField>
 
-              <FormField label="Job Title" error={errors.job_title?.message}>
+              <FormField label={t('beneficiaries.form.fields.jobTitle')} error={errors.job_title?.message}>
                 <Input
                   {...register('job_title')}
                   error={!!errors.job_title}
-                  placeholder="Software Developer"
+                  placeholder={t('beneficiaries.form.placeholders.jobTitle')}
                 />
               </FormField>
 
-              <FormField label="Company" error={errors.company?.message}>
+              <FormField label={t('beneficiaries.form.fields.company')} error={errors.company?.message}>
                 <Input
                   {...register('company')}
                   error={!!errors.company}
-                  placeholder="Tech Corp"
+                  placeholder={t('beneficiaries.form.placeholders.company')}
                 />
               </FormField>
 
-              <FormField label="Industry" error={errors.industry?.message}>
+              <FormField label={t('beneficiaries.form.fields.industry')} error={errors.industry?.message}>
                 <Input
                   {...register('industry')}
                   error={!!errors.industry}
-                  placeholder="Technology"
+                  placeholder={t('beneficiaries.form.placeholders.industry')}
                 />
               </FormField>
 
               <FormField
-                label="Years of Experience"
+                label={t('beneficiaries.form.fields.yearsOfExperience')}
                 error={errors.years_of_experience?.message}
               >
                 <Input
@@ -386,7 +442,7 @@ export default function BeneficiaryForm() {
                   min="0"
                   max="70"
                   error={!!errors.years_of_experience}
-                  placeholder="5"
+                  placeholder={t('beneficiaries.form.placeholders.yearsOfExperience')}
                 />
               </FormField>
             </div>
@@ -394,18 +450,18 @@ export default function BeneficiaryForm() {
 
           {/* Education */}
           <div className="bg-white p-6 rounded-lg shadow space-y-4">
-            <h2 className="text-lg font-semibold mb-4">Education</h2>
+            <h2 className="text-lg font-semibold mb-4">{t('beneficiaries.form.sections.education')}</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
-                label="Education Level"
+                label={t('beneficiaries.form.fields.educationLevel')}
                 error={errors.education_level?.message}
               >
                 <Select
                   {...register('education_level')}
                   error={!!errors.education_level}
                 >
-                  <option value="">Select level</option>
+                  <option value="">{t('beneficiaries.form.fields.selectLevel')}</option>
                   {Object.values(EducationLevel).map((level) => (
                     <option key={level} value={level}>
                       {level.replace(/_/g, ' ').charAt(0).toUpperCase() +
@@ -416,19 +472,19 @@ export default function BeneficiaryForm() {
               </FormField>
 
               <FormField
-                label="Field of Study"
+                label={t('beneficiaries.form.fields.fieldOfStudy')}
                 error={errors.field_of_study?.message}
               >
                 <Input
                   {...register('field_of_study')}
                   error={!!errors.field_of_study}
-                  placeholder="Computer Science"
+                  placeholder={t('beneficiaries.form.placeholders.fieldOfStudy')}
                 />
               </FormField>
             </div>
 
             <FormField
-              label="Certifications"
+              label={t('beneficiaries.form.fields.certifications')}
               error={errors.certifications?.message}
             >
               <Controller
@@ -438,7 +494,7 @@ export default function BeneficiaryForm() {
                   <TagInput
                     value={field.value}
                     onChange={field.onChange}
-                    placeholder="Add certification..."
+                    placeholder={t('beneficiaries.form.fields.addCertification')}
                     error={!!errors.certifications}
                   />
                 )}
@@ -448,9 +504,9 @@ export default function BeneficiaryForm() {
 
           {/* Skills & Interests */}
           <div className="bg-white p-6 rounded-lg shadow space-y-4">
-            <h2 className="text-lg font-semibold mb-4">Skills & Interests</h2>
+            <h2 className="text-lg font-semibold mb-4">{t('beneficiaries.form.sections.skillsInterests')}</h2>
 
-            <FormField label="Skills" error={errors.skills?.message}>
+            <FormField label={t('beneficiaries.form.fields.skills')} error={errors.skills?.message}>
               <Controller
                 name="skills"
                 control={control}
@@ -458,14 +514,14 @@ export default function BeneficiaryForm() {
                   <TagInput
                     value={field.value}
                     onChange={field.onChange}
-                    placeholder="Add skill..."
+                    placeholder={t('beneficiaries.form.fields.addSkill')}
                     error={!!errors.skills}
                   />
                 )}
               />
             </FormField>
 
-            <FormField label="Interests" error={errors.interests?.message}>
+            <FormField label={t('beneficiaries.form.fields.interests')} error={errors.interests?.message}>
               <Controller
                 name="interests"
                 control={control}
@@ -473,14 +529,14 @@ export default function BeneficiaryForm() {
                   <TagInput
                     value={field.value}
                     onChange={field.onChange}
-                    placeholder="Add interest..."
+                    placeholder={t('beneficiaries.form.fields.addInterest')}
                     error={!!errors.interests}
                   />
                 )}
               />
             </FormField>
 
-            <FormField label="Goals" error={errors.goals?.message}>
+            <FormField label={t('beneficiaries.form.fields.goals')} error={errors.goals?.message}>
               <Controller
                 name="goals"
                 control={control}
@@ -488,7 +544,7 @@ export default function BeneficiaryForm() {
                   <TagInput
                     value={field.value}
                     onChange={field.onChange}
-                    placeholder="Add goal..."
+                    placeholder={t('beneficiaries.form.fields.addGoal')}
                     error={!!errors.goals}
                   />
                 )}
@@ -498,11 +554,11 @@ export default function BeneficiaryForm() {
 
           {/* Management */}
           <div className="bg-white p-6 rounded-lg shadow space-y-4">
-            <h2 className="text-lg font-semibold mb-4">Management</h2>
+            <h2 className="text-lg font-semibold mb-4">{t('beneficiaries.form.sections.management')}</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {canEditStatus && (
-                <FormField label="Status" error={errors.status?.message}>
+                <FormField label={t('beneficiaries.form.fields.status')} error={errors.status?.message}>
                   <Select {...register('status')} error={!!errors.status}>
                     {Object.values(BeneficiaryStatus).map((status) => (
                       <option key={status} value={status}>
@@ -514,7 +570,7 @@ export default function BeneficiaryForm() {
               )}
 
               <FormField
-                label="Tags"
+                label={t('beneficiaries.form.fields.tags')}
                 error={errors.tags?.message}
                 className={canEditStatus ? '' : 'md:col-span-2'}
               >
@@ -525,7 +581,7 @@ export default function BeneficiaryForm() {
                     <TagInput
                       value={field.value}
                       onChange={field.onChange}
-                      placeholder="Add tag..."
+                      placeholder={t('beneficiaries.form.fields.addTag')}
                       error={!!errors.tags}
                     />
                   )}
@@ -533,6 +589,53 @@ export default function BeneficiaryForm() {
               </FormField>
             </div>
           </div>
+
+          {/* Documents */}
+          {isEditMode && id && (
+            <div className="bg-white p-6 rounded-lg shadow space-y-4">
+              <h2 className="text-lg font-semibold mb-4">Documents</h2>
+              <p className="text-sm text-gray-600 mb-4">
+                Upload identification documents, certificates, CVs, and other relevant files.
+              </p>
+              <FileUpload
+                onUpload={handleDocumentUpload}
+                onRemove={handleFileRemove}
+                maxFiles={15}
+                maxSize={20 * 1024 * 1024} // 20MB
+                acceptedTypes={[
+                  'application/pdf',
+                  'application/msword',
+                  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                  'image/jpeg',
+                  'image/png',
+                  'image/jpg',
+                  'text/plain',
+                ]}
+                uploadedFiles={beneficiaryDocuments.map(file => ({
+                  id: file.id,
+                  name: file.name,
+                  size: file.size,
+                  type: file.type,
+                  url: file.url,
+                }))}
+                className="w-full"
+              />
+            </div>
+          )}
+
+          {!isEditMode && (
+            <div className="bg-blue-50 border border-blue-200 p-6 rounded-lg">
+              <div className="flex items-start space-x-3">
+                <div className="text-blue-600 text-sm">ℹ️</div>
+                <div>
+                  <h4 className="font-medium text-blue-900 mb-1">{t('beneficiaries.form.documents.uploadNote')}</h4>
+                  <p className="text-sm text-blue-700">
+                    {t('beneficiaries.form.documents.uploadNoteDescription')}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Form Actions */}
           <div className="flex justify-end gap-4">

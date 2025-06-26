@@ -1,0 +1,321 @@
+app/api/health.py:6:1: F401 'redis' imported but unused
+app/api/v1/__init__.py:9:1: E402 module level import not at top of file
+app/api/v1/auth.py:3:1: F401 'datetime.timedelta' imported but unused
+app/api/v1/auth.py:412:5: F841 local variable 'claims' is assigned to but never used
+app/api/v1/beneficiaries.py:100:5: F841 local variable 'e' is assigned to but never used
+app/api/v1/beneficiaries.py:10:1: F401 'app.core.validators.validate_request' imported but unused
+app/api/v1/beneficiaries.py:11:1: F401 'app.schemas.beneficiary.BeneficiaryCreateSchema' imported but unused
+app/api/v1/beneficiaries.py:11:1: F401 'app.schemas.beneficiary.BeneficiaryDetailSchema' imported but unused
+app/api/v1/beneficiaries.py:11:1: F401 'app.schemas.beneficiary.BeneficiaryListSchema' imported but unused
+app/api/v1/beneficiaries.py:11:1: F401 'app.schemas.beneficiary.BeneficiaryUpdateSchema' imported but unused
+app/api/v1/beneficiaries.py:126:5: F841 local variable 'e' is assigned to but never used
+app/api/v1/beneficiaries.py:162:5: F841 local variable 'e' is assigned to but never used
+app/api/v1/beneficiaries.py:203:5: F841 local variable 'e' is assigned to but never used
+app/api/v1/beneficiaries.py:229:5: F841 local variable 'e' is assigned to but never used
+app/api/v1/beneficiaries.py:263:5: F841 local variable 'e' is assigned to but never used
+app/api/v1/beneficiaries.py:297:5: F841 local variable 'e' is assigned to but never used
+app/api/v1/beneficiaries.py:326:5: F841 local variable 'e' is assigned to but never used
+app/api/v1/beneficiaries.py:347:5: F841 local variable 'e' is assigned to but never used
+app/api/v1/beneficiaries.py:384:5: F841 local variable 'e' is assigned to but never used
+app/api/v1/beneficiaries.py:76:5: F841 local variable 'e' is assigned to but never used
+app/api/v1/courses.py:38:1: C901 'get_courses' is too complex (18)
+app/api/v1/dashboard.py:10:1: F401 'app.models.evaluation.Evaluation' imported but unused
+app/api/v1/dashboard.py:10:1: F401 'app.models.evaluation.EvaluationAttempt' imported but unused
+app/api/v1/dashboard.py:18:1: C901 'get_student_dashboard' is too complex (13)
+app/api/v1/dashboard.py:32:41: E712 comparison to False should be 'if cond is False:' or 'if not cond:'
+app/api/v1/dashboard.py:74:48: E711 comparison to None should be 'if cond is not None:'
+app/api/v1/dashboard.py:9:1: F401 'app.models.learning_path.LearningMilestone' imported but unused
+app/api/v1/evaluations.py:11:1: F401 'app.models.evaluation.EvaluationStatus' imported but unused
+app/api/v1/evaluations.py:18:1: F401 'app.schemas.evaluation.EvaluationStatisticsSchema' imported but unused
+app/api/v1/evaluations.py:560:1: C901 'get_attempt_results' is too complex (11)
+app/api/v1/evaluations.py:5:1: F401 'typing.Any' imported but unused
+app/api/v1/evaluations.py:5:1: F401 'typing.Dict' imported but unused
+app/api/v1/evaluations.py:5:1: F401 'typing.List' imported but unused
+app/api/v1/evaluations.py:706:80: E712 comparison to True should be 'if cond is True:' or 'if cond:'
+app/api/v1/learning_paths.py:109:5: F841 local variable 'db' is assigned to but never used
+app/api/v1/learning_paths.py:10:1: F401 'app.services.student_profile_service.StudentProfileService' imported but unused
+app/api/v1/learning_paths.py:111:19: F821 undefined name 'learning_path_service'
+app/api/v1/learning_paths.py:123:5: F841 local variable 'db' is assigned to but never used
+app/api/v1/learning_paths.py:125:15: F821 undefined name 'learning_path_service'
+app/api/v1/learning_paths.py:197:5: F841 local variable 'db' is assigned to but never used
+app/api/v1/learning_paths.py:199:21: F821 undefined name 'learning_path_service'
+app/api/v1/learning_paths.py:213:21: F821 undefined name 'learning_path_service'
+app/api/v1/learning_paths.py:230:21: F821 undefined name 'learning_path_service'
+app/api/v1/learning_paths.py:247:17: F821 undefined name 'learning_path_service'
+app/api/v1/learning_paths.py:269:21: F821 undefined name 'learning_path_service'
+app/api/v1/learning_paths.py:293:41: E712 comparison to False should be 'if cond is False:' or 'if not cond:'
+app/api/v1/learning_paths.py:478:1: F811 redefinition of unused 'update_milestone_progress' from line 239
+app/api/v1/learning_paths.py:52:33: E712 comparison to False should be 'if cond is False:' or 'if not cond:'
+app/api/v1/learning_paths.py:592:13: F821 undefined name 'learning_path_service'
+app/api/v1/learning_paths.py:8:1: F401 'app.models.user.User' imported but unused
+app/api/v1/programs.py:398:1: E402 module level import not at top of file
+app/api/v1/programs.py:67:1: C901 'get_programs' is too complex (12)
+app/api/v1/programs.py:6:1: F401 'datetime.datetime' imported but unused
+app/api/v1/reports.py:100:14: F821 undefined name 'report_service'
+app/api/v1/reports.py:128:5: F841 local variable 'db' is assigned to but never used
+app/api/v1/reports.py:134:14: F821 undefined name 'report_service'
+app/api/v1/reports.py:150:5: F841 local variable 'db' is assigned to but never used
+app/api/v1/reports.py:153:14: F821 undefined name 'report_service'
+app/api/v1/reports.py:196:5: F841 local variable 'db' is assigned to but never used
+app/api/v1/reports.py:213:16: F821 undefined name 'reports_overview_service'
+app/api/v1/reports.py:233:5: F841 local variable 'db' is assigned to but never used
+app/api/v1/reports.py:240:14: F821 undefined name 'reports_overview_service'
+app/api/v1/reports.py:261:5: F841 local variable 'db' is assigned to but never used
+app/api/v1/reports.py:274:19: F821 undefined name 'reports_overview_service'
+app/api/v1/reports.py:311:5: F841 local variable 'db' is assigned to but never used
+app/api/v1/reports.py:314:15: F821 undefined name 'student_profile_service'
+app/api/v1/reports.py:335:5: F841 local variable 'db' is assigned to but never used
+app/api/v1/reports.py:342:14: F821 undefined name 'student_profile_service'
+app/api/v1/reports.py:364:5: F841 local variable 'db' is assigned to but never used
+app/api/v1/reports.py:372:15: F821 undefined name 'student_profile_service'
+app/api/v1/reports.py:398:5: F841 local variable 'db' is assigned to but never used
+app/api/v1/reports.py:401:15: F821 undefined name 'student_profile_service'
+app/api/v1/reports.py:59:5: F841 local variable 'db' is assigned to but never used
+app/api/v1/reports.py:69:15: F821 undefined name 'report_service'
+app/api/v1/reports.py:7:1: F401 'app.services.reports_overview_service.ReportsOverviewService' imported but unused
+app/api/v1/reports.py:8:1: F401 'app.services.student_profile_service.StudentProfileService' imported but unused
+app/api/v1/reports.py:90:5: F841 local variable 'db' is assigned to but never used
+app/api/v1/socketio_events.py:6:1: F401 'flask_jwt_extended.get_jwt_identity' imported but unused
+app/api/v1/socketio_events.py:6:1: F401 'flask_jwt_extended.verify_jwt_in_request' imported but unused
+app/core/database.py:3:1: F401 'flask.current_app' imported but unused
+app/core/database.py:3:1: F401 'flask.g' imported but unused
+app/core/socketio.py:10:1: F401 'jwt.PyJWTError' imported but unused
+app/core/socketio.py:12:1: F401 'datetime.datetime' imported but unused
+app/core/socketio.py:17:1: E402 module level import not at top of file
+app/core/socketio.py:5:1: F401 'flask_socketio.SocketIO' imported but unused
+app/core/socketio.py:6:1: F401 'flask_jwt_extended.get_jwt' imported but unused
+app/core/socketio.py:6:1: F401 'flask_jwt_extended.get_jwt_identity' imported but unused
+app/core/socketio.py:99:1: C901 'register_handlers' is too complex (11)
+app/core/swagger.py:207:9: F401 'app.api.v1.auth' imported but unused
+app/core/swagger.py:207:9: F401 'app.api.v1.beneficiaries' imported but unused
+app/core/swagger.py:207:9: F401 'app.api.v1.courses' imported but unused
+app/core/swagger.py:207:9: F401 'app.api.v1.evaluations' imported but unused
+app/core/swagger.py:207:9: F401 'app.api.v1.programs' imported but unused
+app/core/swagger.py:208:9: F401 'app.api.v1.ai' imported but unused
+app/core/swagger.py:208:9: F401 'app.api.v1.users' imported but unused
+app/core/swagger.py:209:9: F401 'app.api.health' imported but unused
+app/core/validators.py:3:1: F401 'typing.List' imported but unused
+app/core/validators.py:68:1: C901 'validate_request' is too complex (20)
+app/models/base.py:161:1: E402 module level import not at top of file
+app/models/course.py:3:1: F401 'datetime.timedelta' imported but unused
+app/models/course_session.py:3:1: F401 'datetime.datetime' imported but unused
+app/models/evaluation.py:11:1: F401 '.base.TimestampMixin' imported but unused
+app/models/learning_path.py:6:1: F401 'datetime.datetime' imported but unused
+app/schemas/course.py:4:1: F401 'datetime.datetime' imported but unused
+app/schemas/evaluation.py:198:5: C901 'QuestionCreateSchema.validate_question_data' is too complex (12)
+app/schemas/evaluation.py:4:1: F401 'datetime.datetime' imported but unused
+app/schemas/evaluation.py:5:1: F401 'app.models.evaluation.AttemptStatus' imported but unused
+app/schemas/program.py:6:1: F401 'datetime.datetime' imported but unused
+app/services/adaptive_evaluation_service.py:10:1: F401 'app.models.evaluation.QuestionBank' imported but unused
+app/services/adaptive_evaluation_service.py:6:1: F401 'sqlalchemy.and_' imported but unused
+app/services/adaptive_evaluation_service.py:6:1: F401 'sqlalchemy.not_' imported but unused
+app/services/adaptive_evaluation_service.py:7:1: F401 'sqlalchemy.orm.Session' imported but unused
+app/services/adaptive_evaluation_service.py:8:1: F401 'datetime.datetime' imported but unused
+app/services/adaptive_evaluation_service.py:8:1: F401 'datetime.timedelta' imported but unused
+app/services/ai/assessment_engine.py:11:1: F401 'app.models.evaluation.Answer' imported but unused
+app/services/ai/assessment_engine.py:11:1: F401 'app.models.evaluation.Question' imported but unused
+app/services/ai/assessment_engine.py:12:1: F401 'app.core.exceptions.ValidationError' imported but unused
+app/services/ai/assessment_engine.py:193:9: F841 local variable 'topic_performance' is assigned to but never used
+app/services/ai/assessment_engine.py:9:1: F401 'json' imported but unused
+app/services/ai_service.py:1086:5: C901 'AIService._generate_fallback_report' is too complex (13)
+app/services/ai_service.py:116:1: W293 blank line contains whitespace
+app/services/ai_service.py:1224:127: W291 trailing whitespace
+app/services/ai_service.py:122:1: W293 blank line contains whitespace
+app/services/ai_service.py:1256:1: W293 blank line contains whitespace
+app/services/ai_service.py:1264:1: W293 blank line contains whitespace
+app/services/ai_service.py:1267:1: W293 blank line contains whitespace
+app/services/ai_service.py:1273:1: W293 blank line contains whitespace
+app/services/ai_service.py:1278:1: W293 blank line contains whitespace
+app/services/ai_service.py:1311:1: W293 blank line contains whitespace
+app/services/ai_service.py:1433:5: F811 redefinition of unused 'generate_student_profile_analysis' from line 1204
+app/services/ai_service.py:1453:103: W291 trailing whitespace
+app/services/ai_service.py:1477:5: F811 redefinition of unused '_build_profile_analysis_prompt' from line 1247
+app/services/ai_service.py:1504:1: W293 blank line contains whitespace
+app/services/ai_service.py:1511:1: W293 blank line contains whitespace
+app/services/ai_service.py:1516:1: W293 blank line contains whitespace
+app/services/ai_service.py:1519:1: W293 blank line contains whitespace
+app/services/ai_service.py:1524:1: W293 blank line contains whitespace
+app/services/ai_service.py:1527:1: W293 blank line contains whitespace
+app/services/ai_service.py:1529:1: W293 blank line contains whitespace
+app/services/ai_service.py:1535:1: W293 blank line contains whitespace
+app/services/ai_service.py:1541:1: W293 blank line contains whitespace
+app/services/ai_service.py:1554:1: W293 blank line contains whitespace
+app/services/ai_service.py:1560:5: F811 redefinition of unused '_validate_profile_analysis' from line 1322
+app/services/ai_service.py:1617:5: C901 'AIService._generate_fallback_profile_analysis' is too complex (23)
+app/services/ai_service.py:1617:5: F811 redefinition of unused '_generate_fallback_profile_analysis' from line 1362
+app/services/ai_service.py:1638:13: E722 do not use bare 'except'
+app/services/ai_service.py:229:101: W291 trailing whitespace
+app/services/ai_service.py:304:1: W293 blank line contains whitespace
+app/services/ai_service.py:310:1: W293 blank line contains whitespace
+app/services/ai_service.py:315:1: W293 blank line contains whitespace
+app/services/ai_service.py:318:1: W293 blank line contains whitespace
+app/services/ai_service.py:321:1: W293 blank line contains whitespace
+app/services/ai_service.py:326:1: W293 blank line contains whitespace
+app/services/ai_service.py:331:1: W293 blank line contains whitespace
+app/services/ai_service.py:458:5: C901 'AIService._generate_fallback_insights' is too complex (11)
+app/services/ai_service.py:554:108: W291 trailing whitespace
+app/services/ai_service.py:584:1: W293 blank line contains whitespace
+app/services/ai_service.py:589:1: W293 blank line contains whitespace
+app/services/ai_service.py:592:1: W293 blank line contains whitespace
+app/services/ai_service.py:595:1: W293 blank line contains whitespace
+app/services/ai_service.py:598:1: W293 blank line contains whitespace
+app/services/ai_service.py:604:1: W293 blank line contains whitespace
+app/services/ai_service.py:609:1: W293 blank line contains whitespace
+app/services/ai_service.py:611:1: W293 blank line contains whitespace
+app/services/ai_service.py:677:1: W293 blank line contains whitespace
+app/services/ai_service.py:867:116: W291 trailing whitespace
+app/services/ai_service.py:8:1: F401 'typing.Optional' imported but unused
+app/services/ai_service.py:906:1: W293 blank line contains whitespace
+app/services/ai_service.py:911:1: W293 blank line contains whitespace
+app/services/ai_service.py:917:1: W293 blank line contains whitespace
+app/services/ai_service.py:924:1: W293 blank line contains whitespace
+app/services/ai_service.py:931:1: W293 blank line contains whitespace
+app/services/ai_service.py:934:1: W293 blank line contains whitespace
+app/services/ai_service.py:937:1: W293 blank line contains whitespace
+app/services/ai_service.py:940:1: W293 blank line contains whitespace
+app/services/ai_service.py:943:1: W293 blank line contains whitespace
+app/services/ai_service.py:998:1: W293 blank line contains whitespace
+app/services/beneficiary_service.py:127:5: C901 'BeneficiaryService.create' is too complex (14)
+app/services/beneficiary_service.py:176:5: C901 'BeneficiaryService.update' is too complex (15)
+app/services/beneficiary_service.py:285:5: C901 'BeneficiaryService.get_statistics' is too complex (11)
+app/services/beneficiary_service.py:5:1: F401 'sqlalchemy.and_' imported but unused
+app/services/beneficiary_service.py:5:1: F401 'sqlalchemy.func' imported but unused
+app/services/course_service.py:583:39: E712 comparison to True should be 'if cond is True:' or 'if cond:'
+app/services/course_service.py:6:1: F401 'sqlalchemy.and_' imported but unused
+app/services/evaluation_service.py:10:1: F401 'app.models.evaluation.QuestionBank' imported but unused
+app/services/evaluation_service.py:5:1: F401 'typing.Optional' imported but unused
+app/services/evaluation_service.py:6:1: F401 'datetime.timedelta' imported but unused
+app/services/evaluation_service.py:8:1: F401 'sqlalchemy.func' imported but unused
+app/services/learning_path_service.py:1059:9: E722 do not use bare 'except'
+app/services/learning_path_service.py:371:9: F841 local variable 'recent_activities' is assigned to but never used
+app/services/learning_path_service.py:438:13: E722 do not use bare 'except'
+app/services/learning_path_service.py:665:9: F841 local variable 'learning_path' is assigned to but never used
+app/services/learning_path_service.py:773:36: F821 undefined name 'MilestoneStatus'
+app/services/learning_path_service.py:7:1: F401 'sqlalchemy.orm.Session' imported but unused
+app/services/notification_service.py:14:1: F401 'app.core.socketio.socketio' imported but unused
+app/services/notification_service.py:231:36: E712 comparison to True should be 'if cond is True:' or 'if cond:'
+app/services/notification_service.py:359:12: F821 undefined name 'notification_service'
+app/services/notification_service.py:365:12: F821 undefined name 'notification_service'
+app/services/notification_service.py:9:1: F401 'json' imported but unused
+app/services/program_service.py:6:1: F401 'sqlalchemy.and_' imported but unused
+app/services/report_service.py:11:1: F401 'app.models.evaluation.Evaluation' imported but unused
+app/services/report_service.py:11:1: F401 'app.models.evaluation.QuestionResponse' imported but unused
+app/services/report_service.py:12:1: F401 'app.models.learning_path.LearningMilestone' imported but unused
+app/services/report_service.py:238:5: C901 'ReportService._calculate_performance_metrics' is too complex (12)
+app/services/report_service.py:5:1: F401 'typing.Optional' imported but unused
+app/services/report_service.py:7:1: F401 'sqlalchemy.orm.Session' imported but unused
+app/services/report_service.py:8:1: F401 'sqlalchemy.func' imported but unused
+app/services/reports_overview_service.py:146:5: C901 'ReportsOverviewService._generate_student_summary' is too complex (13)
+app/services/reports_overview_service.py:24:5: C901 'ReportsOverviewService.get_students_overview' is too complex (15)
+app/services/reports_overview_service.py:5:1: F401 'typing.Optional' imported but unused
+app/services/reports_overview_service.py:78:9: F841 local variable 'total' is assigned to but never used
+app/services/reports_overview_service.py:7:1: F401 'sqlalchemy.orm.Session' imported but unused
+app/services/reports_overview_service.py:8:1: F401 'sqlalchemy.and_' imported but unused
+app/services/reports_overview_service.py:8:1: F401 'sqlalchemy.func' imported but unused
+app/services/student_profile_service.py:13:1: F401 'app.models.course_session.CourseSession' imported but unused
+app/services/student_profile_service.py:7:1: F401 'sqlalchemy.orm.Session' imported but unused
+app/services/student_profile_service.py:8:1: F401 'sqlalchemy.func' imported but unused
+app/utils/seed.py:333:15: F541 f-string is missing placeholders
+app/utils/seed.py:334:15: F541 f-string is missing placeholders
+app/utils/seed.py:335:15: F541 f-string is missing placeholders
+app/utils/seed.py:4:1: F401 'datetime.datetime' imported but unused
+migrations/env.py:100:32: W292 no newline at end of file
+migrations/env.py:14:1: E402 module level import not at top of file
+migrations/env.py:15:1: E402 module level import not at top of file
+migrations/env.py:15:1: F401 'app.models.*' imported but unused
+migrations/env.py:15:1: F403 'from app.models import *' used; unable to detect undefined names
+migrations/env.py:6:1: F401 'os' imported but unused
+migrations/env.py:77:1: W293 blank line contains whitespace
+tests/conftest.py:13:1: E402 module level import not at top of file
+tests/conftest.py:14:1: E402 module level import not at top of file
+tests/conftest.py:15:1: E402 module level import not at top of file
+tests/conftest.py:16:1: E402 module level import not at top of file
+tests/conftest.py:17:1: E402 module level import not at top of file
+tests/conftest.py:18:1: E402 module level import not at top of file
+tests/conftest.py:8:1: F401 'sqlalchemy.orm.sessionmaker' imported but unused
+tests/integration/test_courses_api.py:10:1: F401 'app.models.tenant.Tenant' imported but unused
+tests/integration/test_courses_api.py:4:1: F401 'json' imported but unused
+tests/integration/test_programs_api.py:4:1: F401 'json' imported but unused
+tests/integration/test_programs_api.py:7:1: F401 'app.models.user.User' imported but unused
+tests/integration/test_programs_api.py:8:1: F401 'app.models.tenant.Tenant' imported but unused
+tests/test_api_courses.py:4:1: F401 'datetime.datetime' imported but unused
+tests/test_api_evaluations.py:19:1: F401 'app.models.user.User' imported but unused
+tests/test_api_evaluations.py:20:1: F401 'app.models.program.Program' imported but unused
+tests/test_api_evaluations.py:21:1: F401 'app.models.course.Course' imported but unused
+tests/test_api_evaluations.py:5:1: F401 'pytest' imported but unused
+tests/test_api_evaluations.py:7:1: F401 'datetime.datetime' imported but unused
+tests/test_api_evaluations.py:7:1: F401 'datetime.timedelta' imported but unused
+tests/test_api_evaluations.py:9:1: F401 'app.models.evaluation.AttemptStatus' imported but unused
+tests/test_api_evaluations.py:9:1: F401 'app.models.evaluation.DifficultyLevel' imported but unused
+tests/test_api_evaluations.py:9:1: F401 'app.models.evaluation.Evaluation' imported but unused
+tests/test_api_evaluations.py:9:1: F401 'app.models.evaluation.EvaluationAttempt' imported but unused
+tests/test_api_evaluations.py:9:1: F401 'app.models.evaluation.EvaluationStatus' imported but unused
+tests/test_api_evaluations.py:9:1: F401 'app.models.evaluation.Question' imported but unused
+tests/test_api_evaluations.py:9:1: F401 'app.models.evaluation.QuestionResponse' imported but unused
+tests/test_api_evaluations.py:9:1: F401 'app.models.evaluation.QuestionType' imported but unused
+tests/test_courses_simple.py:12:9: F401 'app.models.course.Course' imported but unused
+tests/test_courses_simple.py:12:9: F401 'app.models.course.CourseFormat' imported but unused
+tests/test_courses_simple.py:12:9: F401 'app.models.course.CourseStatus' imported but unused
+tests/test_courses_simple.py:12:9: F401 'app.models.course.DifficultyLevel' imported but unused
+tests/test_courses_simple.py:13:9: F401 'app.schemas.course.CourseCreateSchema' imported but unused
+tests/test_courses_simple.py:13:9: F401 'app.schemas.course.CourseUpdateSchema' imported but unused
+tests/test_courses_simple.py:14:9: F401 'app.services.course_service.CourseService' imported but unused
+tests/test_courses_simple.py:67:5: F401 'sqlalchemy.orm.Session' imported but unused
+tests/test_evaluation_integration.py:12:1: F401 'app.models.program.Program' imported but unused
+tests/test_evaluation_integration.py:6:1: F401 'json' imported but unused
+tests/test_evaluation_integration.py:8:1: F401 'flask.Flask' imported but unused
+tests/test_evaluation_service.py:150:9: F841 local variable 'result' is assigned to but never used
+tests/test_evaluation_service.py:18:1: F401 'app.models.user.User' imported but unused
+tests/test_evaluation_service.py:206:13: F841 local variable 'result' is assigned to but never used
+tests/test_evaluation_service.py:25:1: F401 'app.core.exceptions.NotFoundError' imported but unused
+tests/test_evaluation_service.py:264:13: F841 local variable 'result' is assigned to but never used
+tests/test_evaluation_service.py:317:9: F841 local variable 'result' is assigned to but never used
+tests/test_evaluation_service.py:368:13: F841 local variable 'result' is assigned to but never used
+tests/test_evaluation_service.py:61:9: F841 local variable 'result' is assigned to but never used
+tests/test_evaluation_service.py:96:9: F841 local variable 'result' is assigned to but never used
+tests/test_evaluation_service.py:9:1: F401 'app.models.evaluation.Evaluation' imported but unused
+tests/test_evaluation_service.py:9:1: F401 'app.models.evaluation.EvaluationAttempt' imported but unused
+tests/test_evaluation_service.py:9:1: F401 'app.models.evaluation.Question' imported but unused
+tests/test_evaluation_service.py:9:1: F401 'app.models.evaluation.QuestionResponse' imported but unused
+tests/test_evaluation_simple.py:22:1: F401 'app.core.exceptions.NotFoundError' imported but unused
+tests/test_evaluation_simple.py:6:1: F401 'unittest.mock.MagicMock' imported but unused
+tests/test_evaluation_simple.py:7:1: F401 'datetime.datetime' imported but unused
+tests/test_program_api.py:3:1: F401 'pytest' imported but unused
+tests/test_program_api.py:6:1: F401 'app.models.user.User' imported but unused
+tests/test_websockets.py:13:1: F401 'app.services.notification_service.NotificationService' imported but unused
+tests/test_websockets.py:14:1: F401 'app.core.socketio.user_sessions' imported but unused
+tests/test_websockets.py:273:19: F821 undefined name 'notification_service'
+tests/test_websockets.py:287:19: F821 undefined name 'notification_service'
+tests/test_websockets.py:302:19: F821 undefined name 'notification_service'
+tests/test_websockets.py:317:19: F821 undefined name 'notification_service'
+tests/test_websockets.py:337:19: F821 undefined name 'notification_service'
+tests/test_websockets.py:351:19: F821 undefined name 'notification_service'
+tests/test_websockets.py:6:1: F401 'json' imported but unused
+tests/unit/api/v1/test_beneficiaries.py:3:1: F401 'pytest' imported but unused
+tests/unit/api/v1/test_beneficiaries.py:5:1: F401 'datetime.datetime' imported but unused
+tests/unit/services/test_beneficiary_service.py:4:1: F401 'datetime.date' imported but unused
+tests/unit/services/test_beneficiary_service.py:4:1: F401 'datetime.datetime' imported but unused
+tests/unit/services/test_beneficiary_service.py:5:1: F401 'uuid' imported but unused
+tests/unit/services/test_beneficiary_service.py:8:1: F401 'app.models.beneficiary.Beneficiary' imported but unused
+tests/unit/test_course_service.py:306:9: F841 local variable 'result' is assigned to but never used
+tests/unit/test_course_service.py:326:9: F841 local variable 'result' is assigned to but never used
+tests/unit/test_course_service.py:398:9: F841 local variable 'result' is assigned to but never used
+tests/unit/test_course_service.py:435:9: F841 local variable 'result' is assigned to but never used
+tests/unit/test_course_service.py:4:1: F401 'datetime.date' imported but unused
+tests/unit/test_course_service.py:4:1: F401 'datetime.timedelta' imported but unused
+tests/unit/test_course_service.py:5:1: F401 'unittest.mock.MagicMock' imported but unused
+tests/unit/test_course_service.py:7:1: F401 'sqlalchemy.func' imported but unused
+tests/unit/test_course_service_simple.py:5:1: F401 'datetime.date' imported but unused
+tests/unit/test_course_service_simple.py:5:1: F401 'datetime.timedelta' imported but unused
+tests/unit/test_course_service_simple.py:7:1: F401 'app.models.course.CourseFormat' imported but unused
+tests/unit/test_course_service_simple.py:7:1: F401 'app.models.course.CourseStatus' imported but unused
+tests/unit/test_course_service_simple.py:7:1: F401 'app.models.course.DifficultyLevel' imported but unused
+tests/unit/test_course_service_simple.py:9:1: F401 'app.core.exceptions.NotFoundError' imported but unused
+tests/unit/test_program_service.py:233:9: F841 local variable 'result' is assigned to but never used
+tests/unit/test_program_service.py:310:9: F841 local variable 'result' is assigned to but never used
+tests/unit/test_program_service.py:4:1: F401 'datetime.datetime' imported but unused
+tests/unit/test_program_service.py:5:1: F401 'unittest.mock.MagicMock' imported but unused
+tests/unit/test_program_service_simple.py:4:1: F401 'unittest.mock.patch' imported but unused
+tests/unit/test_program_service_simple.py:7:1: F401 'app.models.program.ProgramStatus' imported but unused
+tests/unit/test_program_service_simple.py:7:1: F401 'app.models.program.ProgramType' imported but unused
+tests/unit/test_program_service_simple.py:9:1: F401 'app.core.exceptions.NotFoundError' imported but unused

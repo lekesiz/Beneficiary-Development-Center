@@ -9,15 +9,21 @@ import {
   Menu,
   X,
   Home,
+  Target,
+  MessageSquare,
+  Calendar,
 } from 'lucide-react';
 import * as React from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
+import { Breadcrumbs } from '@/components/common/Breadcrumbs';
 import { useAuth } from '@/contexts/AuthContext';
 
 const DashboardLayout: React.FC = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
 
   const handleLogout = () => {
@@ -28,43 +34,61 @@ const DashboardLayout: React.FC = () => {
   // Define navigation items with role-based access control
   const allNavigationItems = [
     { 
-      name: 'Dashboard', 
+      name: t('navigation.dashboard'), 
       href: '/dashboard', 
       icon: Home,
       requiredRoles: [] // Accessible to all authenticated users
     },
     { 
-      name: 'Beneficiaries', 
+      name: t('navigation.beneficiaries'), 
       href: '/beneficiaries', 
       icon: Users,
       requiredRoles: ['admin', 'manager', 'trainer', 'instructor']
     },
     { 
-      name: 'Programs', 
+      name: t('navigation.programs'), 
       href: '/programs', 
       icon: BookOpen,
       requiredRoles: ['admin', 'manager', 'instructor']
     },
     { 
-      name: 'Courses', 
+      name: t('navigation.courses'), 
       href: '/courses', 
       icon: GraduationCap,
       requiredRoles: ['admin', 'manager', 'instructor']
     },
     { 
-      name: 'Evaluations', 
+      name: t('navigation.sessions'), 
+      href: '/sessions', 
+      icon: Calendar,
+      requiredRoles: [] // Accessible to all authenticated users
+    },
+    { 
+      name: t('navigation.evaluations'), 
       href: '/evaluations', 
       icon: ClipboardCheck,
       requiredRoles: ['admin', 'manager', 'instructor', 'student']
     },
     { 
-      name: 'Reports', 
+      name: t('navigation.learningPaths'), 
+      href: '/learning-paths', 
+      icon: Target,
+      requiredRoles: ['admin', 'manager', 'instructor', 'trainer', 'student']
+    },
+    { 
+      name: t('navigation.chat'), 
+      href: '/chat', 
+      icon: MessageSquare,
+      requiredRoles: [] // Accessible to all authenticated users
+    },
+    { 
+      name: t('navigation.reports'), 
       href: '/reports', 
       icon: BarChart3,
       requiredRoles: ['admin', 'manager', 'instructor', 'trainer', 'student']
     },
     { 
-      name: 'Settings', 
+      name: t('navigation.settings'), 
       href: '/settings', 
       icon: Settings,
       requiredRoles: [] // Accessible to all authenticated users
@@ -156,7 +180,7 @@ const DashboardLayout: React.FC = () => {
               className="mt-3 flex w-full items-center px-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50"
             >
               <LogOut className="mr-3 h-5 w-5" />
-              Logout
+              {t('navigation.logout')}
             </button>
           </div>
         </div>
@@ -176,8 +200,15 @@ const DashboardLayout: React.FC = () => {
         </header>
 
         {/* Page content */}
-        <main className="flex-1 overflow-y-auto">
-          <Outlet />
+        <main className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900">
+          {/* Breadcrumbs */}
+          <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 lg:px-8 py-3">
+            <Breadcrumbs />
+          </div>
+          
+          <div className="p-4 sm:p-6 lg:p-8">
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>

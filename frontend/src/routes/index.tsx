@@ -41,6 +41,9 @@ const TakeEvaluationAdaptive = lazy(
 const EvaluationResults = lazy(
   () => import('@/pages/evaluations/EvaluationResults')
 );
+const LearningPathsList = lazy(
+  () => import('@/pages/learning-paths/LearningPathsList')
+);
 const LearningPathPage = lazy(
   () => import('@/pages/learning-paths/LearningPathPage')
 );
@@ -50,8 +53,12 @@ const MyDevelopmentReport = lazy(
 );
 const CoachDashboard = lazy(() => import('@/pages/coach/CoachDashboard'));
 const StudentProfile = lazy(() => import('@/pages/coach/StudentProfile'));
+const SessionsList = lazy(() => import('@/pages/sessions/SessionsList'));
 const Profile = lazy(() => import('@/pages/settings/Profile'));
 const Settings = lazy(() => import('@/pages/settings/Settings'));
+
+// Chat
+const ChatLayout = lazy(() => import('@/components/chat/ChatLayout'));
 
 // Error pages
 const NotFound = lazy(() => import('@/pages/errors/NotFound'));
@@ -166,6 +173,7 @@ const AppRoutes: React.FC = () => {
           />
 
           {/* Learning Path routes */}
+          <Route path="/learning-paths" element={<LearningPathsList />} />
           <Route path="/learning-paths/:id" element={<LearningPathPage />} />
 
           {/* Report routes */}
@@ -181,6 +189,13 @@ const AppRoutes: React.FC = () => {
             path="/coach/student/:studentId"
             element={<StudentProfile />}
           />
+
+          {/* Sessions/Appointments routes */}
+          <Route path="/sessions" element={<SessionsList />} />
+
+          {/* Chat routes */}
+          <Route path="/chat" element={<ChatLayout />} />
+          <Route path="/chat/:conversationId" element={<ChatLayout />} />
 
           {/* Settings routes */}
           <Route path="/profile" element={<Profile />} />

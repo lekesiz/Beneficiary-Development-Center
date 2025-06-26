@@ -14,12 +14,16 @@ import {
   FileText,
   Download,
   Filter,
+  Users,
 } from 'lucide-react';
 import * as React from 'react';
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
+import { DataTableSkeleton } from '@/components/common/DataTableSkeleton';
 import { DataTable } from '@/components/ui/DataTable';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   useBeneficiaries,
@@ -31,8 +35,9 @@ import { Beneficiary, BeneficiaryStatus } from '@/types/beneficiary';
 export default function BeneficiaryList() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [globalFilter, setGlobalFilter] = useState('');
-  const [statusFilter, setStatusFilter] = useState<BeneficiaryStatus | ''>('');
+  const [statusFilter, setStatusFilter] = useState<BeneficiaryStatus | ''>(BeneficiaryStatus.ACTIVE);
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 20,
@@ -74,7 +79,8 @@ export default function BeneficiaryList() {
   const columns: ColumnDef<Beneficiary>[] = [
     {
       accessorKey: 'full_name',
-      header: 'Name',
+      header: t('beneficiaries.list.columns.name'),
+      enableSorting: true,
       cell: ({ row }) => {
         const beneficiary = row.original;
         return (
@@ -91,12 +97,13 @@ export default function BeneficiaryList() {
     },
     {
       accessorKey: 'phone',
-      header: 'Phone',
+      header: t('beneficiaries.list.columns.phone'),
       cell: ({ row }) => row.original.phone || row.original.mobile_phone || '-',
     },
     {
       accessorKey: 'status',
-      header: 'Status',
+      header: t('beneficiaries.list.columns.status'),
+      enableSorting: true,
       cell: ({ row }) => {
         const status = row.original.status;
         const statusColors = {
@@ -117,12 +124,12 @@ export default function BeneficiaryList() {
     },
     {
       accessorKey: 'assigned_trainer_name',
-      header: 'Trainer',
+      header: t('beneficiaries.list.columns.trainer'),
       cell: ({ row }) => row.original.assigned_trainer_name || '-',
     },
     {
       accessorKey: 'tags',
-      header: 'Tags',
+      header: t('beneficiaries.list.columns.tags'),
       cell: ({ row }) => {
         const tags = row.original.tags;
         if (!tags || tags.length === 0) return '-';
@@ -148,12 +155,13 @@ export default function BeneficiaryList() {
     },
     {
       accessorKey: 'created_at',
-      header: 'Created',
+      header: t('beneficiaries.list.columns.created'),
+      enableSorting: true,
       cell: ({ row }) => formatDate(row.original.created_at),
     },
     {
       id: 'actions',
-      header: 'Actions',
+      header: t('beneficiaries.list.columns.actions'),
       cell: ({ row }) => {
         const beneficiary = row.original;
         const canEdit = user?.role === 'admin' || user?.role === 'trainer';
@@ -164,7 +172,7 @@ export default function BeneficiaryList() {
             <button
               onClick={() => navigate(`/beneficiaries/${beneficiary.id}`)}
               className="p-1 hover:bg-accent rounded"
-              title="View details"
+              title={t('beneficiaries.list.actions.viewDetails')}
             >
               <Eye className="h-4 w-4" />
             </button>
@@ -175,7 +183,7 @@ export default function BeneficiaryList() {
                   navigate(`/beneficiaries/${beneficiary.id}/edit`)
                 }
                 className="p-1 hover:bg-accent rounded"
-                title="Edit"
+                title={t('beneficiaries.list.actions.edit')}
               >
                 <Edit className="h-4 w-4" />
               </button>
@@ -185,13 +193,13 @@ export default function BeneficiaryList() {
               <button
                 onClick={() => {
                   if (
-                    confirm('Are you sure you want to delete this beneficiary?')
+                    confirm(t('beneficiaries.list.actions.deleteConfirm'))
                   ) {
                     deleteMutation.mutate(beneficiary.id);
                   }
                 }}
                 className="p-1 hover:bg-accent rounded text-destructive"
-                title="Delete"
+                title={t('beneficiaries.list.actions.delete')}
               >
                 <Trash2 className="h-4 w-4" />
               </button>
@@ -210,9 +218,9 @@ export default function BeneficiaryList() {
         {/* Header */}
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">Beneficiaries</h1>
+            <h1 className="text-2xl font-bold tracking-tight">{t('beneficiaries.title')}</h1>
             <p className="text-muted-foreground">
-              Manage program beneficiaries and track their progress
+              {t('beneficiaries.subtitle')}
             </p>
           </div>
 
@@ -224,7 +232,7 @@ export default function BeneficiaryList() {
               className="inline-flex items-center px-4 py-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground rounded-md text-sm font-medium"
             >
               <Download className="h-4 w-4 mr-2" />
-              Export
+              {t('common.export')}
             </button>
 
             {canCreate && (
@@ -233,7 +241,7 @@ export default function BeneficiaryList() {
                 className="inline-flex items-center px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-md text-sm font-medium"
               >
                 <Plus className="h-4 w-4 mr-2" />
-                Add Beneficiary
+                {t('beneficiaries.list.addBeneficiary')}
               </button>
             )}
           </div>
@@ -243,7 +251,7 @@ export default function BeneficiaryList() {
         <div className="flex items-center gap-4">
           <div className="flex-1 max-w-sm">
             <input
-              placeholder="Search by name, email, phone..."
+              placeholder={t('beneficiaries.list.searchPlaceholder')}
               value={globalFilter}
               onChange={(e) => handleSearchChange(e.target.value)}
               className="w-full px-3 py-2 text-sm border rounded-md border-input bg-background"
@@ -257,11 +265,11 @@ export default function BeneficiaryList() {
             }
             className="px-3 py-2 text-sm border rounded-md border-input bg-background"
           >
-            <option value="">All Status</option>
-            <option value={BeneficiaryStatus.ACTIVE}>Active</option>
-            <option value={BeneficiaryStatus.INACTIVE}>Inactive</option>
-            <option value={BeneficiaryStatus.COMPLETED}>Completed</option>
-            <option value={BeneficiaryStatus.SUSPENDED}>Suspended</option>
+            <option value="">{t('beneficiaries.list.filters.allStatus')}</option>
+            <option value={BeneficiaryStatus.ACTIVE}>{t('beneficiaries.statuses.active')}</option>
+            <option value={BeneficiaryStatus.INACTIVE}>{t('beneficiaries.statuses.inactive')}</option>
+            <option value={BeneficiaryStatus.COMPLETED}>{t('beneficiaries.statuses.completed')}</option>
+            <option value={BeneficiaryStatus.SUSPENDED}>{t('beneficiaries.statuses.suspended')}</option>
           </select>
 
           <button
@@ -271,21 +279,41 @@ export default function BeneficiaryList() {
             className="inline-flex items-center px-3 py-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground rounded-md text-sm font-medium"
           >
             <Filter className="h-4 w-4 mr-2" />
-            More Filters
+            {t('beneficiaries.list.filters.moreFilters')}
           </button>
         </div>
 
         {/* Data Table */}
-        <DataTable
-          columns={columns}
-          data={data?.data.beneficiaries || []}
-          loading={isLoading}
-          pageCount={data?.data.pagination.pages}
-          pagination={pagination}
-          onPaginationChange={setPagination}
-          sorting={sorting}
-          onSortingChange={setSorting}
-        />
+        {isLoading ? (
+          <DataTableSkeleton columns={7} rows={10} showPagination />
+        ) : data?.data.beneficiaries && data.data.beneficiaries.length === 0 && !globalFilter && !statusFilter ? (
+          <div className="bg-white rounded-lg border">
+            <EmptyState
+              icon={Users}
+              title={t('beneficiaries.list.noBeneficiaries')}
+              description={t('beneficiaries.list.noBeneficiariesDescription')}
+              action={
+                canCreate
+                  ? {
+                      text: t('beneficiaries.list.addNewBeneficiary'),
+                      onClick: () => navigate('/beneficiaries/new'),
+                    }
+                  : undefined
+              }
+            />
+          </div>
+        ) : (
+          <DataTable
+            columns={columns}
+            data={data?.data.beneficiaries || []}
+            loading={isLoading}
+            pageCount={data?.data.pagination.pages}
+            pagination={pagination}
+            onPaginationChange={setPagination}
+            sorting={sorting}
+            onSortingChange={setSorting}
+          />
+        )}
       </div>
     </div>
   );

@@ -4,11 +4,15 @@ import React, {
   useEffect,
   useState,
   ReactNode,
+  useCallback,
 } from 'react';
 import toast from 'react-hot-toast';
 import { io, Socket } from 'socket.io-client';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { useAuth } from './AuthContext';
+import { chatQueryKeys } from '@/hooks/useChat';
+import type { Message } from '@/types/chat';
 
 interface SocketContextType {
   socket: Socket | null;
@@ -16,6 +20,10 @@ interface SocketContextType {
   emit: (event: string, data?: any) => void;
   on: (event: string, callback: (data: any) => void) => void;
   off: (event: string, callback?: (data: any) => void) => void;
+  // Chat-specific methods
+  sendMessage: (conversationId: number, content: string, attachments?: any[]) => void;
+  sendTypingStatus: (conversationId: number, isTyping: boolean) => void;
+  markAsRead: (conversationId: number, messageIds: number[]) => void;
 }
 
 const SocketContext = createContext<SocketContextType | undefined>(undefined);
@@ -36,6 +44,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const { user, isAuthenticated } = useAuth();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (isAuthenticated && user) {
@@ -153,10 +162,148 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
         });
       });
 
+      // Chat event listeners
+      
+      // New message event
+      socketInstance.on('message:new', (message: Message) => {
+        // Update messages in the conversation
+        queryClient.setQueryData(
+          chatQueryKeys.messagesList(message.conversationId),
+          (oldData: any) => {
+            if (!oldData) return oldData;
+            
+            // Check if message already exists (to prevent duplicates)
+            const messageExists = oldData.pages.some((page: any) =>
+              page.messages.some((msg: Message) => msg.id === message.id)
+            );
+            
+            if (messageExists) return oldData;
+            
+            return {
+              ...oldData,
+              pages: oldData.pages.map((page: any, index: number) => {
+                if (index === 0) {
+                  return {
+                    ...page,
+                    messages: [message, ...page.messages],
+                  };
+                }
+                return page;
+              }),
+            };
+          }
+        );
+
+        // Update conversation list to show latest message
+        queryClient.invalidateQueries({ 
+          queryKey: chatQueryKeys.conversations() 
+        });
+
+        // Show notification for new message if not from current user
+        const currentUserId = parseInt(localStorage.getItem('user_id') || '0');
+        if (message.sender.id !== currentUserId) {
+          const senderName = message.sender.fullName || `${message.sender.firstName} ${message.sender.lastName}`;
+          toast(`${senderName}: ${message.content}`, {
+            icon: '💬',
+            duration: 5000,
+          });
+        }
+      });
+
+      // Typing status event
+      socketInstance.on('message:typing', (data: {
+        conversationId: number;
+        userId: number;
+        userName: string;
+        isTyping: boolean;
+      }) => {
+        // You can store typing status in a separate state or context
+        // For now, we'll just log it
+        console.log('Typing status:', data);
+        
+        // Optionally, you can store this in React Query cache
+        queryClient.setQueryData(
+          ['chat', 'typing', data.conversationId],
+          (oldData: any) => {
+            if (!oldData) {
+              return data.isTyping ? [data] : [];
+            }
+            
+            if (data.isTyping) {
+              // Add user to typing list
+              return [...oldData.filter((t: any) => t.userId !== data.userId), data];
+            } else {
+              // Remove user from typing list
+              return oldData.filter((t: any) => t.userId !== data.userId);
+            }
+          }
+        );
+      });
+
+      // Read receipt event
+      socketInstance.on('message:read_receipt', (data: {
+        conversationId: number;
+        messageIds: number[];
+        userId: number;
+        readAt: string;
+      }) => {
+        // Update messages in cache to mark them as read
+        queryClient.setQueryData(
+          chatQueryKeys.messagesList(data.conversationId),
+          (oldData: any) => {
+            if (!oldData) return oldData;
+            
+            return {
+              ...oldData,
+              pages: oldData.pages.map((page: any) => ({
+                ...page,
+                messages: page.messages.map((msg: Message) => {
+                  if (data.messageIds.includes(msg.id)) {
+                    // Add read receipt to message
+                    const readByExists = msg.readBy.some(
+                      (read) => read.userId === data.userId
+                    );
+                    
+                    if (!readByExists) {
+                      return {
+                        ...msg,
+                        readBy: [
+                          ...msg.readBy,
+                          {
+                            userId: data.userId,
+                            readAt: data.readAt,
+                          },
+                        ],
+                      };
+                    }
+                  }
+                  return msg;
+                }),
+              })),
+            };
+          }
+        );
+
+        // Update conversation unread count
+        queryClient.invalidateQueries({
+          queryKey: chatQueryKeys.conversationDetail(data.conversationId),
+        });
+      });
+
       setSocket(socketInstance);
 
       // Cleanup on unmount
       return () => {
+        // Remove all chat event listeners
+        socketInstance.off('message:new');
+        socketInstance.off('message:typing');
+        socketInstance.off('message:read_receipt');
+        socketInstance.off('notification');
+        socketInstance.off('notification:new');
+        socketInstance.off('connect');
+        socketInstance.off('disconnect');
+        socketInstance.off('connect_error');
+        
         socketInstance.disconnect();
       };
     } else {
@@ -167,7 +314,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
         setIsConnected(false);
       }
     }
-  }, [isAuthenticated, user]);
+  }, [isAuthenticated, user, queryClient]);
 
   const emit = (event: string, data?: any) => {
     if (socket && isConnected) {
@@ -193,12 +340,55 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
     }
   };
 
+  // Chat-specific methods
+  const sendMessage = useCallback(
+    (conversationId: number, content: string, attachments?: any[]) => {
+      if (socket && isConnected) {
+        socket.emit('message:send', {
+          conversationId,
+          content,
+          attachments,
+        });
+      } else {
+        console.warn('Socket not connected. Cannot send message');
+      }
+    },
+    [socket, isConnected]
+  );
+
+  const sendTypingStatus = useCallback(
+    (conversationId: number, isTyping: boolean) => {
+      if (socket && isConnected) {
+        socket.emit('message:typing', {
+          conversationId,
+          isTyping,
+        });
+      }
+    },
+    [socket, isConnected]
+  );
+
+  const markAsRead = useCallback(
+    (conversationId: number, messageIds: number[]) => {
+      if (socket && isConnected) {
+        socket.emit('message:mark_read', {
+          conversationId,
+          messageIds,
+        });
+      }
+    },
+    [socket, isConnected]
+  );
+
   const value = {
     socket,
     isConnected,
     emit,
     on,
     off,
+    sendMessage,
+    sendTypingStatus,
+    markAsRead,
   };
 
   return (

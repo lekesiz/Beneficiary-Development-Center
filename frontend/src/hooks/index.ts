@@ -64,3 +64,31 @@ export {
   useSaveQuestionResponse,
   evaluationQueryKeys,
 } from './useEvaluations';
+
+// Chat hooks
+export {
+  useConversations,
+  useConversation,
+  useMessages,
+  useSearchUsers,
+  useChatStatistics,
+  useChatNotifications,
+  useCreateConversation,
+  useUpdateConversation,
+  useDeleteConversation,
+  useSendMessage,
+  useUpdateMessage,
+  useDeleteMessage,
+  useMarkAsRead,
+  useAddParticipants,
+  useRemoveParticipant,
+  useLeaveConversation,
+  useUploadAttachment,
+  useMarkNotificationAsRead,
+  useSendTypingStatus,
+  useAutoMarkAsRead,
+  chatQueryKeys,
+} from './useChat';
+
+// User hooks
+export { useNotificationPreferences } from './useNotificationPreferences';

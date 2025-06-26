@@ -7,7 +7,6 @@ import {
   isBefore,
   isWithinInterval,
 } from 'date-fns';
-import { tr } from 'date-fns/locale';
 
 import {
   PROGRAM_STATUS_OPTIONS,
@@ -23,7 +22,7 @@ export const formatProgramDate = (
   dateString: string,
   formatStr = 'dd MMMM yyyy'
 ) => {
-  return format(new Date(dateString), formatStr, { locale: tr });
+  return format(new Date(dateString), formatStr);
 };
 
 /**
@@ -32,15 +31,15 @@ export const formatProgramDate = (
 export const getProgramDurationText = (program: Program) => {
   const days = program.duration_days;
 
-  if (days === 1) return '1 gün';
-  if (days < 7) return `${days} gün`;
+  if (days === 1) return '1 day';
+  if (days < 7) return `${days} days`;
   if (days < 30) {
     const weeks = Math.ceil(days / 7);
-    return `${weeks} hafta`;
+    return `${weeks} week${weeks > 1 ? 's' : ''}`;
   }
 
   const months = Math.ceil(days / 30);
-  return `${months} ay`;
+  return `${months} month${months > 1 ? 's' : ''}`;
 };
 
 /**
@@ -89,9 +88,9 @@ export const formatProgramPrice = (price: number, currency: string) => {
   const currencyInfo = getCurrencyInfo(currency);
   const amount = price / 100; // Convert from cents
 
-  if (amount === 0) return 'Ücretsiz';
+  if (amount === 0) return 'Free';
 
-  return `${amount.toLocaleString('tr-TR', {
+  return `${amount.toLocaleString('en-US', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })} ${currencyInfo.symbol}`;
@@ -153,7 +152,7 @@ export const isProgramPast = (program: Program) => {
  */
 export const getEnrollmentPeriodText = (program: Program) => {
   if (!program.enrollment_start || !program.enrollment_end) {
-    return 'Program başlayana kadar';
+    return 'Until program starts';
   }
 
   const start = formatProgramDate(program.enrollment_start, 'dd MMM');
@@ -189,9 +188,9 @@ export const calculateEnrollmentPercentage = (program: Program) => {
 export const getAvailableSpotsText = (program: Program) => {
   const available = program.available_spots || 0;
 
-  if (available === 0) return 'Yer kalmadı';
-  if (available === 1) return '1 yer kaldı';
-  return `${available} yer kaldı`;
+  if (available === 0) return 'No spots left';
+  if (available === 1) return '1 spot left';
+  return `${available} spots left`;
 };
 
 /**
@@ -207,7 +206,7 @@ export const sortPrograms = (
 
     switch (sortBy) {
       case 'title':
-        comparison = a.title.localeCompare(b.title, 'tr');
+        comparison = a.title.localeCompare(b.title);
         break;
       case 'start_date':
         comparison =

@@ -3,9 +3,46 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 
+import { useAuth } from '@/contexts/AuthContext';
 import * as beneficiaryHooks from '@/hooks/useBeneficiaries';
 import { mockBeneficiary } from '@/tests/mocks/beneficiary';
 import { render, screen, waitFor } from '@/tests/utils/test-utils';
+
+// Import defaultUser to use in tests
+const defaultUser = {
+  id: 1,
+  uuid: 'test-uuid',
+  email: 'test@example.com',
+  firstName: 'Test',
+  lastName: 'User',
+  first_name: 'Test',
+  last_name: 'User',
+  fullName: 'Test User',
+  isActive: true,
+  isVerified: true,
+  twoFactorEnabled: false,
+  preferences: {
+    language: 'en',
+    theme: 'light',
+    emailFrequency: 'daily',
+    timezone: 'UTC',
+  },
+  notificationSettings: {
+    email: true,
+    inApp: true,
+    sms: false,
+    evaluationReminders: true,
+    appointmentReminders: true,
+    newContent: true,
+  },
+  tenantId: 1,
+  tenant_id: 1,
+  primaryRole: 'admin',
+  role: 'admin',
+  roles: [{ id: 1, name: 'admin', description: 'Administrator' }],
+  createdAt: '2024-01-01T00:00:00Z',
+  updatedAt: '2024-01-01T00:00:00Z',
+};
 
 import BeneficiaryDetail from '../BeneficiaryDetail';
 
@@ -23,6 +60,11 @@ vi.mock('react-router-dom', async () => {
 vi.mock('@/hooks/useBeneficiaries', () => ({
   useBeneficiary: vi.fn(),
   useDeleteBeneficiary: vi.fn(),
+}));
+
+// Mock AuthContext
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: vi.fn(),
 }));
 
 describe('BeneficiaryDetail', () => {
@@ -44,6 +86,13 @@ describe('BeneficiaryDetail', () => {
       mutateAsync: mockDeleteMutate,
       isPending: false,
     } as any);
+
+    // Default auth mock - admin user
+    vi.mocked(useAuth).mockReturnValue({
+      user: { ...defaultUser, role: 'admin', primaryRole: 'admin' },
+      isAuthenticated: true,
+      isLoading: false,
+    } as any);
   });
 
   it('shows loading state', () => {
@@ -55,7 +104,9 @@ describe('BeneficiaryDetail', () => {
 
     render(<BeneficiaryDetail />);
 
-    expect(screen.getByRole('status')).toBeInTheDocument();
+    // Look for the loading spinner by its test id or class
+    const spinner = document.querySelector('.animate-spin');
+    expect(spinner).toBeInTheDocument();
   });
 
   it('shows error state when beneficiary not found', () => {
@@ -174,30 +225,42 @@ describe('BeneficiaryDetail', () => {
 
   describe('Role-based Actions', () => {
     it('shows edit and delete buttons for admin', () => {
-      render(<BeneficiaryDetail />, {
-        user: { role: 'admin', primaryRole: 'admin' } as any,
-      });
+      // useAuth is already mocked with admin role in beforeEach
+      render(<BeneficiaryDetail />);
 
       expect(screen.getByText('Edit')).toBeInTheDocument();
       expect(screen.getByText('Delete')).toBeInTheDocument();
     });
 
     it('shows only edit button for trainer', () => {
-      render(<BeneficiaryDetail />, {
-        user: { role: 'trainer', primaryRole: 'trainer' } as any,
-      });
+      vi.mocked(useAuth).mockReturnValue({
+        user: { ...defaultUser, role: 'trainer', primaryRole: 'trainer' },
+        isAuthenticated: true,
+        isLoading: false,
+      } as any);
+
+      render(<BeneficiaryDetail />);
 
       expect(screen.getByText('Edit')).toBeInTheDocument();
-      expect(screen.queryByText('Delete')).not.toBeInTheDocument();
+      // Check that there's no Delete button (excluding the one in the dialog if it exists)
+      const deleteButtons = screen.queryAllByText('Delete');
+      expect(deleteButtons).toHaveLength(0);
     });
 
     it('hides action buttons for student', () => {
-      render(<BeneficiaryDetail />, {
-        user: { role: 'student', primaryRole: 'student' } as any,
-      });
+      vi.mocked(useAuth).mockReturnValue({
+        user: { ...defaultUser, role: 'student', primaryRole: 'student' },
+        isAuthenticated: true,
+        isLoading: false,
+      } as any);
 
-      expect(screen.queryByText('Edit')).not.toBeInTheDocument();
-      expect(screen.queryByText('Delete')).not.toBeInTheDocument();
+      render(<BeneficiaryDetail />);
+
+      // Check that there are no Edit or Delete buttons
+      const editButtons = screen.queryAllByText('Edit');
+      const deleteButtons = screen.queryAllByText('Delete');
+      expect(editButtons).toHaveLength(0);
+      expect(deleteButtons).toHaveLength(0);
     });
   });
 

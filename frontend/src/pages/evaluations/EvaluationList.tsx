@@ -19,6 +19,7 @@ import {
   BookOpen,
   Target,
   Trophy,
+  ClipboardCheck,
 } from 'lucide-react';
 import * as React from 'react';
 import { useState, useMemo } from 'react';
@@ -27,6 +28,7 @@ import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/Badge';
 import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { Modal } from '@/components/ui/Modal';
 import {
@@ -506,16 +508,28 @@ export default function EvaluationList() {
 
       {/* Data Table */}
       <Card>
-        <DataTable
-          columns={columns}
-          data={evaluationsData?.evaluations || []}
-          loading={isLoading}
-          pageCount={evaluationsData?.pagination.pages}
-          pagination={pagination}
-          onPaginationChange={handlePaginationChange}
-          sorting={sorting}
-          onSortingChange={handleSortingChange}
-        />
+        {evaluationsData?.evaluations && evaluationsData.evaluations.length === 0 && !searchTerm && !filters.status && !filters.type ? (
+          <EmptyState
+            icon={ClipboardCheck}
+            title="No Evaluations Found"
+            description="Create your first evaluation to assess student knowledge and skills. Track progress and provide personalized learning paths based on results."
+            action={{
+              text: "Create New Evaluation",
+              onClick: () => navigate('/evaluations/create'),
+            }}
+          />
+        ) : (
+          <DataTable
+            columns={columns}
+            data={evaluationsData?.evaluations || []}
+            loading={isLoading}
+            pageCount={evaluationsData?.pagination.pages}
+            pagination={pagination}
+            onPaginationChange={handlePaginationChange}
+            sorting={sorting}
+            onSortingChange={handleSortingChange}
+          />
+        )}
       </Card>
 
       {/* Delete Confirmation Modal */}

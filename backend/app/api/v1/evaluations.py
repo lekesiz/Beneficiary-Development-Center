@@ -1,724 +1,726 @@
 """
 Evaluation API endpoints
 """
-from typing import Dict, Any, List
+
 from flask import Blueprint, request, jsonify
+from flask_jwt_extended import jwt_required, get_jwt, get_jwt_identity
+from marshmallow import ValidationError
+
+from app.models.user import User
+from app.models.evaluation import AttemptStatus
 from app.services.evaluation_service import (
-    EvaluationService, QuestionService, EvaluationAttemptService, QuestionResponseService
+    EvaluationService,
+    QuestionService,
+    EvaluationAttemptService,
+    QuestionResponseService,
 )
-from app.services.adaptive_evaluation_service import adaptive_evaluation_service
-from app.core.auth import require_auth, get_current_user
+from app.schemas.evaluation import (
+    EvaluationCreateSchema,
+    EvaluationUpdateSchema,
+    EvaluationResponseSchema,
+    QuestionCreateSchema,
+    QuestionUpdateSchema,
+    QuestionResponseSchema,
+    EvaluationAttemptResponseSchema,
+    QuestionResponseSaveSchema,
+    EvaluationListQuerySchema,
+)
+from app.core.decorators import require_tenant, check_role
+from app.core.exceptions import NotFoundError, BadRequestError, ForbiddenError
 from app.core.database import get_db
-from app.core.exceptions import ValidationError
 
-evaluations_bp = Blueprint('evaluations', __name__, url_prefix='/api/evaluations')
+evaluations_bp = Blueprint("evaluations", __name__, url_prefix="/api/v1/evaluations")
 
 
-@evaluations_bp.route('', methods=['GET'])
-@require_auth
+@evaluations_bp.route("", methods=["GET"])
+@jwt_required()
+@require_tenant()
 def get_evaluations():
-    """Get all evaluations"""
-    user = get_current_user()
-    db = get_db()
-    
-    # Get query parameters
-    filters = {
-        'page': request.args.get('page', 1, type=int),
-        'per_page': request.args.get('per_page', 20, type=int),
-        'status': request.args.get('status'),
-        'course_id': request.args.get('course_id', type=int),
-        'program_id': request.args.get('program_id', type=int),
-        'search': request.args.get('search'),
-        'sort_by': request.args.get('sort_by', 'created_at'),
-        'sort_desc': request.args.get('sort_desc', 'true').lower() == 'true'
-    }
-    
-    evaluation_service = EvaluationService(db)
-    result = evaluation_service.get_all(user.tenant_id, filters, user)
-    
-    # Convert to dict
-    evaluations = []
-    for evaluation in result['evaluations']:
-        evaluation_dict = evaluation.to_dict()
-        evaluations.append(evaluation_dict)
-    
-    return jsonify({
-        'evaluations': evaluations,
-        'pagination': result['pagination']
-    })
+    """Get all evaluations with filtering and pagination"""
+    # Parse and validate query parameters
+    query_schema = EvaluationListQuerySchema()
+    try:
+        filters = query_schema.load(request.args)
+    except ValidationError as e:
+        return jsonify({"error": "Invalid query parameters", "details": e.messages}), 400
+
+    # Get current user
+    user_id = get_jwt_identity()
+    claims = get_jwt()
+    tenant_id = claims.get("tenant_id")
+
+    db = next(get_db())
+    try:
+        user = db.query(User).filter_by(id=user_id).first()
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        # Get evaluations
+        service = EvaluationService(db)
+        result = service.get_all(tenant_id, filters, user)
+
+        # Serialize response
+        schema = EvaluationResponseSchema(many=True)
+        evaluations_data = schema.dump(result["evaluations"])
+
+        return jsonify({"evaluations": evaluations_data, "pagination": result["pagination"]}), 200
+
+    finally:
+        db.close()
 
 
-@evaluations_bp.route('/<int:evaluation_id>', methods=['GET'])
-@require_auth
-def get_evaluation(evaluation_id: int):
+@evaluations_bp.route("/<int:evaluation_id>", methods=["GET"])
+@jwt_required()
+@require_tenant()
+def get_evaluation(evaluation_id):
     """Get evaluation by ID"""
-    user = get_current_user()
-    db = get_db()
-    
-    include_questions = request.args.get('include_questions', 'false').lower() == 'true'
-    
-    evaluation_service = EvaluationService(db)
-    evaluation = evaluation_service.get_by_id(evaluation_id, user.tenant_id, include_questions)
-    
-    evaluation_dict = evaluation.to_dict()
-    
-    if include_questions and evaluation.questions:
-        evaluation_dict['questions'] = [q.to_dict() for q in evaluation.questions]
-    
-    return jsonify(evaluation_dict)
+    claims = get_jwt()
+    tenant_id = claims.get("tenant_id")
+    include_questions = request.args.get("include_questions", "false").lower() == "true"
+
+    db = next(get_db())
+    try:
+        service = EvaluationService(db)
+        evaluation = service.get_by_id(evaluation_id, tenant_id, include_questions)
+
+        schema = EvaluationResponseSchema()
+        return jsonify(schema.dump(evaluation)), 200
+
+    except NotFoundError as e:
+        return jsonify({"error": str(e)}), 404
+    finally:
+        db.close()
 
 
-@evaluations_bp.route('', methods=['POST'])
-@require_auth
+@evaluations_bp.route("", methods=["POST"])
+@jwt_required()
+@require_tenant()
+@check_role(["admin", "manager", "instructor"])
 def create_evaluation():
     """Create a new evaluation"""
-    user = get_current_user()
-    db = get_db()
-    data = request.get_json()
-    
-    if not data:
-        raise ValidationError("Request body is required")
-    
-    evaluation_service = EvaluationService(db)
-    evaluation = evaluation_service.create(user.tenant_id, data, user)
-    
-    return jsonify(evaluation.to_dict()), 201
+    # Validate request data
+    schema = EvaluationCreateSchema()
+    try:
+        data = schema.load(request.json)
+    except ValidationError as e:
+        return jsonify({"error": "Invalid data", "details": e.messages}), 400
+
+    # Get current user
+    user_id = get_jwt_identity()
+    claims = get_jwt()
+    tenant_id = claims.get("tenant_id")
+
+    db = next(get_db())
+    try:
+        user = db.query(User).filter_by(id=user_id).first()
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        # Create evaluation
+        service = EvaluationService(db)
+        evaluation = service.create(tenant_id, data, user)
+
+        # Serialize response
+        response_schema = EvaluationResponseSchema()
+        return jsonify(response_schema.dump(evaluation)), 201
+
+    except (BadRequestError, ForbiddenError) as e:
+        return jsonify({"error": str(e)}), 400
+    finally:
+        db.close()
 
 
-@evaluations_bp.route('/<int:evaluation_id>', methods=['PUT'])
-@require_auth
-def update_evaluation(evaluation_id: int):
+@evaluations_bp.route("/<int:evaluation_id>", methods=["PUT"])
+@jwt_required()
+@require_tenant()
+@check_role(["admin", "manager", "instructor"])
+def update_evaluation(evaluation_id):
     """Update an evaluation"""
-    user = get_current_user()
-    db = get_db()
-    data = request.get_json()
-    
-    if not data:
-        raise ValidationError("Request body is required")
-    
-    evaluation_service = EvaluationService(db)
-    evaluation = evaluation_service.update(evaluation_id, user.tenant_id, data, user)
-    
-    return jsonify(evaluation.to_dict())
+    # Validate request data
+    schema = EvaluationUpdateSchema()
+    try:
+        data = schema.load(request.json)
+    except ValidationError as e:
+        return jsonify({"error": "Invalid data", "details": e.messages}), 400
+
+    # Get current user
+    user_id = get_jwt_identity()
+    claims = get_jwt()
+    tenant_id = claims.get("tenant_id")
+
+    db = next(get_db())
+    try:
+        user = db.query(User).filter_by(id=user_id).first()
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        # Update evaluation
+        service = EvaluationService(db)
+        evaluation = service.update(evaluation_id, tenant_id, data, user)
+
+        # Serialize response
+        response_schema = EvaluationResponseSchema()
+        return jsonify(response_schema.dump(evaluation)), 200
+
+    except NotFoundError as e:
+        return jsonify({"error": str(e)}), 404
+    except (BadRequestError, ForbiddenError) as e:
+        return jsonify({"error": str(e)}), 400
+    finally:
+        db.close()
 
 
-@evaluations_bp.route('/<int:evaluation_id>', methods=['DELETE'])
-@require_auth
-def delete_evaluation(evaluation_id: int):
+@evaluations_bp.route("/<int:evaluation_id>", methods=["DELETE"])
+@jwt_required()
+@require_tenant()
+@check_role(["admin", "manager", "instructor"])
+def delete_evaluation(evaluation_id):
     """Delete an evaluation"""
-    user = get_current_user()
-    db = get_db()
-    
-    evaluation_service = EvaluationService(db)
-    evaluation_service.delete(evaluation_id, user.tenant_id, user)
-    
-    return jsonify({'message': 'Evaluation deleted successfully'})
+    # Get current user
+    user_id = get_jwt_identity()
+    claims = get_jwt()
+    tenant_id = claims.get("tenant_id")
+
+    db = next(get_db())
+    try:
+        user = db.query(User).filter_by(id=user_id).first()
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        # Delete evaluation
+        service = EvaluationService(db)
+        service.delete(evaluation_id, tenant_id, user)
+
+        return jsonify({"message": "Evaluation deleted successfully"}), 200
+
+    except NotFoundError as e:
+        return jsonify({"error": str(e)}), 404
+    except ForbiddenError as e:
+        return jsonify({"error": str(e)}), 403
+    finally:
+        db.close()
 
 
-@evaluations_bp.route('/<int:evaluation_id>/activate', methods=['POST'])
-@require_auth
-def activate_evaluation(evaluation_id: int):
+@evaluations_bp.route("/<int:evaluation_id>/activate", methods=["PUT"])
+@jwt_required()
+@require_tenant()
+@check_role(["admin", "manager", "instructor"])
+def activate_evaluation(evaluation_id):
     """Activate an evaluation"""
-    user = get_current_user()
-    db = get_db()
-    
-    evaluation_service = EvaluationService(db)
-    evaluation = evaluation_service.activate(evaluation_id, user.tenant_id, user)
-    
-    return jsonify(evaluation.to_dict())
+    # Get current user
+    user_id = get_jwt_identity()
+    claims = get_jwt()
+    tenant_id = claims.get("tenant_id")
+
+    db = next(get_db())
+    try:
+        user = db.query(User).filter_by(id=user_id).first()
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        # Activate evaluation
+        service = EvaluationService(db)
+        evaluation = service.activate(evaluation_id, tenant_id, user)
+
+        # Serialize response
+        response_schema = EvaluationResponseSchema()
+        return jsonify(response_schema.dump(evaluation)), 200
+
+    except NotFoundError as e:
+        return jsonify({"error": str(e)}), 404
+    except (BadRequestError, ForbiddenError) as e:
+        return jsonify({"error": str(e)}), 400
+    finally:
+        db.close()
 
 
-@evaluations_bp.route('/<int:evaluation_id>/archive', methods=['POST'])
-@require_auth
-def archive_evaluation(evaluation_id: int):
+@evaluations_bp.route("/<int:evaluation_id>/archive", methods=["PUT"])
+@jwt_required()
+@require_tenant()
+@check_role(["admin", "manager", "instructor"])
+def archive_evaluation(evaluation_id):
     """Archive an evaluation"""
-    user = get_current_user()
-    db = get_db()
-    
-    evaluation_service = EvaluationService(db)
-    evaluation = evaluation_service.archive(evaluation_id, user.tenant_id, user)
-    
-    return jsonify(evaluation.to_dict())
+    # Get current user
+    user_id = get_jwt_identity()
+    claims = get_jwt()
+    tenant_id = claims.get("tenant_id")
+
+    db = next(get_db())
+    try:
+        user = db.query(User).filter_by(id=user_id).first()
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        # Archive evaluation
+        service = EvaluationService(db)
+        evaluation = service.archive(evaluation_id, tenant_id, user)
+
+        # Serialize response
+        response_schema = EvaluationResponseSchema()
+        return jsonify(response_schema.dump(evaluation)), 200
+
+    except NotFoundError as e:
+        return jsonify({"error": str(e)}), 404
+    except ForbiddenError as e:
+        return jsonify({"error": str(e)}), 403
+    finally:
+        db.close()
 
 
 # Question endpoints
-@evaluations_bp.route('/<int:evaluation_id>/questions', methods=['GET'])
-@require_auth
-def get_questions(evaluation_id: int):
+@evaluations_bp.route("/<int:evaluation_id>/questions", methods=["GET"])
+@jwt_required()
+@require_tenant()
+def get_questions(evaluation_id):
     """Get all questions for an evaluation"""
-    user = get_current_user()
-    db = get_db()
-    
-    question_service = QuestionService(db)
-    questions = question_service.get_by_evaluation(evaluation_id, user.tenant_id)
-    
-    return jsonify([q.to_dict() for q in questions])
+    claims = get_jwt()
+    tenant_id = claims.get("tenant_id")
+
+    db = next(get_db())
+    try:
+        # Verify evaluation exists
+        eval_service = EvaluationService(db)
+        eval_service.get_by_id(evaluation_id, tenant_id)
+
+        # Get questions
+        service = QuestionService(db)
+        questions = service.get_by_evaluation(evaluation_id, tenant_id)
+
+        # Serialize response
+        schema = QuestionResponseSchema(many=True)
+        return jsonify(schema.dump(questions)), 200
+
+    except NotFoundError as e:
+        return jsonify({"error": str(e)}), 404
+    finally:
+        db.close()
 
 
-@evaluations_bp.route('/<int:evaluation_id>/questions', methods=['POST'])
-@require_auth
-def create_question(evaluation_id: int):
-    """Create a new question"""
-    user = get_current_user()
-    db = get_db()
-    data = request.get_json()
-    
-    if not data:
-        raise ValidationError("Request body is required")
-    
-    question_service = QuestionService(db)
-    question = question_service.create(evaluation_id, user.tenant_id, data, user)
-    
-    return jsonify(question.to_dict()), 201
+@evaluations_bp.route("/<int:evaluation_id>/questions", methods=["POST"])
+@jwt_required()
+@require_tenant()
+@check_role(["admin", "manager", "instructor"])
+def add_question(evaluation_id):
+    """Add a question to an evaluation"""
+    # Validate request data
+    schema = QuestionCreateSchema()
+    try:
+        data = schema.load(request.json)
+    except ValidationError as e:
+        return jsonify({"error": "Invalid data", "details": e.messages}), 400
+
+    # Get current user
+    user_id = get_jwt_identity()
+    claims = get_jwt()
+    tenant_id = claims.get("tenant_id")
+
+    db = next(get_db())
+    try:
+        user = db.query(User).filter_by(id=user_id).first()
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        # Create question
+        service = QuestionService(db)
+        question = service.create(evaluation_id, tenant_id, data, user)
+
+        # Serialize response
+        response_schema = QuestionResponseSchema()
+        return jsonify(response_schema.dump(question)), 201
+
+    except NotFoundError as e:
+        return jsonify({"error": str(e)}), 404
+    except (BadRequestError, ForbiddenError) as e:
+        return jsonify({"error": str(e)}), 400
+    finally:
+        db.close()
 
 
-@evaluations_bp.route('/<int:evaluation_id>/questions/<int:question_id>', methods=['PUT'])
-@require_auth
-def update_question(evaluation_id: int, question_id: int):
+@evaluations_bp.route("/questions/<int:question_id>", methods=["PUT"])
+@jwt_required()
+@require_tenant()
+@check_role(["admin", "manager", "instructor"])
+def update_question(question_id):
     """Update a question"""
-    user = get_current_user()
-    db = get_db()
-    data = request.get_json()
-    
-    if not data:
-        raise ValidationError("Request body is required")
-    
-    question_service = QuestionService(db)
-    question = question_service.update(question_id, user.tenant_id, data, user)
-    
-    return jsonify(question.to_dict())
+    # Validate request data
+    schema = QuestionUpdateSchema()
+    try:
+        data = schema.load(request.json)
+    except ValidationError as e:
+        return jsonify({"error": "Invalid data", "details": e.messages}), 400
+
+    # Get current user
+    user_id = get_jwt_identity()
+    claims = get_jwt()
+    tenant_id = claims.get("tenant_id")
+
+    db = next(get_db())
+    try:
+        user = db.query(User).filter_by(id=user_id).first()
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        # Update question
+        service = QuestionService(db)
+        question = service.update(question_id, tenant_id, data, user)
+
+        # Serialize response
+        response_schema = QuestionResponseSchema()
+        return jsonify(response_schema.dump(question)), 200
+
+    except NotFoundError as e:
+        return jsonify({"error": str(e)}), 404
+    except ForbiddenError as e:
+        return jsonify({"error": str(e)}), 403
+    finally:
+        db.close()
 
 
-@evaluations_bp.route('/<int:evaluation_id>/questions/<int:question_id>', methods=['DELETE'])
-@require_auth
-def delete_question(evaluation_id: int, question_id: int):
+@evaluations_bp.route("/questions/<int:question_id>", methods=["DELETE"])
+@jwt_required()
+@require_tenant()
+@check_role(["admin", "manager", "instructor"])
+def delete_question(question_id):
     """Delete a question"""
-    user = get_current_user()
-    db = get_db()
-    
-    question_service = QuestionService(db)
-    question_service.delete(question_id, user.tenant_id, user)
-    
-    return jsonify({'message': 'Question deleted successfully'})
+    # Get current user
+    user_id = get_jwt_identity()
+    claims = get_jwt()
+    tenant_id = claims.get("tenant_id")
+
+    db = next(get_db())
+    try:
+        user = db.query(User).filter_by(id=user_id).first()
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        # Delete question
+        service = QuestionService(db)
+        service.delete(question_id, tenant_id, user)
+
+        return jsonify({"message": "Question deleted successfully"}), 200
+
+    except NotFoundError as e:
+        return jsonify({"error": str(e)}), 404
+    except ForbiddenError as e:
+        return jsonify({"error": str(e)}), 403
+    finally:
+        db.close()
 
 
-@evaluations_bp.route('/<int:evaluation_id>/questions/<int:question_id>/reorder', methods=['POST'])
-@require_auth
-def reorder_question(evaluation_id: int, question_id: int):
-    """Reorder a question"""
-    user = get_current_user()
-    db = get_db()
-    data = request.get_json()
-    
-    if not data or 'order_index' not in data:
-        raise ValidationError("order_index is required")
-    
-    question_service = QuestionService(db)
-    question = question_service.reorder(question_id, user.tenant_id, data['order_index'], user)
-    
-    return jsonify(question.to_dict())
-
-
-# Attempt endpoints
-@evaluations_bp.route('/<int:evaluation_id>/attempts', methods=['POST'])
-@require_auth
-def start_attempt(evaluation_id: int):
+# Evaluation attempt endpoints
+@evaluations_bp.route("/<int:evaluation_id>/start", methods=["POST"])
+@jwt_required()
+@require_tenant()
+def start_attempt(evaluation_id):
     """Start a new evaluation attempt"""
-    user = get_current_user()
-    db = get_db()
-    
-    attempt_service = EvaluationAttemptService(db)
-    attempt = attempt_service.start_attempt(evaluation_id, user.tenant_id, user)
-    
-    return jsonify(attempt.to_dict()), 201
+    # Get current user
+    user_id = get_jwt_identity()
+    claims = get_jwt()
+    tenant_id = claims.get("tenant_id")
+
+    db = next(get_db())
+    try:
+        user = db.query(User).filter_by(id=user_id).first()
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        # Start attempt
+        service = EvaluationAttemptService(db)
+        attempt = service.start_attempt(evaluation_id, tenant_id, user)
+
+        # Serialize response
+        response_schema = EvaluationAttemptResponseSchema()
+        return jsonify(response_schema.dump(attempt)), 201
+
+    except NotFoundError as e:
+        return jsonify({"error": str(e)}), 404
+    except BadRequestError as e:
+        return jsonify({"error": str(e)}), 400
+    finally:
+        db.close()
 
 
-@evaluations_bp.route('/<int:evaluation_id>/attempts/<int:attempt_id>', methods=['GET'])
-@require_auth
-def get_attempt(evaluation_id: int, attempt_id: int):
-    """Get an evaluation attempt"""
-    user = get_current_user()
-    db = get_db()
-    
-    attempt_service = EvaluationAttemptService(db)
-    attempt = attempt_service.get_by_id(attempt_id, user.tenant_id)
-    
-    # Check permissions
-    if attempt.user_id != user.id and user.role not in ['admin', 'manager', 'instructor']:
-        return jsonify({'error': 'Forbidden'}), 403
-    
-    attempt_dict = attempt.to_dict()
-    
-    # Include responses if user owns the attempt or has admin rights
-    if attempt.user_id == user.id or user.role in ['admin', 'manager']:
-        attempt_dict['responses'] = [r.to_dict() for r in attempt.responses]
-    
-    return jsonify(attempt_dict)
+@evaluations_bp.route("/attempts/<int:attempt_id>", methods=["GET"])
+@jwt_required()
+@require_tenant()
+def get_attempt(attempt_id):
+    """Get evaluation attempt details"""
+    # Get current user
+    user_id = get_jwt_identity()
+    claims = get_jwt()
+    tenant_id = claims.get("tenant_id")
+
+    db = next(get_db())
+    try:
+        user = db.query(User).filter_by(id=user_id).first()
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        # Get attempt
+        service = EvaluationAttemptService(db)
+        attempt = service.get_by_id(attempt_id, tenant_id)
+
+        # Check permissions
+        if attempt.user_id != user.id and user.role not in ["admin", "manager", "instructor"]:
+            return jsonify({"error": "You do not have permission to view this attempt"}), 403
+
+        # Serialize response
+        response_schema = EvaluationAttemptResponseSchema()
+        return jsonify(response_schema.dump(attempt)), 200
+
+    except NotFoundError as e:
+        return jsonify({"error": str(e)}), 404
+    finally:
+        db.close()
 
 
-@evaluations_bp.route('/<int:evaluation_id>/attempts/<int:attempt_id>/submit', methods=['POST'])
-@require_auth
-def submit_attempt(evaluation_id: int, attempt_id: int):
-    """Submit an evaluation attempt"""
-    user = get_current_user()
-    db = get_db()
-    
-    attempt_service = EvaluationAttemptService(db)
-    attempt = attempt_service.submit_attempt(attempt_id, user.tenant_id, user)
-    
-    return jsonify(attempt.to_dict())
+@evaluations_bp.route("/attempts/<int:attempt_id>/submit", methods=["POST"])
+@jwt_required()
+@require_tenant()
+def submit_attempt(attempt_id):
+    """Submit and score an evaluation attempt"""
+    # Get current user
+    user_id = get_jwt_identity()
+    claims = get_jwt()
+    tenant_id = claims.get("tenant_id")
+
+    db = next(get_db())
+    try:
+        user = db.query(User).filter_by(id=user_id).first()
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        # Submit attempt
+        service = EvaluationAttemptService(db)
+        attempt = service.submit_attempt(attempt_id, tenant_id, user)
+
+        # Serialize response
+        response_schema = EvaluationAttemptResponseSchema()
+        return jsonify(response_schema.dump(attempt)), 200
+
+    except NotFoundError as e:
+        return jsonify({"error": str(e)}), 404
+    except (BadRequestError, ForbiddenError) as e:
+        return jsonify({"error": str(e)}), 400
+    finally:
+        db.close()
 
 
-@evaluations_bp.route('/<int:evaluation_id>/attempts/<int:attempt_id>/responses', methods=['POST'])
-@require_auth
-def save_response(evaluation_id: int, attempt_id: int):
+@evaluations_bp.route("/attempts/<int:attempt_id>/responses", methods=["POST"])
+@jwt_required()
+@require_tenant()
+def save_response(attempt_id):
     """Save a question response"""
-    user = get_current_user()
-    db = get_db()
-    data = request.get_json()
-    
-    if not data or 'question_id' not in data or 'response_data' not in data:
-        raise ValidationError("question_id and response_data are required")
-    
-    response_service = QuestionResponseService(db)
-    response = response_service.save_response(
-        attempt_id, 
-        data['question_id'], 
-        user.tenant_id, 
-        data['response_data'], 
-        user
-    )
-    
-    return jsonify(response.to_dict())
+    # Validate request data
+    schema = QuestionResponseSaveSchema()
+    try:
+        data = schema.load(request.json)
+    except ValidationError as e:
+        return jsonify({"error": "Invalid data", "details": e.messages}), 400
+
+    # Get current user
+    user_id = get_jwt_identity()
+    claims = get_jwt()
+    tenant_id = claims.get("tenant_id")
+
+    db = next(get_db())
+    try:
+        user = db.query(User).filter_by(id=user_id).first()
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        # Save response
+        service = QuestionResponseService(db)
+        response = service.save_response(attempt_id, data["question_id"], tenant_id, data["response_data"], user)
+
+        return (
+            jsonify(
+                {
+                    "message": "Response saved successfully",
+                    "is_correct": response.is_correct,
+                    "points_earned": response.points_earned,
+                }
+            ),
+            200,
+        )
+
+    except NotFoundError as e:
+        return jsonify({"error": str(e)}), 404
+    except (BadRequestError, ForbiddenError) as e:
+        return jsonify({"error": str(e)}), 400
+    finally:
+        db.close()
 
 
-@evaluations_bp.route('/<int:evaluation_id>/my-attempts', methods=['GET'])
-@require_auth
-def get_my_attempts(evaluation_id: int):
-    """Get current user's attempts for an evaluation"""
-    user = get_current_user()
-    db = get_db()
-    
-    attempt_service = EvaluationAttemptService(db)
-    attempts = attempt_service.get_user_attempts(evaluation_id, user.id, user.tenant_id)
-    
-    return jsonify([attempt.to_dict() for attempt in attempts])
+@evaluations_bp.route("/attempts/<int:attempt_id>/results", methods=["GET"])
+@jwt_required()
+@require_tenant()
+def get_attempt_results(attempt_id):
+    """Get detailed results for an evaluation attempt"""
+    # Get current user
+    user_id = get_jwt_identity()
+    claims = get_jwt()
+    tenant_id = claims.get("tenant_id")
 
+    db = next(get_db())
+    try:
+        user = db.query(User).filter_by(id=user_id).first()
+        if not user:
+            return jsonify({"error": "User not found"}), 404
 
-@evaluations_bp.route('/statistics', methods=['GET'])
-@require_auth
-def get_evaluation_statistics():
-    """Get evaluation statistics"""
-    user = get_current_user()
-    db = get_db()
-    
-    # Get basic statistics
-    evaluation_service = EvaluationService(db)
-    
-    # This would be implemented based on specific requirements
-    # For now, return a placeholder
-    stats = {
-        'total_evaluations': 0,
-        'active_evaluations': 0,
-        'total_attempts': 0,
-        'average_score': 0,
-        'pass_rate': 0
-    }
-    
-    return jsonify(stats)
+        # Get attempt with responses
+        service = EvaluationAttemptService(db)
+        attempt = service.get_by_id(attempt_id, tenant_id)
 
+        # Check permissions
+        if attempt.user_id != user.id and user.role not in ["admin", "manager", "instructor"]:
+            return jsonify({"error": "You do not have permission to view these results"}), 403
 
-@evaluations_bp.route('/<int:evaluation_id>/next-question', methods=['GET'])
-@require_auth
-def get_next_adaptive_question(evaluation_id: int):
-    """
-    Get the next question using AI-powered adaptive logic.
-    The question difficulty adapts based on user's recent performance.
-    """
-    user = get_current_user()
-    
-    # Get attempt_id from query params
-    attempt_id = request.args.get('attempt_id', type=int)
-    if not attempt_id:
-        raise ValidationError("attempt_id query parameter is required")
-    
-    # Get next question using adaptive service
-    next_question = adaptive_evaluation_service.get_next_question(
-        tenant_id=user.tenant_id,
-        evaluation_id=evaluation_id,
-        attempt_id=attempt_id,
-        user_id=user.id
-    )
-    
-    if not next_question:
-        # No more questions - evaluation complete
-        return jsonify({
-            'complete': True,
-            'message': 'All questions have been answered',
-            'next_action': 'submit'
-        })
-    
-    # Return question data with adaptive metadata
-    question_data = next_question.to_dict()
-    
-    # Add adaptive metadata
-    question_data['adaptive_metadata'] = {
-        'difficulty_adjusted': True,
-        'current_difficulty': next_question.difficulty_level,
-        'question_number': request.args.get('current_index', 0, type=int) + 1
-    }
-    
-    return jsonify({
-        'complete': False,
-        'question': question_data
-    })
+        # Check if results can be shown
+        if attempt.status != AttemptStatus.COMPLETED:
+            return jsonify({"error": "Attempt not yet completed"}), 400
 
+        if not attempt.evaluation.show_results_immediately and user.role not in ["admin", "manager", "instructor"]:
+            return jsonify({"error": "Results are not available yet"}), 403
 
-@evaluations_bp.route('/<int:evaluation_id>/attempts/<int:attempt_id>/insights', methods=['GET'])
-@require_auth
-def get_learning_insights(evaluation_id: int, attempt_id: int):
-    """
-    Get AI-powered learning insights for the evaluation attempt.
-    Provides personalized recommendations and performance analysis.
-    """
-    user = get_current_user()
-    
-    # Get insights from adaptive service
-    insights = adaptive_evaluation_service.get_learning_insights(
-        tenant_id=user.tenant_id,
-        evaluation_id=evaluation_id,
-        attempt_id=attempt_id
-    )
-    
-    return jsonify(insights)
-
-
-@evaluations_bp.route('/<int:evaluation_id>/attempts/<int:attempt_id>/learning-path', methods=['POST'])
-@require_auth
-def create_learning_path(evaluation_id: int, attempt_id: int):
-    """
-    Create a personalized learning path based on evaluation results.
-    Uses AI to generate a 4-week customized study plan.
-    """
-    user = get_current_user()
-    db = get_db()
-    
-    # Import service here to avoid circular imports
-    from app.services.learning_path_service import learning_path_service
-    
-    # Create learning path
-    learning_path = learning_path_service.create_learning_path(
-        tenant_id=user.tenant_id,
-        evaluation_id=evaluation_id,
-        attempt_id=attempt_id,
-        user=user
-    )
-    
-    return jsonify(learning_path.to_dict()), 201
-
-
-# AI Assessment Engine endpoints
-@evaluations_bp.route('/<int:evaluation_id>/adaptive/start', methods=['POST'])
-@require_auth
-def start_adaptive_assessment(evaluation_id: int):
-    """
-    Start an adaptive assessment session
-    """
-    user = get_current_user()
-    db = get_db()
-    
-    # Import AI service
-    from app.services.ai import AdaptiveAssessmentEngine
-    
-    evaluation_service = EvaluationService(db)
-    evaluation = evaluation_service.get_by_id(evaluation_id, user.tenant_id, include_questions=True)
-    
-    # Initialize adaptive engine
-    engine = AdaptiveAssessmentEngine()
-    
-    # Create new attempt
-    attempt_service = EvaluationAttemptService(db)
-    attempt = attempt_service.create(
-        evaluation_id=evaluation_id,
-        user_id=user.id,
-        tenant_id=user.tenant_id,
-        is_adaptive=True
-    )
-    
-    # Get first question based on average difficulty
-    questions = evaluation.questions
-    if not questions:
-        raise ValidationError("No questions available for this evaluation")
-    
-    # Convert questions to parameters format
-    question_params = []
-    for q in questions:
-        question_params.append({
-            'question_id': q.id,
-            'difficulty': getattr(q, 'difficulty_score', 0.0),
-            'discrimination': 1.0,  # Default discrimination
-            'guessing': 0.25  # Default guessing parameter
-        })
-    
-    # Start with average ability estimate
-    initial_theta = 0.0
-    
-    # Select first question
-    from app.services.ai.assessment_engine import QuestionParameters
-    available = [QuestionParameters(**params) for params in question_params]
-    first_question = engine.select_next_question(initial_theta, available, [])
-    
-    if not first_question:
-        raise ValidationError("Could not select initial question")
-    
-    # Find actual question object
-    selected_question = next(q for q in questions if q.id == first_question.question_id)
-    
-    return jsonify({
-        'attempt_id': attempt.id,
-        'session_id': attempt.session_id,
-        'question': selected_question.to_dict(),
-        'question_number': 1,
-        'estimated_remaining': engine.min_questions
-    }), 201
-
-
-@evaluations_bp.route('/adaptive/<int:attempt_id>/answer', methods=['POST'])
-@require_auth
-def submit_adaptive_answer(attempt_id: int):
-    """
-    Submit an answer and get the next adaptive question
-    """
-    user = get_current_user()
-    db = get_db()
-    data = request.get_json()
-    
-    if not data or 'question_id' not in data or 'answer' not in data:
-        raise ValidationError("question_id and answer are required")
-    
-    # Import AI service
-    from app.services.ai import AdaptiveAssessmentEngine
-    from app.services.ai.assessment_engine import QuestionParameters, StudentAbility
-    
-    # Get attempt
-    attempt_service = EvaluationAttemptService(db)
-    attempt = attempt_service.get_by_id(attempt_id, user.tenant_id)
-    
-    if attempt.completed_at:
-        raise ValidationError("This assessment has already been completed")
-    
-    # Save response
-    response_service = QuestionResponseService(db)
-    response = response_service.create(
-        attempt_id=attempt_id,
-        question_id=data['question_id'],
-        answer=data['answer'],
-        time_spent=data.get('time_spent', 0)
-    )
-    
-    # Get all responses so far
-    all_responses = response_service.get_by_attempt(attempt_id)
-    
-    # Initialize adaptive engine
-    engine = AdaptiveAssessmentEngine()
-    
-    # Get evaluation and questions
-    evaluation_service = EvaluationService(db)
-    evaluation = evaluation_service.get_by_id(attempt.evaluation_id, user.tenant_id, include_questions=True)
-    
-    # Convert to IRT format
-    question_map = {q.id: q for q in evaluation.questions}
-    response_data = []
-    answered_ids = []
-    
-    for resp in all_responses:
-        question = question_map.get(resp.question_id)
-        if question:
-            params = QuestionParameters(
-                question_id=question.id,
-                difficulty=getattr(question, 'difficulty_score', 0.0),
-                discrimination=1.0,
-                guessing=0.25
-            )
-            is_correct = resp.is_correct if hasattr(resp, 'is_correct') else (resp.answer == question.correct_answer)
-            response_data.append((params, is_correct))
-            answered_ids.append(question.id)
-    
-    # Estimate current ability
-    ability = engine.estimate_ability(response_data)
-    
-    # Check stopping criteria
-    if engine.should_stop_assessment(ability):
-        # Complete the assessment
-        attempt_service.complete(attempt_id, user.tenant_id)
-        
-        # Generate performance report
-        report = engine.generate_performance_report(ability, response_data)
-        
-        return jsonify({
-            'completed': True,
-            'report': report,
-            'total_questions': len(response_data)
-        })
-    
-    # Select next question
-    available_params = []
-    for q in evaluation.questions:
-        if q.id not in answered_ids:
-            available_params.append(QuestionParameters(
-                question_id=q.id,
-                difficulty=getattr(q, 'difficulty_score', 0.0),
-                discrimination=1.0,
-                guessing=0.25
-            ))
-    
-    next_question_params = engine.select_next_question(ability.theta, available_params, answered_ids)
-    
-    if not next_question_params:
-        # No more questions available
-        attempt_service.complete(attempt_id, user.tenant_id)
-        report = engine.generate_performance_report(ability, response_data)
-        
-        return jsonify({
-            'completed': True,
-            'report': report,
-            'total_questions': len(response_data)
-        })
-    
-    # Find actual question object
-    next_question = question_map[next_question_params.question_id]
-    
-    return jsonify({
-        'question': next_question.to_dict(),
-        'question_number': len(response_data) + 1,
-        'current_ability': round(ability.theta, 2),
-        'confidence_interval': {
-            'lower': round(ability.confidence_interval[0], 2),
-            'upper': round(ability.confidence_interval[1], 2)
-        },
-        'estimated_remaining': max(engine.min_questions - len(response_data), 1)
-    })
-
-
-@evaluations_bp.route('/adaptive/<int:attempt_id>/report', methods=['GET'])
-@require_auth
-def get_adaptive_report(attempt_id: int):
-    """
-    Get detailed adaptive assessment report
-    """
-    user = get_current_user()
-    db = get_db()
-    
-    # Import AI service
-    from app.services.ai import AdaptiveAssessmentEngine
-    from app.services.ai.assessment_engine import QuestionParameters
-    
-    # Get attempt and responses
-    attempt_service = EvaluationAttemptService(db)
-    attempt = attempt_service.get_by_id(attempt_id, user.tenant_id)
-    
-    if not attempt.completed_at:
-        raise ValidationError("Assessment is not yet completed")
-    
-    response_service = QuestionResponseService(db)
-    responses = response_service.get_by_attempt(attempt_id)
-    
-    # Get evaluation and questions
-    evaluation_service = EvaluationService(db)
-    evaluation = evaluation_service.get_by_id(attempt.evaluation_id, user.tenant_id, include_questions=True)
-    
-    # Convert to IRT format
-    question_map = {q.id: q for q in evaluation.questions}
-    response_data = []
-    
-    for resp in responses:
-        question = question_map.get(resp.question_id)
-        if question:
-            params = QuestionParameters(
-                question_id=question.id,
-                difficulty=getattr(question, 'difficulty_score', 0.0),
-                discrimination=1.0,
-                guessing=0.25
-            )
-            is_correct = resp.is_correct if hasattr(resp, 'is_correct') else (resp.answer == question.correct_answer)
-            response_data.append((params, is_correct))
-    
-    # Generate report
-    engine = AdaptiveAssessmentEngine()
-    ability = engine.estimate_ability(response_data)
-    report = engine.generate_performance_report(ability, response_data)
-    
-    # Add question-level details
-    question_details = []
-    for resp in responses:
-        question = question_map.get(resp.question_id)
-        if question:
-            question_details.append({
-                'question_id': question.id,
-                'question_text': question.text,
-                'difficulty': getattr(question, 'difficulty_score', 0.0),
-                'user_answer': resp.answer,
-                'correct_answer': question.correct_answer,
-                'is_correct': resp.answer == question.correct_answer,
-                'time_spent': resp.time_spent
-            })
-    
-    report['question_details'] = question_details
-    report['evaluation_name'] = evaluation.name
-    report['completed_at'] = attempt.completed_at.isoformat() if attempt.completed_at else None
-    
-    return jsonify(report)
-
-
-@evaluations_bp.route('/question-bank/analyze', methods=['POST'])
-@require_auth(['admin', 'trainer'])
-def analyze_question_bank():
-    """
-    Analyze question bank quality and get recommendations
-    """
-    user = get_current_user()
-    db = get_db()
-    data = request.get_json()
-    
-    evaluation_id = data.get('evaluation_id')
-    if not evaluation_id:
-        raise ValidationError("evaluation_id is required")
-    
-    # Import AI service
-    from app.services.ai import QuestionBankOptimizer
-    
-    # Get evaluation questions
-    evaluation_service = EvaluationService(db)
-    evaluation = evaluation_service.get_by_id(evaluation_id, user.tenant_id, include_questions=True)
-    
-    # Get question statistics
-    question_service = QuestionService(db)
-    optimizer = QuestionBankOptimizer()
-    
-    analysis_results = []
-    recommendations = []
-    
-    for question in evaluation.questions:
-        # Get usage statistics
-        stats = question_service.get_question_statistics(question.id)
-        
-        # Analyze quality
-        quality_metrics = optimizer.analyze_question_quality(stats)
-        quality_metrics['id'] = question.id
-        quality_metrics['text'] = question.text
-        
-        analysis_results.append(quality_metrics)
-    
-    # Get recommendations
-    recommendations = optimizer.recommend_questions_for_revision(analysis_results)
-    
-    return jsonify({
-        'analysis': analysis_results,
-        'recommendations': recommendations,
-        'summary': {
-            'total_questions': len(evaluation.questions),
-            'high_quality': len([q for q in analysis_results if q['quality_score'] > 0.7]),
-            'needs_revision': len(recommendations),
-            'average_discrimination': sum(q['discrimination'] for q in analysis_results) / len(analysis_results) if analysis_results else 0
+        # Build detailed results
+        results = {
+            "attempt_id": attempt.id,
+            "evaluation_title": attempt.evaluation.title,
+            "status": attempt.status.value,
+            "started_at": attempt.started_at.isoformat() if attempt.started_at else None,
+            "completed_at": attempt.completed_at.isoformat() if attempt.completed_at else None,
+            "time_spent_minutes": attempt.time_spent_minutes,
+            "duration_display": attempt.duration_display,
+            "total_questions": attempt.total_questions,
+            "questions_answered": attempt.questions_answered,
+            "total_points": attempt.total_points,
+            "score_earned": attempt.score_earned,
+            "percentage_score": attempt.percentage_score,
+            "passing_score": attempt.passing_score,
+            "passed": attempt.passed,
+            "responses": [],
         }
-    })
+
+        # Add question responses if review is allowed
+        if attempt.evaluation.allow_review or user.role in ["admin", "manager", "instructor"]:
+            for response in attempt.responses:
+                question_data = {
+                    "question_id": response.question_id,
+                    "question_text": response.question.question_text,
+                    "question_type": response.question.question_type.value,
+                    "points": response.question.points,
+                    "response_data": response.response_data,
+                    "is_correct": response.is_correct,
+                    "points_earned": response.points_earned,
+                }
+
+                # Include correct answer and explanation if review is allowed
+                if response.question.explanation:
+                    question_data["explanation"] = response.question.explanation
+
+                if response.ai_feedback:
+                    question_data["ai_feedback"] = response.ai_feedback
+
+                results["responses"].append(question_data)
+
+        return jsonify(results), 200
+
+    except NotFoundError as e:
+        return jsonify({"error": str(e)}), 404
+    finally:
+        db.close()
+
+
+@evaluations_bp.route("/<int:evaluation_id>/attempts", methods=["GET"])
+@jwt_required()
+@require_tenant()
+def get_user_attempts(evaluation_id):
+    """Get all attempts by the current user for an evaluation"""
+    # Get current user
+    user_id = get_jwt_identity()
+    claims = get_jwt()
+    tenant_id = claims.get("tenant_id")
+
+    db = next(get_db())
+    try:
+        # Get attempts
+        service = EvaluationAttemptService(db)
+        attempts = service.get_user_attempts(evaluation_id, user_id, tenant_id)
+
+        # Serialize response
+        response_schema = EvaluationAttemptResponseSchema(many=True)
+        return jsonify(response_schema.dump(attempts)), 200
+
+    finally:
+        db.close()
+
+
+@evaluations_bp.route("/<int:evaluation_id>/statistics", methods=["GET"])
+@jwt_required()
+@require_tenant()
+@check_role(["admin", "manager", "instructor"])
+def get_evaluation_statistics(evaluation_id):
+    """Get statistics for an evaluation"""
+    claims = get_jwt()
+    tenant_id = claims.get("tenant_id")
+
+    db = next(get_db())
+    try:
+        # Get evaluation
+        service = EvaluationService(db)
+        evaluation = service.get_by_id(evaluation_id, tenant_id, include_questions=True)
+
+        # Calculate statistics
+        total_attempts = len(evaluation.attempts)
+        completed_attempts = [a for a in evaluation.attempts if a.status == AttemptStatus.COMPLETED]
+        passed_attempts = [a for a in completed_attempts if a.passed]
+
+        stats = {
+            "evaluation_id": evaluation.id,
+            "evaluation_title": evaluation.title,
+            "total_questions": evaluation.total_questions,
+            "total_points": evaluation.total_points,
+            "passing_score": evaluation.passing_score,
+            "total_attempts": total_attempts,
+            "completed_attempts": len(completed_attempts),
+            "passed_attempts": len(passed_attempts),
+            "pass_rate": (len(passed_attempts) / len(completed_attempts) * 100) if completed_attempts else 0,
+            "average_score": (
+                sum(a.percentage_score for a in completed_attempts) / len(completed_attempts)
+                if completed_attempts
+                else 0
+            ),
+            "average_time_minutes": (
+                sum(a.time_spent_minutes or 0 for a in completed_attempts) / len(completed_attempts)
+                if completed_attempts
+                else 0
+            ),
+            "question_statistics": [],
+        }
+
+        # Calculate per-question statistics
+        for question in evaluation.questions:
+            correct_responses = [r for r in question.responses if r.is_correct is True]
+            total_responses = [r for r in question.responses if r.attempt.status == AttemptStatus.COMPLETED]
+
+            question_stats = {
+                "question_id": question.id,
+                "question_type": question.question_type.value,
+                "difficulty_level": question.difficulty_level.value,
+                "points": question.points,
+                "total_responses": len(total_responses),
+                "correct_responses": len(correct_responses),
+                "success_rate": (len(correct_responses) / len(total_responses) * 100) if total_responses else 0,
+            }
+            stats["question_statistics"].append(question_stats)
+
+        return jsonify(stats), 200
+
+    except NotFoundError as e:
+        return jsonify({"error": str(e)}), 404
+    finally:
+        db.close()
+
+
+# Register the blueprint in __init__.py

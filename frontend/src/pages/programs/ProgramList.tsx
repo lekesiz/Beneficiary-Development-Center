@@ -1,17 +1,20 @@
 /**
  * Program List Page
  */
-import type { ColumnDef } from '@tanstack/react-table';
-import { Edit, Eye, Trash2, Plus, Search, Filter } from 'lucide-react';
+import type { ColumnDef, SortingState } from '@tanstack/react-table';
+import { Edit, Eye, Trash2, Plus, Search, Filter, BookOpen } from 'lucide-react';
 import * as React from 'react';
 import { useState, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
+import { DataTableSkeleton } from '../../components/common/DataTableSkeleton';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
 import { DataTable } from '../../components/ui/DataTable';
+import { EmptyState } from '../../components/ui/EmptyState';
 import { Input } from '../../components/ui/Input';
 import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
 import { Select } from '../../components/ui/Select';
@@ -32,6 +35,7 @@ import {
 export const ProgramList: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useTranslation();
   const deleteProgram = useDeleteProgram();
 
   // Filters state
@@ -41,12 +45,32 @@ export const ProgramList: React.FC = () => {
   });
   const [search, setSearch] = useState('');
   const [showFilters, setShowFilters] = useState(false);
+  const [sorting, setSorting] = useState<SortingState>([]);
   const [deleteConfirm, setDeleteConfirm] = useState<{
     isOpen: boolean;
     program?: Program;
   }>({
     isOpen: false,
   });
+
+  // Update filters when sorting changes
+  React.useEffect(() => {
+    if (sorting.length > 0) {
+      const sort = sorting[0];
+      setFilters((prev) => ({
+        ...prev,
+        sort_by: sort.id,
+        sort_order: sort.desc ? 'desc' : 'asc',
+        page: 1, // Reset to first page on sort change
+      }));
+    } else {
+      setFilters((prev) => ({
+        ...prev,
+        sort_by: undefined,
+        sort_order: undefined,
+      }));
+    }
+  }, [sorting]);
 
   // Fetch programs
   const { data, isLoading, error } = usePrograms(filters);
@@ -95,7 +119,8 @@ export const ProgramList: React.FC = () => {
     () => [
       {
         accessorKey: 'title',
-        header: 'Program Adı',
+        header: t('programs.list.columns.name'),
+        enableSorting: true,
         cell: ({ row }) => (
           <div className="flex flex-col">
             <Link
@@ -110,7 +135,8 @@ export const ProgramList: React.FC = () => {
       },
       {
         accessorKey: 'program_type',
-        header: 'Tür',
+        header: t('programs.list.columns.type'),
+        enableSorting: true,
         cell: ({ row }) => {
           const typeInfo = getProgramTypeInfo(row.original.program_type);
           return (
@@ -123,7 +149,8 @@ export const ProgramList: React.FC = () => {
       },
       {
         accessorKey: 'status',
-        header: 'Durum',
+        header: t('programs.list.columns.status'),
+        enableSorting: true,
         cell: ({ row }) => {
           const statusInfo = getProgramStatusInfo(row.original.status);
           return <Badge color={statusInfo.color}>{statusInfo.label}</Badge>;
@@ -131,19 +158,21 @@ export const ProgramList: React.FC = () => {
       },
       {
         accessorKey: 'start_date',
-        header: 'Başlangıç',
+        header: t('programs.list.columns.startDate'),
+        enableSorting: true,
         cell: ({ row }) =>
           formatProgramDate(row.original.start_date, 'dd MMM yyyy'),
       },
       {
         accessorKey: 'end_date',
-        header: 'Bitiş',
+        header: t('programs.list.columns.endDate'),
+        enableSorting: true,
         cell: ({ row }) =>
           formatProgramDate(row.original.end_date, 'dd MMM yyyy'),
       },
       {
         accessorKey: 'enrollment_count',
-        header: 'Katılımcı',
+        header: t('programs.list.columns.participants'),
         cell: ({ row }) => (
           <div className="text-center">
             <div className="font-medium">
@@ -163,18 +192,26 @@ export const ProgramList: React.FC = () => {
       },
       {
         accessorKey: 'price',
-        header: 'Ücret',
+        header: t('programs.list.columns.price'),
         cell: ({ row }) =>
           formatProgramPrice(row.original.price, row.original.currency),
       },
       {
         accessorKey: 'coordinator_name',
-        header: 'Koordinatör',
+        header: t('programs.list.columns.coordinator'),
         cell: ({ row }) => row.original.coordinator_name || '-',
       },
       {
+        accessorKey: 'created_at',
+        header: t('programs.list.columns.createdAt'),
+        enableSorting: true,
+        cell: ({ row }) =>
+          formatProgramDate(row.original.created_at, 'dd MMM yyyy'),
+      },
+      {
         id: 'actions',
-        header: 'İşlemler',
+        header: t('common.actions'),
+        enableSorting: false,
         cell: ({ row }) => (
           <div className="flex items-center space-x-2">
             <Button
@@ -212,19 +249,13 @@ export const ProgramList: React.FC = () => {
     [navigate, canEdit, canDelete]
   );
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <LoadingSpinner size="lg" />
-      </div>
-    );
-  }
+  // Remove the early return for loading state - we'll handle it inline
 
   if (error) {
     return (
       <Card className="p-6">
         <div className="text-center text-red-600">
-          Programlar yüklenirken hata oluştu. Lütfen tekrar deneyin.
+          {t('errors.loadFailed')}
         </div>
       </Card>
     );
@@ -235,15 +266,15 @@ export const ProgramList: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Programlar</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t('programs.title')}</h1>
           <p className="text-gray-600 mt-1">
-            Eğitim programlarını görüntüleyin ve yönetin
+            {t('programs.subtitle')}
           </p>
         </div>
         {canCreate && (
           <Button onClick={() => navigate('/programs/new')}>
             <Plus className="h-4 w-4 mr-2" />
-            Yeni Program
+            {t('programs.list.newProgram')}
           </Button>
         )}
       </div>
@@ -257,7 +288,7 @@ export const ProgramList: React.FC = () => {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                 <Input
-                  placeholder="Program adı, kod veya açıklama ile ara..."
+                  placeholder={t('programs.list.searchPlaceholder')}
                   value={search}
                   onChange={(e) => handleSearch(e.target.value)}
                   className="pl-10"
@@ -269,7 +300,7 @@ export const ProgramList: React.FC = () => {
               onClick={() => setShowFilters(!showFilters)}
             >
               <Filter className="h-4 w-4 mr-2" />
-              Filtreler
+              {t('common.filters')}
             </Button>
           </div>
 
@@ -277,11 +308,11 @@ export const ProgramList: React.FC = () => {
           {showFilters && (
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-4 border-t">
               <Select
-                placeholder="Durum seçin"
+                placeholder={t('programs.list.filters.allStatuses')}
                 value={filters.status || ''}
                 onChange={(value) => handleFilterChange('status', value)}
                 options={[
-                  { value: '', label: 'Tüm Durumlar' },
+                  { value: '', label: t('programs.list.filters.allStatuses') },
                   ...PROGRAM_STATUS_OPTIONS.map((option) => ({
                     value: option.value,
                     label: option.label,
@@ -289,11 +320,11 @@ export const ProgramList: React.FC = () => {
                 ]}
               />
               <Select
-                placeholder="Tür seçin"
+                placeholder={t('programs.list.filters.allTypes')}
                 value={filters.type || ''}
                 onChange={(value) => handleFilterChange('type', value)}
                 options={[
-                  { value: '', label: 'Tüm Türler' },
+                  { value: '', label: t('programs.list.filters.allTypes') },
                   ...PROGRAM_TYPE_OPTIONS.map((option) => ({
                     value: option.value,
                     label: option.label,
@@ -311,7 +342,7 @@ export const ProgramList: React.FC = () => {
                   className="rounded border-gray-300"
                 />
                 <label htmlFor="upcoming_only" className="text-sm">
-                  Sadece Yaklaşan
+                  {t('programs.list.filters.upcomingOnly')}
                 </label>
               </div>
               <div className="flex items-center space-x-2">
@@ -325,7 +356,7 @@ export const ProgramList: React.FC = () => {
                   className="rounded border-gray-300"
                 />
                 <label htmlFor="active_only" className="text-sm">
-                  Sadece Aktif
+                  {t('programs.list.filters.activeOnly')}
                 </label>
               </div>
             </div>
@@ -335,20 +366,40 @@ export const ProgramList: React.FC = () => {
 
       {/* Table */}
       <Card>
-        <DataTable
-          columns={columns}
-          data={data?.programs || []}
-          pagination={{
-            pageIndex: (filters.page || 1) - 1,
-            pageSize: filters.per_page || 20,
-            pageCount: data?.pagination?.pages || 1,
-            total: data?.pagination?.total || 0,
-          }}
-          onPaginationChange={(pagination) => {
-            handlePageChange(pagination.pageIndex + 1);
-          }}
-          loading={isLoading}
-        />
+        {isLoading ? (
+          <DataTableSkeleton columns={5} rows={10} showPagination />
+        ) : data?.programs && data.programs.length === 0 ? (
+          <EmptyState
+            icon={BookOpen}
+            title={t('programs.list.noPrograms')}
+            description={t('programs.list.noProgramsDescription')}
+            action={
+              canCreate
+                ? {
+                    text: t('programs.list.createNewProgram'),
+                    onClick: () => navigate('/programs/new'),
+                  }
+                : undefined
+            }
+          />
+        ) : (
+          <DataTable
+            columns={columns}
+            data={data?.programs || []}
+            pagination={{
+              pageIndex: (filters.page || 1) - 1,
+              pageSize: filters.per_page || 20,
+              pageCount: data?.pagination?.pages || 1,
+              total: data?.pagination?.total || 0,
+            }}
+            onPaginationChange={(pagination) => {
+              handlePageChange(pagination.pageIndex + 1);
+            }}
+            sorting={sorting}
+            onSortingChange={setSorting}
+            loading={isLoading}
+          />
+        )}
       </Card>
 
       {/* Delete Confirmation */}
@@ -358,10 +409,10 @@ export const ProgramList: React.FC = () => {
         onConfirm={() =>
           deleteConfirm.program && handleDelete(deleteConfirm.program)
         }
-        title="Programı Sil"
-        description={`"${deleteConfirm.program?.title}" programını silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.`}
-        confirmText="Sil"
-        cancelText="İptal"
+        title={t('programs.form.messages.deleteConfirmTitle')}
+        description={t('programs.form.messages.deleteConfirmMessage', { name: deleteConfirm.program?.title })}
+        confirmText={t('common.delete')}
+        cancelText={t('common.cancel')}
         loading={deleteProgram.isPending}
       />
     </div>

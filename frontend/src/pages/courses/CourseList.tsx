@@ -1,7 +1,7 @@
 /**
  * Course List Page
  */
-import type { ColumnDef } from '@tanstack/react-table';
+import type { ColumnDef, SortingState } from '@tanstack/react-table';
 import {
   Edit,
   Eye,
@@ -11,16 +11,20 @@ import {
   Filter,
   Copy,
   ArrowUpDown,
+  GraduationCap,
 } from 'lucide-react';
 import * as React from 'react';
 import { useState, useMemo } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
+import { DataTableSkeleton } from '../../components/common/DataTableSkeleton';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
 import { DataTable } from '../../components/ui/DataTable';
+import { EmptyState } from '../../components/ui/EmptyState';
 import { Input } from '../../components/ui/Input';
 import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
 import { Select } from '../../components/ui/Select';
@@ -44,6 +48,7 @@ export const CourseList: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { user } = useAuth();
+  const { t } = useTranslation();
   const deleteCourse = useDeleteCourse();
 
   // Initialize filters from URL params
@@ -56,12 +61,32 @@ export const CourseList: React.FC = () => {
   });
   const [search, setSearch] = useState('');
   const [showFilters, setShowFilters] = useState(false);
+  const [sorting, setSorting] = useState<SortingState>([]);
   const [deleteConfirm, setDeleteConfirm] = useState<{
     isOpen: boolean;
     course?: Course;
   }>({
     isOpen: false,
   });
+
+  // Update filters when sorting changes
+  React.useEffect(() => {
+    if (sorting.length > 0) {
+      const sort = sorting[0];
+      setFilters((prev) => ({
+        ...prev,
+        sort_by: sort.id,
+        sort_order: sort.desc ? 'desc' : 'asc',
+        page: 1, // Reset to first page on sort change
+      }));
+    } else {
+      setFilters((prev) => ({
+        ...prev,
+        sort_by: undefined,
+        sort_order: undefined,
+      }));
+    }
+  }, [sorting]);
 
   // Fetch courses and programs
   const { data, isLoading, error } = useCourses(filters);
@@ -123,7 +148,8 @@ export const CourseList: React.FC = () => {
     () => [
       {
         accessorKey: 'title',
-        header: 'Kurs Adı',
+        header: t('courses.list.columns.name'),
+        enableSorting: true,
         cell: ({ row }) => (
           <div className="flex flex-col">
             <Link
@@ -143,7 +169,7 @@ export const CourseList: React.FC = () => {
       },
       {
         accessorKey: 'program_title',
-        header: 'Program',
+        header: t('courses.list.columns.program'),
         cell: ({ row }) => (
           <div className="flex flex-col">
             <span className="text-sm font-medium">
@@ -157,7 +183,8 @@ export const CourseList: React.FC = () => {
       },
       {
         accessorKey: 'status',
-        header: 'Durum',
+        header: t('courses.list.columns.status'),
+        enableSorting: true,
         cell: ({ row }) => {
           const statusInfo = getCourseStatusInfo(row.original.status);
           return <Badge color={statusInfo.color}>{statusInfo.label}</Badge>;
@@ -165,7 +192,8 @@ export const CourseList: React.FC = () => {
       },
       {
         accessorKey: 'format',
-        header: 'Format',
+        header: t('courses.list.columns.format'),
+        enableSorting: true,
         cell: ({ row }) => {
           const formatInfo = getCourseFormatInfo(row.original.format);
           return (
@@ -178,7 +206,8 @@ export const CourseList: React.FC = () => {
       },
       {
         accessorKey: 'difficulty_level',
-        header: 'Zorluk',
+        header: t('courses.list.columns.difficulty'),
+        enableSorting: true,
         cell: ({ row }) => {
           const difficultyInfo = getDifficultyLevelInfo(
             row.original.difficulty_level
@@ -190,7 +219,8 @@ export const CourseList: React.FC = () => {
       },
       {
         accessorKey: 'duration_hours',
-        header: 'Süre',
+        header: t('courses.list.columns.duration'),
+        enableSorting: true,
         cell: ({ row }) =>
           formatCourseDuration(
             row.original.total_duration_hours || row.original.duration_hours
@@ -198,7 +228,7 @@ export const CourseList: React.FC = () => {
       },
       {
         accessorKey: 'participant_count',
-        header: 'Katılımcı',
+        header: t('courses.list.columns.participants'),
         cell: ({ row }) => {
           const count = row.original.participant_count || 0;
           const max = row.original.max_participants;
@@ -210,7 +240,7 @@ export const CourseList: React.FC = () => {
               </div>
               {row.original.completion_rate !== undefined && (
                 <div className="text-sm text-gray-500">
-                  {Math.round(row.original.completion_rate)}% tamamlama
+                  {Math.round(row.original.completion_rate)}% {t('courses.list.columns.completion')}
                 </div>
               )}
             </div>
@@ -219,12 +249,13 @@ export const CourseList: React.FC = () => {
       },
       {
         accessorKey: 'instructor_name',
-        header: 'Eğitmen',
+        header: t('courses.list.columns.instructor'),
         cell: ({ row }) => row.original.instructor_name || '-',
       },
       {
         id: 'actions',
-        header: 'İşlemler',
+        header: t('common.actions'),
+        enableSorting: false,
         cell: ({ row }) => (
           <div className="flex items-center space-x-2">
             <Button
@@ -248,7 +279,7 @@ export const CourseList: React.FC = () => {
                 variant="ghost"
                 size="sm"
                 onClick={() => handleDuplicate(row.original)}
-                title="Kursu Kopyala"
+                title={t('courses.list.copyCourse')}
               >
                 <Copy className="h-4 w-4" />
               </Button>
@@ -272,19 +303,11 @@ export const CourseList: React.FC = () => {
     [navigate, canCreate, canDelete, user?.id]
   );
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <LoadingSpinner size="lg" />
-      </div>
-    );
-  }
-
   if (error) {
     return (
       <Card className="p-6">
         <div className="text-center text-red-600">
-          Kurslar yüklenirken hata oluştu. Lütfen tekrar deneyin.
+          {t('courses.form.messages.loadError')}
         </div>
       </Card>
     );
@@ -295,15 +318,15 @@ export const CourseList: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Kurslar</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t('courses.title')}</h1>
           <p className="text-gray-600 mt-1">
-            Eğitim kurslarını görüntüleyin ve yönetin
+            {t('courses.subtitle')}
           </p>
         </div>
         {canCreate && (
           <Button onClick={() => navigate('/courses/new')}>
             <Plus className="h-4 w-4 mr-2" />
-            Yeni Kurs
+            {t('courses.list.newCourse')}
           </Button>
         )}
       </div>
@@ -317,7 +340,7 @@ export const CourseList: React.FC = () => {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                 <Input
-                  placeholder="Kurs adı, kod veya açıklama ile ara..."
+                  placeholder={t('courses.list.searchPlaceholder')}
                   value={search}
                   onChange={(e) => handleSearch(e.target.value)}
                   className="pl-10"
@@ -329,7 +352,7 @@ export const CourseList: React.FC = () => {
               onClick={() => setShowFilters(!showFilters)}
             >
               <Filter className="h-4 w-4 mr-2" />
-              Filtreler
+              {t('common.filters')}
             </Button>
           </div>
 
@@ -337,7 +360,7 @@ export const CourseList: React.FC = () => {
           {showFilters && (
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-4 border-t">
               <Select
-                placeholder="Program seçin"
+                placeholder={t('courses.list.filters.selectProgram')}
                 value={filters.program_id?.toString() || ''}
                 onChange={(value) =>
                   handleFilterChange(
@@ -346,7 +369,7 @@ export const CourseList: React.FC = () => {
                   )
                 }
                 options={[
-                  { value: '', label: 'Tüm Programlar' },
+                  { value: '', label: t('courses.list.filters.allPrograms') },
                   ...(programsData?.programs || []).map((program) => ({
                     value: program.id.toString(),
                     label: program.title,
@@ -354,11 +377,11 @@ export const CourseList: React.FC = () => {
                 ]}
               />
               <Select
-                placeholder="Durum seçin"
+                placeholder={t('courses.list.filters.selectStatus')}
                 value={filters.status || ''}
                 onChange={(value) => handleFilterChange('status', value)}
                 options={[
-                  { value: '', label: 'Tüm Durumlar' },
+                  { value: '', label: t('courses.list.filters.allStatuses') },
                   ...COURSE_STATUS_OPTIONS.map((option) => ({
                     value: option.value,
                     label: option.label,
@@ -366,11 +389,11 @@ export const CourseList: React.FC = () => {
                 ]}
               />
               <Select
-                placeholder="Format seçin"
+                placeholder={t('courses.list.filters.selectFormat')}
                 value={filters.format || ''}
                 onChange={(value) => handleFilterChange('format', value)}
                 options={[
-                  { value: '', label: 'Tüm Formatlar' },
+                  { value: '', label: t('courses.list.filters.allFormats') },
                   ...COURSE_FORMAT_OPTIONS.map((option) => ({
                     value: option.value,
                     label: option.label,
@@ -378,11 +401,11 @@ export const CourseList: React.FC = () => {
                 ]}
               />
               <Select
-                placeholder="Zorluk seçin"
+                placeholder={t('courses.list.filters.selectDifficulty')}
                 value={filters.difficulty || ''}
                 onChange={(value) => handleFilterChange('difficulty', value)}
                 options={[
-                  { value: '', label: 'Tüm Seviyeler' },
+                  { value: '', label: t('courses.list.filters.allLevels') },
                   ...DIFFICULTY_LEVEL_OPTIONS.map((option) => ({
                     value: option.value,
                     label: option.label,
@@ -401,45 +424,65 @@ export const CourseList: React.FC = () => {
             <div className="text-2xl font-bold text-blue-600">
               {data.courses.length}
             </div>
-            <div className="text-sm text-gray-600">Toplam Kurs</div>
+            <div className="text-sm text-gray-600">{t('courses.list.stats.totalCourses')}</div>
           </Card>
           <Card className="p-4">
             <div className="text-2xl font-bold text-green-600">
               {data.courses.filter((c) => c.status === 'published').length}
             </div>
-            <div className="text-sm text-gray-600">Yayınlanan</div>
+            <div className="text-sm text-gray-600">{t('courses.list.stats.published')}</div>
           </Card>
           <Card className="p-4">
             <div className="text-2xl font-bold text-yellow-600">
               {data.courses.filter((c) => c.status === 'draft').length}
             </div>
-            <div className="text-sm text-gray-600">Taslak</div>
+            <div className="text-sm text-gray-600">{t('courses.list.stats.draft')}</div>
           </Card>
           <Card className="p-4">
             <div className="text-2xl font-bold text-purple-600">
               {data.courses.filter((c) => c.has_assessment).length}
             </div>
-            <div className="text-sm text-gray-600">Değerlendirmeli</div>
+            <div className="text-sm text-gray-600">{t('courses.list.stats.withAssessment')}</div>
           </Card>
         </div>
       )}
 
       {/* Table */}
       <Card>
-        <DataTable
-          columns={columns}
-          data={data?.courses || []}
-          pagination={{
-            pageIndex: (filters.page || 1) - 1,
-            pageSize: filters.per_page || 20,
-            pageCount: data?.pagination?.pages || 1,
-            total: data?.pagination?.total || 0,
-          }}
-          onPaginationChange={(pagination) => {
-            handlePageChange(pagination.pageIndex + 1);
-          }}
-          loading={isLoading}
-        />
+        {isLoading ? (
+          <DataTableSkeleton columns={9} rows={10} showPagination />
+        ) : data?.courses && data.courses.length === 0 ? (
+          <EmptyState
+            icon={GraduationCap}
+            title={t('courses.list.noCourses')}
+            description={t('courses.list.noCoursesDescription')}
+            action={
+              canCreate
+                ? {
+                    text: t('courses.list.createNewCourse'),
+                    onClick: () => navigate('/courses/new'),
+                  }
+                : undefined
+            }
+          />
+        ) : (
+          <DataTable
+            columns={columns}
+            data={data?.courses || []}
+            pagination={{
+              pageIndex: (filters.page || 1) - 1,
+              pageSize: filters.per_page || 20,
+              pageCount: data?.pagination?.pages || 1,
+              total: data?.pagination?.total || 0,
+            }}
+            onPaginationChange={(pagination) => {
+              handlePageChange(pagination.pageIndex + 1);
+            }}
+            sorting={sorting}
+            onSortingChange={setSorting}
+            loading={isLoading}
+          />
+        )}
       </Card>
 
       {/* Delete Confirmation */}
@@ -449,10 +492,10 @@ export const CourseList: React.FC = () => {
         onConfirm={() =>
           deleteConfirm.course && handleDelete(deleteConfirm.course)
         }
-        title="Kursu Sil"
-        description={`"${deleteConfirm.course?.title}" kursunu silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.`}
-        confirmText="Sil"
-        cancelText="İptal"
+        title={t('courses.form.messages.deleteConfirmTitle')}
+        description={t('courses.form.messages.deleteConfirmMessage', { name: deleteConfirm.course?.title })}
+        confirmText={t('common.delete')}
+        cancelText={t('common.cancel')}
         loading={deleteCourse.isPending}
       />
     </div>
