@@ -21,28 +21,28 @@ import type { CreateSessionRequest } from '../../types/course';
 const sessionFormSchema = z.object({
   title: z
     .string()
-    .min(1, 'Oturum adı zorunludur')
-    .max(200, 'Oturum adı en fazla 200 karakter olabilir'),
+    .min(1, 'Session name is required')
+    .max(200, 'Session name can be up to 200 characters'),
   description: z.string().optional(),
-  session_date: z.string().min(1, 'Tarih zorunludur'),
-  session_time: z.string().min(1, 'Saat zorunludur'),
+  session_date: z.string().min(1, 'Date is required'),  
+  session_time: z.string().min(1, 'Time is required'),
   duration_hours: z
     .number()
-    .min(0.5, 'Süre en az 0.5 saat olmalıdır')
-    .max(12, 'Süre en fazla 12 saat olabilir'),
+    .min(0.5, 'Duration must be at least 0.5 hours')
+    .max(12, 'Duration can be up to 12 hours'),
   location: z.string().optional(),
   room_number: z.string().optional(),
   is_online: z.boolean(),
   online_link: z
     .string()
-    .url('Geçerli bir URL giriniz')
+    .url('Please enter a valid URL')
     .optional()
     .or(z.literal('')),
   instructor_id: z.number().optional(),
   is_mandatory: z.boolean(),
   materials_url: z
     .string()
-    .url('Geçerli bir URL giriniz')
+    .url('Please enter a valid URL')
     .optional()
     .or(z.literal('')),
 });
@@ -126,7 +126,7 @@ export const CourseSessionForm: React.FC = () => {
     return (
       <Card className="p-6">
         <div className="text-center text-red-600">
-          Bu sayfaya erişim yetkiniz bulunmamaktadır veya kurs bulunamadı.
+          You do not have permission to access this page or the course was not found.
         </div>
       </Card>
     );
@@ -143,12 +143,12 @@ export const CourseSessionForm: React.FC = () => {
             onClick={() => navigate(`/courses/${courseId}`)}
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Kursa Dön
+            Back to Course
           </Button>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Yeni Oturum</h1>
+            <h1 className="text-2xl font-bold text-gray-900">New Session</h1>
             <p className="text-gray-600">
-              {course.title} için yeni oturum oluşturun
+              Create new session for {course.title}
             </p>
           </div>
         </div>
@@ -157,12 +157,12 @@ export const CourseSessionForm: React.FC = () => {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* Basic Information */}
         <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Oturum Bilgileri</h3>
+          <h3 className="text-lg font-semibold mb-4">Session Information</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="md:col-span-2">
               <div className="space-y-2">
                 <label className="text-sm font-medium leading-none">
-                  Oturum Adı <span className="text-destructive">*</span>
+                  Session Name <span className="text-destructive">*</span>
                 </label>
                 <Controller
                   name="title"
@@ -182,7 +182,7 @@ export const CourseSessionForm: React.FC = () => {
             <div className="md:col-span-2">
               <div className="space-y-2">
                 <label className="text-sm font-medium leading-none">
-                  Açıklama
+                  Description
                 </label>
                 <Controller
                   name="description"
@@ -207,7 +207,7 @@ export const CourseSessionForm: React.FC = () => {
 
         {/* Date and Time */}
         <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Tarih ve Süre</h3>
+          <h3 className="text-lg font-semibold mb-4">Date and Duration</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Controller
               name="session_date"
@@ -215,7 +215,7 @@ export const CourseSessionForm: React.FC = () => {
               render={({ field }) => (
                 <DatePicker
                   {...field}
-                  label="Tarih *"
+                  label="Date *"
                   error={errors.session_date?.message}
                 />
               )}
@@ -223,7 +223,7 @@ export const CourseSessionForm: React.FC = () => {
 
             <div className="space-y-2">
               <label className="text-sm font-medium leading-none">
-                Saat <span className="text-destructive">*</span>
+                Time <span className="text-destructive">*</span>
               </label>
               <Controller
                 name="session_time"
@@ -241,7 +241,7 @@ export const CourseSessionForm: React.FC = () => {
 
             <div className="space-y-2">
               <label className="text-sm font-medium leading-none">
-                Süre (Saat) <span className="text-destructive">*</span>
+                Duration (Hours) <span className="text-destructive">*</span>
               </label>
               <Controller
                 name="duration_hours"
@@ -271,7 +271,7 @@ export const CourseSessionForm: React.FC = () => {
 
         {/* Location */}
         <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Konum ve Format</h3>
+          <h3 className="text-lg font-semibold mb-4">Location and Format</h3>
           <div className="space-y-4">
             <div>
               <Controller
@@ -285,7 +285,7 @@ export const CourseSessionForm: React.FC = () => {
                       onChange={field.onChange}
                       className="rounded border-gray-300"
                     />
-                    <span>Online Oturum</span>
+                    <span>Online Session</span>
                   </label>
                 )}
               />
@@ -295,7 +295,7 @@ export const CourseSessionForm: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium leading-none">
-                    Konum
+                    Location
                   </label>
                   <Controller
                     name="location"
@@ -304,7 +304,7 @@ export const CourseSessionForm: React.FC = () => {
                       <Input
                         {...field}
                         error={!!errors.location}
-                        placeholder="Oturum konumu"
+                        placeholder="Session location"
                       />
                     )}
                   />
@@ -317,7 +317,7 @@ export const CourseSessionForm: React.FC = () => {
 
                 <div className="space-y-2">
                   <label className="text-sm font-medium leading-none">
-                    Oda Numarası
+                    Room Number
                   </label>
                   <Controller
                     name="room_number"
@@ -326,7 +326,7 @@ export const CourseSessionForm: React.FC = () => {
                       <Input
                         {...field}
                         error={!!errors.room_number}
-                        placeholder="Oda/salon numarası"
+                        placeholder="Room/hall number"
                       />
                     )}
                   />
@@ -367,7 +367,7 @@ export const CourseSessionForm: React.FC = () => {
 
         {/* Additional Settings */}
         <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Ek Ayarlar</h3>
+          <h3 className="text-lg font-semibold mb-4">Additional Settings</h3>
           <div className="space-y-4">
             <div>
               <Controller
@@ -381,7 +381,7 @@ export const CourseSessionForm: React.FC = () => {
                       onChange={field.onChange}
                       className="rounded border-gray-300"
                     />
-                    <span>Zorunlu Oturum</span>
+                    <span>Mandatory Session</span>
                   </label>
                 )}
               />
@@ -389,7 +389,7 @@ export const CourseSessionForm: React.FC = () => {
 
             <div className="space-y-2">
               <label className="text-sm font-medium leading-none">
-                Materyal URL
+                Material URL
               </label>
               <Controller
                 name="materials_url"
@@ -418,11 +418,11 @@ export const CourseSessionForm: React.FC = () => {
             variant="outline"
             onClick={() => navigate(`/courses/${courseId}`)}
           >
-            İptal
+            Cancel
           </Button>
           <Button type="submit" disabled={isSubmitting || addSession.isPending}>
             <Save className="h-4 w-4 mr-2" />
-            Oturum Oluştur
+            Create Session
           </Button>
         </div>
       </form>

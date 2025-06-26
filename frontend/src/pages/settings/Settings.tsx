@@ -1,9 +1,9 @@
+import { User, Bell, Shield, Palette } from 'lucide-react';
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { User, Bell, Shield, Palette } from 'lucide-react';
 
-import { Card } from '@/components/ui/Card';
 import { NotificationSettings } from '@/components/settings/NotificationSettings';
+import { Card } from '@/components/ui/Card';
 
 interface Tab {
   id: string;

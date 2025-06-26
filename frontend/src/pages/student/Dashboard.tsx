@@ -7,7 +7,6 @@ import {
   Clock,
   AlertCircle,
 } from 'lucide-react';
-import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import LearningPathMilestones from '@/components/student/LearningPathMilestones';

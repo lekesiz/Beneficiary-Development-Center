@@ -16,10 +16,9 @@ import {
   Filter,
   Users,
 } from 'lucide-react';
-import * as React from 'react';
 import { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 
 import { DataTableSkeleton } from '@/components/common/DataTableSkeleton';
 import { DataTable } from '@/components/ui/DataTable';

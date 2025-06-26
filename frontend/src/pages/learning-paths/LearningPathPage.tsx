@@ -16,7 +16,6 @@ import {
   Loader2,
   AlertCircle,
 } from 'lucide-react';
-import * as React from 'react';
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 

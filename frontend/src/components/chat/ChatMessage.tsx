@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
-import { cn } from '@/lib/utils';
-import { MessageAvatar } from './MessageAvatar';
-import { MessageActions } from './MessageActions';
 import { format } from 'date-fns';
-import { Check, CheckCheck, Edit2, Reply } from 'lucide-react';
+import { Check, CheckCheck, Reply } from 'lucide-react';
+import React, { useState } from 'react';
+
+import { cn } from '@/lib/utils';
 import type { Message } from '@/types/chat';
+
+import { MessageActions } from './MessageActions';
+import { MessageAvatar } from './MessageAvatar';
+
 
 interface ChatMessageProps {
   message: Message;

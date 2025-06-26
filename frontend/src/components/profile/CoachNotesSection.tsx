@@ -1,5 +1,4 @@
 import { MessageSquare, Plus, Edit2, Trash2, Save, X } from 'lucide-react';
-import * as React from 'react';
 import { useState } from 'react';
 
 import { Badge } from '@/components/ui/Badge';

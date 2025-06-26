@@ -1,10 +1,11 @@
-import { renderHook, waitFor } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { toast } from 'sonner';
+import { renderHook, waitFor } from '@testing-library/react';
 import * as React from 'react';
+import { toast } from 'sonner';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 import { filesApi } from '@/api/files';
+
 import {
   useFileUpload,
   useSingleFileUpload,

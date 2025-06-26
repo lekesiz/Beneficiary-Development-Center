@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { MessageAvatar } from './MessageAvatar';
+
 import { useSocket } from '@/contexts/SocketContext';
 import type { ChatUser, TypingStatus } from '@/types/chat';
+
+import { MessageAvatar } from './MessageAvatar';
 
 interface TypingIndicatorProps {
   conversationId: number;

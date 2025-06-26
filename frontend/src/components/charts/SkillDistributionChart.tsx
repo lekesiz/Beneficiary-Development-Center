@@ -1,4 +1,3 @@
-import * as React from 'react';
 import {
   BarChart,
   Bar,
@@ -68,17 +67,17 @@ export default function SkillDistributionChart({
         <div className="bg-white p-3 border rounded-lg shadow-lg">
           <p className="font-medium">{label}</p>
           <p className="text-sm text-gray-600">
-            Toplam Odak: {data.total_focus}
+            Total Focus: {data.total_focus}
           </p>
-          <p className="text-sm text-green-600">Tamamlanan: {data.completed}</p>
+          <p className="text-sm text-green-600">Completed: {data.completed}</p>
           <p className="text-sm text-yellow-600">
-            Devam Eden: {data.in_progress}
+            In Progress: {data.in_progress}
           </p>
           <p className="text-sm text-blue-600">
-            Ortalama İlerleme: {data.average_progress}%
+            Average Progress: {data.average_progress}%
           </p>
           <p className="text-sm font-medium mt-1">
-            Ustalık:{' '}
+            Mastery:{' '}
             <span style={{ color: getMasteryColor(data.mastery_level) }}>
               {data.mastery_level}
             </span>
@@ -91,7 +90,7 @@ export default function SkillDistributionChart({
 
   const CustomBar = (props: BarProps) => {
     const { x, y, width, height, payload } = props;
-    const color = getMasteryColor(payload.mastery_level);
+    const color = getMasteryColor(payload?.mastery_level);
 
     return (
       <g>
@@ -127,7 +126,7 @@ export default function SkillDistributionChart({
             tick={{ fontSize: 12 }}
             stroke="#6B7280"
             label={{
-              value: 'İlerleme (%)',
+              value: 'Progress (%)',
               angle: -90,
               position: 'insideLeft',
               style: { fontSize: 12, fill: '#6B7280' },
@@ -137,7 +136,7 @@ export default function SkillDistributionChart({
           <Bar
             dataKey="average_progress"
             shape={<CustomBar />}
-            name="Ortalama İlerleme"
+            name="Average Progress"
           />
         </BarChart>
       </ResponsiveContainer>

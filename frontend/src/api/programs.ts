@@ -12,7 +12,7 @@ import type {
   CreateCourseInProgramRequest,
 } from '../types/program';
 
-import { apiClient } from './client';
+import apiClient from './client';
 
 const PROGRAMS_BASE_URL = '/programs';
 

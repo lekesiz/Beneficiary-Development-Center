@@ -13,12 +13,12 @@ class EvaluationSettingsSchema(Schema):
         validate=validate.Range(min=1, max=600),
         metadata={"description": "Time limit in minutes, NULL means no time limit"},
     )
-    max_attempts = fields.Integer(validate=validate.Range(min=1, max=10), missing=1)
-    passing_score = fields.Float(validate=validate.Range(min=0, max=100), missing=70.0)
-    shuffle_questions = fields.Boolean(missing=False)
-    show_results_immediately = fields.Boolean(missing=True)
-    allow_review = fields.Boolean(missing=True)
-    is_adaptive = fields.Boolean(missing=False)
+    max_attempts = fields.Integer(validate=validate.Range(min=1, max=10), load_default=1)
+    passing_score = fields.Float(validate=validate.Range(min=0, max=100), load_default=70.0)
+    shuffle_questions = fields.Boolean(load_default=False)
+    show_results_immediately = fields.Boolean(load_default=True)
+    allow_review = fields.Boolean(load_default=True)
+    is_adaptive = fields.Boolean(load_default=False)
 
 
 class EvaluationCreateSchema(Schema):
@@ -37,11 +37,11 @@ class EvaluationCreateSchema(Schema):
     program_id = fields.Integer(allow_none=True)
 
     # Settings (nested)
-    settings = fields.Nested(EvaluationSettingsSchema, missing={})
+    settings = fields.Nested(EvaluationSettingsSchema, load_default={})
 
     # Status
     status = fields.String(
-        validate=validate.OneOf([s.value for s in EvaluationStatus]), missing=EvaluationStatus.DRAFT.value
+        validate=validate.OneOf([s.value for s in EvaluationStatus]), load_default=EvaluationStatus.DRAFT.value
     )
 
     # Dates
@@ -49,8 +49,8 @@ class EvaluationCreateSchema(Schema):
     available_until = fields.DateTime(allow_none=True, format="iso")
 
     # Metadata
-    evaluation_metadata = fields.Dict(missing={})
-    tags = fields.List(fields.String(), missing=[])
+    evaluation_metadata = fields.Dict(load_default={})
+    tags = fields.List(fields.String(), load_default=[])
 
     @pre_load
     def extract_settings(self, data, **kwargs):
@@ -177,22 +177,22 @@ class QuestionCreateSchema(Schema):
         error_messages={"required": "Question type is required"},
     )
     difficulty_level = fields.String(
-        validate=validate.OneOf([d.value for d in DifficultyLevel]), missing=DifficultyLevel.MEDIUM.value
+        validate=validate.OneOf([d.value for d in DifficultyLevel]), load_default=DifficultyLevel.MEDIUM.value
     )
-    points = fields.Float(validate=validate.Range(min=0, max=100), missing=1.0)
-    order_index = fields.Integer(validate=validate.Range(min=0), missing=0)
+    points = fields.Float(validate=validate.Range(min=0, max=100), load_default=1.0)
+    order_index = fields.Integer(validate=validate.Range(min=0), load_default=0)
 
     # Question data (flexible structure for different question types)
     question_data = fields.Dict(required=True, error_messages={"required": "Question data is required"})
 
     # Settings
-    is_required = fields.Boolean(missing=True)
+    is_required = fields.Boolean(load_default=True)
     explanation = fields.String(allow_none=True)
-    hints = fields.List(fields.String(), missing=[])
+    hints = fields.List(fields.String(), load_default=[])
 
     # Metadata
-    question_metadata = fields.Dict(missing={})
-    tags = fields.List(fields.String(), missing=[])
+    question_metadata = fields.Dict(load_default={})
+    tags = fields.List(fields.String(), load_default=[])
 
     @pre_load
     def validate_question_data(self, data, **kwargs):
@@ -330,7 +330,7 @@ class QuestionResponseSaveSchema(Schema):
 
     question_id = fields.Integer(required=True, error_messages={"required": "Question ID is required"})
     response_data = fields.Dict(required=True, error_messages={"required": "Response data is required"})
-    time_spent_seconds = fields.Integer(validate=validate.Range(min=0), missing=0)
+    time_spent_seconds = fields.Integer(validate=validate.Range(min=0), load_default=0)
 
     @pre_load
     def validate_response_data(self, data, **kwargs):
@@ -352,14 +352,14 @@ class EvaluationListQuerySchema(Schema):
     search = fields.String(validate=validate.Length(max=100))
 
     # Pagination
-    page = fields.Integer(validate=validate.Range(min=1), missing=1)
-    per_page = fields.Integer(validate=validate.Range(min=1, max=100), missing=20)
+    page = fields.Integer(validate=validate.Range(min=1), load_default=1)
+    per_page = fields.Integer(validate=validate.Range(min=1, max=100), load_default=20)
 
     # Sorting
     sort_by = fields.String(
-        validate=validate.OneOf(["title", "created_at", "updated_at", "status"]), missing="created_at"
+        validate=validate.OneOf(["title", "created_at", "updated_at", "status"]), load_default="created_at"
     )
-    sort_order = fields.String(validate=validate.OneOf(["asc", "desc"]), missing="desc")
+    sort_order = fields.String(validate=validate.OneOf(["asc", "desc"]), load_default="desc")
 
     # Filters
     is_available = fields.Boolean()
@@ -438,7 +438,7 @@ class QuestionBankImportSchema(Schema):
     """Schema for importing questions from question bank."""
 
     question_bank_ids = fields.List(fields.Integer(), required=True, validate=validate.Length(min=1, max=50))
-    randomize_order = fields.Boolean(missing=False)
+    randomize_order = fields.Boolean(load_default=False)
 
 
 class EvaluationDuplicateSchema(Schema):
@@ -447,7 +447,7 @@ class EvaluationDuplicateSchema(Schema):
     title = fields.String(required=True, validate=validate.Length(min=1, max=200))
     course_id = fields.Integer(allow_none=True)
     program_id = fields.Integer(allow_none=True)
-    include_questions = fields.Boolean(missing=True)
+    include_questions = fields.Boolean(load_default=True)
     status = fields.String(
-        validate=validate.OneOf([s.value for s in EvaluationStatus]), missing=EvaluationStatus.DRAFT.value
+        validate=validate.OneOf([s.value for s in EvaluationStatus]), load_default=EvaluationStatus.DRAFT.value
     )

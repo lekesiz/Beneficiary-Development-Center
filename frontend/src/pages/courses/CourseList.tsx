@@ -15,8 +15,8 @@ import {
 } from 'lucide-react';
 import * as React from 'react';
 import { useState, useMemo } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 
 import { DataTableSkeleton } from '../../components/common/DataTableSkeleton';
 import { Badge } from '../../components/ui/Badge';

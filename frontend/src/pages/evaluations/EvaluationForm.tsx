@@ -44,26 +44,26 @@ const evaluationSchema = z
   .object({
     title: z
       .string()
-      .min(1, 'Başlık gereklidir')
-      .max(200, 'Başlık en fazla 200 karakter olabilir'),
+      .min(1, 'Title is required')
+      .max(200, 'Title can be at most 200 characters'),
     description: z.string().optional(),
     instructions: z.string().optional(),
     course_id: z.number().optional(),
     program_id: z.number().optional(),
     time_limit_minutes: z
       .number()
-      .min(1, 'Süre en az 1 dakika olmalıdır')
-      .max(1440, 'Süre en fazla 24 saat olabilir')
+      .min(1, 'Duration must be at least 1 minute')
+      .max(1440, 'Duration can be at most 24 hours')
       .optional(),
     max_attempts: z
       .number()
-      .min(1, 'Maksimum deneme sayısı en az 1 olmalıdır')
-      .max(10, 'Maksimum deneme sayısı en fazla 10 olabilir')
+      .min(1, 'Maximum attempts must be at least 1')
+      .max(10, 'Maximum attempts can be at most 10')
       .default(1),
     passing_score: z
       .number()
-      .min(0, 'Geçme puanı 0-100 arasında olmalıdır')
-      .max(100, 'Geçme puanı 0-100 arasında olmalıdır')
+      .min(0, 'Passing score must be between 0-100')
+      .max(100, 'Passing score must be between 0-100')
       .default(70),
     shuffle_questions: z.boolean().default(false),
     show_results_immediately: z.boolean().default(true),
@@ -79,7 +79,7 @@ const evaluationSchema = z
       return data.course_id || data.program_id;
     },
     {
-      message: 'Kurs veya program seçilmelidir',
+      message: 'Course or program must be selected',
       path: ['course_id'],
     }
   )
@@ -92,7 +92,7 @@ const evaluationSchema = z
       return true;
     },
     {
-      message: 'Başlangıç tarihi bitiş tarihinden önce olmalıdır',
+      message: 'Start date must be before end date',
       path: ['available_until'],
     }
   );
@@ -231,13 +231,13 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
         <div>
           <h1 className="text-2xl font-bold">
             {mode === 'create'
-              ? 'Yeni Değerlendirme'
-              : 'Değerlendirmeyi Düzenle'}
+              ? 'New Evaluation'
+              : 'Edit Evaluation'}
           </h1>
           <p className="text-gray-600">
             {mode === 'create'
-              ? 'Yeni bir değerlendirme oluşturun'
-              : 'Mevcut değerlendirmeyi düzenleyin'}
+              ? 'Create a new evaluation'
+              : 'Edit existing evaluation'}
           </p>
         </div>
       </div>
@@ -247,7 +247,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
         <Card className="p-6">
           <div className="flex items-center space-x-2 mb-4">
             <Info className="h-5 w-5 text-blue-600" />
-            <h2 className="text-lg font-semibold">Temel Bilgiler</h2>
+            <h2 className="text-lg font-semibold">Basic Information</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -257,13 +257,13 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
                 control={control}
                 render={({ field }) => (
                   <FormField
-                    label="Başlık"
+                    label="Title"
                     error={errors.title?.message}
                     required
                   >
                     <Input
                       {...field}
-                      placeholder="Değerlendirme başlığını girin"
+                      placeholder="Enter evaluation title"
                       error={!!errors.title}
                     />
                   </FormField>
@@ -277,12 +277,12 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
                 control={control}
                 render={({ field }) => (
                   <FormField
-                    label="Açıklama"
+                    label="Description"
                     error={errors.description?.message}
                   >
                     <Textarea
                       {...field}
-                      placeholder="Değerlendirme hakkında kısa açıklama"
+                      placeholder="Brief description about the evaluation"
                       rows={3}
                       error={!!errors.description}
                     />
@@ -297,12 +297,12 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
                 control={control}
                 render={({ field }) => (
                   <FormField
-                    label="Talimatlar"
+                    label="Instructions"
                     error={errors.instructions?.message}
                   >
                     <Textarea
                       {...field}
-                      placeholder="Öğrenciler için değerlendirme talimatları"
+                      placeholder="Evaluation instructions for students"
                       rows={4}
                       error={!!errors.instructions}
                     />
@@ -317,7 +317,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
         <Card className="p-6">
           <div className="flex items-center space-x-2 mb-4">
             <FileText className="h-5 w-5 text-green-600" />
-            <h2 className="text-lg font-semibold">Program ve Kurs</h2>
+            <h2 className="text-lg font-semibold">Program and Course</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -339,7 +339,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
                     }}
                     error={!!errors.program_id}
                   >
-                    <option value="">Program seçin</option>
+                    <option value="">Select program</option>
                     {programsData?.programs.map((program) => (
                       <option key={program.id} value={program.id}>
                         {program.title}
@@ -354,7 +354,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
               name="course_id"
               control={control}
               render={({ field }) => (
-                <FormField label="Kurs" error={errors.course_id?.message}>
+                <FormField label="Course" error={errors.course_id?.message}>
                   <Select
                     {...field}
                     value={field.value || ''}
@@ -367,7 +367,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
                     error={!!errors.course_id}
                     disabled={!watchedProgramId}
                   >
-                    <option value="">Kurs seçin</option>
+                    <option value="">Select course</option>
                     {filteredCourses.map((course) => (
                       <option key={course.id} value={course.id}>
                         {course.title}
@@ -381,7 +381,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
 
           {!watchedProgramId && (
             <p className="text-sm text-gray-500 mt-2">
-              Kurs seçebilmek için önce bir program seçin
+              Select a program first to choose a course
             </p>
           )}
         </Card>
@@ -390,7 +390,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
         <Card className="p-6">
           <div className="flex items-center space-x-2 mb-4">
             <Settings className="h-5 w-5 text-purple-600" />
-            <h2 className="text-lg font-semibold">Ayarlar</h2>
+            <h2 className="text-lg font-semibold">Settings</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -399,7 +399,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
               control={control}
               render={({ field }) => (
                 <FormField
-                  label="Süre Sınırı (dakika)"
+                  label="Time Limit (minutes)"
                   error={errors.time_limit_minutes?.message}
                 >
                   <Input
@@ -407,7 +407,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
                     type="number"
                     min="1"
                     max="1440"
-                    placeholder="Örn: 60"
+                    placeholder="e.g.: 60"
                     onChange={(e) =>
                       field.onChange(
                         e.target.value ? parseInt(e.target.value) : undefined
@@ -424,7 +424,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
               control={control}
               render={({ field }) => (
                 <FormField
-                  label="Maksimum Deneme"
+                  label="Maximum Attempts"
                   error={errors.max_attempts?.message}
                   required
                 >
@@ -445,7 +445,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
               control={control}
               render={({ field }) => (
                 <FormField
-                  label="Geçme Puanı (%)"
+                  label="Passing Score (%)"
                   error={errors.passing_score?.message}
                   required
                 >
@@ -475,7 +475,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
                     onChange={field.onChange}
                     className="rounded border-gray-300"
                   />
-                  <span className="text-sm font-medium">Soruları karıştır</span>
+                  <span className="text-sm font-medium">Shuffle questions</span>
                 </label>
               )}
             />
@@ -492,7 +492,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
                     className="rounded border-gray-300"
                   />
                   <span className="text-sm font-medium">
-                    Sonuçları hemen göster
+                    Show results immediately
                   </span>
                 </label>
               )}
@@ -510,7 +510,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
                     className="rounded border-gray-300"
                   />
                   <span className="text-sm font-medium">
-                    İncelemeye izin ver
+                    Allow review
                   </span>
                 </label>
               )}
@@ -530,7 +530,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
                   <div className="flex items-center space-x-2">
                     <Brain className="h-4 w-4 text-purple-600" />
                     <span className="text-sm font-medium">
-                      AI Destekli Adaptif Değerlendirme
+                      AI Powered Adaptive Evaluation
                     </span>
                   </div>
                 </label>
@@ -540,9 +540,9 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
             {watch('is_adaptive') && (
               <div className="mt-2 p-3 bg-purple-50 rounded-lg">
                 <p className="text-sm text-purple-700">
-                  <strong>Adaptif mod etkin:</strong> Sorular öğrencinin
-                  performansına göre AI tarafından otomatik olarak ayarlanacak.
-                  Zorluk seviyesi dinamik olarak değişecek.
+                  <strong>Adaptive mode enabled:</strong> Questions will be
+                  automatically adjusted by AI based on student performance.
+                  Difficulty level will change dynamically.
                 </p>
               </div>
             )}
@@ -553,7 +553,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
         <Card className="p-6">
           <div className="flex items-center space-x-2 mb-4">
             <Calendar className="h-5 w-5 text-orange-600" />
-            <h2 className="text-lg font-semibold">Kullanılabilirlik</h2>
+            <h2 className="text-lg font-semibold">Availability</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -562,7 +562,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
               control={control}
               render={({ field }) => (
                 <FormField
-                  label="Başlangıç Tarihi"
+                  label="Start Date"
                   error={errors.available_from?.message}
                 >
                   <Input
@@ -579,7 +579,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
               control={control}
               render={({ field }) => (
                 <FormField
-                  label="Bitiş Tarihi"
+                  label="End Date"
                   error={errors.available_until?.message}
                 >
                   <Input
@@ -597,18 +597,18 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
         <Card className="p-6">
           <div className="flex items-center space-x-2 mb-4">
             <span className="text-lg">#</span>
-            <h2 className="text-lg font-semibold">Etiketler</h2>
+            <h2 className="text-lg font-semibold">Tags</h2>
           </div>
 
           <Controller
             name="tags"
             control={control}
             render={({ field }) => (
-              <FormField label="Etiketler" error={errors.tags?.message}>
+              <FormField label="Tags" error={errors.tags?.message}>
                 <TagInput
                   value={field.value}
                   onChange={field.onChange}
-                  placeholder="Etiket eklemek için yazın ve Enter'a basın"
+                  placeholder="Type and press Enter to add tags"
                 />
               </FormField>
             )}
@@ -623,12 +623,12 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
             onClick={() => navigate('/evaluations')}
             disabled={isSubmitting}
           >
-            İptal
+            Cancel
           </Button>
 
           <Button type="submit" loading={isSubmitting} disabled={isSubmitting}>
             <Save className="mr-2 h-4 w-4" />
-            {mode === 'create' ? 'Oluştur' : 'Güncelle'}
+            {mode === 'create' ? 'Create' : 'Update'}
           </Button>
         </div>
       </form>

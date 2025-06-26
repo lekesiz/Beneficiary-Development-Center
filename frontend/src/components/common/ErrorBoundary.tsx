@@ -139,16 +139,16 @@ class ErrorBoundary extends Component<Props, State> {
                   onClick={this.handleReload}
                   variant="primary"
                   className="flex-1"
-                  leftIcon={<RefreshCw className="h-4 w-4" />}
                 >
+                  <RefreshCw className="h-4 w-4 mr-2" />
                   Refresh Page
                 </Button>
                 <Button
                   onClick={this.handleGoHome}
                   variant="outline"
                   className="flex-1"
-                  leftIcon={<Home className="h-4 w-4" />}
                 >
+                  <Home className="h-4 w-4 mr-2" />
                   Go Home
                 </Button>
               </div>
@@ -158,8 +158,8 @@ class ErrorBoundary extends Component<Props, State> {
                 variant="ghost"
                 size="sm"
                 className="w-full text-gray-600"
-                leftIcon={<Bug className="h-4 w-4" />}
               >
+                <Bug className="h-4 w-4 mr-2" />
                 Report this error
               </Button>
             </div>

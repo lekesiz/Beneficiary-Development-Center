@@ -98,7 +98,7 @@ const TrueFalseQuestion: React.FC<QuestionComponentProps> = ({
           disabled={disabled}
           className="text-blue-600"
         />
-        <span className="flex-1">Doğru</span>
+        <span className="flex-1">True</span>
       </label>
       <label className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
         <input
@@ -110,7 +110,7 @@ const TrueFalseQuestion: React.FC<QuestionComponentProps> = ({
           disabled={disabled}
           className="text-blue-600"
         />
-        <span className="flex-1">Yanlış</span>
+        <span className="flex-1">False</span>
       </label>
     </div>
   );
@@ -130,14 +130,14 @@ const ShortAnswerQuestion: React.FC<QuestionComponentProps> = ({
         value={response?.text || ''}
         onChange={(e) => onResponseChange({ text: e.target.value })}
         disabled={disabled}
-        placeholder="Cevabınızı yazın..."
+        placeholder="Write your answer..."
         className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         maxLength={question.question_data.max_length || 500}
       />
       {question.question_data.max_length && (
         <p className="text-sm text-gray-500 mt-1">
           {(response?.text || '').length} / {question.question_data.max_length}{' '}
-          karakter
+          characters
         </p>
       )}
     </div>
@@ -161,16 +161,16 @@ const EssayQuestion: React.FC<QuestionComponentProps> = ({
         value={response?.text || ''}
         onChange={(e) => onResponseChange({ text: e.target.value })}
         disabled={disabled}
-        placeholder="Kompozisyon yazın..."
+        placeholder="Write your essay..."
         className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         rows={8}
       />
       <div className="flex justify-between text-sm text-gray-500 mt-1">
         <span>
-          Kelime sayısı: {wordCount}
-          {minWords > 0 && ` (en az ${minWords})`}
+          Word count: {wordCount}
+          {minWords > 0 && ` (minimum ${minWords})`}
         </span>
-        <span>Maksimum: {maxWords} kelime</span>
+        <span>Maximum: {maxWords} words</span>
       </div>
     </div>
   );
@@ -391,7 +391,7 @@ export default function TakeEvaluation() {
       case 'essay':
         return <EssayQuestion {...commonProps} />;
       default:
-        return <div>Desteklenmeyen soru tipi</div>;
+        return <div>Unsupported question type</div>;
     }
   };
 
@@ -408,12 +408,12 @@ export default function TakeEvaluation() {
       <div className="p-6">
         <div className="text-center py-12">
           <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-          <p className="text-red-600">Değerlendirme bulunamadı.</p>
+          <p className="text-red-600">Evaluation not found.</p>
           <button
             onClick={() => navigate('/evaluations')}
             className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
           >
-            Geri Dön
+            Go Back
           </button>
         </div>
       </div>
@@ -426,13 +426,13 @@ export default function TakeEvaluation() {
         <div className="text-center py-12">
           <AlertCircle className="h-12 w-12 text-yellow-500 mx-auto mb-4" />
           <p className="text-yellow-600">
-            Bu değerlendirme şu anda mevcut değil.
+            This evaluation is not currently available.
           </p>
           <button
             onClick={() => navigate('/evaluations')}
             className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
           >
-            Geri Dön
+            Go Back
           </button>
         </div>
       </div>
@@ -453,7 +453,7 @@ export default function TakeEvaluation() {
               <h1 className="text-xl font-bold">{evaluation.title}</h1>
               <div className="flex items-center space-x-4 mt-1">
                 <span className="text-sm text-gray-600">
-                  Soru {currentQuestionIndex + 1} / {questions.length}
+                  Question {currentQuestionIndex + 1} / {questions.length}
                 </span>
                 <div className="w-32 bg-gray-200 rounded-full h-2">
                   <div
@@ -462,7 +462,7 @@ export default function TakeEvaluation() {
                   />
                 </div>
                 <span className="text-sm text-gray-600">
-                  {answeredCount} cevaplandı
+                  {answeredCount} answered
                 </span>
               </div>
             </div>
@@ -485,7 +485,7 @@ export default function TakeEvaluation() {
                 ) : (
                   <Eye className="h-4 w-4" />
                 )}
-                <span className="ml-2 hidden sm:inline">Sorular</span>
+                <span className="ml-2 hidden sm:inline">Questions</span>
               </button>
 
               <button
@@ -493,7 +493,7 @@ export default function TakeEvaluation() {
                 className="flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
               >
                 <Send className="mr-2 h-4 w-4" />
-                Bitir
+                Finish
               </button>
             </div>
           </div>
@@ -507,7 +507,7 @@ export default function TakeEvaluation() {
             <div className="lg:col-span-1">
               <Card className="sticky top-24">
                 <div className="p-4 border-b">
-                  <h3 className="font-semibold">Soru Haritası</h3>
+                  <h3 className="font-semibold">Question Map</h3>
                 </div>
                 <QuestionNavigator
                   questions={questions}
@@ -528,19 +528,19 @@ export default function TakeEvaluation() {
                   <div className="flex items-center space-x-2 mb-2">
                     <Badge variant="outline">
                       {currentQuestion.question_type === 'multiple_choice' &&
-                        'Çoktan Seçmeli'}
+                        'Multiple Choice'}
                       {currentQuestion.question_type === 'true_false' &&
-                        'Doğru/Yanlış'}
+                        'True/False'}
                       {currentQuestion.question_type === 'short_answer' &&
-                        'Kısa Cevap'}
+                        'Short Answer'}
                       {currentQuestion.question_type === 'essay' &&
-                        'Kompozisyon'}
+                        'Essay'}
                     </Badge>
                     <Badge variant="secondary">
-                      {currentQuestion.points} Puan
+                      {currentQuestion.points} Points
                     </Badge>
                     {currentQuestion.is_required && (
-                      <Badge variant="warning">Zorunlu</Badge>
+                      <Badge variant="warning">Required</Badge>
                     )}
                   </div>
                   <h2 className="text-lg font-medium mb-4">
@@ -555,7 +555,7 @@ export default function TakeEvaluation() {
               {/* Question Hints */}
               {currentQuestion.hints && currentQuestion.hints.length > 0 && (
                 <div className="mb-6 p-4 bg-blue-50 rounded-lg">
-                  <h4 className="font-medium text-blue-800 mb-2">💡 İpucu:</h4>
+                  <h4 className="font-medium text-blue-800 mb-2">💡 Hint:</h4>
                   <ul className="text-blue-700 space-y-1">
                     {currentQuestion.hints.map((hint, index) => (
                       <li key={index} className="text-sm">
@@ -574,7 +574,7 @@ export default function TakeEvaluation() {
                   disabled={currentQuestionIndex === 0}
                 >
                   <ChevronLeft className="mr-2 h-4 w-4" />
-                  Önceki
+                  Previous
                 </Button>
 
                 <div className="flex items-center space-x-2">
@@ -583,8 +583,8 @@ export default function TakeEvaluation() {
                   )}
                   <span className="text-sm text-gray-600">
                     {responses[currentQuestion.id]
-                      ? 'Cevaplandı'
-                      : 'Cevaplanmadı'}
+                      ? 'Answered'
+                      : 'Not Answered'}
                   </span>
                 </div>
 
@@ -592,7 +592,7 @@ export default function TakeEvaluation() {
                   onClick={handleNext}
                   disabled={currentQuestionIndex === questions.length - 1}
                 >
-                  Sonraki
+                  Next
                   <ChevronRight className="ml-2 h-4 w-4" />
                 </Button>
               </div>
@@ -605,17 +605,17 @@ export default function TakeEvaluation() {
       <Modal
         isOpen={showSubmitModal}
         onClose={() => setShowSubmitModal(false)}
-        title="Değerlendirmeyi Bitir"
+        title="Finish Evaluation"
       >
         <div className="space-y-4">
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
             <div className="flex items-start space-x-2">
               <AlertCircle className="h-5 w-5 text-yellow-600 mt-0.5" />
               <div>
-                <h4 className="font-medium text-yellow-800">Dikkat!</h4>
+                <h4 className="font-medium text-yellow-800">Attention!</h4>
                 <p className="text-yellow-700 text-sm mt-1">
-                  Değerlendirmeyi bitirdikten sonra cevaplarınızı
-                  değiştiremezsiniz.
+                  You cannot change your answers after finishing
+                  the evaluation.
                 </p>
               </div>
             </div>
@@ -623,11 +623,11 @@ export default function TakeEvaluation() {
 
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div className="bg-gray-50 p-3 rounded">
-              <div className="font-medium">Toplam Soru</div>
+              <div className="font-medium">Total Questions</div>
               <div className="text-lg font-bold">{questions.length}</div>
             </div>
             <div className="bg-gray-50 p-3 rounded">
-              <div className="font-medium">Cevaplanan</div>
+              <div className="font-medium">Answered</div>
               <div className="text-lg font-bold text-green-600">
                 {answeredCount}
               </div>
@@ -636,20 +636,20 @@ export default function TakeEvaluation() {
 
           {answeredCount < questions.length && (
             <p className="text-orange-600 text-sm">
-              {questions.length - answeredCount} soru cevaplanmadı.
-              Değerlendirmeyi yine de bitirmek istiyor musunuz?
+              {questions.length - answeredCount} questions not answered.
+              Do you still want to finish the evaluation?
             </p>
           )}
 
           <div className="flex justify-end space-x-2">
             <Button variant="outline" onClick={() => setShowSubmitModal(false)}>
-              Devam Et
+              Continue
             </Button>
             <Button
               onClick={handleSubmit}
               loading={submitAttemptMutation.isPending}
             >
-              Bitir ve Gönder
+              Finish and Submit
             </Button>
           </div>
         </div>

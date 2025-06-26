@@ -1,4 +1,3 @@
-import * as React from 'react';
 import {
   LineChart,
   Line,
@@ -52,12 +51,12 @@ export default function PerformanceTrendChart({
           {data.hasData ? (
             <>
               <p className="text-sm text-blue-600">
-                Puan: {data.score.toFixed(1)}%
+                Score: {data.score?.toFixed(1) ?? 0}%
               </p>
-              <p className="text-sm text-gray-600">Deneme: {data.attempts}</p>
+              <p className="text-sm text-gray-600">Attempts: {data.attempts}</p>
             </>
           ) : (
-            <p className="text-sm text-gray-500">Veri yok</p>
+            <p className="text-sm text-gray-500">No data</p>
           )}
         </div>
       );
@@ -68,7 +67,7 @@ export default function PerformanceTrendChart({
   const CustomDot = (props: DotProps) => {
     const { cx, cy, payload } = props;
 
-    if (!payload.hasData) {
+    if (!payload?.hasData) {
       return null;
     }
 
@@ -98,7 +97,7 @@ export default function PerformanceTrendChart({
             tick={{ fontSize: 12 }}
             stroke="#6B7280"
             label={{
-              value: 'Performans (%)',
+              value: 'Performance (%)',
               angle: -90,
               position: 'insideLeft',
               style: { fontSize: 12, fill: '#6B7280' },

@@ -12,7 +12,6 @@ import {
   SortAsc,
   SortDesc,
 } from 'lucide-react';
-import * as React from 'react';
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 

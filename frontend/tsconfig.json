@@ -20,6 +20,10 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
 
+    /* React */
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    
     /* Path aliases */
     "baseUrl": ".",
     "paths": {

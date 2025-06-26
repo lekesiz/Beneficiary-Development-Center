@@ -3,6 +3,7 @@
  * This file shows the integration of Socket.io events with React Query
  */
 import React, { useState, useEffect, useRef } from 'react';
+
 import { useSocket } from '@/contexts/SocketContext';
 import { useMessages, useSendMessage, useAutoMarkAsRead } from '@/hooks/useChat';
 import { useChatSocket } from '@/hooks/useChatSocket';

@@ -398,7 +398,8 @@ def get_program_statistics():
         return jsonify({"error": "Failed to fetch statistics"}), 500
 
 
-# Register the courses blueprint
+# Register the courses blueprint as a nested route under programs
 from app.api.v1 import courses
 
-bp.register_blueprint(courses.bp)
+# This will make courses available at /api/v1/programs/{program_id}/courses
+bp.register_blueprint(courses.bp, url_prefix="/<int:program_id>/courses")

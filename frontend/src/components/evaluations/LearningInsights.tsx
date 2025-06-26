@@ -1,11 +1,8 @@
 import {
   Brain,
-  TrendingUp,
-  TrendingDown,
   Activity,
   Target,
   Zap,
-  Clock,
   BarChart3,
   CheckCircle,
   AlertCircle,
@@ -26,7 +23,6 @@ import {
   getTrendLabel,
   formatPerformanceMetrics,
 } from '@/hooks/useEvaluationInsights';
-import type { LearningInsights as LearningInsightsType } from '@/types/evaluation';
 
 interface LearningInsightsProps {
   evaluationId: number;

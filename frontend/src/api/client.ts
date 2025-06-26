@@ -82,7 +82,8 @@ apiClient.interceptors.response.use(
 
     // Handle other errors
     if (error.response) {
-      const message = error.response.data?.message || 'An error occurred';
+      const errorData = error.response.data as { message?: string };
+      const message = errorData?.message || 'An error occurred';
 
       // Don't show toast for validation errors (handle them in forms)
       if (error.response.status !== 400) {

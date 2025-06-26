@@ -11,7 +11,6 @@ import {
   ChevronDown,
   ChevronUp,
 } from 'lucide-react';
-import * as React from 'react';
 import { useState } from 'react';
 
 import { Badge } from '@/components/ui/Badge';

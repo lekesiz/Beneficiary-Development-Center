@@ -128,7 +128,7 @@ def register_jwt_callbacks(jwt_manager):
     def user_lookup_callback(_jwt_header, jwt_data):
         """Load user from JWT."""
         identity = jwt_data["sub"]
-        return User.query.filter_by(id=identity).first()
+        return db.session.query(User).filter_by(id=identity).first()
 
     @jwt_manager.expired_token_loader
     def expired_token_callback(jwt_header, jwt_payload):

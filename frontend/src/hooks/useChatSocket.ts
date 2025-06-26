@@ -2,9 +2,11 @@
  * Custom hook to integrate Socket.io with chat functionality
  * This demonstrates how to use the Socket context for chat features
  */
-import { useEffect, useCallback, useRef } from 'react';
-import { useSocket } from '@/contexts/SocketContext';
 import { useQueryClient } from '@tanstack/react-query';
+import { useEffect, useCallback, useRef } from 'react';
+
+import { useSocket } from '@/contexts/SocketContext';
+
 import { chatQueryKeys } from './useChat';
 
 interface UseChatSocketOptions {

@@ -1,80 +1,80 @@
 # Core Flask dependencies
-flask==3.0.0
+flask==3.1.1
 flask-sqlalchemy==3.1.1
-flask-jwt-extended==4.6.0
-flask-cors==4.0.0
-flask-migrate==4.0.5
-python-dotenv==1.0.0
+flask-jwt-extended==4.7.1
+flask-cors==6.0.1
+flask-migrate==4.1.0
+python-dotenv==1.1.1
 
 # Database
-psycopg2-binary==2.9.9
-alembic==1.13.1
+psycopg2-binary==2.9.10
+alembic==1.16.2
 
 # Security
-argon2-cffi==23.1.0
-cryptography==41.0.7
+argon2-cffi==25.1.0
+cryptography==45.0.4
 
 # Redis and Caching
-redis==5.0.1
-flask-caching==2.1.0
+redis==6.2.0
+flask-caching==2.3.1
 
 # Task Queue
-celery==5.3.4
+celery==5.5.3
 flower==2.0.1
 
 # WebSocket support
-flask-socketio==5.3.5
-python-socketio==5.10.0
+flask-socketio==5.5.1
+python-socketio==5.13.0
 
 # API and Serialization
-marshmallow==3.20.1
-marshmallow-sqlalchemy==0.29.0
-apispec==6.3.0
-apispec-webframeworks==0.5.2
+marshmallow==4.0.0
+marshmallow-sqlalchemy==1.4.2
+apispec==6.8.2
+apispec-webframeworks==1.2.0
 
 # AI and OpenAI
-openai==1.6.1
-tiktoken==0.5.2
-tenacity==8.3.0
-scikit-learn==1.5.0
+openai==1.91.0
+tiktoken==0.9.0
+tenacity==9.1.2
+scikit-learn==1.7.0
 
 # HTTP Requests
-requests==2.31.0
-httpx==0.25.2
+requests==2.32.4
+httpx==0.28.1
 
 # Date and Time
-python-dateutil==2.8.2
-pytz==2023.3
+python-dateutil==2.9.0.post0
+pytz==2025.2
 
 # Testing
-pytest==7.4.3
+pytest==8.4.1
 pytest-flask==1.3.0
-pytest-cov==4.1.0
-pytest-mock==3.12.0
-pytest-asyncio==0.21.1
-faker==20.1.0
-factory-boy==3.3.0
-coverage==7.3.2
+pytest-cov==6.2.1
+pytest-mock==3.14.1
+pytest-asyncio==1.0.0
+faker==37.4.0
+factory-boy==3.3.3
+coverage==7.9.1
 
 # Development
-flask-debugtoolbar==0.13.1
+flask-debugtoolbar==0.16.0
 python-decouple==3.8
 
 # Monitoring and Logging
-sentry-sdk[flask]==1.38.0
-flask-limiter==3.5.0
-python-json-logger==2.0.7
+sentry-sdk[flask]==2.31.0
+flask-limiter==3.12
+python-json-logger==3.3.0
 
 # File handling
 python-magic==0.4.27
-pillow==10.1.0
+pillow==11.2.1
 
 # Email
-flask-mail==0.9.1
+flask-mail==0.10.0
 
 # Documentation
 flasgger==0.9.7.1
 
 # Deployment
-gunicorn==21.2.0
-gevent==23.9.1
+gunicorn==23.0.0
+gevent==25.5.1

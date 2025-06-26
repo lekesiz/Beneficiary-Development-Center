@@ -1,10 +1,11 @@
+import { useQueryClient } from '@tanstack/react-query';
 import { useMemo, useEffect, useState } from 'react';
 import { useLocation, useMatches, useParams } from 'react-router-dom';
-import { useQueryClient } from '@tanstack/react-query';
-import { useProgram, programQueryKeys } from './usePrograms';
-import { useCourse, courseQueryKeys } from './useCourses';
+
 import { useBeneficiary, beneficiaryKeys } from './useBeneficiaries';
+import { useCourse, courseQueryKeys } from './useCourses';
 import { useEvaluation, evaluationQueryKeys } from './useEvaluations';
+import { useProgram, programQueryKeys } from './usePrograms';
 
 export interface Breadcrumb {
   label: string;

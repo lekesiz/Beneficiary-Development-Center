@@ -26,12 +26,12 @@ import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 
 import { Badge } from '../../components/ui/Badge';
+import { CalendarButton } from '../../components/ui/CalendarButton';
 import { Card } from '../../components/ui/Card';
 import { DataTable } from '../../components/ui/DataTable';
 import { Button } from '../../components/ui/Form';
 import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
 import { ConfirmDialog } from '../../components/ui/Modal';
-import { CalendarButton } from '../../components/ui/CalendarButton';
 import { useAuth } from '../../contexts/AuthContext';
 import {
   useCourse,

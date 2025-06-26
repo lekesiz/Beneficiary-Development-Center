@@ -5,8 +5,8 @@ import type { ColumnDef, SortingState } from '@tanstack/react-table';
 import { Edit, Eye, Trash2, Plus, Search, Filter, BookOpen } from 'lucide-react';
 import * as React from 'react';
 import { useState, useMemo } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Link, useNavigate } from 'react-router-dom';
 
 import { DataTableSkeleton } from '../../components/common/DataTableSkeleton';
 import { Badge } from '../../components/ui/Badge';

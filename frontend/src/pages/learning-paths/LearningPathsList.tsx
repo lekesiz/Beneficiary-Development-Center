@@ -1,5 +1,4 @@
 import { CheckCircle, Clock, Target, TrendingUp, Filter, Search, Eye, Calendar, User } from 'lucide-react';
-import * as React from 'react';
 import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 

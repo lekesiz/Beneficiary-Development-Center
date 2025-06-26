@@ -9,7 +9,6 @@ import {
   Trash2,
   Check,
 } from 'lucide-react';
-import * as React from 'react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -57,9 +56,9 @@ export default function NotificationCenter() {
     } as const;
 
     const labels = {
-      high: 'Yüksek',
-      medium: 'Orta',
-      low: 'Düşük',
+      high: 'High',
+      medium: 'Medium',
+      low: 'Low',
     };
 
     return (
@@ -78,7 +77,7 @@ export default function NotificationCenter() {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors"
-        aria-label="Bildirimler"
+        aria-label="Notifications"
       >
         <Bell className="h-6 w-6 text-gray-600" />
         {unreadCount > 0 && (
@@ -107,10 +106,10 @@ export default function NotificationCenter() {
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold flex items-center">
                   <Bell className="mr-2 h-5 w-5" />
-                  Bildirimler
+                  Notifications
                   {unreadCount > 0 && (
-                    <Badge variant="primary" size="sm" className="ml-2">
-                      {unreadCount} yeni
+                    <Badge variant="default" size="sm" className="ml-2">
+                      {unreadCount} new
                     </Badge>
                   )}
                 </h3>
@@ -123,7 +122,7 @@ export default function NotificationCenter() {
                       className="text-xs"
                     >
                       <Check className="h-3 w-3 mr-1" />
-                      Tümünü okundu işaretle
+                      Mark All as Read
                     </Button>
                   )}
                   <button
@@ -170,8 +169,8 @@ export default function NotificationCenter() {
                               </p>
                               <p className="text-sm text-gray-600 mt-1">
                                 {notification.type === 'help_request'
-                                  ? `"${notification.milestone_title}" için yardım istiyor`
-                                  : `"${notification.milestone_title}" hedefini tamamladı`}
+                                  ? `needs help with "${notification.milestone_title}"`
+                                  : `completed "${notification.milestone_title}" milestone`}
                               </p>
                               {notification.message && (
                                 <p className="text-sm text-gray-500 mt-1 italic">
@@ -187,7 +186,7 @@ export default function NotificationCenter() {
                                   getPriorityBadge(notification.priority)}
                                 {notification.path_completed && (
                                   <Badge variant="success" size="sm">
-                                    Yol Tamamlandı
+                                    Path Completed
                                   </Badge>
                                 )}
                               </div>
@@ -199,7 +198,7 @@ export default function NotificationCenter() {
                                   handleNotificationClick(notification);
                                 }}
                                 className="p-1 hover:bg-gray-200 rounded"
-                                title="Öğrenci profiline git"
+                                title="Go to student profile"
                               >
                                 <ExternalLink className="h-4 w-4 text-gray-500" />
                               </button>
@@ -209,7 +208,7 @@ export default function NotificationCenter() {
                                   clearNotification(notification.id);
                                 }}
                                 className="p-1 hover:bg-gray-200 rounded"
-                                title="Bildirimi sil"
+                                title="Delete notification"
                               >
                                 <Trash2 className="h-4 w-4 text-gray-500" />
                               </button>
@@ -223,7 +222,7 @@ export default function NotificationCenter() {
               ) : (
                 <div className="p-8 text-center">
                   <Bell className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-                  <p className="text-gray-500">Henüz bildirim yok</p>
+                  <p className="text-gray-500">You have no new notifications</p>
                 </div>
               )}
             </div>
@@ -240,7 +239,7 @@ export default function NotificationCenter() {
                     setIsOpen(false);
                   }}
                 >
-                  Tüm bildirimleri görüntüle
+                  View all notifications
                 </Button>
               </div>
             )}
@@ -250,7 +249,7 @@ export default function NotificationCenter() {
               <div className="px-4 py-2 bg-yellow-50 border-t border-yellow-200">
                 <p className="text-xs text-yellow-800 flex items-center">
                   <AlertCircle className="h-3 w-3 mr-1" />
-                  Bağlantı koptu. Yeniden bağlanmaya çalışılıyor...
+                  Connection lost. Attempting to reconnect...
                 </p>
               </div>
             )}

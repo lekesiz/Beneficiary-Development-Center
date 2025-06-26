@@ -1,5 +1,4 @@
 import { Users, BookOpen, ClipboardCheck, TrendingUp } from 'lucide-react';
-import * as React from 'react';
 
 import { useBeneficiaryStatistics } from '@/hooks/useBeneficiaries';
 

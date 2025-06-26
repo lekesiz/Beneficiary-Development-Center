@@ -154,8 +154,7 @@ export interface CreateEvaluationRequest {
   tags?: string[];
 }
 
-export interface UpdateEvaluationRequest
-  extends Partial<CreateEvaluationRequest> {}
+export type UpdateEvaluationRequest = Partial<CreateEvaluationRequest>;
 
 export interface CreateQuestionRequest {
   question_text: string;

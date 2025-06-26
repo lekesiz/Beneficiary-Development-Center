@@ -4,15 +4,14 @@
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { toast } from 'react-hot-toast';
 import { BrowserRouter } from 'react-router-dom';
-import { describe, it, expect, vi, beforeEach, beforeAll, afterAll } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 import programsApi from '@/api/programs';
 import * as authContext from '@/contexts/AuthContext';
-import ProgramList from '@/pages/programs/ProgramList';
 import * as usePrograms from '@/hooks/usePrograms';
+import ProgramList from '@/pages/programs/ProgramList';
+import { Program, ProgramStatus, ProgramType } from '@/types/program';
 
 // Mock dependencies
 vi.mock('@/contexts/AuthContext');
@@ -35,28 +34,54 @@ vi.mock('@/hooks/usePrograms', () => ({
 }));
 
 describe('Program Management - End to End', () => {
-  const mockPrograms = [
+  const mockPrograms: Program[] = [
     {
       id: 1,
+      uuid: 'uuid-1',
       title: 'Web Development Bootcamp',
       code: 'WEB-2024',
-      status: 'active',
-      program_type: 'bootcamp',
+      status: ProgramStatus.ACTIVE,
+      program_type: ProgramType.BOOTCAMP,
       start_date: '2024-01-01',
       end_date: '2024-06-30',
+      min_participants: 5,
       max_participants: 30,
+      objectives: ['Learn web development', 'Build projects'],
+      requirements: {},
+      is_online: false,
+      is_hybrid: false,
+      price: 0,
+      currency: 'USD',
+      tags: [],
+      program_metadata: {},
+      resources: [],
+      created_by: 1,
       created_at: '2023-12-01T00:00:00Z',
+      updated_at: '2023-12-01T00:00:00Z',
     },
     {
       id: 2,
+      uuid: 'uuid-2',
       title: 'Data Science Workshop',
       code: 'DS-2024',
-      status: 'draft',
-      program_type: 'workshop',
+      status: ProgramStatus.DRAFT,
+      program_type: ProgramType.WORKSHOP,
       start_date: '2024-03-01',
       end_date: '2024-03-15',
+      min_participants: 5,
       max_participants: 20,
+      objectives: ['Learn data science', 'Analyze data'],
+      requirements: {},
+      is_online: false,
+      is_hybrid: false,
+      price: 0,
+      currency: 'USD',
+      tags: [],
+      program_metadata: {},
+      resources: [],
+      created_by: 1,
       created_at: '2023-12-15T00:00:00Z',
+      updated_at: '2023-12-15T00:00:00Z',
     },
   ];
 
@@ -92,9 +117,7 @@ describe('Program Management - End to End', () => {
     vi.mocked(programsApi.update).mockResolvedValue(mockPrograms[0]);
     vi.mocked(programsApi.delete).mockResolvedValue(undefined);
     vi.mocked(programsApi.getStatistics).mockResolvedValue({} as any);
-    if (programsApi.addCourse) vi.mocked(programsApi.addCourse).mockResolvedValue({} as any);
-    if (programsApi.removeCourse) vi.mocked(programsApi.removeCourse).mockResolvedValue(undefined);
-    if (programsApi.getCourses) vi.mocked(programsApi.getCourses).mockResolvedValue({ courses: [] });
+    // These methods don't exist on programsApi, removing them
   });
 
   it('renders programs list component', async () => {
@@ -146,8 +169,7 @@ describe('Program Management - End to End', () => {
     const newProgram = {
       title: 'New Test Program',
       code: 'TEST-2024',
-      status: 'draft' as const,
-      program_type: 'training' as const,
+      program_type: ProgramType.TRAINING,
       start_date: '2024-07-01',
       end_date: '2024-12-31',
       max_participants: 25,

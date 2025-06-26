@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { ChatLayout } from '@/components/chat';
 
 export const ChatPage: React.FC = () => {

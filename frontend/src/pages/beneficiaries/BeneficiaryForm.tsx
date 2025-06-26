@@ -1,10 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowLeft, Save, Loader2 } from 'lucide-react';
-import * as React from 'react';
 import { useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import { FileUpload } from '@/components/ui/FileUpload';
 import {

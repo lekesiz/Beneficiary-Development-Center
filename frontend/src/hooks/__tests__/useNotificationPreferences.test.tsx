@@ -1,9 +1,10 @@
-import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { renderHook, waitFor } from '@testing-library/react';
 import { vi } from 'vitest';
 
-import { useNotificationPreferences } from '../useNotificationPreferences';
 import { usersApi } from '@/api/users';
+
+import { useNotificationPreferences } from '../useNotificationPreferences';
 
 // Mock the API
 vi.mock('@/api/users', () => ({

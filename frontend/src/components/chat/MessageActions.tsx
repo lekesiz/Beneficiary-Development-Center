@@ -1,6 +1,7 @@
+import { Reply, Edit2, Trash2, Copy } from 'lucide-react';
 import React from 'react';
+
 import { Button } from '@/components/ui/Button';
-import { Reply, Edit2, Trash2, Copy, MoreVertical } from 'lucide-react';
 import { useUpdateMessage, useDeleteMessage } from '@/hooks/useChat';
 import type { Message } from '@/types/chat';
 
@@ -17,7 +18,6 @@ export const MessageActions: React.FC<MessageActionsProps> = ({
   onReply,
   onEdit,
 }) => {
-  const updateMessage = useUpdateMessage();
   const deleteMessage = useDeleteMessage();
 
   const handleCopy = () => {
@@ -25,7 +25,7 @@ export const MessageActions: React.FC<MessageActionsProps> = ({
   };
 
   const handleDelete = () => {
-    if (window.confirm('Bu mesajı silmek istediğinizden emin misiniz?')) {
+    if (window.confirm('Are you sure you want to delete this message?')) {
       deleteMessage.mutate(message.id);
     }
   };
@@ -36,7 +36,7 @@ export const MessageActions: React.FC<MessageActionsProps> = ({
         variant="ghost"
         size="sm"
         onClick={onReply}
-        title="Yanıtla"
+        title="Reply"
         className="!h-7 !w-7 !p-0"
       >
         <Reply size={14} />
@@ -47,7 +47,7 @@ export const MessageActions: React.FC<MessageActionsProps> = ({
           variant="ghost"
           size="sm"
           onClick={handleCopy}
-          title="Kopyala"
+          title="Copy"
           className="!h-7 !w-7 !p-0"
         >
           <Copy size={14} />
@@ -59,7 +59,7 @@ export const MessageActions: React.FC<MessageActionsProps> = ({
           variant="ghost"
           size="sm"
           onClick={onEdit}
-          title="Düzenle"
+          title="Edit"
           className="!h-7 !w-7 !p-0"
         >
           <Edit2 size={14} />
@@ -71,7 +71,7 @@ export const MessageActions: React.FC<MessageActionsProps> = ({
           variant="ghost"
           size="sm"
           onClick={handleDelete}
-          title="Sil"
+          title="Delete"
           className="text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 !h-7 !w-7 !p-0"
         >
           <Trash2 size={14} />

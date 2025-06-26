@@ -26,7 +26,7 @@ def close_db(e=None):
     """Close database connection."""
     from app import db
 
-    db.session.remove()
+    db.session.close()
 
 
 def commit_db():

@@ -47,11 +47,11 @@ import type {
 // Form validation schema
 const courseFormSchema = z
   .object({
-    program_id: z.number().min(1, 'Program seçimi zorunludur'),
+    program_id: z.number().min(1, 'Program selection is required'),
     title: z
       .string()
-      .min(1, 'Kurs adı zorunludur')
-      .max(200, 'Kurs adı en fazla 200 karakter olabilir'),
+      .min(1, 'Course name is required')
+      .max(200, 'Course name can be up to 200 characters'),
     subtitle: z.string().optional(),
     description: z.string().optional(),
     status: z.nativeEnum(CourseStatus).optional(),
@@ -59,8 +59,8 @@ const courseFormSchema = z
     difficulty_level: z.nativeEnum(DifficultyLevel).optional(),
     duration_hours: z
       .number()
-      .min(0.5, 'Süre en az 0.5 saat olmalıdır')
-      .max(500, 'Süre en fazla 500 saat olabilir'),
+      .min(0.5, 'Duration must be at least 0.5 hours')
+      .max(500, 'Duration can be up to 500 hours'),
     duration_weeks: z.number().min(1).max(52).optional(),
     order_index: z.number().min(1).optional(),
     objectives: z.array(z.string()).optional(),
@@ -68,12 +68,12 @@ const courseFormSchema = z
     materials: z.array(z.string()).optional(),
     content_url: z
       .string()
-      .url('Geçerli bir URL giriniz')
+      .url('Please enter a valid URL')
       .optional()
       .or(z.literal('')),
     video_url: z
       .string()
-      .url('Geçerli bir URL giriniz')
+      .url('Please enter a valid URL')
       .optional()
       .or(z.literal('')),
     has_assessment: z.boolean().optional(),
@@ -82,16 +82,16 @@ const courseFormSchema = z
     max_attempts: z.number().min(1).optional(),
     min_participants: z
       .number()
-      .min(1, 'Minimum katılımcı sayısı en az 1 olmalıdır')
+      .min(1, 'Minimum participants must be at least 1')
       .optional(),
     max_participants: z
       .number()
-      .min(1, 'Maksimum katılımcı sayısı en az 1 olmalıdır')
+      .min(1, 'Maximum participants must be at least 1')
       .optional(),
     tags: z.array(z.string()).optional(),
     thumbnail_url: z
       .string()
-      .url('Geçerli bir URL giriniz')
+      .url('Please enter a valid URL')
       .optional()
       .or(z.literal('')),
     instructor_id: z.number().optional(),
@@ -104,7 +104,7 @@ const courseFormSchema = z
       return true;
     },
     {
-      message: 'Maksimum katılımcı sayısı minimum sayıdan az olamaz',
+      message: 'Maximum participants cannot be less than minimum participants',
       path: ['max_participants'],
     }
   );
@@ -387,7 +387,7 @@ export const CourseForm: React.FC = () => {
     return (
       <Card className="p-6">
         <div className="text-center text-red-600">
-          Bu sayfaya erişim yetkiniz bulunmamaktadır.
+          You do not have permission to access this page.
         </div>
       </Card>
     );
@@ -412,16 +412,16 @@ export const CourseForm: React.FC = () => {
             onClick={() => navigate('/courses')}
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Kurslara Dön
+            Back to Courses
           </Button>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">
-              {isEdit ? 'Kurs Düzenle' : 'Yeni Kurs'}
+              {isEdit ? 'Edit Course' : 'New Course'}
             </h1>
             <p className="text-gray-600">
               {isEdit
-                ? 'Kurs bilgilerini güncelleyin'
-                : 'Yeni bir kurs oluşturun'}
+                ? 'Update course information'
+                : 'Create a new course'}
             </p>
           </div>
         </div>
@@ -430,7 +430,7 @@ export const CourseForm: React.FC = () => {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* Basic Information */}
         <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Temel Bilgiler</h3>
+          <h3 className="text-lg font-semibold mb-4">Basic Information</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="text-sm font-medium leading-none">
@@ -446,7 +446,7 @@ export const CourseForm: React.FC = () => {
                     onChange={(e) => field.onChange(parseInt(e.target.value))}
                     value={field.value?.toString() || ''}
                   >
-                    <option value="">Program seçin</option>
+                    <option value="">Select program</option>
                     {programsData?.programs?.map((program) => (
                       <option key={program.id} value={program.id}>
                         {program.title}
@@ -463,7 +463,7 @@ export const CourseForm: React.FC = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium leading-none">Sıra</label>
+              <label className="text-sm font-medium leading-none">Order</label>
               <Controller
                 name="order_index"
                 control={control}
@@ -488,7 +488,7 @@ export const CourseForm: React.FC = () => {
             <div className="md:col-span-2">
               <div className="space-y-2">
                 <label className="text-sm font-medium leading-none">
-                  Kurs Adı <span className="text-destructive">*</span>
+                  Course Name <span className="text-destructive">*</span>
                 </label>
                 <Controller
                   name="title"
@@ -507,7 +507,7 @@ export const CourseForm: React.FC = () => {
 
             <div className="space-y-2">
               <label className="text-sm font-medium leading-none">
-                Alt Başlık
+                Subtitle
               </label>
               <Controller
                 name="subtitle"
@@ -547,7 +547,7 @@ export const CourseForm: React.FC = () => {
 
             <div className="space-y-2">
               <label className="text-sm font-medium leading-none">
-                Zorluk Seviyesi
+                Difficulty Level
               </label>
               <Controller
                 name="difficulty_level"
@@ -572,7 +572,7 @@ export const CourseForm: React.FC = () => {
             {canSetStatus && (
               <div className="space-y-2">
                 <label className="text-sm font-medium leading-none">
-                  Durum
+                  Status
                 </label>
                 <Controller
                   name="status"
@@ -598,7 +598,7 @@ export const CourseForm: React.FC = () => {
             <div className="md:col-span-2">
               <div className="space-y-2">
                 <label className="text-sm font-medium leading-none">
-                  Açıklama
+                  Description
                 </label>
                 <Controller
                   name="description"
@@ -628,22 +628,22 @@ export const CourseForm: React.FC = () => {
               <Info className="h-5 w-5 text-blue-600 mt-0.5" />
               <div>
                 <h4 className="font-medium text-blue-900">
-                  Seçili Program: {selectedProgram.title}
+                  Selected Program: {selectedProgram.title}
                 </h4>
                 <p className="text-sm text-blue-700 mt-1">
                   {selectedProgram.description}
                 </p>
                 <div className="flex items-center space-x-4 mt-2">
                   <span className="text-xs text-blue-600">
-                    Başlangıç:{' '}
+                    Start Date:{' '}
                     {new Date(selectedProgram.start_date).toLocaleDateString(
-                      'tr-TR'
+                      'en-US'
                     )}
                   </span>
                   <span className="text-xs text-blue-600">
-                    Bitiş:{' '}
+                    End Date:{' '}
                     {new Date(selectedProgram.end_date).toLocaleDateString(
-                      'tr-TR'
+                      'en-US'
                     )}
                   </span>
                 </div>
@@ -654,11 +654,11 @@ export const CourseForm: React.FC = () => {
 
         {/* Duration and Capacity */}
         <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Süre ve Kapasite</h3>
+          <h3 className="text-lg font-semibold mb-4">Duration and Capacity</h3>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="space-y-2">
               <label className="text-sm font-medium leading-none">
-                Süre (Saat) <span className="text-destructive">*</span>
+                Duration (Hours) <span className="text-destructive">*</span>
               </label>
               <Controller
                 name="duration_hours"
@@ -684,7 +684,7 @@ export const CourseForm: React.FC = () => {
 
             <div className="space-y-2">
               <label className="text-sm font-medium leading-none">
-                Süre (Hafta)
+                Duration (Weeks)
               </label>
               <Controller
                 name="duration_weeks"
@@ -709,7 +709,7 @@ export const CourseForm: React.FC = () => {
 
             <div className="space-y-2">
               <label className="text-sm font-medium leading-none">
-                Min. Katılımcı
+                Min. Participants
               </label>
               <Controller
                 name="min_participants"
@@ -734,7 +734,7 @@ export const CourseForm: React.FC = () => {
 
             <div className="space-y-2">
               <label className="text-sm font-medium leading-none">
-                Max. Katılımcı
+                Max. Participants
               </label>
               <Controller
                 name="max_participants"
@@ -761,11 +761,11 @@ export const CourseForm: React.FC = () => {
 
         {/* Content and Media */}
         <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">İçerik ve Medya</h3>
+          <h3 className="text-lg font-semibold mb-4">Content and Media</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="text-sm font-medium leading-none">
-                İçerik URL
+                Content URL
               </label>
               <Controller
                 name="content_url"
@@ -837,9 +837,9 @@ export const CourseForm: React.FC = () => {
         {isEdit && courseId && (
           <>
             <Card className="p-6">
-              <h3 className="text-lg font-semibold mb-4">Kurs Materyalleri</h3>
+              <h3 className="text-lg font-semibold mb-4">Course Materials</h3>
               <p className="text-sm text-gray-600 mb-4">
-                PDF, DOC, PPT ve diğer belge formatlarını yükleyebilirsiniz.
+                You can upload PDF, DOC, PPT and other document formats.
               </p>
               <FileUpload
                 onUpload={handleMaterialUpload}
@@ -868,9 +868,9 @@ export const CourseForm: React.FC = () => {
             </Card>
 
             <Card className="p-6">
-              <h3 className="text-lg font-semibold mb-4">Medya Dosyaları</h3>
+              <h3 className="text-lg font-semibold mb-4">Media Files</h3>
               <p className="text-sm text-gray-600 mb-4">
-                Video, ses ve resim dosyalarını yükleyebilirsiniz.
+                You can upload video, audio and image files.
               </p>
               <FileUpload
                 onUpload={handleMediaUpload}
@@ -901,10 +901,10 @@ export const CourseForm: React.FC = () => {
               <Info className="h-5 w-5 text-blue-600 mt-0.5" />
               <div>
                 <h4 className="font-medium text-blue-900">
-                  Dosya Yükleme
+                  File Upload
                 </h4>
                 <p className="text-sm text-blue-700 mt-1">
-                  Kurs oluşturduktan sonra materyaller ve medya dosyalarını yükleyebileceksiniz.
+                  You will be able to upload materials and media files after creating the course.
                 </p>
               </div>
             </div>
@@ -913,7 +913,7 @@ export const CourseForm: React.FC = () => {
 
         {/* Assessment */}
         <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Değerlendirme</h3>
+          <h3 className="text-lg font-semibold mb-4">Assessment</h3>
           <div className="space-y-4">
             <div>
               <Controller
@@ -927,7 +927,7 @@ export const CourseForm: React.FC = () => {
                       onChange={field.onChange}
                       className="rounded border-gray-300"
                     />
-                    <span>Bu kursun bir değerlendirmesi var</span>
+                    <span>This course has an assessment</span>
                   </label>
                 )}
               />
@@ -937,18 +937,18 @@ export const CourseForm: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium leading-none">
-                    Değerlendirme Türü
+                    Assessment Type
                   </label>
                   <Controller
                     name="assessment_type"
                     control={control}
                     render={({ field }) => (
                       <Select {...field} error={!!errors.assessment_type}>
-                        <option value="">Seçiniz</option>
+                        <option value="">Select</option>
                         <option value="quiz">Quiz</option>
-                        <option value="exam">Sınav</option>
-                        <option value="project">Proje</option>
-                        <option value="assignment">Ödev</option>
+                        <option value="exam">Exam</option>
+                        <option value="project">Project</option>
+                        <option value="assignment">Assignment</option>
                       </Select>
                     )}
                   />
@@ -961,7 +961,7 @@ export const CourseForm: React.FC = () => {
 
                 <div className="space-y-2">
                   <label className="text-sm font-medium leading-none">
-                    Geçme Puanı (%)
+                    Passing Score (%)
                   </label>
                   <Controller
                     name="passing_score"
@@ -988,7 +988,7 @@ export const CourseForm: React.FC = () => {
 
                 <div className="space-y-2">
                   <label className="text-sm font-medium leading-none">
-                    Max. Deneme
+                    Max. Attempts
                   </label>
                   <Controller
                     name="max_attempts"
@@ -1018,13 +1018,13 @@ export const CourseForm: React.FC = () => {
 
         {/* Objectives */}
         <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Kurs Hedefleri</h3>
+          <h3 className="text-lg font-semibold mb-4">Course Objectives</h3>
           <div className="space-y-4">
             <div className="flex space-x-2">
               <Input
                 value={newObjective}
                 onChange={(e) => setNewObjective(e.target.value)}
-                placeholder="Yeni hedef ekleyin"
+                placeholder="Add new objective"
                 onKeyPress={(e) =>
                   e.key === 'Enter' && (e.preventDefault(), addObjective())
                 }
@@ -1063,13 +1063,13 @@ export const CourseForm: React.FC = () => {
 
         {/* Prerequisites */}
         <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Ön Koşullar</h3>
+          <h3 className="text-lg font-semibold mb-4">Prerequisites</h3>
           <div className="space-y-4">
             <div className="flex space-x-2">
               <Input
                 value={newPrerequisite}
                 onChange={(e) => setNewPrerequisite(e.target.value)}
-                placeholder="Yeni ön koşul ekleyin"
+                placeholder="Add new prerequisite"
                 onKeyPress={(e) =>
                   e.key === 'Enter' && (e.preventDefault(), addPrerequisite())
                 }
@@ -1108,13 +1108,13 @@ export const CourseForm: React.FC = () => {
 
         {/* Materials */}
         <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Materyaller</h3>
+          <h3 className="text-lg font-semibold mb-4">Materials</h3>
           <div className="space-y-4">
             <div className="flex space-x-2">
               <Input
                 value={newMaterial}
                 onChange={(e) => setNewMaterial(e.target.value)}
-                placeholder="Yeni materyal ekleyin"
+                placeholder="Add new material"
                 onKeyPress={(e) =>
                   e.key === 'Enter' && (e.preventDefault(), addMaterial())
                 }
@@ -1153,13 +1153,13 @@ export const CourseForm: React.FC = () => {
 
         {/* Tags */}
         <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Etiketler</h3>
+          <h3 className="text-lg font-semibold mb-4">Tags</h3>
           <div className="space-y-4">
             <div className="flex space-x-2">
               <Input
                 value={newTag}
                 onChange={(e) => setNewTag(e.target.value)}
-                placeholder="Yeni etiket ekleyin"
+                placeholder="Add new tag"
                 onKeyPress={(e) =>
                   e.key === 'Enter' && (e.preventDefault(), addTag())
                 }
@@ -1201,7 +1201,7 @@ export const CourseForm: React.FC = () => {
             variant="outline"
             onClick={() => navigate('/courses')}
           >
-            İptal
+            Cancel
           </Button>
           <Button
             type="submit"
@@ -1210,7 +1210,7 @@ export const CourseForm: React.FC = () => {
             }
           >
             <Save className="h-4 w-4 mr-2" />
-            {isEdit ? 'Güncelle' : 'Oluştur'}
+            {isEdit ? 'Update' : 'Create'}
           </Button>
         </div>
       </form>

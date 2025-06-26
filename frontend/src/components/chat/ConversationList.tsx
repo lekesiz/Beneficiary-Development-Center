@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
-import { ConversationItem } from './ConversationItem';
-import { Input } from '@/components/ui/Input';
-import { Button } from '@/components/ui/Button';
-import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
-import { EmptyState } from '@/components/ui/EmptyState';
 import { Search, Plus, MessageSquare } from 'lucide-react';
+import React, { useState } from 'react';
+
+import { Button } from '@/components/ui/Button';
+import { EmptyState } from '@/components/ui/EmptyState';
+import { Input } from '@/components/ui/Input';
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { useConversations } from '@/hooks/useChat';
 import type { ConversationFilters } from '@/types/chat';
+
+import { ConversationItem } from './ConversationItem';
 
 interface ConversationListProps {
   selectedId?: number;
@@ -39,8 +41,8 @@ export const ConversationList: React.FC<ConversationListProps> = ({
       <div className="p-4">
         <EmptyState
           icon={MessageSquare}
-          title="Hata"
-          description="Sohbetler yüklenirken bir hata oluştu"
+          title="Error"
+          description="An error occurred while loading conversations"
         />
       </div>
     );
@@ -51,11 +53,11 @@ export const ConversationList: React.FC<ConversationListProps> = ({
       {/* Header */}
       <div className="p-4 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold">Mesajlar</h2>
+          <h2 className="text-xl font-semibold">Messages</h2>
           <Button
             size="sm"
             onClick={handleNewConversation}
-            title="Yeni Sohbet"
+            title="New Chat"
           >
             <Plus size={16} />
           </Button>
@@ -66,7 +68,7 @@ export const ConversationList: React.FC<ConversationListProps> = ({
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
           <Input
             type="text"
-            placeholder="Sohbet ara..."
+            placeholder="Search conversations..."
             value={searchQuery}
             onChange={(e) => handleSearch(e.target.value)}
             className="pl-9"
@@ -83,14 +85,15 @@ export const ConversationList: React.FC<ConversationListProps> = ({
         ) : data?.conversations.length === 0 ? (
           <EmptyState
             icon={MessageSquare}
-            title="Sohbet Yok"
-            description={searchQuery ? "Aramanızla eşleşen sohbet bulunamadı" : "Henüz bir sohbet başlatmadınız"}
+            title="No Conversations"
+            description={searchQuery ? "No conversations match your search" : "You haven't started any conversations yet"}
             action={
-              !searchQuery && (
-                <Button onClick={handleNewConversation}>
-                  Yeni Sohbet Başlat
-                </Button>
-              )
+              !searchQuery
+                ? {
+                    text: 'Start New Chat',
+                    onClick: handleNewConversation,
+                  }
+                : undefined
             }
           />
         ) : (

@@ -1,14 +1,15 @@
+import { format, isToday, isYesterday } from 'date-fns';
+import { MessageSquare, AlertCircle } from 'lucide-react';
 import React, { useEffect, useRef, useCallback, useState } from 'react';
+import { useInView } from 'react-intersection-observer';
+
+import { EmptyState } from '@/components/ui/EmptyState';
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
+import { useMessages } from '@/hooks/useChat';
+
 import { ChatMessage } from './ChatMessage';
 import { TypingIndicator } from './TypingIndicator';
-import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
-import { EmptyState } from '@/components/ui/EmptyState';
-import { Button } from '@/components/ui/Button';
-import { MessageSquare, AlertCircle } from 'lucide-react';
-import { useMessages } from '@/hooks/useChat';
-import { useInView } from 'react-intersection-observer';
-import { format, isToday, isYesterday } from 'date-fns';
-import { tr } from 'date-fns/locale';
+
 
 interface MessageStreamProps {
   conversationId: number;
@@ -41,9 +42,9 @@ export const MessageStream: React.FC<MessageStreamProps> = ({ conversationId }) 
 
   // Format date header
   const formatDateHeader = (date: Date) => {
-    if (isToday(date)) return 'Bugün';
-    if (isYesterday(date)) return 'Dün';
-    return format(date, 'd MMMM yyyy', { locale: tr });
+    if (isToday(date)) return 'Today';
+    if (isYesterday(date)) return 'Yesterday';
+    return format(date, 'd MMMM yyyy');
   };
 
   // Group messages by date
@@ -51,7 +52,7 @@ export const MessageStream: React.FC<MessageStreamProps> = ({ conversationId }) 
     if (!data?.pages) return [];
 
     const groups: Array<{ date: string; messages: any[] }> = [];
-    const allMessages = data.pages.flatMap(page => page.messages).reverse();
+    const allMessages = data.pages.flatMap((page: any) => page.messages || []).reverse();
 
     allMessages.forEach((message) => {
       const messageDate = formatDateHeader(new Date(message.createdAt));
@@ -108,13 +109,12 @@ export const MessageStream: React.FC<MessageStreamProps> = ({ conversationId }) 
       <div className="flex items-center justify-center h-full">
         <EmptyState
           icon={AlertCircle}
-          title="Hata"
-          description="Mesajlar yüklenirken bir hata oluştu"
-          action={
-            <Button onClick={() => window.location.reload()}>
-              Yenile
-            </Button>
-          }
+          title="Error"
+          description="An error occurred while loading messages"
+          action={{
+            text: 'Refresh',
+            onClick: () => window.location.reload(),
+          }}
         />
       </div>
     );
@@ -127,8 +127,8 @@ export const MessageStream: React.FC<MessageStreamProps> = ({ conversationId }) 
       <div className="flex items-center justify-center h-full">
         <EmptyState
           icon={MessageSquare}
-          title="Henüz mesaj yok"
-          description="Bu sohbette henüz mesaj bulunmuyor. İlk mesajı siz gönderin!"
+          title="No messages yet"
+          description="Send a message to start the conversation"
         />
       </div>
     );
@@ -149,7 +149,7 @@ export const MessageStream: React.FC<MessageStreamProps> = ({ conversationId }) 
       )}
 
       {/* Messages */}
-      {messageGroups.map((group, groupIndex) => (
+      {messageGroups.map((group) => (
         <div key={group.date}>
           {/* Date Header */}
           <div className="flex items-center justify-center my-4">

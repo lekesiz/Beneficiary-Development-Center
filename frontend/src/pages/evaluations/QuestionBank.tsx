@@ -96,13 +96,13 @@ const mockQuestionBankData = {
 // Question type badge
 const QuestionTypeBadge: React.FC<{ type: string }> = ({ type }) => {
   const labels = {
-    multiple_choice: 'Çoktan Seçmeli',
-    true_false: 'Doğru/Yanlış',
-    short_answer: 'Kısa Cevap',
-    essay: 'Kompozisyon',
-    matching: 'Eşleştirme',
-    ordering: 'Sıralama',
-    fill_in_blank: 'Boşluk Doldurma',
+    multiple_choice: 'Multiple Choice',
+    true_false: 'True/False',
+    short_answer: 'Short Answer',
+    essay: 'Essay',
+    matching: 'Matching',
+    ordering: 'Ordering',
+    fill_in_blank: 'Fill in the Blank',
   };
 
   return (
@@ -121,9 +121,9 @@ const DifficultyBadge: React.FC<{ level: string }> = ({ level }) => {
   } as const;
 
   const labels = {
-    easy: 'Kolay',
-    medium: 'Orta',
-    hard: 'Zor',
+    easy: 'Easy',
+    medium: 'Medium',
+    hard: 'Hard',
   };
 
   return (
@@ -162,7 +162,7 @@ const ActionsDropdown: React.FC<{
             className="flex items-center w-full px-4 py-2 text-sm hover:bg-gray-100"
           >
             <Eye className="mr-2 h-4 w-4" />
-            Önizleme
+            Preview
           </button>
           <button
             onClick={() => {
@@ -172,7 +172,7 @@ const ActionsDropdown: React.FC<{
             className="flex items-center w-full px-4 py-2 text-sm hover:bg-gray-100"
           >
             <Edit className="mr-2 h-4 w-4" />
-            Düzenle
+            Edit
           </button>
           <button
             onClick={() => {
@@ -182,7 +182,7 @@ const ActionsDropdown: React.FC<{
             className="flex items-center w-full px-4 py-2 text-sm hover:bg-gray-100"
           >
             <Copy className="mr-2 h-4 w-4" />
-            Kopyala
+            Copy
           </button>
           <hr className="my-1" />
           <button
@@ -193,7 +193,7 @@ const ActionsDropdown: React.FC<{
             className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
           >
             <Trash2 className="mr-2 h-4 w-4" />
-            Sil
+            Delete
           </button>
         </div>
       )}
@@ -215,14 +215,14 @@ const QuestionFilters: React.FC<{
         className="flex items-center px-4 py-2 border rounded-md hover:bg-gray-50"
       >
         <Filter className="mr-2 h-4 w-4" />
-        Filtrele
+        Filter
       </button>
 
       {isOpen && (
         <div className="absolute right-0 mt-2 w-80 bg-white border rounded-md shadow-lg z-10 p-4">
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Konu</label>
+              <label className="block text-sm font-medium mb-1">Topic</label>
               <input
                 type="text"
                 value={filters.subject || ''}
@@ -232,13 +232,13 @@ const QuestionFilters: React.FC<{
                     subject: e.target.value || undefined,
                   })
                 }
-                placeholder="Konu ara..."
+                placeholder="Search topic..."
                 className="w-full p-2 border rounded-md"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Alt Konu</label>
+              <label className="block text-sm font-medium mb-1">Subtopic</label>
               <input
                 type="text"
                 value={filters.topic || ''}
@@ -248,14 +248,14 @@ const QuestionFilters: React.FC<{
                     topic: e.target.value || undefined,
                   })
                 }
-                placeholder="Alt konu ara..."
+                placeholder="Search subtopic..."
                 className="w-full p-2 border rounded-md"
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-1">
-                Soru Tipi
+                Question Type
               </label>
               <select
                 value={filters.question_type || ''}
@@ -267,19 +267,19 @@ const QuestionFilters: React.FC<{
                 }
                 className="w-full p-2 border rounded-md"
               >
-                <option value="">Tümü</option>
-                <option value="multiple_choice">Çoktan Seçmeli</option>
-                <option value="true_false">Doğru/Yanlış</option>
-                <option value="short_answer">Kısa Cevap</option>
-                <option value="essay">Kompozisyon</option>
-                <option value="matching">Eşleştirme</option>
-                <option value="ordering">Sıralama</option>
-                <option value="fill_in_blank">Boşluk Doldurma</option>
+                <option value="">All</option>
+                <option value="multiple_choice">Multiple Choice</option>
+                <option value="true_false">True/False</option>
+                <option value="short_answer">Short Answer</option>
+                <option value="essay">Essay</option>
+                <option value="matching">Matching</option>
+                <option value="ordering">Ordering</option>
+                <option value="fill_in_blank">Fill in the Blank</option>
               </select>
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Zorluk</label>
+              <label className="block text-sm font-medium mb-1">Difficulty</label>
               <select
                 value={filters.difficulty_level || ''}
                 onChange={(e) =>
@@ -290,15 +290,15 @@ const QuestionFilters: React.FC<{
                 }
                 className="w-full p-2 border rounded-md"
               >
-                <option value="">Tümü</option>
-                <option value="easy">Kolay</option>
-                <option value="medium">Orta</option>
-                <option value="hard">Zor</option>
+                <option value="">All</option>
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
               </select>
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Sıralama</label>
+              <label className="block text-sm font-medium mb-1">Sort By</label>
               <select
                 value={filters.sort_by || 'created_at'}
                 onChange={(e) =>
@@ -306,11 +306,11 @@ const QuestionFilters: React.FC<{
                 }
                 className="w-full p-2 border rounded-md"
               >
-                <option value="created_at">Oluşturulma Tarihi</option>
-                <option value="title">Başlık</option>
-                <option value="usage_count">Kullanım Sayısı</option>
-                <option value="subject">Konu</option>
-                <option value="difficulty_level">Zorluk</option>
+                <option value="created_at">Creation Date</option>
+                <option value="title">Title</option>
+                <option value="usage_count">Usage Count</option>
+                <option value="subject">Topic</option>
+                <option value="difficulty_level">Difficulty</option>
               </select>
             </div>
 
@@ -325,7 +325,7 @@ const QuestionFilters: React.FC<{
                 className="mr-2"
               />
               <label htmlFor="sort_desc" className="text-sm">
-                Azalan sıralama
+                Descending order
               </label>
             </div>
           </div>
@@ -335,7 +335,7 @@ const QuestionFilters: React.FC<{
               onClick={() => setIsOpen(false)}
               className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
             >
-              Uygula
+              Apply
             </button>
           </div>
         </div>
@@ -391,7 +391,7 @@ export default function QuestionBank() {
     () => [
       {
         accessorKey: 'title',
-        header: 'Başlık',
+        header: 'Title',
         cell: ({ row }) => (
           <div className="flex flex-col">
             <span className="font-medium">{row.original.title}</span>
@@ -403,7 +403,7 @@ export default function QuestionBank() {
       },
       {
         accessorKey: 'subject',
-        header: 'Konu',
+        header: 'Topic',
         cell: ({ row }) => (
           <div className="flex flex-col">
             <span className="font-medium">{row.original.subject}</span>
@@ -417,26 +417,26 @@ export default function QuestionBank() {
       },
       {
         accessorKey: 'question_type',
-        header: 'Tip',
+        header: 'Type',
         cell: ({ row }) => (
           <QuestionTypeBadge type={row.original.question_type} />
         ),
       },
       {
         accessorKey: 'difficulty_level',
-        header: 'Zorluk',
+        header: 'Difficulty',
         cell: ({ row }) => (
           <DifficultyBadge level={row.original.difficulty_level} />
         ),
       },
       {
         accessorKey: 'points',
-        header: 'Puan',
+        header: 'Points',
         cell: ({ row }) => row.original.points,
       },
       {
         accessorKey: 'usage_count',
-        header: 'Kullanım',
+        header: 'Usage',
         cell: ({ row }) => (
           <div className="flex items-center">
             <Hash className="mr-1 h-4 w-4 text-gray-400" />
@@ -446,15 +446,15 @@ export default function QuestionBank() {
       },
       {
         accessorKey: 'last_used_at',
-        header: 'Son Kullanım',
+        header: 'Last Used',
         cell: ({ row }) =>
           row.original.last_used_at
-            ? new Date(row.original.last_used_at).toLocaleDateString('tr-TR')
-            : 'Hiç',
+            ? new Date(row.original.last_used_at).toLocaleDateString('en-US')
+            : 'Never',
       },
       {
         accessorKey: 'tags',
-        header: 'Etiketler',
+        header: 'Tags',
         cell: ({ row }) => (
           <div className="flex flex-wrap gap-1">
             {row.original.tags.slice(0, 2).map((tag, index) => (
@@ -472,7 +472,7 @@ export default function QuestionBank() {
       },
       {
         id: 'actions',
-        header: 'İşlemler',
+        header: 'Actions',
         cell: ({ row }) => (
           <ActionsDropdown
             question={row.original}
@@ -516,9 +516,9 @@ export default function QuestionBank() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold">Soru Bankası</h1>
+          <h1 className="text-2xl font-bold">Question Bank</h1>
           <p className="text-gray-600">
-            Yeniden kullanılabilir soruları yönetin
+            Manage reusable questions
           </p>
         </div>
         <button
@@ -526,7 +526,7 @@ export default function QuestionBank() {
           className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
         >
           <Plus className="mr-2 h-4 w-4" />
-          Yeni Soru
+          New Question
         </button>
       </div>
 
@@ -536,7 +536,7 @@ export default function QuestionBank() {
           <div className="flex items-center">
             <BookOpen className="h-8 w-8 text-blue-600" />
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Toplam Soru</p>
+              <p className="text-sm font-medium text-gray-600">Total Questions</p>
               <p className="text-2xl font-bold">
                 {questionsData.pagination.total}
               </p>
@@ -547,7 +547,7 @@ export default function QuestionBank() {
           <div className="flex items-center">
             <Target className="h-8 w-8 text-green-600" />
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Kolay Sorular</p>
+              <p className="text-sm font-medium text-gray-600">Easy Questions</p>
               <p className="text-2xl font-bold">
                 {
                   questionsData.questions.filter(
@@ -562,7 +562,7 @@ export default function QuestionBank() {
           <div className="flex items-center">
             <Target className="h-8 w-8 text-yellow-600" />
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Orta Sorular</p>
+              <p className="text-sm font-medium text-gray-600">Medium Questions</p>
               <p className="text-2xl font-bold">
                 {
                   questionsData.questions.filter(
@@ -577,7 +577,7 @@ export default function QuestionBank() {
           <div className="flex items-center">
             <Target className="h-8 w-8 text-red-600" />
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Zor Sorular</p>
+              <p className="text-sm font-medium text-gray-600">Hard Questions</p>
               <p className="text-2xl font-bold">
                 {
                   questionsData.questions.filter(
@@ -597,7 +597,7 @@ export default function QuestionBank() {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             <input
               type="text"
-              placeholder="Soru bankasında ara..."
+              placeholder="Search in question bank..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border rounded-md"
@@ -625,7 +625,7 @@ export default function QuestionBank() {
       <Modal
         isOpen={previewModal.isOpen}
         onClose={() => setPreviewModal({ isOpen: false })}
-        title="Soru Önizlemesi"
+        title="Question Preview"
         size="lg"
       >
         {previewModal.question && (
@@ -634,12 +634,12 @@ export default function QuestionBank() {
               <QuestionTypeBadge type={previewModal.question.question_type} />
               <DifficultyBadge level={previewModal.question.difficulty_level} />
               <span className="text-sm text-gray-500">
-                {previewModal.question.points} puan
+                {previewModal.question.points} points
               </span>
             </div>
 
             <div>
-              <h3 className="font-semibold mb-2">Soru:</h3>
+              <h3 className="font-semibold mb-2">Question:</h3>
               <p className="text-gray-800">
                 {previewModal.question.question_text}
               </p>
@@ -647,7 +647,7 @@ export default function QuestionBank() {
 
             {previewModal.question.question_type === 'multiple_choice' && (
               <div>
-                <h3 className="font-semibold mb-2">Seçenekler:</h3>
+                <h3 className="font-semibold mb-2">Options:</h3>
                 <div className="space-y-2">
                   {previewModal.question.question_data.options?.map(
                     (option: string, index: number) => (
@@ -669,7 +669,7 @@ export default function QuestionBank() {
                           previewModal.question.question_data
                             .correct_answer && (
                           <Badge variant="success" className="text-xs">
-                            Doğru
+                            Correct
                           </Badge>
                         )}
                       </div>
@@ -681,7 +681,7 @@ export default function QuestionBank() {
 
             {previewModal.question.explanation && (
               <div>
-                <h3 className="font-semibold mb-2">Açıklama:</h3>
+                <h3 className="font-semibold mb-2">Explanation:</h3>
                 <p className="text-blue-800 bg-blue-50 p-3 rounded">
                   {previewModal.question.explanation}
                 </p>
@@ -690,7 +690,7 @@ export default function QuestionBank() {
 
             {previewModal.question.tags.length > 0 && (
               <div>
-                <h3 className="font-semibold mb-2">Etiketler:</h3>
+                <h3 className="font-semibold mb-2">Tags:</h3>
                 <div className="flex flex-wrap gap-2">
                   {previewModal.question.tags.map((tag, index) => (
                     <Badge key={index} variant="outline">
@@ -708,19 +708,19 @@ export default function QuestionBank() {
       <Modal
         isOpen={deleteModal.isOpen}
         onClose={() => setDeleteModal({ isOpen: false })}
-        title="Soruyu Sil"
+        title="Delete Question"
       >
         <div className="space-y-4">
           <p>
-            Bu soruyu soru bankasından silmek istediğinizden emin misiniz? Bu
-            işlem geri alınamaz.
+            Are you sure you want to delete this question from the question bank? This
+            action cannot be undone.
           </p>
           <div className="flex justify-end space-x-2">
             <Button
               variant="outline"
               onClick={() => setDeleteModal({ isOpen: false })}
             >
-              İptal
+              Cancel
             </Button>
             <Button
               variant="destructive"
@@ -729,7 +729,7 @@ export default function QuestionBank() {
                 setDeleteModal({ isOpen: false });
               }}
             >
-              Sil
+              Delete
             </Button>
           </div>
         </div>

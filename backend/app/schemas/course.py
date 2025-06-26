@@ -16,43 +16,43 @@ class CourseBaseSchema(Schema):
     description = fields.String(allow_none=True)
 
     # Course details
-    status = fields.String(validate=validate.OneOf([s.value for s in CourseStatus]), missing=CourseStatus.DRAFT.value)
-    format = fields.String(validate=validate.OneOf([f.value for f in CourseFormat]), missing=CourseFormat.LECTURE.value)
+    status = fields.String(validate=validate.OneOf([s.value for s in CourseStatus]), load_default=CourseStatus.DRAFT.value)
+    format = fields.String(validate=validate.OneOf([f.value for f in CourseFormat]), load_default=CourseFormat.LECTURE.value)
     difficulty_level = fields.String(
-        validate=validate.OneOf([d.value for d in DifficultyLevel]), missing=DifficultyLevel.BEGINNER.value
+        validate=validate.OneOf([d.value for d in DifficultyLevel]), load_default=DifficultyLevel.BEGINNER.value
     )
 
     # Duration
-    duration_hours = fields.Float(validate=validate.Range(min=0.5, max=100), missing=1.0)
-    duration_weeks = fields.Integer(validate=validate.Range(min=1, max=52), missing=1)
-    order_index = fields.Integer(validate=validate.Range(min=0), missing=0)
+    duration_hours = fields.Float(validate=validate.Range(min=0.5, max=100), load_default=1.0)
+    duration_weeks = fields.Integer(validate=validate.Range(min=1, max=52), load_default=1)
+    order_index = fields.Integer(validate=validate.Range(min=0), load_default=0)
 
     # Content
-    objectives = fields.List(fields.String(), missing=list)
-    outline = fields.List(fields.String(), missing=list)
-    prerequisites = fields.List(fields.String(), missing=list)
-    materials = fields.List(fields.String(), missing=list)
+    objectives = fields.List(fields.String(), load_default=list)
+    outline = fields.List(fields.String(), load_default=list)
+    prerequisites = fields.List(fields.String(), load_default=list)
+    materials = fields.List(fields.String(), load_default=list)
 
     # Resources
     content_url = fields.URL(allow_none=True)
     video_url = fields.URL(allow_none=True)
     thumbnail_url = fields.URL(allow_none=True)
-    resources = fields.List(fields.Dict(), missing=list)
-    assignments = fields.List(fields.Dict(), missing=list)
+    resources = fields.List(fields.Dict(), load_default=list)
+    assignments = fields.List(fields.Dict(), load_default=list)
 
     # Assessment
-    has_assessment = fields.Boolean(missing=False)
+    has_assessment = fields.Boolean(load_default=False)
     assessment_type = fields.String(allow_none=True, validate=validate.Length(max=50))
-    passing_score = fields.Float(validate=validate.Range(min=0, max=100), missing=70.0)
-    max_attempts = fields.Integer(validate=validate.Range(min=1, max=10), missing=3)
+    passing_score = fields.Float(validate=validate.Range(min=0, max=100), load_default=70.0)
+    max_attempts = fields.Integer(validate=validate.Range(min=1, max=10), load_default=3)
 
     # Capacity
-    min_participants = fields.Integer(validate=validate.Range(min=1), missing=1)
+    min_participants = fields.Integer(validate=validate.Range(min=1), load_default=1)
     max_participants = fields.Integer(allow_none=True, validate=validate.Range(min=1))
 
     # Additional
-    tags = fields.List(fields.String(), missing=list)
-    course_metadata = fields.Dict(missing=dict)
+    tags = fields.List(fields.String(), load_default=list)
+    course_metadata = fields.Dict(load_default=dict)
 
     # Relations
     instructor_id = fields.Integer(allow_none=True)
@@ -154,4 +154,4 @@ class CourseSessionAddSchema(Schema):
     instructor_id = fields.Integer(allow_none=True)
     max_participants = fields.Integer(allow_none=True, validate=validate.Range(min=1))
     description = fields.String(allow_none=True)
-    materials = fields.List(fields.Dict(), missing=list)
+    materials = fields.List(fields.Dict(), load_default=list)

@@ -1,14 +1,15 @@
+import { MessageSquare, Menu, X } from 'lucide-react';
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { cn } from '@/lib/utils';
-import { ConversationList } from './ConversationList';
-import { MessageStream } from './MessageStream';
-import { ChatInput } from './ChatInput';
-import { Card } from '@/components/ui/Card';
+
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
-import { MessageSquare, Menu, X } from 'lucide-react';
 import { useConversation, useAutoMarkAsRead } from '@/hooks/useChat';
+import { cn } from '@/lib/utils';
+
+import { ChatInput } from './ChatInput';
+import { ConversationList } from './ConversationList';
+import { MessageStream } from './MessageStream';
 
 export const ChatLayout: React.FC = () => {
   const { conversationId } = useParams();
@@ -39,7 +40,7 @@ export const ChatLayout: React.FC = () => {
           >
             {isMobileSidebarOpen ? <X size={20} /> : <Menu size={20} />}
           </Button>
-          <h1 className="text-lg font-semibold">Mesajlar</h1>
+          <h1 className="text-lg font-semibold">Messages</h1>
           <div className="w-10" /> {/* Spacer for balance */}
         </div>
       </div>
@@ -97,12 +98,12 @@ export const ChatLayout: React.FC = () => {
                   <div>
                     <h2 className="text-lg font-semibold">
                       {conversation.type === 'direct'
-                        ? conversation.participants.find(p => p.id !== parseInt(localStorage.getItem('user_id') || '0'))?.fullName || 'Kullanıcı'
-                        : conversation.name || 'Grup Sohbeti'}
+                        ? conversation.participants.find(p => p.id !== parseInt(localStorage.getItem('user_id') || '0'))?.fullName || 'User'
+                        : conversation.name || 'Group Chat'}
                     </h2>
                     {conversation.type === 'group' && (
                       <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {conversation.participants.length} katılımcı
+                        {conversation.participants.length} participants
                       </p>
                     )}
                   </div>
@@ -123,8 +124,8 @@ export const ChatLayout: React.FC = () => {
             <div className="flex-1 flex items-center justify-center">
               <EmptyState
                 icon={MessageSquare}
-                title="Sohbet Seçin"
-                description="Mesajlaşmaya başlamak için bir sohbet seçin veya yeni bir sohbet başlatın"
+                title="Select a chat"
+                description="Start by selecting a chat or start a new conversation"
               />
             </div>
           )}

@@ -1,16 +1,16 @@
 import {
   format,
   formatRelative,
-  formatDistanceToNow,
-  parseISO,
- tr } from 'date-fns';
+  formatDistanceToNow as formatDistanceToNowFn,
+  parseISO
+} from 'date-fns';
 
 export function formatDate(date: string | Date | null | undefined): string {
   if (!date) return '-';
 
   try {
     const dateObj = typeof date === 'string' ? parseISO(date) : date;
-    return format(dateObj, 'dd MMM yyyy', { locale: tr });
+    return format(dateObj, 'dd MMM yyyy');
   } catch (error) {
     console.error('Date formatting error:', error);
     return '-';
@@ -22,7 +22,7 @@ export function formatDateTime(date: string | Date | null | undefined): string {
 
   try {
     const dateObj = typeof date === 'string' ? parseISO(date) : date;
-    return format(dateObj, 'dd MMM yyyy HH:mm', { locale: tr });
+    return format(dateObj, 'dd MMM yyyy HH:mm');
   } catch (error) {
     console.error('DateTime formatting error:', error);
     return '-';
@@ -36,7 +36,7 @@ export function formatRelativeDate(
 
   try {
     const dateObj = typeof date === 'string' ? parseISO(date) : date;
-    return formatRelative(dateObj, new Date(), { locale: tr });
+    return formatRelative(dateObj, new Date());
   } catch (error) {
     console.error('Relative date formatting error:', error);
     return '-';
@@ -50,7 +50,7 @@ export function formatDistanceFromNow(
 
   try {
     const dateObj = typeof date === 'string' ? parseISO(date) : date;
-    return formatDistanceToNow(dateObj, { addSuffix: true, locale: tr });
+    return formatDistanceToNowFn(dateObj, { addSuffix: true });
   } catch (error) {
     console.error('Distance date formatting error:', error);
     return '-';
@@ -58,7 +58,7 @@ export function formatDistanceFromNow(
 }
 
 // Alias for consistency with component usage
-export const formatDistanceToNow = formatDistanceFromNow;
+export { formatDistanceFromNow as formatDistanceToNow };
 
 export function formatShortDate(
   date: string | Date | null | undefined
@@ -67,7 +67,7 @@ export function formatShortDate(
 
   try {
     const dateObj = typeof date === 'string' ? parseISO(date) : date;
-    return format(dateObj, 'dd/MM/yyyy', { locale: tr });
+    return format(dateObj, 'dd/MM/yyyy');
   } catch (error) {
     console.error('Short date formatting error:', error);
     return '-';
@@ -79,7 +79,7 @@ export function formatTime(date: string | Date | null | undefined): string {
 
   try {
     const dateObj = typeof date === 'string' ? parseISO(date) : date;
-    return format(dateObj, 'HH:mm', { locale: tr });
+    return format(dateObj, 'HH:mm');
   } catch (error) {
     console.error('Time formatting error:', error);
     return '-';

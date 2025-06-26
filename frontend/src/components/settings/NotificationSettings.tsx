@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
 import { Bell, Mail, Smartphone } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 
-import { Card } from '@/components/ui/Card';
-import { useNotificationPreferences } from '@/hooks/useNotificationPreferences';
 import { NotificationPreferences } from '@/api/users';
+import { Card } from '@/components/ui/Card';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { useNotificationPreferences } from '@/hooks/useNotificationPreferences';
 
 interface NotificationCategory {
   key: keyof NotificationPreferences['notifications']['email'];

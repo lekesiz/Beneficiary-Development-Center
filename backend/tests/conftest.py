@@ -36,7 +36,7 @@ def app():
     with app.app_context():
         db.create_all()
         yield app
-        db.session.remove()
+        db.session.close()
         db.drop_all()
 
 
@@ -63,7 +63,7 @@ def db_session(app, tables):
 
         # Configure session to use this transaction
         from sqlalchemy.orm import sessionmaker
-        Session = sessionmaker(bind=connection)
+        Session = sessionmaker(bind=connection, expire_on_commit=False)
         session = Session()
 
         # Make session available to db

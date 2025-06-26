@@ -2,8 +2,8 @@
  * React Query hooks for Chat
  */
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
-import { toast } from 'react-hot-toast';
 import { useEffect } from 'react';
+import { toast } from 'react-hot-toast';
 
 import { chatApi } from '../api/chat';
 import type {

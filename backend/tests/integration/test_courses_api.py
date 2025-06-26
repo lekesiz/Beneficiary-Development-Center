@@ -100,7 +100,12 @@ class TestCoursesAPI:
 
     def _get_auth_token(self, email, password):
         """Helper to get auth token."""
-        response = self.client.post("/api/v1/auth/login", json={"email": email, "password": password})
+        response = self.client.post(
+            "/api/v1/auth/login", 
+            json={"email": email, "password": password, "tenant_id": self.tenant.id}
+        )
+        if response.status_code != 200:
+            raise Exception(f"Login failed: {response.json}")
         return response.json["access_token"]
 
     def test_get_all_courses(self):

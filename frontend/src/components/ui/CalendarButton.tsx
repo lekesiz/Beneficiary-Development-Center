@@ -3,12 +3,15 @@
  * A dropdown button that allows users to add events to their calendar
  */
 
-import React, { useState, useRef, useEffect } from 'react';
 import { Calendar, Download, ChevronDown } from 'lucide-react';
-import { Button } from './Form';
+import React, { useState, useRef, useEffect } from 'react';
+
+import { useToast } from '../../hooks/useToast';
 import type { CourseSession } from '../../types/course';
 import { downloadSessionCalendar, openInCalendar } from '../../utils/calendar';
-import { useToast } from '../../hooks/useToast';
+
+import { Button } from './Form';
+
 
 interface CalendarButtonProps {
   session: CourseSession;

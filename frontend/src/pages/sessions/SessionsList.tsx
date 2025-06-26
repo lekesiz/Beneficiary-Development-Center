@@ -3,19 +3,20 @@
  * Shows all upcoming sessions/appointments for the user
  */
 
-import React, { useState } from 'react';
 import { Calendar, Clock, MapPin, Globe, User, BookOpen, Filter } from 'lucide-react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Card } from '../../components/ui/Card';
+
 import { Badge } from '../../components/ui/Badge';
-import { Button } from '../../components/ui/Form';
 import { CalendarButton } from '../../components/ui/CalendarButton';
-import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
+import { Card } from '../../components/ui/Card';
 import { EmptyState } from '../../components/ui/EmptyState';
+import { Button } from '../../components/ui/Form';
+import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSessions } from '../../hooks/useSessions';
-import { formatSessionDateTime, isSessionPast } from '../../utils/calendar';
 import type { CourseSession } from '../../types/course';
+import { formatSessionDateTime, isSessionPast } from '../../utils/calendar';
 
 interface SessionWithCourse extends CourseSession {
   course?: {

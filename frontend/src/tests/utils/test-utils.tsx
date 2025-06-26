@@ -129,17 +129,75 @@ export function renderWithProviders(
     window.history.pushState({}, 'Test page', initialRoute);
   }
 
+  const mergedUser = { ...defaultUser, ...user };
+
   return {
     ...render(ui, {
       wrapper: ({ children }) => (
-        <AllTheProviders user={user}>{children}</AllTheProviders>
+        <AllTheProviders user={mergedUser}>{children}</AllTheProviders>
       ),
       ...options,
     }),
-    user,
+    user: mergedUser,
   };
 }
 
-// Re-export everything
-export * from '@testing-library/react';
+// Re-export everything except render
+export {
+  act,
+  cleanup,
+  fireEvent,
+  screen,
+  waitFor,
+  within,
+  waitForElementToBeRemoved,
+  findAllByText,
+  findByText,
+  getByText,
+  queryByText,
+  getAllByText,
+  queryAllByText,
+  getByTestId,
+  getAllByTestId,
+  queryByTestId,
+  queryAllByTestId,
+  findByTestId,
+  findAllByTestId,
+  getByRole,
+  getAllByRole,
+  queryByRole,
+  queryAllByRole,
+  findByRole,
+  findAllByRole,
+  getByLabelText,
+  getAllByLabelText,
+  queryByLabelText,
+  queryAllByLabelText,
+  findByLabelText,
+  findAllByLabelText,
+  getByPlaceholderText,
+  getAllByPlaceholderText,
+  queryByPlaceholderText,
+  queryAllByPlaceholderText,
+  findByPlaceholderText,
+  findAllByPlaceholderText,
+  getByDisplayValue,
+  getAllByDisplayValue,
+  queryByDisplayValue,
+  queryAllByDisplayValue,
+  findByDisplayValue,
+  findAllByDisplayValue,
+  getByAltText,
+  getAllByAltText,
+  queryByAltText,
+  queryAllByAltText,
+  findByAltText,
+  findAllByAltText,
+  getByTitle,
+  getAllByTitle,
+  queryByTitle,
+  queryAllByTitle,
+  findByTitle,
+  findAllByTitle,
+} from '@testing-library/react';
 export { renderWithProviders as render };

@@ -1,3 +1,4 @@
+import { useQueryClient } from '@tanstack/react-query';
 import React, {
   createContext,
   useContext,
@@ -8,11 +9,11 @@ import React, {
 } from 'react';
 import toast from 'react-hot-toast';
 import { io, Socket } from 'socket.io-client';
-import { useQueryClient } from '@tanstack/react-query';
 
-import { useAuth } from './AuthContext';
 import { chatQueryKeys } from '@/hooks/useChat';
 import type { Message } from '@/types/chat';
+
+import { useAuth } from './AuthContext';
 
 interface SocketContextType {
   socket: Socket | null;

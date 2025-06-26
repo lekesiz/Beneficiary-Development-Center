@@ -1,10 +1,10 @@
+import { formatDistanceToNow , tr } from 'date-fns';
+import { Pin, VolumeX } from 'lucide-react';
 import React from 'react';
-import { cn } from '@/lib/utils';
+
 import { Avatar } from '@/components/ui/Avatar';
 import { Badge } from '@/components/ui/Badge';
-import { formatDistanceToNow } from 'date-fns';
-import { tr } from 'date-fns/locale';
-import { Pin, Volume2, VolumeX } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import type { Conversation } from '@/types/chat';
 
 interface ConversationItemProps {
@@ -118,7 +118,7 @@ export const ConversationItem: React.FC<ConversationItemProps> = ({
             {getLastMessagePreview()}
           </p>
           {conversation.unreadCount > 0 && (
-            <Badge variant="primary" size="sm" className="ml-2 flex-shrink-0">
+            <Badge variant="default" size="sm" className="ml-2 flex-shrink-0">
               {conversation.unreadCount > 99 ? '99+' : conversation.unreadCount}
             </Badge>
           )}

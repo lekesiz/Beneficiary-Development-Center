@@ -14,7 +14,7 @@ import type {
   CourseStatistics,
 } from '../types/course';
 
-import { apiClient } from './client';
+import apiClient from './client';
 
 const COURSES_BASE_URL = '/courses';
 

@@ -1,10 +1,11 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { vi } from 'vitest';
 
-import Settings from '../Settings';
 import { usersApi } from '@/api/users';
+
+import Settings from '../Settings';
 
 // Mock the API
 vi.mock('@/api/users', () => ({
