@@ -37,19 +37,22 @@ course_session_schema = CourseSessionAddSchema()
 @bp.route("", methods=["GET"])
 @jwt_required()
 @require_tenant()
-def get_courses(program_id):
-    """Get all courses for a program."""
+def get_courses(program_id=None):
+    """Get all courses."""
     try:
         jwt_payload = get_jwt()
         tenant_id = jwt_payload.get("tenant_id")
         user_id = get_jwt_identity()
 
         # Get current user
-        user = db.session.query(User).filter_by(id=user_id).first()
+        user = db.session.query(User).filter_by(id=int(user_id)).first()
         if not user:
             return jsonify({"error": "User not found"}), 404
 
         # Get query parameters
+        # Use program_id from URL if provided, otherwise from query params
+        if program_id is None:
+            program_id = request.args.get("program_id", type=int)  # Optional program filter
         page = int(request.args.get("page", 1))
         per_page = int(request.args.get("per_page", 20))
         status = request.args.get("status")
@@ -112,8 +115,8 @@ def get_courses(program_id):
 
         total = total_query.count()
 
-        # Serialize courses
-        courses_data = [course_response_schema.dump(c.to_dict(include_related=True)) for c in courses]
+        # Serialize courses - just use to_dict, don't apply schema again
+        courses_data = [c.to_dict(include_related=True) for c in courses]
 
         return (
             jsonify(
@@ -140,7 +143,7 @@ def get_courses(program_id):
 @bp.route("/<int:course_id>", methods=["GET"])
 @jwt_required()
 @require_tenant()
-def get_course(program_id, course_id):
+def get_course(course_id, program_id=None):
     """Get a specific course."""
     try:
         jwt_payload = get_jwt()
@@ -163,7 +166,7 @@ def get_course(program_id, course_id):
         if include_sessions:
             data["sessions"] = [s.to_dict() for s in course.sessions]
 
-        return jsonify(course_response_schema.dump(data)), 200
+        return jsonify(data), 200
 
     except NotFoundError as e:
         return jsonify({"error": str(e)}), 404
@@ -192,29 +195,29 @@ def create_course(program_id):
         data = course_create_schema.load(request.json)
 
         # Convert string enum values to actual enums
-        if 'status' in data and isinstance(data['status'], str):
+        if "status" in data and isinstance(data["status"], str):
             try:
-                data['status'] = CourseStatus(data['status'])
+                data["status"] = CourseStatus(data["status"])
             except ValueError:
                 return jsonify({"error": f"Invalid status: {data['status']}"}), 400
-        
-        if 'format' in data and isinstance(data['format'], str):
+
+        if "format" in data and isinstance(data["format"], str):
             try:
-                data['format'] = CourseFormat(data['format'])
+                data["format"] = CourseFormat(data["format"])
             except ValueError:
                 return jsonify({"error": f"Invalid format: {data['format']}"}), 400
-        
-        if 'difficulty_level' in data and isinstance(data['difficulty_level'], str):
+
+        if "difficulty_level" in data and isinstance(data["difficulty_level"], str):
             try:
-                data['difficulty_level'] = DifficultyLevel(data['difficulty_level'])
+                data["difficulty_level"] = DifficultyLevel(data["difficulty_level"])
             except ValueError:
                 return jsonify({"error": f"Invalid difficulty_level: {data['difficulty_level']}"}), 400
 
         # Create course
         service = CourseService(db.session)
-        course = service.create(tenant_id, program_id, data, user)
+        course = service.create_for_program(tenant_id, program_id, data, user)
 
-        return jsonify(course_response_schema.dump(course.to_dict(include_related=True))), 201
+        return jsonify(course.to_dict(include_related=True)), 201
 
     except ValidationError as e:
         return jsonify({"error": "Validation error", "details": e.messages}), 400
@@ -249,21 +252,21 @@ def update_course(program_id, course_id):
         data = course_update_schema.load(request.json)
 
         # Convert string enum values to actual enums
-        if 'status' in data and isinstance(data['status'], str):
+        if "status" in data and isinstance(data["status"], str):
             try:
-                data['status'] = CourseStatus(data['status'])
+                data["status"] = CourseStatus(data["status"])
             except ValueError:
                 return jsonify({"error": f"Invalid status: {data['status']}"}), 400
-        
-        if 'format' in data and isinstance(data['format'], str):
+
+        if "format" in data and isinstance(data["format"], str):
             try:
-                data['format'] = CourseFormat(data['format'])
+                data["format"] = CourseFormat(data["format"])
             except ValueError:
                 return jsonify({"error": f"Invalid format: {data['format']}"}), 400
-        
-        if 'difficulty_level' in data and isinstance(data['difficulty_level'], str):
+
+        if "difficulty_level" in data and isinstance(data["difficulty_level"], str):
             try:
-                data['difficulty_level'] = DifficultyLevel(data['difficulty_level'])
+                data["difficulty_level"] = DifficultyLevel(data["difficulty_level"])
             except ValueError:
                 return jsonify({"error": f"Invalid difficulty_level: {data['difficulty_level']}"}), 400
 
@@ -548,13 +551,12 @@ def download_session_calendar(program_id, course_id, session_id):
         course = service.get_by_id(tenant_id, program_id, course_id, user)
 
         # Get session
-        session = db.session.query(CourseSession).filter_by(
-            id=session_id, 
-            course_id=course_id,
-            tenant_id=tenant_id,
-            deleted_at=None
-        ).first()
-        
+        session = (
+            db.session.query(CourseSession)
+            .filter_by(id=session_id, course_id=course_id, tenant_id=tenant_id, deleted_at=None)
+            .first()
+        )
+
         if not session:
             return jsonify({"error": "Session not found"}), 404
 
@@ -563,17 +565,13 @@ def download_session_calendar(program_id, course_id, session_id):
 
         # Generate session data for ICS
         session_data = session.to_dict(include_related=True)
-        
+
         # Add instructor name if available
         if session.instructor:
             session_data["instructor_name"] = session.instructor.full_name
 
         # Generate ICS content
-        ics_content = generate_session_ics(
-            session=session_data,
-            course_title=course.title,
-            timezone=timezone
-        )
+        ics_content = generate_session_ics(session=session_data, course_title=course.title, timezone=timezone)
 
         # Create response with ICS file
         response = Response(
@@ -581,8 +579,8 @@ def download_session_calendar(program_id, course_id, session_id):
             mimetype="text/calendar",
             headers={
                 "Content-Disposition": f'attachment; filename="session_{session.uuid}.ics"',
-                "Content-Type": "text/calendar; charset=utf-8"
-            }
+                "Content-Type": "text/calendar; charset=utf-8",
+            },
         )
 
         return response
@@ -619,23 +617,18 @@ def get_course_sessions(program_id, course_id):
 
         # Query sessions
         sessions_query = db.session.query(CourseSession).filter_by(
-            course_id=course_id,
-            tenant_id=tenant_id,
-            deleted_at=None
+            course_id=course_id, tenant_id=tenant_id, deleted_at=None
         )
 
         # Filter by date if needed
         if not include_past:
             from datetime import datetime
-            sessions_query = sessions_query.filter(
-                CourseSession.session_date >= datetime.utcnow()
-            )
+
+            sessions_query = sessions_query.filter(CourseSession.session_date >= datetime.utcnow())
 
         # Filter cancelled sessions
         if not include_cancelled:
-            sessions_query = sessions_query.filter(
-                CourseSession.is_cancelled == False
-            )
+            sessions_query = sessions_query.filter(CourseSession.is_cancelled == False)
 
         # Order by date
         sessions = sessions_query.order_by(CourseSession.session_date).all()
@@ -645,17 +638,17 @@ def get_course_sessions(program_id, course_id):
         for session in sessions:
             session_dict = session.to_dict(include_related=True)
             # Add calendar download URL
-            session_dict["calendar_url"] = f"/api/v1/programs/{program_id}/courses/{course_id}/sessions/{session.id}/calendar"
+            session_dict["calendar_url"] = (
+                f"/api/v1/programs/{program_id}/courses/{course_id}/sessions/{session.id}/calendar"
+            )
             sessions_data.append(session_dict)
 
-        return jsonify({
-            "sessions": sessions_data,
-            "course": {
-                "id": course.id,
-                "title": course.title,
-                "code": course.code
-            }
-        }), 200
+        return (
+            jsonify(
+                {"sessions": sessions_data, "course": {"id": course.id, "title": course.title, "code": course.code}}
+            ),
+            200,
+        )
 
     except NotFoundError as e:
         return jsonify({"error": str(e)}), 404

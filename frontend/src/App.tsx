@@ -8,6 +8,7 @@ import { I18nProvider } from '@/contexts/I18nContext';
 import { SocketProvider } from '@/contexts/SocketContext';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import AppRoutes from '@/routes';
+import AuthDebug from '@/components/debug/AuthDebug';
 import '@/styles/globals.css';
 
 // Create a client
@@ -28,10 +29,16 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <I18nProvider>
           <ThemeProvider>
-            <AuthProvider>
-              <SocketProvider>
-                <Router>
+            <Router
+              future={{
+                v7_startTransition: true,
+                v7_relativeSplatPath: true,
+              }}
+            >
+              <AuthProvider>
+                <SocketProvider>
                   <AppRoutes />
+                  <AuthDebug />
                   <Toaster
                     position="top-right"
                     toastOptions={{
@@ -56,9 +63,9 @@ function App() {
                       },
                     }}
                   />
-                </Router>
-              </SocketProvider>
-            </AuthProvider>
+                </SocketProvider>
+              </AuthProvider>
+            </Router>
           </ThemeProvider>
         </I18nProvider>
       </QueryClientProvider>

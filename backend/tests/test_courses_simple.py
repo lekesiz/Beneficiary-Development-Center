@@ -51,14 +51,9 @@ def test_course_schema():
     # Valid data
     valid_data = {"title": "Test Course", "program_id": 1}
 
-    try:
-        result = schema.load(valid_data)
-        assert result["title"] == "Test Course"
-        print("✓ Course schema validation successful")
-        return True
-    except Exception as e:
-        print(f"✗ Schema validation error: {e}")
-        return False
+    result = schema.load(valid_data)
+    assert result["title"] == "Test Course"
+    print("✓ Course schema validation successful")
 
 
 def test_course_service():
@@ -71,7 +66,6 @@ def test_course_service():
     service = CourseService(None)  # type: ignore
     assert service is not None
     print("✓ Course service instantiation successful")
-    return True
 
 
 if __name__ == "__main__":

@@ -1,0 +1,22 @@
+# Monitoring and observability dependencies
+
+# Prometheus metrics
+prometheus-client==0.19.0
+
+# Structured logging
+python-json-logger==2.0.7
+
+# OpenTelemetry (optional - for distributed tracing)
+opentelemetry-api==1.21.0
+opentelemetry-sdk==1.21.0
+opentelemetry-instrumentation-flask==0.42b0
+opentelemetry-instrumentation-sqlalchemy==0.42b0
+opentelemetry-instrumentation-requests==0.42b0
+opentelemetry-exporter-otlp==1.21.0
+
+# Performance monitoring
+psutil==5.9.6  # Already in main requirements
+
+# APM (optional)
+# elastic-apm==6.19.0  # For Elastic APM
+# ddtrace==2.3.0  # For Datadog APM

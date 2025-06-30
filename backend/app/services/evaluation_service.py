@@ -4,7 +4,7 @@ Evaluation service for managing evaluations, questions and attempts
 
 from typing import Dict, Any, List, Optional
 from datetime import datetime, timedelta
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 from sqlalchemy import and_, or_, desc, func
 
 from app.models.evaluation import (
@@ -26,7 +26,7 @@ class EvaluationService(BaseService):
     """Service for evaluation operations"""
 
     def __init__(self, db: Session):
-        super().__init__(db, Evaluation)
+        super().__init__(model_class=Evaluation, db_session=db)
 
     def create(self, tenant_id: int, data: Dict[str, Any], user: User) -> Evaluation:
         """Create a new evaluation"""
@@ -108,7 +108,7 @@ class EvaluationService(BaseService):
         )
 
         if include_questions:
-            query = query.options(self.db.selectinload(Evaluation.questions))
+            query = query.options(selectinload(Evaluation.questions))
 
         evaluation = query.first()
         if not evaluation:
@@ -215,7 +215,7 @@ class QuestionService(BaseService):
     """Service for question operations"""
 
     def __init__(self, db: Session):
-        super().__init__(db, Question)
+        super().__init__(model_class=Question, db_session=db)
 
     def create(self, evaluation_id: int, tenant_id: int, data: Dict[str, Any], user: User) -> Question:
         """Create a new question"""

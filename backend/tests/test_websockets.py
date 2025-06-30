@@ -111,7 +111,7 @@ class TestWebSocketAuthentication:
         """Test successful connection with valid token"""
         # Mock database and user
         mock_db = MagicMock()
-        mock_user = MagicMock(spec=User)
+        mock_user = MagicMock()
         mock_user.id = 1
         mock_user.email = "test@example.com"
         mock_user.role = "admin"
@@ -141,7 +141,7 @@ class TestWebSocketAuthentication:
         """Test that user automatically joins appropriate rooms on connect"""
         # Mock database and user
         mock_db = MagicMock()
-        mock_user = MagicMock(spec=User)
+        mock_user = MagicMock()
         mock_user.id = 1
         mock_user.email = "test@example.com"
         mock_user.role = "admin"
@@ -169,7 +169,7 @@ class TestWebSocketEvents:
         """Test ping/pong functionality"""
         # Setup mock
         mock_db = MagicMock()
-        mock_user = MagicMock(spec=User)
+        mock_user = MagicMock()
         mock_user.id = 1
         mock_user.email = "test@example.com"
         mock_user.role = "admin"
@@ -199,7 +199,7 @@ class TestWebSocketEvents:
         """Test joining a custom room"""
         # Setup mock
         mock_db = MagicMock()
-        mock_user = MagicMock(spec=User)
+        mock_user = MagicMock()
         mock_user.id = 1
         mock_user.email = "test@example.com"
         mock_user.role = "admin"
@@ -228,7 +228,7 @@ class TestWebSocketEvents:
         """Test leaving a room"""
         # Setup mock
         mock_db = MagicMock()
-        mock_user = MagicMock(spec=User)
+        mock_user = MagicMock()
         mock_user.id = 1
         mock_user.email = "test@example.com"
         mock_user.role = "admin"
@@ -263,7 +263,7 @@ class TestNotificationService:
         """Test sending notification to a specific user"""
         # Mock database and user
         mock_db = MagicMock()
-        mock_user = MagicMock(spec=User)
+        mock_user = MagicMock()
         mock_user.id = 1
         mock_user.email = "test@example.com"
 
@@ -329,7 +329,7 @@ class TestNotificationService:
         """Test program creation notification"""
         # Mock database and user
         mock_db = MagicMock()
-        mock_user = MagicMock(spec=User)
+        mock_user = MagicMock()
         mock_user.id = 1
 
         mock_db.query.return_value.filter_by.return_value.first.return_value = mock_user

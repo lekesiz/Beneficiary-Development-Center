@@ -22,6 +22,12 @@ from app.core.cache import cache
 class ReportsOverviewService(BaseService):
     """Service for managing reports overview for coaches."""
 
+    def __init__(self, db_session: Session = None):
+        """Initialize the service."""
+        super().__init__(db_session=db_session)
+        import logging
+        self.logger = logging.getLogger(__name__)
+
     def get_students_overview(self, tenant_id: int, requesting_user: User, filters: Dict[str, Any]) -> Dict[str, Any]:
         """
         Get overview of all students' development reports.
@@ -42,16 +48,23 @@ class ReportsOverviewService(BaseService):
         page = filters.get("page", 1)
         per_page = filters.get("per_page", 20)
         risk_level = filters.get("risk")
-        min_performance = filters.get("min_performance", type=float)
-        max_performance = filters.get("max_performance", type=float)
-        program_id = filters.get("program_id", type=int)
-        course_id = filters.get("course_id", type=int)
+        min_performance = filters.get("min_performance")
+        max_performance = filters.get("max_performance")
+        program_id = filters.get("program_id")
+        course_id = filters.get("course_id")
         search = filters.get("search")
         sort_by = filters.get("sort_by", "risk_score")  # risk_score, performance, name
         sort_desc = filters.get("sort_desc", "true").lower() == "true"
 
         # Build base query for students
-        query = self.db.query(User).filter(User.tenant_id == tenant_id, User.role.in_(["student", "participant"]))
+        # Note: We need to filter by roles relationship, not the role property
+        from app.models.user import Role
+        student_role_names = ["student", "participant"]
+        query = self.db.query(User).filter(
+            User.tenant_id == tenant_id
+        ).join(User.roles).filter(
+            Role.name.in_(student_role_names)
+        )
 
         # Apply search filter
         if search:
@@ -66,13 +79,13 @@ class ReportsOverviewService(BaseService):
 
         # Apply program/course filters
         if program_id:
-            query = query.join(ProgramEnrollment).filter(
-                ProgramEnrollment.program_id == program_id, ProgramEnrollment.status == "active"
+            query = query.join(Enrollment).filter(
+                Enrollment.program_id == program_id, Enrollment.status == "active"
             )
 
         if course_id:
-            query = query.join(CourseEnrollment).filter(
-                CourseEnrollment.course_id == course_id, CourseEnrollment.status == "active"
+            query = query.join(Enrollment).filter(
+                Enrollment.course_id == course_id, Enrollment.status == "active"
             )
 
         # Get total count before pagination

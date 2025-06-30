@@ -1,27 +1,34 @@
 /**
- * Toast notification hook
- * Simple implementation - can be replaced with a proper toast library
+ * Toast notification hook using react-hot-toast
  */
-import { useCallback } from 'react';
+import toast from 'react-hot-toast';
 
 export const useToast = () => {
-  const toast = useCallback(
-    (message: string, type: 'success' | 'error' | 'info' = 'info') => {
-      // Simple console log for now - replace with actual toast library
-      console.log(`[${type.toUpperCase()}] ${message}`);
-
-      // You can integrate with libraries like:
-      // - react-hot-toast
-      // - react-toastify
-      // - sonner
-      // etc.
-    },
-    []
-  );
-
   return {
-    success: (message: string) => toast(message, 'success'),
-    error: (message: string) => toast(message, 'error'),
-    info: (message: string) => toast(message, 'info'),
+    success: (message: string) => toast.success(message, {
+      duration: 4000,
+      position: 'top-right',
+      style: {
+        background: '#10B981',
+        color: '#fff',
+      },
+    }),
+    error: (message: string) => toast.error(message, {
+      duration: 4000,
+      position: 'top-right',
+      style: {
+        background: '#EF4444',
+        color: '#fff',
+      },
+    }),
+    info: (message: string) => toast(message, {
+      duration: 4000,
+      position: 'top-right',
+      icon: 'ℹ️',
+      style: {
+        background: '#3B82F6',
+        color: '#fff',
+      },
+    }),
   };
 };

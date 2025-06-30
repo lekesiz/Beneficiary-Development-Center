@@ -60,9 +60,7 @@ export const Toast: React.FC<ToastProps> = ({
           )}
           <div className="ml-3 w-0 flex-1">
             <p className="text-sm font-medium text-gray-900">{title}</p>
-            {description && (
-              <p className="mt-1 text-sm text-gray-500">{description}</p>
-            )}
+            {description && <p className="mt-1 text-sm text-gray-500">{description}</p>}
           </div>
           {onClose && (
             <div className="ml-4 flex-shrink-0 flex">
@@ -82,14 +80,10 @@ export const Toast: React.FC<ToastProps> = ({
 };
 
 // Toast container component
-export const ToastContainer: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+export const ToastContainer: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <div className="fixed inset-0 z-50 pointer-events-none flex items-end px-4 py-6 sm:items-start sm:p-6">
-      <div className="w-full flex flex-col items-center space-y-4 sm:items-end">
-        {children}
-      </div>
+      <div className="w-full flex flex-col items-center space-y-4 sm:items-end">{children}</div>
     </div>
   );
 };
@@ -100,13 +94,9 @@ interface ToastContextType {
   removeToast: (id: string) => void;
 }
 
-const ToastContext = React.createContext<ToastContextType | undefined>(
-  undefined
-);
+const ToastContext = React.createContext<ToastContextType | undefined>(undefined);
 
-export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [toasts, setToasts] = React.useState<ToastProps[]>([]);
 
   const addToast = React.useCallback((toast: Omit<ToastProps, 'id'>) => {
@@ -132,11 +122,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
       {children}
       <ToastContainer>
         {toasts.map((toast) => (
-          <Toast
-            key={toast.id}
-            {...toast}
-            onClose={() => removeToast(toast.id!)}
-          />
+          <Toast key={toast.id} {...toast} onClose={() => removeToast(toast.id!)} />
         ))}
       </ToastContainer>
     </ToastContext.Provider>

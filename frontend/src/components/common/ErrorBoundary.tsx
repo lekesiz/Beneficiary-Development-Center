@@ -29,7 +29,7 @@ class ErrorBoundary extends Component<Props, State> {
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // Log the error to an error reporting service
     console.error('ErrorBoundary caught an error:', error, errorInfo);
-    
+
     this.setState({
       error,
       errorInfo,
@@ -67,7 +67,7 @@ class ErrorBoundary extends Component<Props, State> {
         2
       )}`
     );
-    
+
     window.open(`mailto:support@bdc.com?subject=${subject}&body=${body}`);
   };
 
@@ -87,14 +87,12 @@ class ErrorBoundary extends Component<Props, State> {
             </div>
 
             {/* Error Title */}
-            <h1 className="text-xl font-semibold text-gray-900 mb-2">
-              Something went wrong
-            </h1>
+            <h1 className="text-xl font-semibold text-gray-900 mb-2">Something went wrong</h1>
 
             {/* Error Description */}
             <p className="text-gray-600 mb-6">
-              We apologize for the inconvenience. An unexpected error has occurred. 
-              Please try refreshing the page or returning to the home page.
+              We apologize for the inconvenience. An unexpected error has occurred. Please try
+              refreshing the page or returning to the home page.
             </p>
 
             {/* Error Details (in development mode) */}
@@ -135,24 +133,16 @@ class ErrorBoundary extends Component<Props, State> {
             {/* Action Buttons */}
             <div className="space-y-3">
               <div className="flex space-x-3">
-                <Button
-                  onClick={this.handleReload}
-                  variant="primary"
-                  className="flex-1"
-                >
+                <Button onClick={this.handleReload} variant="primary" className="flex-1">
                   <RefreshCw className="h-4 w-4 mr-2" />
                   Refresh Page
                 </Button>
-                <Button
-                  onClick={this.handleGoHome}
-                  variant="outline"
-                  className="flex-1"
-                >
+                <Button onClick={this.handleGoHome} variant="outline" className="flex-1">
                   <Home className="h-4 w-4 mr-2" />
                   Go Home
                 </Button>
               </div>
-              
+
               <Button
                 onClick={this.handleReportError}
                 variant="ghost"
@@ -168,10 +158,7 @@ class ErrorBoundary extends Component<Props, State> {
             <div className="mt-6 pt-4 border-t border-gray-200">
               <p className="text-xs text-gray-500">
                 If this problem persists, please contact support at{' '}
-                <a 
-                  href="mailto:support@bdc.com" 
-                  className="text-blue-600 hover:text-blue-500"
-                >
+                <a href="mailto:support@bdc.com" className="text-blue-600 hover:text-blue-500">
                   support@bdc.com
                 </a>
               </p>

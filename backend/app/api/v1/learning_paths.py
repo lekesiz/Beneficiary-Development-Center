@@ -14,15 +14,22 @@ from app.core.socketio import emit_coach_notification
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.core.database import get_db
 from app.core.exceptions import ValidationError, NotFoundError, ForbiddenError
+from app.core.jwt_utils import get_current_user_id
 
-learning_paths_bp = Blueprint("learning_paths", __name__, url_prefix="/api/learning-paths")
+learning_paths_bp = Blueprint("learning_paths", __name__, url_prefix="/learning-paths")
 
 
 @learning_paths_bp.route("/<int:path_id>", methods=["GET"])
 @jwt_required()
 def get_learning_path(path_id: int):
     """Get a learning path by ID"""
-    user = get_jwt_identity()
+    current_user_id = get_current_user_id()
+    db = get_db()
+    
+    # Get the actual user object
+    user = db.query(User).filter(User.id == current_user_id).first()
+    if not user:
+        return jsonify({"error": "User not found"}), 404
 
     learning_path_service = LearningPathService()
     learning_path = learning_path_service.get_learning_path(path_id=path_id, tenant_id=user.tenant_id, user=user)
@@ -34,8 +41,13 @@ def get_learning_path(path_id: int):
 @jwt_required()
 def get_my_learning_paths():
     """Get learning paths for a specific user (used by coach panel)."""
-    user = get_jwt_identity()
+    current_user_id = get_current_user_id()
     db = get_db()
+    
+    # Get the actual user object
+    user = db.query(User).filter(User.id == current_user_id).first()
+    if not user:
+        return jsonify({"error": "User not found"}), 404
 
     user_id = request.args.get("user_id", type=int)
     status = request.args.get("status", "")
@@ -49,7 +61,7 @@ def get_my_learning_paths():
     query = db.query(LearningPath).filter(
         LearningPath.user_id == target_user_id,
         LearningPath.tenant_id == user.tenant_id,
-        LearningPath.is_deleted.is_(False),
+        LearningPath.deleted_at.is_(None),
     )
 
     if status:
@@ -61,11 +73,11 @@ def get_my_learning_paths():
     result = []
     for path in paths:
         # Calculate progress
-        total_milestones = len([m for m in path.milestones if not m.is_deleted])
+        total_milestones = len([m for m in path.milestones if m.deleted_at is None])
         completed_milestones = 0
 
         for milestone in path.milestones:
-            if milestone.is_deleted:
+            if milestone.deleted_at is not None:
                 continue
             progress = (
                 db.query(MilestoneProgress)
@@ -266,7 +278,14 @@ def update_milestone_progress(path_id: int, milestone_id: int):
 @jwt_required()
 def provide_feedback(path_id: int):
     """Provide feedback on a learning path"""
-    user = get_jwt_identity()
+    current_user_id = get_current_user_id()
+    db = get_db()
+    
+    # Get the actual user object
+    user = db.query(User).filter(User.id == current_user_id).first()
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+        
     data = request.get_json()
 
     if not data or "feedback" not in data:
@@ -287,8 +306,13 @@ def provide_feedback(path_id: int):
 @jwt_required()
 def get_student_milestones():
     """Get current student's milestones with progress."""
-    user = get_jwt_identity()
+    current_user_id = get_current_user_id()
     db = get_db()
+    
+    # Get the actual user object
+    user = db.query(User).filter(User.id == current_user_id).first()
+    if not user:
+        return jsonify({"error": "User not found"}), 404
 
     try:
         # Get all active learning paths for the student
