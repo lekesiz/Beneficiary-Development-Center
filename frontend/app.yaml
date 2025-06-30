@@ -1,0 +1,32 @@
+service: frontend
+runtime: python39
+
+handlers:
+# Serve static files
+- url: /assets
+  static_dir: dist/assets
+  secure: always
+
+# Serve favicon and other root static files
+- url: /(.*\.(ico|png|jpg|jpeg|gif|svg|webp|json|txt))$
+  static_files: dist/\1
+  upload: dist/.*\.(ico|png|jpg|jpeg|gif|svg|webp|json|txt)$
+  secure: always
+
+# Serve index.html for all routes (SPA)
+- url: /.*
+  static_files: dist/index.html
+  upload: dist/index.html
+  secure: always
+
+env_variables:
+  NODE_ENV: "production"
+
+# Security headers
+default_expiration: "1d"
+
+# Automatic scaling
+automatic_scaling:
+  target_cpu_utilization: 0.65
+  min_instances: 1
+  max_instances: 5
