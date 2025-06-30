@@ -6,9 +6,7 @@ import { TagInput } from '../TagInput';
 
 describe('TagInput', () => {
   it('renders with placeholder', () => {
-    render(
-      <TagInput value={[]} onChange={() => {}} placeholder="Add a tag..." />
-    );
+    render(<TagInput value={[]} onChange={() => {}} placeholder="Add a tag..." />);
 
     expect(screen.getByPlaceholderText('Add a tag...')).toBeInTheDocument();
   });

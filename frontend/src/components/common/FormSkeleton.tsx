@@ -37,7 +37,7 @@ export const FormSkeleton: React.FC<FormSkeletonProps> = ({
         <Card key={`section-${sectionIndex}`} className="p-6">
           {/* Section title */}
           <Skeleton className="h-6 w-40 mb-4" />
-          
+
           {/* Form fields */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {Array.from({ length: fieldsPerSection }).map((_, fieldIndex) => (

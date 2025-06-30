@@ -49,7 +49,7 @@ def get_evaluations():
     claims = get_jwt()
     tenant_id = claims.get("tenant_id")
 
-    db = next(get_db())
+    db = get_db()
     try:
         user = db.query(User).filter_by(id=user_id).first()
         if not user:
@@ -78,7 +78,7 @@ def get_evaluation(evaluation_id):
     tenant_id = claims.get("tenant_id")
     include_questions = request.args.get("include_questions", "false").lower() == "true"
 
-    db = next(get_db())
+    db = get_db()
     try:
         service = EvaluationService(db)
         evaluation = service.get_by_id(evaluation_id, tenant_id, include_questions)
@@ -110,7 +110,7 @@ def create_evaluation():
     claims = get_jwt()
     tenant_id = claims.get("tenant_id")
 
-    db = next(get_db())
+    db = get_db()
     try:
         user = db.query(User).filter_by(id=user_id).first()
         if not user:
@@ -148,7 +148,7 @@ def update_evaluation(evaluation_id):
     claims = get_jwt()
     tenant_id = claims.get("tenant_id")
 
-    db = next(get_db())
+    db = get_db()
     try:
         user = db.query(User).filter_by(id=user_id).first()
         if not user:
@@ -181,7 +181,7 @@ def delete_evaluation(evaluation_id):
     claims = get_jwt()
     tenant_id = claims.get("tenant_id")
 
-    db = next(get_db())
+    db = get_db()
     try:
         user = db.query(User).filter_by(id=user_id).first()
         if not user:
@@ -212,7 +212,7 @@ def activate_evaluation(evaluation_id):
     claims = get_jwt()
     tenant_id = claims.get("tenant_id")
 
-    db = next(get_db())
+    db = get_db()
     try:
         user = db.query(User).filter_by(id=user_id).first()
         if not user:
@@ -245,7 +245,7 @@ def archive_evaluation(evaluation_id):
     claims = get_jwt()
     tenant_id = claims.get("tenant_id")
 
-    db = next(get_db())
+    db = get_db()
     try:
         user = db.query(User).filter_by(id=user_id).first()
         if not user:
@@ -276,7 +276,7 @@ def get_questions(evaluation_id):
     claims = get_jwt()
     tenant_id = claims.get("tenant_id")
 
-    db = next(get_db())
+    db = get_db()
     try:
         # Verify evaluation exists
         eval_service = EvaluationService(db)
@@ -314,7 +314,7 @@ def add_question(evaluation_id):
     claims = get_jwt()
     tenant_id = claims.get("tenant_id")
 
-    db = next(get_db())
+    db = get_db()
     try:
         user = db.query(User).filter_by(id=user_id).first()
         if not user:
@@ -354,7 +354,7 @@ def update_question(question_id):
     claims = get_jwt()
     tenant_id = claims.get("tenant_id")
 
-    db = next(get_db())
+    db = get_db()
     try:
         user = db.query(User).filter_by(id=user_id).first()
         if not user:
@@ -387,7 +387,7 @@ def delete_question(question_id):
     claims = get_jwt()
     tenant_id = claims.get("tenant_id")
 
-    db = next(get_db())
+    db = get_db()
     try:
         user = db.query(User).filter_by(id=user_id).first()
         if not user:
@@ -418,7 +418,7 @@ def start_attempt(evaluation_id):
     claims = get_jwt()
     tenant_id = claims.get("tenant_id")
 
-    db = next(get_db())
+    db = get_db()
     try:
         user = db.query(User).filter_by(id=user_id).first()
         if not user:
@@ -450,7 +450,7 @@ def get_attempt(attempt_id):
     claims = get_jwt()
     tenant_id = claims.get("tenant_id")
 
-    db = next(get_db())
+    db = get_db()
     try:
         user = db.query(User).filter_by(id=user_id).first()
         if not user:
@@ -484,7 +484,7 @@ def submit_attempt(attempt_id):
     claims = get_jwt()
     tenant_id = claims.get("tenant_id")
 
-    db = next(get_db())
+    db = get_db()
     try:
         user = db.query(User).filter_by(id=user_id).first()
         if not user:
@@ -523,7 +523,7 @@ def save_response(attempt_id):
     claims = get_jwt()
     tenant_id = claims.get("tenant_id")
 
-    db = next(get_db())
+    db = get_db()
     try:
         user = db.query(User).filter_by(id=user_id).first()
         if not user:
@@ -562,7 +562,7 @@ def get_attempt_results(attempt_id):
     claims = get_jwt()
     tenant_id = claims.get("tenant_id")
 
-    db = next(get_db())
+    db = get_db()
     try:
         user = db.query(User).filter_by(id=user_id).first()
         if not user:
@@ -642,7 +642,7 @@ def get_user_attempts(evaluation_id):
     claims = get_jwt()
     tenant_id = claims.get("tenant_id")
 
-    db = next(get_db())
+    db = get_db()
     try:
         # Get attempts
         service = EvaluationAttemptService(db)
@@ -665,7 +665,7 @@ def get_evaluation_statistics(evaluation_id):
     claims = get_jwt()
     tenant_id = claims.get("tenant_id")
 
-    db = next(get_db())
+    db = get_db()
     try:
         # Get evaluation
         service = EvaluationService(db)

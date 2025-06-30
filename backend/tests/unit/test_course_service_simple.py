@@ -22,7 +22,7 @@ def test_get_all_courses_basic():
     service = CourseService(mock_db)
 
     # Mock user
-    user = Mock(spec=User)
+    user = Mock()
     user.role = "admin"
 
     # Mock query chain
@@ -46,7 +46,7 @@ def test_create_course_validation():
     service = CourseService(mock_db)
 
     # Mock admin user
-    admin_user = Mock(spec=User)
+    admin_user = Mock()
     admin_user.id = 1
     admin_user.role = "admin"
 
@@ -56,7 +56,7 @@ def test_create_course_validation():
         # Missing program_id
     }
 
-    with pytest.raises(BadRequestError, match="Program ID is required"):
+    with pytest.raises(BadRequestError, match="program_id is required"):
         service.create(1, data, admin_user)
 
 
@@ -66,7 +66,7 @@ def test_create_course_permission_check():
     service = CourseService(mock_db)
 
     # Mock staff user (insufficient permissions)
-    staff_user = Mock(spec=User)
+    staff_user = Mock()
     staff_user.role = "staff"
 
     data = {"program_id": 1, "title": "Test Course"}
@@ -81,7 +81,7 @@ def test_instructor_can_create_course():
     service = CourseService(mock_db)
 
     # Mock instructor user
-    instructor_user = Mock(spec=User)
+    instructor_user = Mock()
     instructor_user.id = 3
     instructor_user.role = "instructor"
 

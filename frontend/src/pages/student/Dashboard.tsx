@@ -1,12 +1,4 @@
-import {
-  Target,
-  BookOpen,
-  Award,
-  TrendingUp,
-  Calendar,
-  Clock,
-  AlertCircle,
-} from 'lucide-react';
+import { Target, BookOpen, Award, TrendingUp, Calendar, Clock, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import LearningPathMilestones from '@/components/student/LearningPathMilestones';
@@ -42,12 +34,8 @@ export default function StudentDashboard() {
     <div className="p-6 max-w-7xl mx-auto space-y-6">
       {/* Welcome Header */}
       <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-6 text-white">
-        <h1 className="text-2xl font-bold mb-2">
-          Welcome, {user?.fullName}! 👋
-        </h1>
-        <p className="text-blue-100">
-          Ready to continue your learning journey?
-        </p>
+        <h1 className="text-2xl font-bold mb-2">Welcome, {user?.fullName}! 👋</h1>
+        <p className="text-blue-100">Ready to continue your learning journey?</p>
       </div>
 
       {/* Quick Stats */}
@@ -55,12 +43,8 @@ export default function StudentDashboard() {
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">
-                Overall Progress
-              </p>
-              <p className="text-2xl font-bold">
-                {dashboard.stats.overall_progress}%
-              </p>
+              <p className="text-sm font-medium text-gray-600">Overall Progress</p>
+              <p className="text-2xl font-bold">{dashboard.stats.overall_progress}%</p>
               <ProgressBar
                 value={dashboard.stats.overall_progress}
                 className="mt-2"
@@ -75,9 +59,7 @@ export default function StudentDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Completed</p>
-              <p className="text-2xl font-bold">
-                {dashboard.stats.completed_milestones}
-              </p>
+              <p className="text-2xl font-bold">{dashboard.stats.completed_milestones}</p>
               <p className="text-xs text-gray-500">Milestones</p>
             </div>
             <Award className="h-8 w-8 text-green-600 opacity-80" />
@@ -88,9 +70,7 @@ export default function StudentDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">This Week</p>
-              <p className="text-2xl font-bold">
-                {dashboard.stats.weekly_hours}s
-              </p>
+              <p className="text-2xl font-bold">{dashboard.stats.weekly_hours}s</p>
               <p className="text-xs text-gray-500">Study Hours</p>
             </div>
             <Clock className="h-8 w-8 text-purple-600 opacity-80" />
@@ -101,9 +81,7 @@ export default function StudentDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Active Paths</p>
-              <p className="text-2xl font-bold">
-                {dashboard.stats.active_paths}
-              </p>
+              <p className="text-2xl font-bold">{dashboard.stats.active_paths}</p>
               <p className="text-xs text-gray-500">Programs</p>
             </div>
             <Target className="h-8 w-8 text-orange-600 opacity-80" />
@@ -156,9 +134,7 @@ export default function StudentDashboard() {
                     onClick={() => navigate(`/evaluations/${evaluation.id}`)}
                   >
                     <h4 className="font-medium text-sm">{evaluation.title}</h4>
-                    <p className="text-xs text-gray-600 mt-1">
-                      {formatDate(evaluation.due_date)}
-                    </p>
+                    <p className="text-xs text-gray-600 mt-1">{formatDate(evaluation.due_date)}</p>
                     <Badge variant="warning" size="sm" className="mt-2">
                       {evaluation.type}
                     </Badge>
@@ -166,9 +142,7 @@ export default function StudentDashboard() {
                 ))}
               </div>
             ) : (
-              <p className="text-gray-500 text-sm">
-                No upcoming evaluations
-              </p>
+              <p className="text-gray-500 text-sm">No upcoming evaluations</p>
             )}
           </Card>
 
@@ -181,18 +155,13 @@ export default function StudentDashboard() {
             {dashboard.recent_achievements.length > 0 ? (
               <div className="space-y-3">
                 {dashboard.recent_achievements.map((achievement) => (
-                  <div
-                    key={achievement.id}
-                    className="flex items-center space-x-3"
-                  >
+                  <div key={achievement.id} className="flex items-center space-x-3">
                     <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
                       <Award className="h-5 w-5 text-green-600" />
                     </div>
                     <div className="flex-1">
                       <p className="font-medium text-sm">{achievement.title}</p>
-                      <p className="text-xs text-gray-500">
-                        {formatDate(achievement.earned_at)}
-                      </p>
+                      <p className="text-xs text-gray-500">{formatDate(achievement.earned_at)}</p>
                     </div>
                   </div>
                 ))}

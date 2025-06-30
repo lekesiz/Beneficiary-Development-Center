@@ -175,13 +175,10 @@ export function useAddCoachNote() {
       note: string;
       category?: string;
     }) => {
-      const response = await apiClient.post(
-        `/api/reports/profile/${studentId}/notes`,
-        {
-          note,
-          category,
-        }
-      );
+      const response = await apiClient.post(`/api/reports/profile/${studentId}/notes`, {
+        note,
+        category,
+      });
       return response.data;
     },
     onSuccess: (data, variables) => {
@@ -203,13 +200,10 @@ export function useExportStudentProfile() {
       studentId: number;
       format?: 'json' | 'pdf';
     }) => {
-      const response = await apiClient.get(
-        `/api/reports/profile/${studentId}/export`,
-        {
-          params: { format },
-          responseType: 'blob',
-        }
-      );
+      const response = await apiClient.get(`/api/reports/profile/${studentId}/export`, {
+        params: { format },
+        responseType: 'blob',
+      });
 
       // Create download link
       const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -217,9 +211,7 @@ export function useExportStudentProfile() {
       link.href = url;
       link.setAttribute(
         'download',
-        `student_profile_${studentId}_${
-          new Date().toISOString().split('T')[0]
-        }.${format}`
+        `student_profile_${studentId}_${new Date().toISOString().split('T')[0]}.${format}`
       );
       document.body.appendChild(link);
       link.click();
@@ -237,9 +229,7 @@ export function useProfileRecommendations(studentId: number | null) {
     queryKey: ['profileRecommendations', studentId],
     queryFn: async () => {
       if (!studentId) return null;
-      const response = await apiClient.get(
-        `/api/reports/profile/${studentId}/recommendations`
-      );
+      const response = await apiClient.get(`/api/reports/profile/${studentId}/recommendations`);
       return response.data as ProfileRecommendations;
     },
     enabled: !!studentId,

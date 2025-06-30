@@ -1,0 +1,80 @@
+# Core Flask dependencies
+flask==3.0.0
+flask-sqlalchemy==3.1.1
+flask-jwt-extended==4.6.0
+flask-cors==4.0.0
+flask-migrate==4.0.5
+python-dotenv==1.0.0
+
+# Database
+psycopg2-binary==2.9.9
+alembic==1.13.1
+
+# Security (UPDATED FOR SECURITY)
+argon2-cffi==25.1.0
+cryptography==45.0.4
+
+# Redis and Caching
+redis==5.0.1
+flask-caching==2.1.0
+
+# Task Queue
+celery==5.3.4
+flower==2.0.1
+
+# WebSocket support
+flask-socketio==5.3.5
+python-socketio==5.10.0
+
+# API and Serialization
+marshmallow==3.20.1
+marshmallow-sqlalchemy==0.29.0
+apispec==6.3.0
+apispec-webframeworks==0.5.2
+
+# AI and OpenAI
+openai==1.6.1
+tiktoken==0.5.2
+tenacity==8.3.0
+scikit-learn==1.5.0
+
+# HTTP Requests
+requests==2.31.0
+httpx==0.25.2
+
+# Date and Time
+python-dateutil==2.8.2
+pytz==2023.3
+
+# Testing
+pytest==7.4.3
+pytest-flask==1.3.0
+pytest-cov==4.1.0
+pytest-mock==3.12.0
+pytest-asyncio==0.21.1
+faker==20.1.0
+factory-boy==3.3.0
+coverage==7.3.2
+
+# Development
+flask-debugtoolbar==0.13.1
+python-decouple==3.8
+
+# Monitoring and Logging
+sentry-sdk[flask]==1.38.0
+flask-limiter==3.5.0
+python-json-logger==2.0.7
+
+# File handling
+python-magic==0.4.27
+pillow==10.1.0
+
+# Email
+flask-mail==0.9.1
+
+# Documentation
+flasgger==0.9.7.1
+
+# Deployment
+gunicorn==21.2.0
+gevent==23.9.1

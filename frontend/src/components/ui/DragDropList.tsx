@@ -28,9 +28,7 @@ export const DragDropList: React.FC<DragDropListProps> = ({
   disabled = false,
 }) => {
   const [draggedItem, setDraggedItem] = useState<string | number | null>(null);
-  const [dragOverItem, setDragOverItem] = useState<string | number | null>(
-    null
-  );
+  const [dragOverItem, setDragOverItem] = useState<string | number | null>(null);
 
   const handleDragStart = (e: React.DragEvent, id: string | number) => {
     if (disabled) return;
@@ -108,9 +106,7 @@ export const DragDropList: React.FC<DragDropListProps> = ({
             </div>
           )}
           <div className="flex-1">{item.content}</div>
-          <div className="ml-2 text-sm text-gray-500 font-mono">
-            #{index + 1}
-          </div>
+          <div className="ml-2 text-sm text-gray-500 font-mono">#{index + 1}</div>
         </div>
       ))}
     </div>

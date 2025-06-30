@@ -1,8 +1,4 @@
-import {
-  ColumnDef,
-  PaginationState,
-  SortingState,
-} from '@tanstack/react-table';
+import { ColumnDef, PaginationState, SortingState } from '@tanstack/react-table';
 import {
   Eye,
   Edit,
@@ -76,10 +72,7 @@ const ActionsDropdown: React.FC<{
 
   return (
     <div className="relative">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="p-2 hover:bg-gray-100 rounded-md"
-      >
+      <button onClick={() => setIsOpen(!isOpen)} className="p-2 hover:bg-gray-100 rounded-md">
         <MoreHorizontal className="h-4 w-4" />
       </button>
 
@@ -190,9 +183,7 @@ const EvaluationFilters: React.FC<{
               <label className="block text-sm font-medium mb-1">Sıralama</label>
               <select
                 value={filters.sort_by || 'created_at'}
-                onChange={(e) =>
-                  onFiltersChange({ ...filters, sort_by: e.target.value })
-                }
+                onChange={(e) => onFiltersChange({ ...filters, sort_by: e.target.value })}
                 className="w-full p-2 border rounded-md"
               >
                 <option value="created_at">Oluşturulma Tarihi</option>
@@ -207,9 +198,7 @@ const EvaluationFilters: React.FC<{
                 type="checkbox"
                 id="sort_desc"
                 checked={filters.sort_desc || false}
-                onChange={(e) =>
-                  onFiltersChange({ ...filters, sort_desc: e.target.checked })
-                }
+                onChange={(e) => onFiltersChange({ ...filters, sort_desc: e.target.checked })}
                 className="mr-2"
               />
               <label htmlFor="sort_desc" className="text-sm">
@@ -289,10 +278,7 @@ export default function EvaluationList() {
             <div className="flex items-center space-x-2">
               <span className="font-medium">{row.original.title}</span>
               {row.original.is_adaptive && (
-                <Badge
-                  variant="outline"
-                  className="bg-purple-50 text-purple-700 border-purple-200"
-                >
+                <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
                   <Brain className="mr-1 h-3 w-3" />
                   AI Adaptif
                 </Badge>
@@ -324,7 +310,7 @@ export default function EvaluationList() {
       {
         accessorKey: 'total_points',
         header: 'Toplam Puan',
-        cell: ({ row }) => row.original.total_points.toFixed(1),
+        cell: ({ row }) => row.original.total_points?.toFixed(1) || '0.0',
       },
       {
         accessorKey: 'passing_score',
@@ -353,8 +339,7 @@ export default function EvaluationList() {
       {
         accessorKey: 'created_at',
         header: 'Oluşturulma',
-        cell: ({ row }) =>
-          new Date(row.original.created_at).toLocaleDateString('tr-TR'),
+        cell: ({ row }) => new Date(row.original.created_at).toLocaleDateString('tr-TR'),
       },
       {
         id: 'actions',
@@ -364,9 +349,7 @@ export default function EvaluationList() {
             evaluation={row.original}
             onView={(id) => navigate(`/evaluations/${id}`)}
             onEdit={(id) => navigate(`/evaluations/${id}/edit`)}
-            onDelete={(id) =>
-              setDeleteModal({ isOpen: true, evaluationId: id })
-            }
+            onDelete={(id) => setDeleteModal({ isOpen: true, evaluationId: id })}
             onActivate={(id) => activateMutation.mutate(id)}
             onArchive={(id) => archiveMutation.mutate(id)}
           />
@@ -407,9 +390,7 @@ export default function EvaluationList() {
     return (
       <div className="p-6">
         <div className="text-center py-12">
-          <p className="text-red-600">
-            Değerlendirmeler yüklenirken hata oluştu.
-          </p>
+          <p className="text-red-600">Değerlendirmeler yüklenirken hata oluştu.</p>
         </div>
       </div>
     );
@@ -439,12 +420,8 @@ export default function EvaluationList() {
             <div className="flex items-center">
               <FileText className="h-8 w-8 text-blue-600" />
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">
-                  Toplam Değerlendirme
-                </p>
-                <p className="text-2xl font-bold">
-                  {statistics.total_evaluations}
-                </p>
+                <p className="text-sm font-medium text-gray-600">Toplam Değerlendirme</p>
+                <p className="text-2xl font-bold">{statistics.total_evaluations}</p>
               </div>
             </div>
           </Card>
@@ -452,12 +429,8 @@ export default function EvaluationList() {
             <div className="flex items-center">
               <Play className="h-8 w-8 text-green-600" />
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">
-                  Aktif Değerlendirmeler
-                </p>
-                <p className="text-2xl font-bold">
-                  {statistics.active_evaluations}
-                </p>
+                <p className="text-sm font-medium text-gray-600">Aktif Değerlendirmeler</p>
+                <p className="text-2xl font-bold">{statistics.active_evaluations}</p>
               </div>
             </div>
           </Card>
@@ -465,12 +438,8 @@ export default function EvaluationList() {
             <div className="flex items-center">
               <Users className="h-8 w-8 text-purple-600" />
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">
-                  Toplam Deneme
-                </p>
-                <p className="text-2xl font-bold">
-                  {statistics.total_attempts}
-                </p>
+                <p className="text-sm font-medium text-gray-600">Toplam Deneme</p>
+                <p className="text-2xl font-bold">{statistics.total_attempts}</p>
               </div>
             </div>
           </Card>
@@ -480,12 +449,8 @@ export default function EvaluationList() {
                 <span className="text-yellow-600 font-bold">%</span>
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">
-                  Ortalama Başarı
-                </p>
-                <p className="text-2xl font-bold">
-                  {statistics.average_score.toFixed(1)}%
-                </p>
+                <p className="text-sm font-medium text-gray-600">Ortalama Başarı</p>
+                <p className="text-2xl font-bold">{statistics.average_score?.toFixed(1) || '0.0'}%</p>
               </div>
             </div>
           </Card>
@@ -508,13 +473,17 @@ export default function EvaluationList() {
 
       {/* Data Table */}
       <Card>
-        {evaluationsData?.evaluations && evaluationsData.evaluations.length === 0 && !searchTerm && !filters.status && !filters.type ? (
+        {evaluationsData?.evaluations &&
+        evaluationsData.evaluations.length === 0 &&
+        !searchTerm &&
+        !filters.status &&
+        !filters.type ? (
           <EmptyState
             icon={ClipboardCheck}
             title="No Evaluations Found"
             description="Create your first evaluation to assess student knowledge and skills. Track progress and provide personalized learning paths based on results."
             action={{
-              text: "Create New Evaluation",
+              text: 'Create New Evaluation',
               onClick: () => navigate('/evaluations/create'),
             }}
           />
@@ -523,7 +492,7 @@ export default function EvaluationList() {
             columns={columns}
             data={evaluationsData?.evaluations || []}
             loading={isLoading}
-            pageCount={evaluationsData?.pagination.pages}
+            pageCount={evaluationsData?.pagination?.pages}
             pagination={pagination}
             onPaginationChange={handlePaginationChange}
             sorting={sorting}
@@ -539,10 +508,7 @@ export default function EvaluationList() {
         title="Değerlendirmeyi Sil"
       >
         <div className="space-y-4">
-          <p>
-            Bu değerlendirmeyi silmek istediğinizden emin misiniz? Bu işlem geri
-            alınamaz.
-          </p>
+          <p>Bu değerlendirmeyi silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.</p>
           <div className="flex justify-end space-x-2">
             <button
               onClick={() => setDeleteModal({ isOpen: false })}

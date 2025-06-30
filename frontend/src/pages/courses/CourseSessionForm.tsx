@@ -16,7 +16,6 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useCourse, useAddSession } from '../../hooks/useCourses';
 import type { CreateSessionRequest } from '../../types/course';
 
-
 // Form validation schema
 const sessionFormSchema = z.object({
   title: z
@@ -24,7 +23,7 @@ const sessionFormSchema = z.object({
     .min(1, 'Session name is required')
     .max(200, 'Session name can be up to 200 characters'),
   description: z.string().optional(),
-  session_date: z.string().min(1, 'Date is required'),  
+  session_date: z.string().min(1, 'Date is required'),
   session_time: z.string().min(1, 'Time is required'),
   duration_hours: z
     .number()
@@ -33,18 +32,10 @@ const sessionFormSchema = z.object({
   location: z.string().optional(),
   room_number: z.string().optional(),
   is_online: z.boolean(),
-  online_link: z
-    .string()
-    .url('Please enter a valid URL')
-    .optional()
-    .or(z.literal('')),
+  online_link: z.string().url('Please enter a valid URL').optional().or(z.literal('')),
   instructor_id: z.number().optional(),
   is_mandatory: z.boolean(),
-  materials_url: z
-    .string()
-    .url('Please enter a valid URL')
-    .optional()
-    .or(z.literal('')),
+  materials_url: z.string().url('Please enter a valid URL').optional().or(z.literal('')),
 });
 
 type SessionFormData = z.infer<typeof sessionFormSchema>;
@@ -55,17 +46,13 @@ export const CourseSessionForm: React.FC = () => {
   const { user } = useAuth();
   const courseIdNum = parseInt(courseId!);
 
-  const { data: course, isLoading: isLoadingCourse } = useCourse(
-    courseIdNum,
-    false
-  );
+  const { data: course, isLoading: isLoadingCourse } = useCourse(courseIdNum, false);
   const addSession = useAddSession();
 
   // Permission checks
   const canEdit = (course: any) => {
     if (user?.role === 'admin' || user?.role === 'manager') return true;
-    if (user?.role === 'instructor' && course?.instructor_id === user.id)
-      return true;
+    if (user?.role === 'instructor' && course?.instructor_id === user.id) return true;
     return false;
   };
 
@@ -89,9 +76,7 @@ export const CourseSessionForm: React.FC = () => {
   // Form submission
   const onSubmit = async (data: SessionFormData) => {
     try {
-      const sessionDateTime = new Date(
-        `${data.session_date}T${data.session_time}`
-      );
+      const sessionDateTime = new Date(`${data.session_date}T${data.session_time}`);
 
       const sessionData: CreateSessionRequest = {
         title: data.title,
@@ -137,19 +122,13 @@ export const CourseSessionForm: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate(`/courses/${courseId}`)}
-          >
+          <Button variant="ghost" size="sm" onClick={() => navigate(`/courses/${courseId}`)}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Course
           </Button>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">New Session</h1>
-            <p className="text-gray-600">
-              Create new session for {course.title}
-            </p>
+            <p className="text-gray-600">Create new session for {course.title}</p>
           </div>
         </div>
       </div>
@@ -167,38 +146,24 @@ export const CourseSessionForm: React.FC = () => {
                 <Controller
                   name="title"
                   control={control}
-                  render={({ field }) => (
-                    <Input {...field} error={!!errors.title} />
-                  )}
+                  render={({ field }) => <Input {...field} error={!!errors.title} />}
                 />
-                {errors.title && (
-                  <p className="text-sm text-destructive">
-                    {errors.title.message}
-                  </p>
-                )}
+                {errors.title && <p className="text-sm text-destructive">{errors.title.message}</p>}
               </div>
             </div>
 
             <div className="md:col-span-2">
               <div className="space-y-2">
-                <label className="text-sm font-medium leading-none">
-                  Description
-                </label>
+                <label className="text-sm font-medium leading-none">Description</label>
                 <Controller
                   name="description"
                   control={control}
                   render={({ field }) => (
-                    <Textarea
-                      {...field}
-                      error={!!errors.description}
-                      rows={3}
-                    />
+                    <Textarea {...field} error={!!errors.description} rows={3} />
                   )}
                 />
                 {errors.description && (
-                  <p className="text-sm text-destructive">
-                    {errors.description.message}
-                  </p>
+                  <p className="text-sm text-destructive">{errors.description.message}</p>
                 )}
               </div>
             </div>
@@ -213,11 +178,7 @@ export const CourseSessionForm: React.FC = () => {
               name="session_date"
               control={control}
               render={({ field }) => (
-                <DatePicker
-                  {...field}
-                  label="Date *"
-                  error={errors.session_date?.message}
-                />
+                <DatePicker {...field} label="Date *" error={errors.session_date?.message} />
               )}
             />
 
@@ -233,9 +194,7 @@ export const CourseSessionForm: React.FC = () => {
                 )}
               />
               {errors.session_time && (
-                <p className="text-sm text-destructive">
-                  {errors.session_time.message}
-                </p>
+                <p className="text-sm text-destructive">{errors.session_time.message}</p>
               )}
             </div>
 
@@ -254,16 +213,12 @@ export const CourseSessionForm: React.FC = () => {
                     min="0.5"
                     max="12"
                     error={!!errors.duration_hours}
-                    onChange={(e) =>
-                      field.onChange(parseFloat(e.target.value) || 0)
-                    }
+                    onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                   />
                 )}
               />
               {errors.duration_hours && (
-                <p className="text-sm text-destructive">
-                  {errors.duration_hours.message}
-                </p>
+                <p className="text-sm text-destructive">{errors.duration_hours.message}</p>
               )}
             </div>
           </div>
@@ -294,31 +249,21 @@ export const CourseSessionForm: React.FC = () => {
             {!watchIsOnline && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium leading-none">
-                    Location
-                  </label>
+                  <label className="text-sm font-medium leading-none">Location</label>
                   <Controller
                     name="location"
                     control={control}
                     render={({ field }) => (
-                      <Input
-                        {...field}
-                        error={!!errors.location}
-                        placeholder="Session location"
-                      />
+                      <Input {...field} error={!!errors.location} placeholder="Session location" />
                     )}
                   />
                   {errors.location && (
-                    <p className="text-sm text-destructive">
-                      {errors.location.message}
-                    </p>
+                    <p className="text-sm text-destructive">{errors.location.message}</p>
                   )}
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium leading-none">
-                    Room Number
-                  </label>
+                  <label className="text-sm font-medium leading-none">Room Number</label>
                   <Controller
                     name="room_number"
                     control={control}
@@ -331,9 +276,7 @@ export const CourseSessionForm: React.FC = () => {
                     )}
                   />
                   {errors.room_number && (
-                    <p className="text-sm text-destructive">
-                      {errors.room_number.message}
-                    </p>
+                    <p className="text-sm text-destructive">{errors.room_number.message}</p>
                   )}
                 </div>
               </div>
@@ -341,24 +284,16 @@ export const CourseSessionForm: React.FC = () => {
 
             {watchIsOnline && (
               <div className="space-y-2">
-                <label className="text-sm font-medium leading-none">
-                  Online Link
-                </label>
+                <label className="text-sm font-medium leading-none">Online Link</label>
                 <Controller
                   name="online_link"
                   control={control}
                   render={({ field }) => (
-                    <Input
-                      {...field}
-                      error={!!errors.online_link}
-                      placeholder="https://..."
-                    />
+                    <Input {...field} error={!!errors.online_link} placeholder="https://..." />
                   )}
                 />
                 {errors.online_link && (
-                  <p className="text-sm text-destructive">
-                    {errors.online_link.message}
-                  </p>
+                  <p className="text-sm text-destructive">{errors.online_link.message}</p>
                 )}
               </div>
             )}
@@ -388,24 +323,16 @@ export const CourseSessionForm: React.FC = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium leading-none">
-                Material URL
-              </label>
+              <label className="text-sm font-medium leading-none">Material URL</label>
               <Controller
                 name="materials_url"
                 control={control}
                 render={({ field }) => (
-                  <Input
-                    {...field}
-                    error={!!errors.materials_url}
-                    placeholder="https://..."
-                  />
+                  <Input {...field} error={!!errors.materials_url} placeholder="https://..." />
                 )}
               />
               {errors.materials_url && (
-                <p className="text-sm text-destructive">
-                  {errors.materials_url.message}
-                </p>
+                <p className="text-sm text-destructive">{errors.materials_url.message}</p>
               )}
             </div>
           </div>
@@ -413,11 +340,7 @@ export const CourseSessionForm: React.FC = () => {
 
         {/* Actions */}
         <div className="flex items-center justify-end space-x-4">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => navigate(`/courses/${courseId}`)}
-          >
+          <Button type="button" variant="outline" onClick={() => navigate(`/courses/${courseId}`)}>
             Cancel
           </Button>
           <Button type="submit" disabled={isSubmitting || addSession.isPending}>

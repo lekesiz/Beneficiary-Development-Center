@@ -50,9 +50,7 @@ export function useStartMilestone() {
 
   return useMutation({
     mutationFn: async (milestoneId: number) => {
-      const response = await apiClient.post(
-        `/api/learning-paths/milestones/${milestoneId}/start`
-      );
+      const response = await apiClient.post(`/api/learning-paths/milestones/${milestoneId}/start`);
       return response.data;
     },
     onSuccess: () => {
@@ -112,19 +110,10 @@ export function useRequestHelp() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({
-      milestoneId,
-      message,
-    }: {
-      milestoneId: number;
-      message: string;
-    }) => {
-      const response = await apiClient.post(
-        `/api/learning-paths/milestones/${milestoneId}/help`,
-        {
-          message,
-        }
-      );
+    mutationFn: async ({ milestoneId, message }: { milestoneId: number; message: string }) => {
+      const response = await apiClient.post(`/api/learning-paths/milestones/${milestoneId}/help`, {
+        message,
+      });
       return response.data;
     },
     onSuccess: () => {
@@ -139,9 +128,7 @@ export function useMilestoneDetails(milestoneId: number | null) {
     queryKey: ['milestoneDetails', milestoneId],
     queryFn: async () => {
       if (!milestoneId) return null;
-      const response = await apiClient.get(
-        `/api/learning-paths/milestones/${milestoneId}`
-      );
+      const response = await apiClient.get(`/api/learning-paths/milestones/${milestoneId}`);
       return response.data.milestone as StudentMilestone;
     },
     enabled: !!milestoneId,

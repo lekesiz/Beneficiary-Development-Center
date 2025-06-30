@@ -22,12 +22,12 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api': {
-        target: 'http://localhost:5000',
+        target: 'http://localhost:5001',
         changeOrigin: true,
         secure: false,
       },
       '/socket.io': {
-        target: 'http://localhost:5000',
+        target: 'http://localhost:5001',
         ws: true,
         changeOrigin: true,
       },
@@ -35,17 +35,27 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
-    sourcemap: true,
+    sourcemap: false, // Disable in production for security
+    minify: 'esbuild', // Use esbuild instead of terser
     rollupOptions: {
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom', 'react-router-dom'],
           ui: ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-tabs'],
-          charts: ['chart.js', 'react-chartjs-2', 'recharts'],
+          charts: ['chart.js', 'react-chartjs-2'],
           forms: ['react-hook-form', '@hookform/resolvers', 'zod'],
-          i18n: ['i18next', 'react-i18next'],
+          utils: ['date-fns', 'clsx'],
         },
+        chunkFileNames: 'assets/[name]-[hash].js',
+        entryFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash].[ext]',
       },
     },
+    chunkSizeWarningLimit: 1000,
+    reportCompressedSize: true,
+    // Enable tree shaking
+    target: 'esnext',
+    // Skip type checking for production builds (faster builds)
+    emptyOutDir: true,
   },
 })

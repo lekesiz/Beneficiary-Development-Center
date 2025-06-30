@@ -117,19 +117,11 @@ describe('ConfirmDialog', () => {
     render(<ConfirmDialog {...defaultProps} />);
 
     expect(screen.getByText('Confirm Action')).toBeInTheDocument();
-    expect(
-      screen.getByText('Are you sure you want to proceed?')
-    ).toBeInTheDocument();
+    expect(screen.getByText('Are you sure you want to proceed?')).toBeInTheDocument();
   });
 
   it('renders custom button text', () => {
-    render(
-      <ConfirmDialog
-        {...defaultProps}
-        confirmText="Yes, Delete"
-        cancelText="No, Keep"
-      />
-    );
+    render(<ConfirmDialog {...defaultProps} confirmText="Yes, Delete" cancelText="No, Keep" />);
 
     expect(screen.getByText('Yes, Delete')).toBeInTheDocument();
     expect(screen.getByText('No, Keep')).toBeInTheDocument();
@@ -169,9 +161,7 @@ describe('ConfirmDialog', () => {
     const variants = ['danger', 'warning', 'info'] as const;
 
     variants.forEach((variant) => {
-      const { rerender } = render(
-        <ConfirmDialog {...defaultProps} variant={variant} />
-      );
+      const { rerender } = render(<ConfirmDialog {...defaultProps} variant={variant} />);
 
       const confirmButton = screen.getByText('Confirm');
 

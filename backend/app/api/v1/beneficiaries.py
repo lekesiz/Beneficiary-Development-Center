@@ -1,7 +1,8 @@
 """Beneficiary API endpoints."""
 
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required
+from app.core.jwt_utils import get_current_user_id
 from app.core.database import get_db
 from app.models.user import User
 from app.services.beneficiary_service import BeneficiaryService
@@ -16,7 +17,10 @@ bp = Blueprint("beneficiaries", __name__)
 def get_beneficiaries():
     """Get all beneficiaries with pagination and filters."""
     # Get current user
-    current_user_id = get_jwt_identity()
+    current_user_id = get_current_user_id()
+    if not current_user_id:
+        return jsonify({"error": "Invalid authentication token"}), 401
+        
     db = get_db()
     current_user = db.query(User).get(current_user_id)
 
@@ -76,7 +80,9 @@ def get_beneficiaries():
 @jwt_required()
 def get_beneficiary(beneficiary_id):
     """Get beneficiary by ID."""
-    current_user_id = get_jwt_identity()
+    current_user_id = get_current_user_id()
+    if not current_user_id:
+        return jsonify({"error": "Invalid authentication token"}), 401
     db = get_db()
     current_user = db.query(User).get(current_user_id)
 
@@ -100,7 +106,9 @@ def get_beneficiary(beneficiary_id):
 @jwt_required()
 def get_beneficiary_by_uuid(uuid):
     """Get beneficiary by UUID."""
-    current_user_id = get_jwt_identity()
+    current_user_id = get_current_user_id()
+    if not current_user_id:
+        return jsonify({"error": "Invalid authentication token"}), 401
     db = get_db()
     current_user = db.query(User).get(current_user_id)
 
@@ -127,7 +135,9 @@ def get_beneficiary_by_uuid(uuid):
 @requires_role(["super_admin", "admin", "trainer"])
 def create_beneficiary():
     """Create a new beneficiary."""
-    current_user_id = get_jwt_identity()
+    current_user_id = get_current_user_id()
+    if not current_user_id:
+        return jsonify({"error": "Invalid authentication token"}), 401
     db = get_db()
     current_user = db.query(User).get(current_user_id)
 
@@ -164,7 +174,9 @@ def create_beneficiary():
 @requires_role(["super_admin", "admin", "trainer"])
 def update_beneficiary(beneficiary_id):
     """Update beneficiary."""
-    current_user_id = get_jwt_identity()
+    current_user_id = get_current_user_id()
+    if not current_user_id:
+        return jsonify({"error": "Invalid authentication token"}), 401
     db = get_db()
     current_user = db.query(User).get(current_user_id)
 
@@ -205,7 +217,9 @@ def update_beneficiary(beneficiary_id):
 @requires_role(["super_admin", "admin"])
 def delete_beneficiary(beneficiary_id):
     """Delete beneficiary (soft delete)."""
-    current_user_id = get_jwt_identity()
+    current_user_id = get_current_user_id()
+    if not current_user_id:
+        return jsonify({"error": "Invalid authentication token"}), 401
     db = get_db()
     current_user = db.query(User).get(current_user_id)
 
@@ -231,7 +245,9 @@ def delete_beneficiary(beneficiary_id):
 @requires_role(["super_admin", "admin", "trainer"])
 def add_note(beneficiary_id):
     """Add note to beneficiary."""
-    current_user_id = get_jwt_identity()
+    current_user_id = get_current_user_id()
+    if not current_user_id:
+        return jsonify({"error": "Invalid authentication token"}), 401
     db = get_db()
     current_user = db.query(User).get(current_user_id)
 
@@ -265,7 +281,9 @@ def add_note(beneficiary_id):
 @requires_role(["super_admin", "admin", "trainer"])
 def add_tag(beneficiary_id):
     """Add tag to beneficiary."""
-    current_user_id = get_jwt_identity()
+    current_user_id = get_current_user_id()
+    if not current_user_id:
+        return jsonify({"error": "Invalid authentication token"}), 401
     db = get_db()
     current_user = db.query(User).get(current_user_id)
 
@@ -299,7 +317,9 @@ def add_tag(beneficiary_id):
 @requires_role(["super_admin", "admin", "trainer"])
 def remove_tag(beneficiary_id, tag):
     """Remove tag from beneficiary."""
-    current_user_id = get_jwt_identity()
+    current_user_id = get_current_user_id()
+    if not current_user_id:
+        return jsonify({"error": "Invalid authentication token"}), 401
     db = get_db()
     current_user = db.query(User).get(current_user_id)
 
@@ -327,7 +347,9 @@ def remove_tag(beneficiary_id, tag):
 @jwt_required()
 def get_statistics():
     """Get beneficiary statistics."""
-    current_user_id = get_jwt_identity()
+    current_user_id = get_current_user_id()
+    if not current_user_id:
+        return jsonify({"error": "Invalid authentication token"}), 401
     db = get_db()
     current_user = db.query(User).get(current_user_id)
 
@@ -348,7 +370,9 @@ def get_statistics():
 @requires_role(["super_admin", "admin"])
 def assign_trainer(beneficiary_id):
     """Assign trainer to beneficiary."""
-    current_user_id = get_jwt_identity()
+    current_user_id = get_current_user_id()
+    if not current_user_id:
+        return jsonify({"error": "Invalid authentication token"}), 401
     db = get_db()
     current_user = db.query(User).get(current_user_id)
 

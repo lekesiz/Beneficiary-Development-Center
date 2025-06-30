@@ -1,8 +1,4 @@
-import {
-  ColumnDef,
-  PaginationState,
-  SortingState,
-} from '@tanstack/react-table';
+import { ColumnDef, PaginationState, SortingState } from '@tanstack/react-table';
 import {
   MoreHorizontal,
   Plus,
@@ -24,11 +20,8 @@ import { DataTableSkeleton } from '@/components/common/DataTableSkeleton';
 import { DataTable } from '@/components/ui/DataTable';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { useAuth } from '@/contexts/AuthContext';
-import {
-  useBeneficiaries,
-  useDeleteBeneficiary,
-} from '@/hooks/useBeneficiaries';
-import { formatDate , debounce } from '@/lib/utils';
+import { useBeneficiaries, useDeleteBeneficiary } from '@/hooks/useBeneficiaries';
+import { formatDate, debounce } from '@/lib/utils';
 import { Beneficiary, BeneficiaryStatus } from '@/types/beneficiary';
 
 export default function BeneficiaryList() {
@@ -36,14 +29,14 @@ export default function BeneficiaryList() {
   const { user } = useAuth();
   const { t } = useTranslation();
   const [globalFilter, setGlobalFilter] = useState('');
-  const [statusFilter, setStatusFilter] = useState<BeneficiaryStatus | ''>(BeneficiaryStatus.ACTIVE);
+  const [statusFilter, setStatusFilter] = useState<BeneficiaryStatus | ''>(
+    BeneficiaryStatus.ACTIVE
+  );
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 20,
   });
-  const [sorting, setSorting] = useState<SortingState>([
-    { id: 'created_at', desc: true },
-  ]);
+  const [sorting, setSorting] = useState<SortingState>([{ id: 'created_at', desc: true }]);
 
   // Debounced search
   const debouncedSearch = useMemo(
@@ -86,9 +79,7 @@ export default function BeneficiaryList() {
           <div>
             <div className="font-medium">{beneficiary.full_name}</div>
             {beneficiary.email && (
-              <div className="text-sm text-muted-foreground">
-                {beneficiary.email}
-              </div>
+              <div className="text-sm text-muted-foreground">{beneficiary.email}</div>
             )}
           </div>
         );
@@ -144,9 +135,7 @@ export default function BeneficiaryList() {
               </span>
             ))}
             {tags.length > 3 && (
-              <span className="text-xs text-muted-foreground">
-                +{tags.length - 3}
-              </span>
+              <span className="text-xs text-muted-foreground">+{tags.length - 3}</span>
             )}
           </div>
         );
@@ -178,9 +167,7 @@ export default function BeneficiaryList() {
 
             {canEdit && (
               <button
-                onClick={() =>
-                  navigate(`/beneficiaries/${beneficiary.id}/edit`)
-                }
+                onClick={() => navigate(`/beneficiaries/${beneficiary.id}/edit`)}
                 className="p-1 hover:bg-accent rounded"
                 title={t('beneficiaries.list.actions.edit')}
               >
@@ -191,9 +178,7 @@ export default function BeneficiaryList() {
             {canDelete && (
               <button
                 onClick={() => {
-                  if (
-                    confirm(t('beneficiaries.list.actions.deleteConfirm'))
-                  ) {
+                  if (confirm(t('beneficiaries.list.actions.deleteConfirm'))) {
                     deleteMutation.mutate(beneficiary.id);
                   }
                 }}
@@ -218,9 +203,7 @@ export default function BeneficiaryList() {
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-2xl font-bold tracking-tight">{t('beneficiaries.title')}</h1>
-            <p className="text-muted-foreground">
-              {t('beneficiaries.subtitle')}
-            </p>
+            <p className="text-muted-foreground">{t('beneficiaries.subtitle')}</p>
           </div>
 
           <div className="flex items-center gap-2">
@@ -259,16 +242,20 @@ export default function BeneficiaryList() {
 
           <select
             value={statusFilter}
-            onChange={(e) =>
-              setStatusFilter(e.target.value as BeneficiaryStatus | '')
-            }
+            onChange={(e) => setStatusFilter(e.target.value as BeneficiaryStatus | '')}
             className="px-3 py-2 text-sm border rounded-md border-input bg-background"
           >
             <option value="">{t('beneficiaries.list.filters.allStatus')}</option>
             <option value={BeneficiaryStatus.ACTIVE}>{t('beneficiaries.statuses.active')}</option>
-            <option value={BeneficiaryStatus.INACTIVE}>{t('beneficiaries.statuses.inactive')}</option>
-            <option value={BeneficiaryStatus.COMPLETED}>{t('beneficiaries.statuses.completed')}</option>
-            <option value={BeneficiaryStatus.SUSPENDED}>{t('beneficiaries.statuses.suspended')}</option>
+            <option value={BeneficiaryStatus.INACTIVE}>
+              {t('beneficiaries.statuses.inactive')}
+            </option>
+            <option value={BeneficiaryStatus.COMPLETED}>
+              {t('beneficiaries.statuses.completed')}
+            </option>
+            <option value={BeneficiaryStatus.SUSPENDED}>
+              {t('beneficiaries.statuses.suspended')}
+            </option>
           </select>
 
           <button
@@ -285,7 +272,10 @@ export default function BeneficiaryList() {
         {/* Data Table */}
         {isLoading ? (
           <DataTableSkeleton columns={7} rows={10} showPagination />
-        ) : data?.data.beneficiaries && data.data.beneficiaries.length === 0 && !globalFilter && !statusFilter ? (
+        ) : data?.data.beneficiaries &&
+          data.data.beneficiaries.length === 0 &&
+          !globalFilter &&
+          !statusFilter ? (
           <div className="bg-white rounded-lg border">
             <EmptyState
               icon={Users}
@@ -306,7 +296,7 @@ export default function BeneficiaryList() {
             columns={columns}
             data={data?.data.beneficiaries || []}
             loading={isLoading}
-            pageCount={data?.data.pagination.pages}
+            pageCount={data?.data.pagination?.pages}
             pagination={pagination}
             onPaginationChange={setPagination}
             sorting={sorting}

@@ -58,9 +58,7 @@ describe('BeneficiaryForm', () => {
       render(<BeneficiaryForm />);
 
       expect(screen.getByText('Add New Beneficiary')).toBeInTheDocument();
-      expect(
-        screen.getByText('Create a new beneficiary profile')
-      ).toBeInTheDocument();
+      expect(screen.getByText('Create a new beneficiary profile')).toBeInTheDocument();
     });
 
     it('shows required field indicators', () => {
@@ -75,18 +73,14 @@ describe('BeneficiaryForm', () => {
       render(<BeneficiaryForm />);
 
       const submitButton = screen.getByText('Create Beneficiary');
-      
+
       await act(async () => {
         await user.click(submitButton);
       });
 
       await waitFor(() => {
-        expect(
-          screen.getByText('First name must be at least 2 characters')
-        ).toBeInTheDocument();
-        expect(
-          screen.getByText('Last name must be at least 2 characters')
-        ).toBeInTheDocument();
+        expect(screen.getByText('First name must be at least 2 characters')).toBeInTheDocument();
+        expect(screen.getByText('Last name must be at least 2 characters')).toBeInTheDocument();
       });
     });
 
@@ -103,25 +97,29 @@ describe('BeneficiaryForm', () => {
       });
 
       const emailInput = screen.getByPlaceholderText('john.doe@example.com');
-      
+
       await act(async () => {
         await user.type(emailInput, 'invalid-email');
       });
 
       const submitButton = screen.getByText('Create Beneficiary');
-      
+
       await act(async () => {
         await user.click(submitButton);
       });
 
       // Look for the error message in a more flexible way
-      await waitFor(() => {
-        const errorElement = screen.getByText((content, element) => {
-          return element?.className?.includes('text-destructive') && 
-                 content.includes('Invalid email');
-        });
-        expect(errorElement).toBeInTheDocument();
-      }, { timeout: 3000 });
+      await waitFor(
+        () => {
+          const errorElement = screen.getByText((content, element) => {
+            return (
+              element?.className?.includes('text-destructive') && content.includes('Invalid email')
+            );
+          });
+          expect(errorElement).toBeInTheDocument();
+        },
+        { timeout: 3000 }
+      );
     });
 
     it.skip('validates phone format', async () => {
@@ -137,25 +135,29 @@ describe('BeneficiaryForm', () => {
       });
 
       const phoneInput = screen.getByPlaceholderText('+33 1 23 45 67 89');
-      
+
       await act(async () => {
         await user.type(phoneInput, 'invalid-phone');
       });
 
       const submitButton = screen.getByText('Create Beneficiary');
-      
+
       await act(async () => {
         await user.click(submitButton);
       });
 
       // Look for the error message in a more flexible way
-      await waitFor(() => {
-        const errorElement = screen.getByText((content, element) => {
-          return element?.className?.includes('text-destructive') && 
-                 content.includes('Invalid phone');
-        });
-        expect(errorElement).toBeInTheDocument();
-      }, { timeout: 3000 });
+      await waitFor(
+        () => {
+          const errorElement = screen.getByText((content, element) => {
+            return (
+              element?.className?.includes('text-destructive') && content.includes('Invalid phone')
+            );
+          });
+          expect(errorElement).toBeInTheDocument();
+        },
+        { timeout: 3000 }
+      );
     });
 
     it.skip('submits form with valid data', async () => {
@@ -172,14 +174,17 @@ describe('BeneficiaryForm', () => {
       });
 
       const submitButton = screen.getByText('Create Beneficiary');
-      
+
       await act(async () => {
         await user.click(submitButton);
       });
 
-      await waitFor(() => {
-        expect(mockCreateMutate).toHaveBeenCalled();
-      }, { timeout: 3000 });
+      await waitFor(
+        () => {
+          expect(mockCreateMutate).toHaveBeenCalled();
+        },
+        { timeout: 3000 }
+      );
 
       // Check the call was made with correct data
       expect(mockCreateMutate).toHaveBeenCalledWith(
@@ -189,7 +194,7 @@ describe('BeneficiaryForm', () => {
           status: 'ACTIVE', // Default value from schema
         })
       );
-      
+
       expect(mockNavigate).toHaveBeenCalledWith('/beneficiaries');
     });
 
@@ -213,7 +218,7 @@ describe('BeneficiaryForm', () => {
       render(<BeneficiaryForm />);
 
       const cancelButton = screen.getByText('Cancel');
-      
+
       await act(async () => {
         await user.click(cancelButton);
       });
@@ -236,9 +241,7 @@ describe('BeneficiaryForm', () => {
       render(<BeneficiaryForm />);
 
       expect(screen.getByText('Edit Beneficiary')).toBeInTheDocument();
-      expect(
-        screen.getByText('Update beneficiary information')
-      ).toBeInTheDocument();
+      expect(screen.getByText('Update beneficiary information')).toBeInTheDocument();
     });
 
     it('shows loading state while fetching data', () => {
@@ -261,9 +264,7 @@ describe('BeneficiaryForm', () => {
       await waitFor(() => {
         expect(screen.getByDisplayValue('John')).toBeInTheDocument();
         expect(screen.getByDisplayValue('Doe')).toBeInTheDocument();
-        expect(
-          screen.getByDisplayValue('john.doe@example.com')
-        ).toBeInTheDocument();
+        expect(screen.getByDisplayValue('john.doe@example.com')).toBeInTheDocument();
       });
     });
 
@@ -279,14 +280,14 @@ describe('BeneficiaryForm', () => {
 
       // Update first name
       const firstNameInput = screen.getByDisplayValue('John');
-      
+
       await act(async () => {
         await user.clear(firstNameInput);
         await user.type(firstNameInput, 'Jane');
       });
 
       const submitButton = screen.getByText('Update Beneficiary');
-      
+
       await act(async () => {
         await user.click(submitButton);
       });

@@ -136,7 +136,7 @@ export interface CreateCourseRequest {
   instructor_id?: number;
 }
 
-export type UpdateCourseRequest = Partial<Omit<CreateCourseRequest, 'program_id'>>
+export type UpdateCourseRequest = Partial<Omit<CreateCourseRequest, 'program_id'>>;
 
 export interface CourseFilters {
   page?: number;

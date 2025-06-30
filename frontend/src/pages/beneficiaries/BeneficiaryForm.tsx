@@ -6,13 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { FileUpload } from '@/components/ui/FileUpload';
-import {
-  FormField,
-  Input,
-  Select,
-  Textarea,
-  Button,
-} from '@/components/ui/Form';
+import { FormField, Input, Select, Textarea, Button } from '@/components/ui/Form';
 import { TagInput } from '@/components/ui/TagInput';
 import { useAuth } from '@/contexts/AuthContext';
 import {
@@ -20,21 +14,13 @@ import {
   useCreateBeneficiary,
   useUpdateBeneficiary,
 } from '@/hooks/useBeneficiaries';
-import {
-  useBeneficiaryDocumentUpload,
-  useFilesByEntity,
-  useDeleteFile,
-} from '@/hooks/useFiles';
+import { useBeneficiaryDocumentUpload, useFilesByEntity, useDeleteFile } from '@/hooks/useFiles';
 import {
   beneficiaryFormSchema,
   BeneficiaryFormData,
   transformFormDataForAPI,
 } from '@/schemas/beneficiary';
-import {
-  BeneficiaryStatus,
-  EmploymentStatus,
-  EducationLevel,
-} from '@/types/beneficiary';
+import { BeneficiaryStatus, EmploymentStatus, EducationLevel } from '@/types/beneficiary';
 
 export default function BeneficiaryForm() {
   const navigate = useNavigate();
@@ -44,18 +30,17 @@ export default function BeneficiaryForm() {
   const isEditMode = !!id;
 
   // Queries and mutations
-  const { data: beneficiaryData, isLoading: isLoadingBeneficiary } =
-    useBeneficiary(Number(id), isEditMode);
+  const { data: beneficiaryData, isLoading: isLoadingBeneficiary } = useBeneficiary(
+    Number(id),
+    isEditMode
+  );
   const createMutation = useCreateBeneficiary();
   const updateMutation = useUpdateBeneficiary();
   const documentUpload = useBeneficiaryDocumentUpload();
   const deleteFile = useDeleteFile();
 
   // File queries
-  const { data: beneficiaryDocuments = [] } = useFilesByEntity(
-    'beneficiary_document',
-    id || ''
-  );
+  const { data: beneficiaryDocuments = [] } = useFilesByEntity('beneficiary_document', id || '');
 
   // Form setup
   const {
@@ -116,7 +101,7 @@ export default function BeneficiaryForm() {
   // File upload handlers
   const handleDocumentUpload = async (files: File[]) => {
     if (!id) return [];
-    
+
     const results = [];
     for (const file of files) {
       try {
@@ -195,7 +180,9 @@ export default function BeneficiaryForm() {
           </button>
 
           <h1 className="text-2xl font-bold">
-            {isEditMode ? t('beneficiaries.form.editBeneficiary') : t('beneficiaries.form.addNewBeneficiary')}
+            {isEditMode
+              ? t('beneficiaries.form.editBeneficiary')
+              : t('beneficiaries.form.addNewBeneficiary')}
           </h1>
           <p className="text-muted-foreground">
             {isEditMode
@@ -208,7 +195,9 @@ export default function BeneficiaryForm() {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
           {/* Basic Information */}
           <div className="bg-white p-6 rounded-lg shadow space-y-4">
-            <h2 className="text-lg font-semibold mb-4">{t('beneficiaries.form.sections.basicInfo')}</h2>
+            <h2 className="text-lg font-semibold mb-4">
+              {t('beneficiaries.form.sections.basicInfo')}
+            </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
@@ -278,21 +267,22 @@ export default function BeneficiaryForm() {
 
           {/* Personal Information */}
           <div className="bg-white p-6 rounded-lg shadow space-y-4">
-            <h2 className="text-lg font-semibold mb-4">{t('beneficiaries.form.sections.personalInfo')}</h2>
+            <h2 className="text-lg font-semibold mb-4">
+              {t('beneficiaries.form.sections.personalInfo')}
+            </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 label={t('beneficiaries.form.fields.dateOfBirth')}
                 error={errors.date_of_birth?.message}
               >
-                <Input
-                  {...register('date_of_birth')}
-                  type="date"
-                  error={!!errors.date_of_birth}
-                />
+                <Input {...register('date_of_birth')} type="date" error={!!errors.date_of_birth} />
               </FormField>
 
-              <FormField label={t('beneficiaries.form.fields.gender')} error={errors.gender?.message}>
+              <FormField
+                label={t('beneficiaries.form.fields.gender')}
+                error={errors.gender?.message}
+              >
                 <Select {...register('gender')} error={!!errors.gender}>
                   <option value="">{t('beneficiaries.form.fields.selectGender')}</option>
                   <option value="male">{t('beneficiaries.gender.male')}</option>
@@ -312,7 +302,10 @@ export default function BeneficiaryForm() {
                 />
               </FormField>
 
-              <FormField label={t('beneficiaries.form.fields.birthplace')} error={errors.birthplace?.message}>
+              <FormField
+                label={t('beneficiaries.form.fields.birthplace')}
+                error={errors.birthplace?.message}
+              >
                 <Input
                   {...register('birthplace')}
                   error={!!errors.birthplace}
@@ -324,7 +317,9 @@ export default function BeneficiaryForm() {
 
           {/* Address */}
           <div className="bg-white p-6 rounded-lg shadow space-y-4">
-            <h2 className="text-lg font-semibold mb-4">{t('beneficiaries.form.sections.address')}</h2>
+            <h2 className="text-lg font-semibold mb-4">
+              {t('beneficiaries.form.sections.address')}
+            </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
@@ -339,7 +334,10 @@ export default function BeneficiaryForm() {
                 />
               </FormField>
 
-              <FormField label={t('beneficiaries.form.fields.city')} error={errors.address?.city?.message}>
+              <FormField
+                label={t('beneficiaries.form.fields.city')}
+                error={errors.address?.city?.message}
+              >
                 <Input
                   {...register('address.city')}
                   error={!!errors.address?.city}
@@ -393,10 +391,7 @@ export default function BeneficiaryForm() {
                 label={t('beneficiaries.form.fields.employmentStatus')}
                 error={errors.employment_status?.message}
               >
-                <Select
-                  {...register('employment_status')}
-                  error={!!errors.employment_status}
-                >
+                <Select {...register('employment_status')} error={!!errors.employment_status}>
                   <option value="">{t('beneficiaries.form.fields.selectStatus')}</option>
                   {Object.values(EmploymentStatus).map((status) => (
                     <option key={status} value={status}>
@@ -407,7 +402,10 @@ export default function BeneficiaryForm() {
                 </Select>
               </FormField>
 
-              <FormField label={t('beneficiaries.form.fields.jobTitle')} error={errors.job_title?.message}>
+              <FormField
+                label={t('beneficiaries.form.fields.jobTitle')}
+                error={errors.job_title?.message}
+              >
                 <Input
                   {...register('job_title')}
                   error={!!errors.job_title}
@@ -415,7 +413,10 @@ export default function BeneficiaryForm() {
                 />
               </FormField>
 
-              <FormField label={t('beneficiaries.form.fields.company')} error={errors.company?.message}>
+              <FormField
+                label={t('beneficiaries.form.fields.company')}
+                error={errors.company?.message}
+              >
                 <Input
                   {...register('company')}
                   error={!!errors.company}
@@ -423,7 +424,10 @@ export default function BeneficiaryForm() {
                 />
               </FormField>
 
-              <FormField label={t('beneficiaries.form.fields.industry')} error={errors.industry?.message}>
+              <FormField
+                label={t('beneficiaries.form.fields.industry')}
+                error={errors.industry?.message}
+              >
                 <Input
                   {...register('industry')}
                   error={!!errors.industry}
@@ -449,17 +453,16 @@ export default function BeneficiaryForm() {
 
           {/* Education */}
           <div className="bg-white p-6 rounded-lg shadow space-y-4">
-            <h2 className="text-lg font-semibold mb-4">{t('beneficiaries.form.sections.education')}</h2>
+            <h2 className="text-lg font-semibold mb-4">
+              {t('beneficiaries.form.sections.education')}
+            </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 label={t('beneficiaries.form.fields.educationLevel')}
                 error={errors.education_level?.message}
               >
-                <Select
-                  {...register('education_level')}
-                  error={!!errors.education_level}
-                >
+                <Select {...register('education_level')} error={!!errors.education_level}>
                   <option value="">{t('beneficiaries.form.fields.selectLevel')}</option>
                   {Object.values(EducationLevel).map((level) => (
                     <option key={level} value={level}>
@@ -503,7 +506,9 @@ export default function BeneficiaryForm() {
 
           {/* Skills & Interests */}
           <div className="bg-white p-6 rounded-lg shadow space-y-4">
-            <h2 className="text-lg font-semibold mb-4">{t('beneficiaries.form.sections.skillsInterests')}</h2>
+            <h2 className="text-lg font-semibold mb-4">
+              {t('beneficiaries.form.sections.skillsInterests')}
+            </h2>
 
             <FormField label={t('beneficiaries.form.fields.skills')} error={errors.skills?.message}>
               <Controller
@@ -520,7 +525,10 @@ export default function BeneficiaryForm() {
               />
             </FormField>
 
-            <FormField label={t('beneficiaries.form.fields.interests')} error={errors.interests?.message}>
+            <FormField
+              label={t('beneficiaries.form.fields.interests')}
+              error={errors.interests?.message}
+            >
               <Controller
                 name="interests"
                 control={control}
@@ -553,11 +561,16 @@ export default function BeneficiaryForm() {
 
           {/* Management */}
           <div className="bg-white p-6 rounded-lg shadow space-y-4">
-            <h2 className="text-lg font-semibold mb-4">{t('beneficiaries.form.sections.management')}</h2>
+            <h2 className="text-lg font-semibold mb-4">
+              {t('beneficiaries.form.sections.management')}
+            </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {canEditStatus && (
-                <FormField label={t('beneficiaries.form.fields.status')} error={errors.status?.message}>
+                <FormField
+                  label={t('beneficiaries.form.fields.status')}
+                  error={errors.status?.message}
+                >
                   <Select {...register('status')} error={!!errors.status}>
                     {Object.values(BeneficiaryStatus).map((status) => (
                       <option key={status} value={status}>
@@ -610,7 +623,7 @@ export default function BeneficiaryForm() {
                   'image/jpg',
                   'text/plain',
                 ]}
-                uploadedFiles={beneficiaryDocuments.map(file => ({
+                uploadedFiles={beneficiaryDocuments.map((file) => ({
                   id: file.id,
                   name: file.name,
                   size: file.size,
@@ -627,7 +640,9 @@ export default function BeneficiaryForm() {
               <div className="flex items-start space-x-3">
                 <div className="text-blue-600 text-sm">ℹ️</div>
                 <div>
-                  <h4 className="font-medium text-blue-900 mb-1">{t('beneficiaries.form.documents.uploadNote')}</h4>
+                  <h4 className="font-medium text-blue-900 mb-1">
+                    {t('beneficiaries.form.documents.uploadNote')}
+                  </h4>
                   <p className="text-sm text-blue-700">
                     {t('beneficiaries.form.documents.uploadNoteDescription')}
                   </p>
@@ -638,20 +653,12 @@ export default function BeneficiaryForm() {
 
           {/* Form Actions */}
           <div className="flex justify-end gap-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => navigate('/beneficiaries')}
-            >
+            <Button type="button" variant="outline" onClick={() => navigate('/beneficiaries')}>
               Cancel
             </Button>
             <Button
               type="submit"
-              loading={
-                isSubmitting ||
-                createMutation.isPending ||
-                updateMutation.isPending
-              }
+              loading={isSubmitting || createMutation.isPending || updateMutation.isPending}
             >
               <Save className="h-4 w-4 mr-2" />
               {isEditMode ? 'Update Beneficiary' : 'Create Beneficiary'}

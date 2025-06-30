@@ -20,14 +20,8 @@ import { formatDistanceToNow } from '@/utils/date';
 export default function NotificationCenter() {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
-  const {
-    notifications,
-    unreadCount,
-    markAsRead,
-    markAllAsRead,
-    clearNotification,
-    isConnected,
-  } = useCoachNotifications();
+  const { notifications, unreadCount, markAsRead, markAllAsRead, clearNotification, isConnected } =
+    useCoachNotifications();
 
   const handleNotificationClick = (notification: any) => {
     markAsRead(notification.id);
@@ -62,10 +56,7 @@ export default function NotificationCenter() {
     };
 
     return (
-      <Badge
-        variant={variants[priority as keyof typeof variants] || 'default'}
-        size="sm"
-      >
+      <Badge variant={variants[priority as keyof typeof variants] || 'default'} size="sm">
         {labels[priority as keyof typeof labels] || priority}
       </Badge>
     );
@@ -119,12 +110,7 @@ export default function NotificationCenter() {
                 </h3>
                 <div className="flex items-center space-x-2">
                   {unreadCount > 0 && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={markAllAsRead}
-                      className="text-xs"
-                    >
+                    <Button variant="ghost" size="sm" onClick={markAllAsRead} className="text-xs">
                       <Check className="h-3 w-3 mr-1" />
                       Mark All as Read
                     </Button>
@@ -158,15 +144,11 @@ export default function NotificationCenter() {
                           <div className="flex items-start justify-between">
                             <div
                               className="flex-1"
-                              onClick={() =>
-                                handleNotificationClick(notification)
-                              }
+                              onClick={() => handleNotificationClick(notification)}
                             >
                               <p
                                 className={`text-sm ${
-                                  !notification.read
-                                    ? 'font-semibold'
-                                    : 'font-medium'
+                                  !notification.read ? 'font-semibold' : 'font-medium'
                                 }`}
                               >
                                 {notification.student_name}
@@ -186,8 +168,7 @@ export default function NotificationCenter() {
                                   <Clock className="h-3 w-3 mr-1" />
                                   {formatDistanceToNow(notification.timestamp)}
                                 </span>
-                                {notification.priority &&
-                                  getPriorityBadge(notification.priority)}
+                                {notification.priority && getPriorityBadge(notification.priority)}
                                 {notification.path_completed && (
                                   <Badge variant="success" size="sm">
                                     Path Completed

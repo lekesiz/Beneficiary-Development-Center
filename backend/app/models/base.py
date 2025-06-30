@@ -50,7 +50,7 @@ class Base:
             if column.name not in exclude:
                 value = getattr(self, column.name)
                 # Handle datetime conversion
-                if value is not None and hasattr(value, 'isoformat'):
+                if value is not None and hasattr(value, "isoformat") and callable(getattr(value, "isoformat")):
                     value = value.isoformat()
                 data[column.name] = value
 
@@ -66,15 +66,18 @@ class Base:
     def get_by_id(cls, record_id):
         """Get record by ID."""
         from app.extensions import db
+
         return db.session.get(cls, record_id)
 
     @classmethod
     def get_or_404(cls, record_id):
         """Get record by ID or raise 404."""
         from app.extensions import db
+
         result = db.session.get(cls, record_id)
         if not result:
             from flask import abort
+
             abort(404)
         return result
 

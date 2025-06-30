@@ -5,7 +5,7 @@ from marshmallow import Schema, fields, validate
 
 class ConversationSchema(Schema):
     """Schema for conversation data."""
-    
+
     id = fields.Integer(dump_only=True)
     uuid = fields.String(dump_only=True)
     user1_id = fields.Integer(required=True)
@@ -17,7 +17,7 @@ class ConversationSchema(Schema):
     is_active = fields.Boolean(dump_only=True)
     created_at = fields.DateTime(dump_only=True)
     updated_at = fields.DateTime(dump_only=True)
-    
+
     # Computed fields
     other_user = fields.Dict(dump_only=True)
     unread_count = fields.Integer(dump_only=True)
@@ -26,7 +26,7 @@ class ConversationSchema(Schema):
 
 class ChatMessageSchema(Schema):
     """Schema for chat message data."""
-    
+
     id = fields.Integer(dump_only=True)
     uuid = fields.String(dump_only=True)
     conversation_id = fields.Integer(required=True)
@@ -42,7 +42,7 @@ class ChatMessageSchema(Schema):
     deleted_for_receiver = fields.Boolean(dump_only=True)
     created_at = fields.DateTime(dump_only=True)
     updated_at = fields.DateTime(dump_only=True)
-    
+
     # Computed fields
     sender = fields.Dict(dump_only=True)
     is_read = fields.Boolean(dump_only=True)
@@ -52,7 +52,7 @@ class ChatMessageSchema(Schema):
 
 class SendMessageRequestSchema(Schema):
     """Schema for sending a message request."""
-    
+
     receiver_id = fields.Integer(required=True)
     content = fields.String(required=True, validate=validate.Length(min=1, max=5000))
     message_metadata = fields.Dict(required=False)
@@ -60,13 +60,13 @@ class SendMessageRequestSchema(Schema):
 
 class CreateConversationRequestSchema(Schema):
     """Schema for creating a conversation request."""
-    
+
     user_id = fields.Integer(required=True)
 
 
 class ConversationListResponseSchema(Schema):
     """Schema for conversation list response."""
-    
+
     conversations = fields.List(fields.Nested(ConversationSchema))
     total = fields.Integer()
     page = fields.Integer()
@@ -76,7 +76,7 @@ class ConversationListResponseSchema(Schema):
 
 class MessageListResponseSchema(Schema):
     """Schema for message list response."""
-    
+
     messages = fields.List(fields.Nested(ChatMessageSchema))
     conversation_id = fields.Integer()
     total = fields.Integer()

@@ -19,8 +19,7 @@ export const useEvaluationInsights = (
 ) => {
   return useQuery<LearningInsights, Error>({
     queryKey: ['evaluationInsights', evaluationId, attemptId],
-    queryFn: () =>
-      evaluationsApi.adaptive.getLearningInsights(evaluationId, attemptId),
+    queryFn: () => evaluationsApi.adaptive.getLearningInsights(evaluationId, attemptId),
     enabled: options?.enabled !== false && !!evaluationId && !!attemptId,
     staleTime: options?.staleTime || 10 * 60 * 1000, // 10 minutes by default
     refetchOnWindowFocus: options?.refetchOnWindowFocus !== false,
@@ -51,9 +50,7 @@ export const getPerformanceLevelLabel = (level: string): string => {
   return labels[level as keyof typeof labels] || level;
 };
 
-export const getTrendIcon = (
-  trend: 'improving' | 'declining' | 'stable'
-): string => {
+export const getTrendIcon = (trend: 'improving' | 'declining' | 'stable'): string => {
   const icons = {
     improving: '📈',
     declining: '📉',
@@ -62,9 +59,7 @@ export const getTrendIcon = (
   return icons[trend] || '➡️';
 };
 
-export const getTrendLabel = (
-  trend: 'improving' | 'declining' | 'stable'
-): string => {
+export const getTrendLabel = (trend: 'improving' | 'declining' | 'stable'): string => {
   const labels = {
     improving: 'Gelişiyor',
     declining: 'Düşüşte',
@@ -80,9 +75,7 @@ export const getMetricColor = (value: number): string => {
 };
 
 // Format performance metrics for display
-export const formatPerformanceMetrics = (
-  metrics: LearningInsights['performance_metrics']
-) => {
+export const formatPerformanceMetrics = (metrics: LearningInsights['performance_metrics']) => {
   return {
     overallScore: {
       value: metrics.overall_score,

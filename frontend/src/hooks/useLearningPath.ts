@@ -13,10 +13,7 @@ import type {
 // API client functions
 const learningPathApi = {
   // Create a new learning path from evaluation results
-  createLearningPath: async (
-    evaluationId: number,
-    attemptId: number
-  ): Promise<LearningPath> => {
+  createLearningPath: async (evaluationId: number, attemptId: number): Promise<LearningPath> => {
     const response = await apiClient.post(
       `/api/evaluations/${evaluationId}/attempts/${attemptId}/learning-path`
     );
@@ -36,12 +33,9 @@ const learningPathApi = {
   }): Promise<LearningPath[]> => {
     const params = new URLSearchParams();
     if (filters?.status) params.append('status', filters.status);
-    if (filters?.evaluation_id)
-      params.append('evaluation_id', filters.evaluation_id.toString());
+    if (filters?.evaluation_id) params.append('evaluation_id', filters.evaluation_id.toString());
 
-    const response = await apiClient.get(
-      `/api/learning-paths/my-paths?${params}`
-    );
+    const response = await apiClient.get(`/api/learning-paths/my-paths?${params}`);
     return response.data;
   },
 
@@ -50,12 +44,9 @@ const learningPathApi = {
     pathId: number,
     customizationNotes?: string
   ): Promise<LearningPath> => {
-    const response = await apiClient.post(
-      `/api/learning-paths/${pathId}/accept`,
-      {
-        customization_notes: customizationNotes,
-      }
-    );
+    const response = await apiClient.post(`/api/learning-paths/${pathId}/accept`, {
+      customization_notes: customizationNotes,
+    });
     return response.data;
   },
 
@@ -64,10 +55,7 @@ const learningPathApi = {
     pathId: number,
     updates: LearningPathUpdateParams
   ): Promise<LearningPath> => {
-    const response = await apiClient.put(
-      `/api/learning-paths/${pathId}`,
-      updates
-    );
+    const response = await apiClient.put(`/api/learning-paths/${pathId}`, updates);
     return response.data;
   },
 
@@ -90,13 +78,10 @@ const learningPathApi = {
     feedback: string,
     rating?: number
   ): Promise<LearningPath> => {
-    const response = await apiClient.post(
-      `/api/learning-paths/${pathId}/feedback`,
-      {
-        feedback,
-        rating,
-      }
-    );
+    const response = await apiClient.post(`/api/learning-paths/${pathId}/feedback`, {
+      feedback,
+      rating,
+    });
     return response.data;
   },
 
@@ -118,10 +103,8 @@ export const learningPathKeys = {
   my: (filters?: { status?: string; evaluation_id?: number }) =>
     [...learningPathKeys.all, 'my', filters] as const,
   stats: () => [...learningPathKeys.all, 'stats'] as const,
-  milestones: (pathId: number) =>
-    [...learningPathKeys.detail(pathId), 'milestones'] as const,
-  progress: (pathId: number) =>
-    [...learningPathKeys.detail(pathId), 'progress'] as const,
+  milestones: (pathId: number) => [...learningPathKeys.detail(pathId), 'milestones'] as const,
+  progress: (pathId: number) => [...learningPathKeys.detail(pathId), 'progress'] as const,
 };
 
 // React Query hooks
@@ -131,13 +114,8 @@ export const useCreateLearningPath = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      evaluationId,
-      attemptId,
-    }: {
-      evaluationId: number;
-      attemptId: number;
-    }) => learningPathApi.createLearningPath(evaluationId, attemptId),
+    mutationFn: ({ evaluationId, attemptId }: { evaluationId: number; attemptId: number }) =>
+      learningPathApi.createLearningPath(evaluationId, attemptId),
     onSuccess: (data) => {
       // Invalidate relevant queries
       queryClient.invalidateQueries({ queryKey: learningPathKeys.all });
@@ -158,10 +136,7 @@ export const useLearningPath = (pathId: number) => {
 };
 
 // Get user's learning paths
-export const useMyLearningPaths = (filters?: {
-  status?: string;
-  evaluation_id?: number;
-}) => {
+export const useMyLearningPaths = (filters?: { status?: string; evaluation_id?: number }) => {
   return useQuery({
     queryKey: learningPathKeys.my(filters),
     queryFn: () => learningPathApi.getMyLearningPaths(filters),
@@ -173,13 +148,8 @@ export const useAcceptLearningPath = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      pathId,
-      customizationNotes,
-    }: {
-      pathId: number;
-      customizationNotes?: string;
-    }) => learningPathApi.acceptLearningPath(pathId, customizationNotes),
+    mutationFn: ({ pathId, customizationNotes }: { pathId: number; customizationNotes?: string }) =>
+      learningPathApi.acceptLearningPath(pathId, customizationNotes),
     onSuccess: (data) => {
       // Update the learning path in cache
       queryClient.setQueryData(learningPathKeys.detail(data.id), data);
@@ -194,13 +164,8 @@ export const useUpdateLearningPath = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      pathId,
-      updates,
-    }: {
-      pathId: number;
-      updates: LearningPathUpdateParams;
-    }) => learningPathApi.updateLearningPath(pathId, updates),
+    mutationFn: ({ pathId, updates }: { pathId: number; updates: LearningPathUpdateParams }) =>
+      learningPathApi.updateLearningPath(pathId, updates),
     onSuccess: (data) => {
       // Update the learning path in cache
       queryClient.setQueryData(learningPathKeys.detail(data.id), data);

@@ -4,9 +4,9 @@ import random
 from datetime import datetime, timedelta
 from faker import Faker
 from app import create_app, db
-from app.models.user import User
+from app.models.user import User, Role
 from app.models.tenant import Tenant
-from app.models.program import Program
+from app.models.program import Program, ProgramStatus
 from app.models.course import Course
 from app.models.beneficiary import Beneficiary
 from app.models.enrollment import Enrollment
@@ -48,43 +48,95 @@ def create_tenants():
     return tenants
 
 
-def create_users(tenants):
+def create_roles():
+    """Create system roles."""
+    roles = []
+    
+    # Create system roles
+    role_definitions = [
+        {
+            "name": "super_admin",
+            "description": "Super Administrator with full system access",
+            "permissions": Role.get_default_permissions("super_admin"),
+            "is_system": True
+        },
+        {
+            "name": "admin",
+            "description": "Administrator with tenant management access",
+            "permissions": Role.get_default_permissions("admin"),
+            "is_system": True
+        },
+        {
+            "name": "trainer",
+            "description": "Trainer with program and beneficiary management",
+            "permissions": Role.get_default_permissions("trainer"),
+            "is_system": True
+        },
+        {
+            "name": "student",
+            "description": "Student with basic access",
+            "permissions": Role.get_default_permissions("student"),
+            "is_system": True
+        }
+    ]
+    
+    for role_def in role_definitions:
+        role = Role(**role_def)
+        roles.append(role)
+    
+    db.session.add_all(roles)
+    db.session.commit()
+    return roles
+
+
+def create_users(tenants, roles):
     """Create sample users."""
     users = []
-    roles = ["admin", "manager", "instructor", "student"]
+    role_names = ["admin", "trainer", "student"]
+    
+    # Get role objects
+    admin_role = next(r for r in roles if r.name == "admin")
+    trainer_role = next(r for r in roles if r.name == "trainer")
+    student_role = next(r for r in roles if r.name == "student")
 
-    # Create super admin
-    super_admin = User(
+    # Create admin
+    admin_user = User(
         email="admin@bdc.local",
-        username="admin",
         password_hash=generate_password_hash("admin123"),
         first_name="Super",
         last_name="Admin",
-        role="admin",
         tenant_id=tenants[0].id,
         is_active=True,
         is_verified=True,
     )
-    users.append(super_admin)
-
-    # Create users for each tenant
-    for tenant in tenants:
-        for role in roles:
-            for i in range(random.randint(2, 5)):
-                user = User(
-                    email=fake.email(),
-                    username=fake.user_name(),
-                    password_hash=generate_password_hash("password123"),
-                    first_name=fake.first_name(),
-                    last_name=fake.last_name(),
-                    role=role,
-                    tenant_id=tenant.id,
-                    is_active=True,
-                    is_verified=True,
-                    phone=fake.phone_number(),
-                    bio=fake.text(max_nb_chars=200) if role in ["instructor", "manager"] else None,
-                )
-                users.append(user)
+    admin_user.roles.append(admin_role)
+    users.append(admin_user)
+    
+    # Create trainer
+    trainer_user = User(
+        email="trainer@bdc.local",
+        password_hash=generate_password_hash("trainer123"),
+        first_name="John",
+        last_name="Trainer",
+        tenant_id=tenants[0].id,
+        is_active=True,
+        is_verified=True,
+    )
+    trainer_user.roles.append(trainer_role)
+    users.append(trainer_user)
+    
+    # Create student
+    student_user = User(
+        email="student@bdc.local",
+        password_hash=generate_password_hash("student123"),
+        first_name="Jane",
+        last_name="Student", 
+        tenant_id=tenants[0].id,
+        is_active=True,
+        is_verified=True,
+    )
+    student_user.roles.append(student_role)
+    users.append(student_user)
 
     db.session.add_all(users)
     db.session.commit()
@@ -97,7 +149,7 @@ def create_programs(tenants, users):
     categories = ["education", "vocational", "health", "social", "economic"]
 
     for tenant in tenants:
-        managers = [u for u in users if u.tenant_id == tenant.id and u.role == "manager"]
+        managers = [u for u in users if u.tenant_id == tenant.id and u.has_role("admin")]
 
         for i in range(random.randint(3, 8)):
             start_date = fake.date_between(start_date="-30d", end_date="+180d")
@@ -106,18 +158,14 @@ def create_programs(tenants, users):
             program = Program(
                 tenant_id=tenant.id,
                 code=f"PRG-{tenant.id}-{i+1:03d}",
-                name=f"{fake.catch_phrase()} Program",
+                title=f"{fake.catch_phrase()} Program",
                 description=fake.text(max_nb_chars=500),
-                category=random.choice(categories),
-                status=random.choice(["draft", "active", "completed"]),
+                status=random.choice([ProgramStatus.DRAFT, ProgramStatus.ACTIVE, ProgramStatus.COMPLETED]),
                 start_date=start_date,
                 end_date=end_date,
-                budget=random.randint(10000, 100000),
-                objectives={
-                    "primary": [fake.sentence() for _ in range(3)],
-                    "secondary": [fake.sentence() for _ in range(2)],
-                },
-                eligibility_criteria={
+                objectives=[fake.sentence() for _ in range(3)],
+                tags=[random.choice(categories)],
+                requirements={
                     "min_age": random.randint(16, 25),
                     "max_age": random.randint(35, 65),
                     "requirements": [fake.sentence() for _ in range(3)],
@@ -137,7 +185,7 @@ def create_courses(programs, users):
     course_types = ["lecture", "workshop", "practical", "online", "hybrid"]
 
     for program in programs:
-        instructors = [u for u in users if u.tenant_id == program.tenant_id and u.role == "instructor"]
+        instructors = [u for u in users if u.tenant_id == program.tenant_id and u.has_role("trainer")]
 
         for i in range(random.randint(2, 6)):
             course = Course(
@@ -235,7 +283,7 @@ def create_evaluations(courses, users):
     evaluations = []
 
     for course in courses:
-        instructors = [u for u in users if u.tenant_id == course.tenant_id and u.role == "instructor"]
+        instructors = [u for u in users if u.tenant_id == course.tenant_id and u.has_role("trainer")]
 
         # Create 1-3 evaluations per course
         for i in range(random.randint(1, 3)):
@@ -303,8 +351,11 @@ def seed_database(env="local"):
         print("🏢 Creating tenants...")
         tenants = create_tenants()
 
+        print("🔐 Creating roles...")
+        roles = create_roles()
+
         print("👥 Creating users...")
-        users = create_users(tenants)
+        users = create_users(tenants, roles)
 
         print("📚 Creating programs...")
         programs = create_programs(tenants, users)

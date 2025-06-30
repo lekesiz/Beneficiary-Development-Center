@@ -3,11 +3,7 @@
  */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import {
-  evaluationsApi,
-  AdaptiveQuestionResponse,
-  LearningInsights,
-} from '@/api/evaluations';
+import { evaluationsApi, AdaptiveQuestionResponse, LearningInsights } from '@/api/evaluations';
 import { useToast } from '@/hooks/useToast';
 
 /**
@@ -22,11 +18,7 @@ export const useAdaptiveNextQuestion = () => {
     { evaluationId: number; attemptId: number; currentIndex?: number }
   >({
     mutationFn: ({ evaluationId, attemptId, currentIndex }) =>
-      evaluationsApi.adaptive.getNextQuestion(
-        evaluationId,
-        attemptId,
-        currentIndex
-      ),
+      evaluationsApi.adaptive.getNextQuestion(evaluationId, attemptId, currentIndex),
     onError: (error) => {
       toast.error('Sonraki soru alınamadı. Lütfen tekrar deneyin.');
       console.error('Error getting next adaptive question:', error);
@@ -37,15 +29,10 @@ export const useAdaptiveNextQuestion = () => {
 /**
  * Hook to get learning insights for an attempt
  */
-export const useLearningInsights = (
-  evaluationId: number,
-  attemptId: number,
-  enabled = true
-) => {
+export const useLearningInsights = (evaluationId: number, attemptId: number, enabled = true) => {
   return useQuery<LearningInsights, Error>({
     queryKey: ['learningInsights', evaluationId, attemptId],
-    queryFn: () =>
-      evaluationsApi.adaptive.getLearningInsights(evaluationId, attemptId),
+    queryFn: () => evaluationsApi.adaptive.getLearningInsights(evaluationId, attemptId),
     enabled: enabled && !!evaluationId && !!attemptId,
     staleTime: 5 * 60 * 1000, // 5 minutes
     refetchOnWindowFocus: false,
@@ -68,18 +55,9 @@ export const useAdaptiveEvaluationFlow = () => {
     // Prefetch the next 2 questions for better performance
     for (let i = 1; i <= 2; i++) {
       queryClient.prefetchQuery({
-        queryKey: [
-          'adaptiveQuestion',
-          evaluationId,
-          attemptId,
-          currentIndex + i,
-        ],
+        queryKey: ['adaptiveQuestion', evaluationId, attemptId, currentIndex + i],
         queryFn: () =>
-          evaluationsApi.adaptive.getNextQuestion(
-            evaluationId,
-            attemptId,
-            currentIndex + i
-          ),
+          evaluationsApi.adaptive.getNextQuestion(evaluationId, attemptId, currentIndex + i),
         staleTime: 30 * 1000, // 30 seconds
       });
     }
@@ -100,9 +78,7 @@ export const useAdaptiveEvaluationFlow = () => {
 };
 
 // Helper function to determine difficulty badge color
-export const getDifficultyColor = (
-  difficulty: 'easy' | 'medium' | 'hard'
-): string => {
+export const getDifficultyColor = (difficulty: 'easy' | 'medium' | 'hard'): string => {
   switch (difficulty) {
     case 'easy':
       return 'bg-green-100 text-green-800';
@@ -116,9 +92,7 @@ export const getDifficultyColor = (
 };
 
 // Helper function to get difficulty label in Turkish
-export const getDifficultyLabel = (
-  difficulty: 'easy' | 'medium' | 'hard'
-): string => {
+export const getDifficultyLabel = (difficulty: 'easy' | 'medium' | 'hard'): string => {
   switch (difficulty) {
     case 'easy':
       return 'Kolay';

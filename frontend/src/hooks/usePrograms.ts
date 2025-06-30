@@ -17,8 +17,7 @@ import type {
 export const programQueryKeys = {
   all: ['programs'] as const,
   lists: () => [...programQueryKeys.all, 'list'] as const,
-  list: (filters?: ProgramFilters) =>
-    [...programQueryKeys.lists(), filters] as const,
+  list: (filters?: ProgramFilters) => [...programQueryKeys.lists(), filters] as const,
   details: () => [...programQueryKeys.all, 'detail'] as const,
   detail: (id: number, includeCourses?: boolean) =>
     [...programQueryKeys.details(), id, includeCourses] as const,
@@ -75,16 +74,12 @@ export const useCreateProgram = () => {
       });
 
       // Add to cache
-      queryClient.setQueryData(
-        programQueryKeys.detail(newProgram.id),
-        newProgram
-      );
+      queryClient.setQueryData(programQueryKeys.detail(newProgram.id), newProgram);
 
       toast.success('Program başarıyla oluşturuldu');
     },
     onError: (error: any) => {
-      const message =
-        error.response?.data?.error || 'Program oluşturulurken hata oluştu';
+      const message = error.response?.data?.error || 'Program oluşturulurken hata oluştu';
       toast.error(message);
     },
   });
@@ -101,10 +96,7 @@ export const useUpdateProgram = () => {
       programsApi.update(id, data),
     onSuccess: (updatedProgram) => {
       // Update cached data
-      queryClient.setQueryData(
-        programQueryKeys.detail(updatedProgram.id),
-        updatedProgram
-      );
+      queryClient.setQueryData(programQueryKeys.detail(updatedProgram.id), updatedProgram);
 
       // Invalidate lists to refresh
       queryClient.invalidateQueries({ queryKey: programQueryKeys.lists() });
@@ -115,8 +107,7 @@ export const useUpdateProgram = () => {
       toast.success('Program başarıyla güncellendi');
     },
     onError: (error: any) => {
-      const message =
-        error.response?.data?.error || 'Program güncellenirken hata oluştu';
+      const message = error.response?.data?.error || 'Program güncellenirken hata oluştu';
       toast.error(message);
     },
   });
@@ -145,8 +136,7 @@ export const useDeleteProgram = () => {
       toast.success('Program başarıyla silindi');
     },
     onError: (error: any) => {
-      const message =
-        error.response?.data?.error || 'Program silinirken hata oluştu';
+      const message = error.response?.data?.error || 'Program silinirken hata oluştu';
       toast.error(message);
     },
   });
@@ -163,10 +153,7 @@ export const useUpdateProgramStatus = () => {
       programsApi.updateStatus(id, status),
     onSuccess: (updatedProgram) => {
       // Update cached data
-      queryClient.setQueryData(
-        programQueryKeys.detail(updatedProgram.id),
-        updatedProgram
-      );
+      queryClient.setQueryData(programQueryKeys.detail(updatedProgram.id), updatedProgram);
 
       // Invalidate lists
       queryClient.invalidateQueries({ queryKey: programQueryKeys.lists() });
@@ -177,9 +164,7 @@ export const useUpdateProgramStatus = () => {
       toast.success('Program durumu güncellendi');
     },
     onError: (error: any) => {
-      const message =
-        error.response?.data?.error ||
-        'Program durumu güncellenirken hata oluştu';
+      const message = error.response?.data?.error || 'Program durumu güncellenirken hata oluştu';
       toast.error(message);
     },
   });
@@ -211,8 +196,7 @@ export const useAddCourseToProgram = () => {
       toast.success('Kurs programa başarıyla eklendi');
     },
     onError: (error: any) => {
-      const message =
-        error.response?.data?.error || 'Kurs eklenirken hata oluştu';
+      const message = error.response?.data?.error || 'Kurs eklenirken hata oluştu';
       toast.error(message);
     },
   });

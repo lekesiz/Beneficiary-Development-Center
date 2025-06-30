@@ -39,7 +39,7 @@ const columns: ColumnDef<TestData>[] = [
 describe('DataTable', () => {
   it('renders data correctly', () => {
     render(<DataTable columns={columns} data={mockData} />);
-    
+
     expect(screen.getByText('Alpha')).toBeInTheDocument();
     expect(screen.getByText('Beta')).toBeInTheDocument();
     expect(screen.getByText('Charlie')).toBeInTheDocument();
@@ -48,30 +48,26 @@ describe('DataTable', () => {
 
   it('shows loading state', () => {
     render(<DataTable columns={columns} data={[]} loading={true} />);
-    
+
     expect(screen.getByText('Loading...')).toBeInTheDocument();
   });
 
   it('shows empty state', () => {
     render(<DataTable columns={columns} data={[]} />);
-    
+
     expect(screen.getByText('No results.')).toBeInTheDocument();
   });
 
   it('handles sorting when onSortingChange is provided', async () => {
     const onSortingChange = vi.fn();
     const { container } = render(
-      <DataTable
-        columns={columns}
-        data={mockData}
-        onSortingChange={onSortingChange}
-      />
+      <DataTable columns={columns} data={mockData} onSortingChange={onSortingChange} />
     );
-    
+
     // Click on Name header to sort
     const nameHeader = screen.getByText('Name');
     fireEvent.click(nameHeader);
-    
+
     await waitFor(() => {
       expect(onSortingChange).toHaveBeenCalled();
       // React Table passes a function or the new state directly
@@ -83,7 +79,7 @@ describe('DataTable', () => {
         expect(callArg).toEqual([{ id: 'name', desc: false }]);
       }
     });
-    
+
     // Should show sorting icon
     const sortIcon = container.querySelector('[class*="chevron"]');
     expect(sortIcon).toBeInTheDocument();
@@ -99,11 +95,11 @@ describe('DataTable', () => {
         onSortingChange={onSortingChange}
       />
     );
-    
+
     // Click on Name header again to toggle sort
     const nameHeader = screen.getByText('Name');
     fireEvent.click(nameHeader);
-    
+
     await waitFor(() => {
       expect(onSortingChange).toHaveBeenCalled();
       const callArg = onSortingChange.mock.calls[0][0];
@@ -126,11 +122,11 @@ describe('DataTable', () => {
         pageCount={2}
       />
     );
-    
+
     // Click next page button
     const nextButton = screen.getByRole('button', { name: /go to next page/i });
     fireEvent.click(nextButton);
-    
+
     await waitFor(() => {
       expect(onPaginationChange).toHaveBeenCalled();
       const callArg = onPaginationChange.mock.calls[0][0];
@@ -151,10 +147,10 @@ describe('DataTable', () => {
         pageCount={2}
       />
     );
-    
+
     const prevButton = screen.getByRole('button', { name: /go to previous page/i });
     const nextButton = screen.getByRole('button', { name: /go to next page/i });
-    
+
     // First page - previous should be disabled
     expect(prevButton).toBeDisabled();
     expect(nextButton).not.toBeDisabled();
@@ -170,10 +166,10 @@ describe('DataTable', () => {
         onPaginationChange={onPaginationChange}
       />
     );
-    
+
     const pageSizeSelect = screen.getByRole('combobox');
     fireEvent.change(pageSizeSelect, { target: { value: '20' } });
-    
+
     await waitFor(() => {
       expect(onPaginationChange).toHaveBeenCalled();
       const callArg = onPaginationChange.mock.calls[0][0];
@@ -194,7 +190,7 @@ describe('DataTable', () => {
         pageCount={2}
       />
     );
-    
+
     expect(screen.getByText('Page 2 of 2')).toBeInTheDocument();
   });
 
@@ -212,14 +208,12 @@ describe('DataTable', () => {
       },
     ];
 
-    const { container } = render(
-      <DataTable columns={columnsWithMixedSorting} data={mockData} />
-    );
-    
+    const { container } = render(<DataTable columns={columnsWithMixedSorting} data={mockData} />);
+
     // Name header should have cursor-pointer class
     const nameHeader = screen.getByText('Name').closest('th');
     expect(nameHeader).toHaveClass('cursor-pointer');
-    
+
     // Status header should not have cursor-pointer class
     const statusHeader = screen.getByText('Status').closest('th');
     expect(statusHeader).not.toHaveClass('cursor-pointer');

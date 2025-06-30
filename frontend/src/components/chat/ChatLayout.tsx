@@ -18,7 +18,10 @@ export const ChatLayout: React.FC = () => {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   const selectedConversationId = conversationId ? parseInt(conversationId) : undefined;
-  const { data: conversation } = useConversation(selectedConversationId || 0, !!selectedConversationId);
+  const { data: conversation } = useConversation(
+    selectedConversationId || 0,
+    !!selectedConversationId
+  );
 
   // Auto mark messages as read when viewing conversation
   useAutoMarkAsRead(selectedConversationId || 0, !!selectedConversationId);
@@ -52,10 +55,7 @@ export const ChatLayout: React.FC = () => {
           isSidebarOpen ? 'w-80' : 'w-0 overflow-hidden'
         )}
       >
-        <ConversationList
-          selectedId={selectedConversationId}
-          onSelect={handleConversationSelect}
-        />
+        <ConversationList selectedId={selectedConversationId} onSelect={handleConversationSelect} />
       </div>
 
       {/* Sidebar - Mobile */}
@@ -65,8 +65,8 @@ export const ChatLayout: React.FC = () => {
           isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
-        <div 
-          className="absolute inset-0 bg-black/50" 
+        <div
+          className="absolute inset-0 bg-black/50"
           onClick={() => setIsMobileSidebarOpen(false)}
           onKeyDown={(e) => e.key === 'Escape' && setIsMobileSidebarOpen(false)}
           role="button"
@@ -105,7 +105,9 @@ export const ChatLayout: React.FC = () => {
                   <div>
                     <h2 className="text-lg font-semibold">
                       {conversation.type === 'direct'
-                        ? conversation.participants.find(p => p.id !== parseInt(localStorage.getItem('user_id') || '0'))?.fullName || 'User'
+                        ? conversation.participants.find(
+                            (p) => p.id !== parseInt(localStorage.getItem('user_id') || '0')
+                          )?.fullName || 'User'
                         : conversation.name || 'Group Chat'}
                     </h2>
                     {conversation.type === 'group' && (

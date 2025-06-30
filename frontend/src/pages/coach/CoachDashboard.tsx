@@ -22,6 +22,7 @@ import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Form';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { useAuth } from '@/contexts/AuthContext';
+import { canViewReports } from '@/utils/permissions';
 import { useCourses } from '@/hooks/useCourses';
 import { usePrograms } from '@/hooks/usePrograms';
 import {
@@ -53,18 +54,15 @@ export default function CoachDashboard() {
   const { data: courses } = useCourses();
   const exportMutation = useExportBatchReports();
 
-  // Check permissions
-  const hasAccess =
-    user && ['admin', 'manager', 'instructor', 'trainer'].includes(user.role);
+  // Check permissions using centralized system
+  const hasAccess = canViewReports(user);
 
   if (!hasAccess) {
     return (
       <div className="p-6">
         <div className="text-center py-12">
           <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-          <p className="text-red-600">
-            You do not have permission to access this page.
-          </p>
+          <p className="text-red-600">You do not have permission to access this page.</p>
           <Button onClick={() => navigate('/dashboard')} className="mt-4">
             Return to Dashboard
           </Button>
@@ -79,14 +77,11 @@ export default function CoachDashboard() {
 
     const summaries = overview.summaries;
     const highRisk = summaries.filter((s) => s.risk_score === 'High').length;
-    const mediumRisk = summaries.filter(
-      (s) => s.risk_score === 'Medium'
-    ).length;
+    const mediumRisk = summaries.filter((s) => s.risk_score === 'Medium').length;
     const lowRisk = summaries.filter((s) => s.risk_score === 'Low').length;
     const avgPerformance =
       summaries.length > 0
-        ? summaries.reduce((sum, s) => sum + s.performance_index, 0) /
-          summaries.length
+        ? summaries.reduce((sum, s) => sum + s.performance_index, 0) / summaries.length
         : 0;
 
     return {
@@ -169,9 +164,7 @@ export default function CoachDashboard() {
             <Users className="mr-2 h-6 w-6" />
             Student Development Reports
           </h1>
-          <p className="text-gray-600 mt-1">
-            View performance and risk analysis for all students
-          </p>
+          <p className="text-gray-600 mt-1">View performance and risk analysis for all students</p>
         </div>
 
         <div className="flex items-center space-x-2">
@@ -196,9 +189,7 @@ export default function CoachDashboard() {
           <Card className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">
-                  Total Students
-                </p>
+                <p className="text-sm font-medium text-gray-600">Total Students</p>
                 <p className="text-2xl font-bold">{statistics.total}</p>
               </div>
               <Users className="h-8 w-8 text-blue-600 opacity-80" />
@@ -208,12 +199,8 @@ export default function CoachDashboard() {
           <Card className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">
-                  Average Performance
-                </p>
-                <p className="text-2xl font-bold">
-                  {statistics.avgPerformance}
-                </p>
+                <p className="text-sm font-medium text-gray-600">Average Performance</p>
+                <p className="text-2xl font-bold">{statistics.avgPerformance}</p>
               </div>
               <TrendingUp className="h-8 w-8 text-green-600 opacity-80" />
             </div>
@@ -223,9 +210,7 @@ export default function CoachDashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-red-800">High Risk</p>
-                <p className="text-2xl font-bold text-red-600">
-                  {statistics.highRisk}
-                </p>
+                <p className="text-2xl font-bold text-red-600">{statistics.highRisk}</p>
               </div>
               <AlertCircle className="h-8 w-8 text-red-600 opacity-80" />
             </div>
@@ -235,9 +220,7 @@ export default function CoachDashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-yellow-800">Medium Risk</p>
-                <p className="text-2xl font-bold text-yellow-600">
-                  {statistics.mediumRisk}
-                </p>
+                <p className="text-2xl font-bold text-yellow-600">{statistics.mediumRisk}</p>
               </div>
               <Shield className="h-8 w-8 text-yellow-600 opacity-80" />
             </div>
@@ -247,9 +230,7 @@ export default function CoachDashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-green-800">Low Risk</p>
-                <p className="text-2xl font-bold text-green-600">
-                  {statistics.lowRisk}
-                </p>
+                <p className="text-2xl font-bold text-green-600">{statistics.lowRisk}</p>
               </div>
               <Shield className="h-8 w-8 text-green-600 opacity-80" />
             </div>
@@ -268,9 +249,7 @@ export default function CoachDashboard() {
                 type="text"
                 placeholder="Search student..."
                 value={tempFilters.search || ''}
-                onChange={(e) =>
-                  setTempFilters({ ...tempFilters, search: e.target.value })
-                }
+                onChange={(e) => setTempFilters({ ...tempFilters, search: e.target.value })}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     handleApplyFilters();
@@ -296,23 +275,17 @@ export default function CoachDashboard() {
             </Button>
 
             {/* Active Filters */}
-            {filters.risk && (
-              <Badge variant="outline">Risk: {filters.risk}</Badge>
-            )}
+            {filters.risk && <Badge variant="outline">Risk: {filters.risk}</Badge>}
             {filters.program_id && programs && (
               <Badge variant="outline">
-                Program:{' '}
-                {
-                  programs.programs.find((p) => p.id === filters.program_id)
-                    ?.title
-                }
+                Program: {programs.programs.find((p) => p.id === filters.program_id)?.title}
               </Badge>
             )}
           </div>
 
           {/* Results Count */}
           <div className="text-sm text-gray-600">
-            {overview && `${overview.pagination.total} results found`}
+            {overview && overview.pagination?.total && `${overview.pagination.total} results found`}
           </div>
         </div>
 
@@ -321,9 +294,7 @@ export default function CoachDashboard() {
           <div className="mt-4 pt-4 border-t grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Risk Level */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Risk Level
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Risk Level</label>
               <select
                 value={tempFilters.risk || ''}
                 onChange={(e) =>
@@ -356,9 +327,7 @@ export default function CoachDashboard() {
                   onChange={(e) =>
                     setTempFilters({
                       ...tempFilters,
-                      min_performance: e.target.value
-                        ? Number(e.target.value)
-                        : undefined,
+                      min_performance: e.target.value ? Number(e.target.value) : undefined,
                     })
                   }
                   className="w-20 px-2 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -373,9 +342,7 @@ export default function CoachDashboard() {
                   onChange={(e) =>
                     setTempFilters({
                       ...tempFilters,
-                      max_performance: e.target.value
-                        ? Number(e.target.value)
-                        : undefined,
+                      max_performance: e.target.value ? Number(e.target.value) : undefined,
                     })
                   }
                   className="w-20 px-2 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -385,17 +352,13 @@ export default function CoachDashboard() {
 
             {/* Program Filter */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Program
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Program</label>
               <select
                 value={tempFilters.program_id || ''}
                 onChange={(e) =>
                   setTempFilters({
                     ...tempFilters,
-                    program_id: e.target.value
-                      ? Number(e.target.value)
-                      : undefined,
+                    program_id: e.target.value ? Number(e.target.value) : undefined,
                   })
                 }
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -436,9 +399,7 @@ export default function CoachDashboard() {
                   <th className="px-6 py-3 text-left">
                     <input
                       type="checkbox"
-                      checked={
-                        selectedStudents.length === overview.summaries.length
-                      }
+                      checked={selectedStudents.length === overview.summaries.length}
                       onChange={(e) => handleSelectAll(e.target.checked)}
                       className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                     />
@@ -505,9 +466,7 @@ export default function CoachDashboard() {
                     key={summary.student_id}
                     summary={summary}
                     isSelected={selectedStudents.includes(summary.student_id)}
-                    onSelect={(selected) =>
-                      handleSelectStudent(summary.student_id, selected)
-                    }
+                    onSelect={(selected) => handleSelectStudent(summary.student_id, selected)}
                     onViewDetails={handleViewDetails}
                   />
                 ))}
@@ -516,40 +475,33 @@ export default function CoachDashboard() {
           </div>
 
           {/* Pagination */}
-          {overview.pagination.pages > 1 && (
+          {overview?.pagination?.pages && overview.pagination.pages > 1 && (
             <div className="px-6 py-4 flex items-center justify-between border-t">
               <div className="text-sm text-gray-700">
                 Showing {(filters.page! - 1) * filters.per_page! + 1} -{' '}
-                {Math.min(
-                  filters.page! * filters.per_page!,
-                  overview.pagination.total
-                )}{' '}
-                of {overview.pagination.total} records
+                {Math.min(filters.page! * filters.per_page!, overview.pagination?.total || 0)} of{' '}
+                {overview.pagination?.total || 0} records
               </div>
 
               <div className="flex items-center space-x-2">
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() =>
-                    setFilters({ ...filters, page: filters.page! - 1 })
-                  }
+                  onClick={() => setFilters({ ...filters, page: filters.page! - 1 })}
                   disabled={filters.page === 1}
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
 
                 <span className="text-sm">
-                  Page {filters.page} / {overview.pagination.pages}
+                  Page {filters.page} / {overview.pagination?.pages || 1}
                 </span>
 
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() =>
-                    setFilters({ ...filters, page: filters.page! + 1 })
-                  }
-                  disabled={filters.page === overview.pagination.pages}
+                  onClick={() => setFilters({ ...filters, page: filters.page! + 1 })}
+                  disabled={filters.page === (overview.pagination?.pages || 1)}
                 >
                   <ChevronRight className="h-4 w-4" />
                 </Button>

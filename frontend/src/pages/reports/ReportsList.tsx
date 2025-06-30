@@ -23,7 +23,8 @@ export default function ReportsList() {
     {
       id: 'my-development',
       title: 'My Development Report',
-      description: 'View your personal learning progress, skill development, and achievement summary.',
+      description:
+        'View your personal learning progress, skill development, and achievement summary.',
       icon: <TrendingUp className="h-6 w-6" />,
       path: '/reports/my-development',
       badge: 'Personal',
@@ -31,7 +32,8 @@ export default function ReportsList() {
     {
       id: 'program-analytics',
       title: 'Program Analytics',
-      description: 'Comprehensive analysis of program effectiveness, completion rates, and participant outcomes.',
+      description:
+        'Comprehensive analysis of program effectiveness, completion rates, and participant outcomes.',
       icon: <BarChart3 className="h-6 w-6" />,
       path: '/reports/program-analytics',
       requiredRoles: ['admin', 'manager', 'instructor'],
@@ -40,7 +42,8 @@ export default function ReportsList() {
     {
       id: 'beneficiary-overview',
       title: 'Beneficiary Overview',
-      description: 'Statistical overview of all beneficiaries including demographics, progress, and status distribution.',
+      description:
+        'Statistical overview of all beneficiaries including demographics, progress, and status distribution.',
       icon: <Users className="h-6 w-6" />,
       path: '/reports/beneficiary-overview',
       requiredRoles: ['admin', 'manager', 'trainer'],
@@ -49,7 +52,8 @@ export default function ReportsList() {
     {
       id: 'evaluation-insights',
       title: 'Evaluation Insights',
-      description: 'Detailed analysis of evaluation performance, learning path effectiveness, and assessment outcomes.',
+      description:
+        'Detailed analysis of evaluation performance, learning path effectiveness, and assessment outcomes.',
       icon: <FileText className="h-6 w-6" />,
       path: '/reports/evaluation-insights',
       requiredRoles: ['admin', 'manager', 'instructor'],
@@ -118,10 +122,8 @@ export default function ReportsList() {
               <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
                 {report.title}
               </h3>
-              
-              <p className="text-gray-600 text-sm mb-4 line-clamp-3">
-                {report.description}
-              </p>
+
+              <p className="text-gray-600 text-sm mb-4 line-clamp-3">{report.description}</p>
 
               <div className="flex items-center justify-end">
                 <Button
@@ -140,11 +142,10 @@ export default function ReportsList() {
         {availableReports.length === 0 && (
           <div className="text-center py-12">
             <FileText className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              No Reports Available
-            </h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No Reports Available</h3>
             <p className="text-gray-600">
-              You don't have access to any reports at this time. Contact your administrator for access.
+              You don't have access to any reports at this time. Contact your administrator for
+              access.
             </p>
           </div>
         )}
@@ -152,29 +153,15 @@ export default function ReportsList() {
         {/* Quick Actions */}
         {user?.roles?.some((role) => ['admin', 'manager'].includes(role.name)) && (
           <div className="mt-12 bg-gray-50 rounded-lg p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">
-              Quick Actions
-            </h2>
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
             <div className="flex flex-wrap gap-3">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => navigate('/reports/export')}
-              >
+              <Button variant="outline" size="sm" onClick={() => navigate('/reports/export')}>
                 Export All Data
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => navigate('/reports/schedule')}
-              >
+              <Button variant="outline" size="sm" onClick={() => navigate('/reports/schedule')}>
                 Schedule Reports
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => navigate('/reports/custom')}
-              >
+              <Button variant="outline" size="sm" onClick={() => navigate('/reports/custom')}>
                 Create Custom Report
               </Button>
             </div>

@@ -2,7 +2,8 @@
 
 from functools import wraps
 from flask import jsonify
-from flask_jwt_extended import get_jwt_identity, get_jwt, verify_jwt_in_request
+from flask_jwt_extended import get_jwt, verify_jwt_in_request
+from app.core.jwt_utils import get_current_user_id
 from app.core.database import get_db
 from app.models.user import User
 
@@ -14,7 +15,10 @@ def requires_role(allowed_roles):
         @wraps(f)
         def decorated_function(*args, **kwargs):
             # Get current user
-            current_user_id = get_jwt_identity()
+            current_user_id = get_current_user_id()
+            if not current_user_id:
+                return jsonify({"error": "Invalid authentication token"}), 401
+                
             db = next(get_db())
 
             try:
@@ -24,7 +28,7 @@ def requires_role(allowed_roles):
                     return jsonify({"error": "User not found"}), 404
 
                 # Check if user has one of the allowed roles
-                if current_user.role not in allowed_roles:
+                if not current_user.has_any_role(*allowed_roles):
                     return jsonify({"error": f'Access denied. Required roles: {", ".join(allowed_roles)}'}), 403
 
                 return f(*args, **kwargs)
@@ -43,7 +47,10 @@ def tenant_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         # Get current user
-        current_user_id = get_jwt_identity()
+        current_user_id = get_current_user_id()
+        if not current_user_id:
+            return jsonify({"error": "Invalid authentication token"}), 401
+            
         db = next(get_db())
 
         try:
@@ -175,9 +182,14 @@ def check_role(allowed_roles):
     return decorator
 
 
+def require_permission(allowed_roles):
+    """Alias for check_role for compatibility."""
+    return check_role(allowed_roles)
+
+
 def audit_log(action=None):
     """Decorator to log audit trail for important actions."""
-    
+
     def decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
@@ -190,7 +202,7 @@ def audit_log(action=None):
             # - Request details
             # - Response status
             return f(*args, **kwargs)
-        
+
         return decorated_function
-    
+
     return decorator

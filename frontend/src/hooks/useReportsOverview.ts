@@ -84,9 +84,7 @@ const reportsOverviewApi = {
       });
     }
 
-    const response = await apiClient.get(
-      `${API_BASE_URL}/reports/overview?${params}`
-    );
+    const response = await apiClient.get(`/reports/overview?${params}`);
     return response.data;
   },
 
@@ -95,22 +93,16 @@ const reportsOverviewApi = {
     studentId: number,
     note: string
   ): Promise<{ success: boolean; note: CoachNote }> => {
-    const response = await apiClient.post(
-      `${API_BASE_URL}/reports/students/${studentId}/note`,
-      {
-        note,
-      }
-    );
+    const response = await apiClient.post(`/reports/students/${studentId}/note`, {
+      note,
+    });
     return response.data;
   },
 
   // Export batch reports
-  exportBatchReports: async ({
-    student_ids,
-    format = 'json',
-  }: BatchExportRequest) => {
+  exportBatchReports: async ({ student_ids, format = 'json' }: BatchExportRequest) => {
     const response = await apiClient.post(
-      `${API_BASE_URL}/reports/export/batch`,
+      `/reports/export/batch`,
       { student_ids, format },
       { responseType: 'blob' }
     );
@@ -121,9 +113,7 @@ const reportsOverviewApi = {
     link.href = url;
     link.setAttribute(
       'download',
-      `student_reports_batch_${
-        new Date().toISOString().split('T')[0]
-      }.${format}`
+      `student_reports_batch_${new Date().toISOString().split('T')[0]}.${format}`
     );
     document.body.appendChild(link);
     link.click();

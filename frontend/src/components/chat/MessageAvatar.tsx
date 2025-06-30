@@ -16,12 +16,7 @@ export const MessageAvatar: React.FC<MessageAvatarProps> = ({
 }) => {
   return (
     <div className="relative">
-      <Avatar
-        src={user.avatarUrl}
-        alt={user.fullName}
-        fallback={user.fullName}
-        size={size}
-      />
+      <Avatar src={user.avatarUrl} alt={user.fullName} fallback={user.fullName} size={size} />
       {showOnlineStatus && user.isOnline && (
         <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-white dark:border-gray-800" />
       )}

@@ -31,16 +31,13 @@ interface LearningPathUpdatesSectionProps {
   studentId: number;
 }
 
-export default function LearningPathUpdatesSection({
-  studentId,
-}: LearningPathUpdatesSectionProps) {
+export default function LearningPathUpdatesSection({ studentId }: LearningPathUpdatesSectionProps) {
   const [selectedPathId, setSelectedPathId] = useState<number | null>(null);
   const [rejectReason, setRejectReason] = useState('');
   const [showRejectModal, setShowRejectModal] = useState<number | null>(null);
 
   // Queries
-  const { data: learningPaths, isLoading: pathsLoading } =
-    useStudentLearningPaths(studentId);
+  const { data: learningPaths, isLoading: pathsLoading } = useStudentLearningPaths(studentId);
   const { data: pendingUpdates, isLoading: updatesLoading } =
     usePendingLearningPathUpdates(selectedPathId);
 
@@ -130,10 +127,7 @@ export default function LearningPathUpdatesSection({
     };
 
     return (
-      <Badge
-        variant={variants[priority as keyof typeof variants] || 'default'}
-        size="sm"
-      >
+      <Badge variant={variants[priority as keyof typeof variants] || 'default'} size="sm">
         {labels[priority as keyof typeof labels] || priority}
       </Badge>
     );
@@ -156,15 +150,9 @@ export default function LearningPathUpdatesSection({
             <BookOpen className="mr-2 h-5 w-5" />
             Aktif Öğrenme Yolları
           </h3>
-          <Button
-            onClick={handleSuggestUpdates}
-            disabled={suggestMutation.isPending}
-            size="sm"
-          >
+          <Button onClick={handleSuggestUpdates} disabled={suggestMutation.isPending} size="sm">
             <RefreshCw
-              className={`mr-2 h-4 w-4 ${
-                suggestMutation.isPending ? 'animate-spin' : ''
-              }`}
+              className={`mr-2 h-4 w-4 ${suggestMutation.isPending ? 'animate-spin' : ''}`}
             />
             Önerileri Güncelle
           </Button>
@@ -186,19 +174,12 @@ export default function LearningPathUpdatesSection({
                   <div>
                     <h4 className="font-medium">{path.title}</h4>
                     <p className="text-sm text-gray-600">
-                      İlerleme: {path.overall_progress}% •
-                      {path.completed_milestones}/{path.total_milestones} adım
-                      tamamlandı
+                      İlerleme: {path.overall_progress}% •{path.completed_milestones}/
+                      {path.total_milestones} adım tamamlandı
                     </p>
                   </div>
-                  <Badge
-                    variant={
-                      path.status === 'in_progress' ? 'primary' : 'default'
-                    }
-                  >
-                    {path.status === 'in_progress'
-                      ? 'Devam Ediyor'
-                      : 'Kabul Edildi'}
+                  <Badge variant={path.status === 'in_progress' ? 'primary' : 'default'}>
+                    {path.status === 'in_progress' ? 'Devam Ediyor' : 'Kabul Edildi'}
                   </Badge>
                 </div>
               </div>
@@ -226,10 +207,7 @@ export default function LearningPathUpdatesSection({
           ) : pendingUpdates && pendingUpdates.updates.length > 0 ? (
             <div className="space-y-4">
               {pendingUpdates.updates.map((update: LearningPathUpdate) => (
-                <Card
-                  key={update.id}
-                  className="p-5 border-l-4 border-blue-500"
-                >
+                <Card key={update.id} className="p-5 border-l-4 border-blue-500">
                   <div className="space-y-3">
                     {/* Header */}
                     <div className="flex items-start justify-between">
@@ -256,9 +234,7 @@ export default function LearningPathUpdatesSection({
                                 : 'Manuel'}
                             </Badge>
                           </h4>
-                          <p className="text-sm text-gray-600">
-                            {update.reason}
-                          </p>
+                          <p className="text-sm text-gray-600">{update.reason}</p>
                         </div>
                       </div>
                       {getPriorityBadge(update.priority)}
@@ -266,32 +242,19 @@ export default function LearningPathUpdatesSection({
 
                     {/* Expected Impact */}
                     <div className="bg-green-50 p-3 rounded-lg">
-                      <p className="text-sm font-medium text-green-800">
-                        Beklenen Etki:
-                      </p>
-                      <p className="text-sm text-green-700">
-                        {update.expected_impact}
-                      </p>
+                      <p className="text-sm font-medium text-green-800">Beklenen Etki:</p>
+                      <p className="text-sm text-green-700">{update.expected_impact}</p>
                     </div>
 
                     {/* Suggested Milestones */}
                     {update.suggested_milestones.length > 0 && (
                       <div className="space-y-2">
-                        <p className="text-sm font-medium text-gray-700">
-                          Önerilen Adımlar:
-                        </p>
+                        <p className="text-sm font-medium text-gray-700">Önerilen Adımlar:</p>
                         {update.suggested_milestones.map((milestone, index) => (
-                          <div
-                            key={index}
-                            className="ml-4 p-3 bg-gray-50 rounded-lg"
-                          >
-                            <h5 className="font-medium text-sm">
-                              {milestone.title}
-                            </h5>
+                          <div key={index} className="ml-4 p-3 bg-gray-50 rounded-lg">
+                            <h5 className="font-medium text-sm">{milestone.title}</h5>
                             {milestone.description && (
-                              <p className="text-xs text-gray-600 mt-1">
-                                {milestone.description}
-                              </p>
+                              <p className="text-xs text-gray-600 mt-1">{milestone.description}</p>
                             )}
                             <div className="flex items-center mt-2 text-xs text-gray-500 space-x-4">
                               <span className="flex items-center">
@@ -302,9 +265,7 @@ export default function LearningPathUpdatesSection({
                                 <Target className="h-3 w-3 mr-1" />
                                 Hafta {milestone.week_number}
                               </span>
-                              {milestone.skill_focus && (
-                                <span>Odak: {milestone.skill_focus}</span>
-                              )}
+                              {milestone.skill_focus && <span>Odak: {milestone.skill_focus}</span>}
                             </div>
                           </div>
                         ))}
@@ -369,9 +330,7 @@ export default function LearningPathUpdatesSection({
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg p-6 max-w-md w-full">
             <h3 className="text-lg font-semibold mb-4">Güncellemeyi Reddet</h3>
-            <p className="text-sm text-gray-600 mb-4">
-              Lütfen reddetme nedeninizi belirtin:
-            </p>
+            <p className="text-sm text-gray-600 mb-4">Lütfen reddetme nedeninizi belirtin:</p>
             <textarea
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}

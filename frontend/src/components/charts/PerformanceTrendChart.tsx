@@ -32,9 +32,7 @@ interface DotProps {
   payload?: PerformanceTrendData & { hasData: boolean };
 }
 
-export default function PerformanceTrendChart({
-  data,
-}: PerformanceTrendChartProps) {
+export default function PerformanceTrendChart({ data }: PerformanceTrendChartProps) {
   // Filter out weeks with no data and prepare for display
   const chartData = data.map((item) => ({
     ...item,
@@ -50,9 +48,7 @@ export default function PerformanceTrendChart({
           <p className="font-medium">{label}</p>
           {data.hasData ? (
             <>
-              <p className="text-sm text-blue-600">
-                Score: {data.score?.toFixed(1) ?? 0}%
-              </p>
+              <p className="text-sm text-blue-600">Score: {data.score?.toFixed(1) ?? 0}%</p>
               <p className="text-sm text-gray-600">Attempts: {data.attempts}</p>
             </>
           ) : (
@@ -71,25 +67,13 @@ export default function PerformanceTrendChart({
       return null;
     }
 
-    return (
-      <circle
-        cx={cx}
-        cy={cy}
-        r={4}
-        fill="#3B82F6"
-        stroke="#fff"
-        strokeWidth={2}
-      />
-    );
+    return <circle cx={cx} cy={cy} r={4} fill="#3B82F6" stroke="#fff" strokeWidth={2} />;
   };
 
   return (
     <div className="h-64">
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart
-          data={chartData}
-          margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-        >
+        <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
           <XAxis dataKey="week" tick={{ fontSize: 12 }} stroke="#6B7280" />
           <YAxis

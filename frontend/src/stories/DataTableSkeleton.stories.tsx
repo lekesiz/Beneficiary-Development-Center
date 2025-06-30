@@ -9,7 +9,8 @@ const meta = {
     layout: 'padded',
     docs: {
       description: {
-        component: 'A skeleton loader that mimics the structure of a data table, providing visual feedback while data is loading.',
+        component:
+          'A skeleton loader that mimics the structure of a data table, providing visual feedback while data is loading.',
       },
     },
   },
@@ -103,7 +104,8 @@ export const UserTable: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Example configuration for a typical user management table with columns for name, email, role, status, created date, and actions.',
+        story:
+          'Example configuration for a typical user management table with columns for name, email, role, status, created date, and actions.',
       },
     },
   },
@@ -119,7 +121,8 @@ export const ProductTable: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Example configuration for a product listing table with columns for image, name, category, price, stock, status, and actions.',
+        story:
+          'Example configuration for a product listing table with columns for image, name, category, price, stock, status, and actions.',
       },
     },
   },

@@ -45,9 +45,7 @@ const MetricCard: React.FC<{
           <p className="text-sm font-medium text-gray-600">{label}</p>
         </div>
         <p className={`text-2xl font-bold ${color}`}>{value}</p>
-        {description && (
-          <p className="text-xs text-gray-500 mt-1">{description}</p>
-        )}
+        {description && <p className="text-xs text-gray-500 mt-1">{description}</p>}
       </div>
     </div>
   </Card>
@@ -73,9 +71,7 @@ const InsightItem: React.FC<{
   };
 
   return (
-    <div
-      className={`flex items-start space-x-3 p-3 rounded-lg border ${getColorClass()}`}
-    >
+    <div className={`flex items-start space-x-3 p-3 rounded-lg border ${getColorClass()}`}>
       <div className="flex-shrink-0 mt-0.5">{icon}</div>
       <p className="text-sm leading-relaxed">{text}</p>
     </div>
@@ -109,23 +105,14 @@ const ProgressBar: React.FC<{
   );
 };
 
-export const LearningInsights: React.FC<LearningInsightsProps> = ({
-  evaluationId,
-  attemptId,
-}) => {
-  const {
-    data: insights,
-    isLoading,
-    error,
-  } = useEvaluationInsights(evaluationId, attemptId);
+export const LearningInsights: React.FC<LearningInsightsProps> = ({ evaluationId, attemptId }) => {
+  const { data: insights, isLoading, error } = useEvaluationInsights(evaluationId, attemptId);
 
   if (isLoading) {
     return (
       <div className="flex justify-center items-center py-12">
         <LoadingSpinner size="lg" />
-        <p className="ml-3 text-gray-600">
-          AI öğrenme tavsiyeleri hazırlanıyor...
-        </p>
+        <p className="ml-3 text-gray-600">AI öğrenme tavsiyeleri hazırlanıyor...</p>
       </div>
     );
   }
@@ -155,17 +142,13 @@ export const LearningInsights: React.FC<LearningInsightsProps> = ({
           <div className="flex items-center space-x-3">
             <Badge
               variant="outline"
-              className={getPerformanceLevelColor(
-                insights.visual_indicators.level
-              )}
+              className={getPerformanceLevelColor(insights.visual_indicators.level)}
             >
               <Award className="mr-1 h-3 w-3" />
               {getPerformanceLevelLabel(insights.visual_indicators.level)}
             </Badge>
             <Badge variant="outline" className="flex items-center">
-              <span className="mr-1">
-                {getTrendIcon(insights.visual_indicators.trend)}
-              </span>
+              <span className="mr-1">{getTrendIcon(insights.visual_indicators.trend)}</span>
               {getTrendLabel(insights.visual_indicators.trend)}
             </Badge>
           </div>
@@ -264,9 +247,7 @@ export const LearningInsights: React.FC<LearningInsightsProps> = ({
                 />
               ))
             ) : (
-              <p className="text-sm text-gray-500">
-                Henüz belirlenmiş güçlü yön yok
-              </p>
+              <p className="text-sm text-gray-500">Henüz belirlenmiş güçlü yön yok</p>
             )}
           </div>
         </Card>
@@ -288,9 +269,7 @@ export const LearningInsights: React.FC<LearningInsightsProps> = ({
                 />
               ))
             ) : (
-              <p className="text-sm text-gray-500">
-                Henüz belirlenmiş gelişim alanı yok
-              </p>
+              <p className="text-sm text-gray-500">Henüz belirlenmiş gelişim alanı yok</p>
             )}
           </div>
         </Card>
@@ -327,30 +306,27 @@ export const LearningInsights: React.FC<LearningInsightsProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <p className="text-sm text-gray-700">
-              <span className="font-medium">🎯 Hedef Belirleme:</span> Zayıf
-              olduğunuz konulara öncelik verin
+              <span className="font-medium">🎯 Hedef Belirleme:</span> Zayıf olduğunuz konulara
+              öncelik verin
             </p>
             <p className="text-sm text-gray-700">
-              <span className="font-medium">⏰ Düzenli Çalışma:</span> Günde en
-              az 30 dakika pratik yapın
+              <span className="font-medium">⏰ Düzenli Çalışma:</span> Günde en az 30 dakika pratik
+              yapın
             </p>
             <p className="text-sm text-gray-700">
-              <span className="font-medium">📝 Not Alma:</span> Yanlış
-              yaptığınız soruları not edin
+              <span className="font-medium">📝 Not Alma:</span> Yanlış yaptığınız soruları not edin
             </p>
           </div>
           <div className="space-y-2">
             <p className="text-sm text-gray-700">
-              <span className="font-medium">🔄 Tekrar:</span> Öğrendiğiniz
-              konuları düzenli tekrarlayın
+              <span className="font-medium">🔄 Tekrar:</span> Öğrendiğiniz konuları düzenli
+              tekrarlayın
             </p>
             <p className="text-sm text-gray-700">
-              <span className="font-medium">💪 Motivasyon:</span> Küçük
-              başarılarınızı kutlayın
+              <span className="font-medium">💪 Motivasyon:</span> Küçük başarılarınızı kutlayın
             </p>
             <p className="text-sm text-gray-700">
-              <span className="font-medium">🤝 Destek:</span> Anlamadığınız
-              konularda yardım isteyin
+              <span className="font-medium">🤝 Destek:</span> Anlamadığınız konularda yardım isteyin
             </p>
           </div>
         </div>

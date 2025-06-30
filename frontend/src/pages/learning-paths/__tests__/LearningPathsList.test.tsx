@@ -74,7 +74,7 @@ const mockLearningPaths = [
 describe('LearningPathsList', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    
+
     mockUseAuth.mockReturnValue({
       user: {
         id: 1,
@@ -90,7 +90,7 @@ describe('LearningPathsList', () => {
     mockUseLearningPath.useMyLearningPaths.mockImplementation((params: any) => {
       if (params?.status === 'completed') {
         return {
-          data: { learning_paths: mockLearningPaths.filter(p => p.status === 'completed') },
+          data: { learning_paths: mockLearningPaths.filter((p) => p.status === 'completed') },
           isLoading: false,
           error: null,
         } as any;
@@ -107,12 +107,14 @@ describe('LearningPathsList', () => {
     render(<LearningPathsList />, { wrapper: createWrapper() });
 
     expect(screen.getByText('Learning Paths')).toBeInTheDocument();
-    expect(screen.getByText('Discover and track your personalized learning journey')).toBeInTheDocument();
+    expect(
+      screen.getByText('Discover and track your personalized learning journey')
+    ).toBeInTheDocument();
 
     // Statistics section is rendered as grid cards
     // Check that stats are displayed correctly
     expect(screen.getByText('3')).toBeInTheDocument(); // Total paths
-    
+
     // Check that stats labels exist
     expect(screen.getByText('Total Paths')).toBeInTheDocument();
     expect(screen.getAllByText('In Progress').length).toBeGreaterThan(0);
@@ -125,7 +127,9 @@ describe('LearningPathsList', () => {
 
     // Check first learning path
     expect(screen.getByText('Web Development Fundamentals')).toBeInTheDocument();
-    expect(screen.getByText('Learn the basics of web development including HTML, CSS, and JavaScript.')).toBeInTheDocument();
+    expect(
+      screen.getByText('Learn the basics of web development including HTML, CSS, and JavaScript.')
+    ).toBeInTheDocument();
     // Status is displayed without underscores
     expect(screen.getByText('in progress')).toBeInTheDocument();
     expect(screen.getByText('5 milestones')).toBeInTheDocument();
@@ -144,11 +148,11 @@ describe('LearningPathsList', () => {
 
     // Check that the in-progress path shows milestone progress text
     expect(screen.getByText('2/5 milestones')).toBeInTheDocument();
-    
+
     // Look for the progress bar container and inner bar
     const progressContainer = document.querySelector('.bg-gray-200.rounded-full');
     expect(progressContainer).toBeInTheDocument();
-    
+
     // The filled progress bar should exist with the correct width
     const progressBar = progressContainer?.querySelector('.bg-blue-600');
     expect(progressBar).toBeInTheDocument();
@@ -173,11 +177,11 @@ describe('LearningPathsList', () => {
     // Verify filter controls exist
     expect(screen.getByPlaceholderText('Search learning paths...')).toBeInTheDocument();
     expect(screen.getByText('Clear Filters')).toBeInTheDocument();
-    
+
     // Verify status dropdown exists with options
     const selects = screen.getAllByRole('combobox');
     expect(selects.length).toBeGreaterThan(0);
-    
+
     // The hook is called to fetch data
     expect(mockUseLearningPath.useMyLearningPaths).toHaveBeenCalled();
   });
@@ -244,7 +248,9 @@ describe('LearningPathsList', () => {
 
     render(<LearningPathsList />, { wrapper: createWrapper() });
 
-    expect(screen.getByText('Failed to load learning paths. Please try again later.')).toBeInTheDocument();
+    expect(
+      screen.getByText('Failed to load learning paths. Please try again later.')
+    ).toBeInTheDocument();
   });
 
   it('shows empty state when no learning paths exist', () => {
@@ -257,7 +263,9 @@ describe('LearningPathsList', () => {
     render(<LearningPathsList />, { wrapper: createWrapper() });
 
     expect(screen.getByText('No Learning Paths Yet')).toBeInTheDocument();
-    expect(screen.getByText('Complete an evaluation to get personalized learning path recommendations.')).toBeInTheDocument();
+    expect(
+      screen.getByText('Complete an evaluation to get personalized learning path recommendations.')
+    ).toBeInTheDocument();
     expect(screen.getByText('Take an Evaluation')).toBeInTheDocument();
   });
 
@@ -271,7 +279,11 @@ describe('LearningPathsList', () => {
 
     await waitFor(() => {
       expect(screen.getByText('No Matching Learning Paths')).toBeInTheDocument();
-      expect(screen.getByText('Try adjusting your search terms or filters to find what you\'re looking for.')).toBeInTheDocument();
+      expect(
+        screen.getByText(
+          "Try adjusting your search terms or filters to find what you're looking for."
+        )
+      ).toBeInTheDocument();
     });
   });
 
@@ -280,13 +292,13 @@ describe('LearningPathsList', () => {
 
     // Status text has underscores replaced with spaces
     // Check for the badge elements containing status text
-    const badges = screen.getAllByRole('generic').filter(el => 
-      el.className.includes('Badge') || el.querySelector('svg')
-    );
-    
+    const badges = screen
+      .getAllByRole('generic')
+      .filter((el) => el.className.includes('Badge') || el.querySelector('svg'));
+
     // Verify that we have status badges
     expect(badges.length).toBeGreaterThan(0);
-    
+
     // Check that specific statuses are displayed in the stats section
     expect(screen.getAllByText('In Progress').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Completed').length).toBeGreaterThan(0);
@@ -298,8 +310,10 @@ describe('LearningPathsList', () => {
 
     // Verify the header is displayed
     expect(screen.getByText('Learning Paths')).toBeInTheDocument();
-    expect(screen.getByText('Discover and track your personalized learning journey')).toBeInTheDocument();
-    
+    expect(
+      screen.getByText('Discover and track your personalized learning journey')
+    ).toBeInTheDocument();
+
     // Verify statistics section shows counts
     expect(screen.getByText('Total Paths')).toBeInTheDocument();
     expect(screen.getByText('3')).toBeInTheDocument(); // Total count

@@ -32,19 +32,12 @@ export const Modal: React.FC<ModalProps> = ({
   return (
     <>
       {/* Backdrop */}
-      <div
-        className="fixed inset-0 z-50 bg-black/50 transition-opacity"
-        onClick={onClose}
-      />
+      <div className="fixed inset-0 z-50 bg-black/50 transition-opacity" onClick={onClose} />
 
       {/* Modal */}
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
         <div
-          className={cn(
-            'w-full bg-white rounded-lg shadow-xl',
-            sizes[size],
-            className
-          )}
+          className={cn('w-full bg-white rounded-lg shadow-xl', sizes[size], className)}
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
@@ -92,8 +85,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   loading = false,
 }) => {
   const variants = {
-    danger:
-      'bg-destructive text-destructive-foreground hover:bg-destructive/90',
+    danger: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
     warning: 'bg-yellow-600 text-white hover:bg-yellow-700',
     info: 'bg-primary text-primary-foreground hover:bg-primary/90',
   };

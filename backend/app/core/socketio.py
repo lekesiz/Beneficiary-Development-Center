@@ -202,64 +202,65 @@ def register_handlers(socketio):
             recipient_id = data.get("recipient_id")
             content = data.get("content")
             message_metadata = data.get("message_metadata", {})
-            
+
             # Validate inputs
             if not recipient_id or not content:
                 emit("message:error", {"error": "Recipient ID and content are required"})
                 return
-            
+
             if not isinstance(content, str) or len(content.strip()) == 0:
                 emit("message:error", {"error": "Message content cannot be empty"})
                 return
-            
+
             if len(content) > 5000:  # Max message length
                 emit("message:error", {"error": "Message content too long (max 5000 characters)"})
                 return
-            
+
             # Get database session
             db = get_db()
             try:
                 chat_service = ChatService(db.session)
-                
+
                 # Send the message
                 message = chat_service.send_message(
                     sender_id=current_user["user_id"],
                     receiver_id=recipient_id,
                     content=content.strip(),
                     tenant_id=current_user["tenant_id"],
-                    message_metadata=message_metadata
+                    message_metadata=message_metadata,
                 )
-                
+
                 # Get conversation for additional info
                 conversation = message.conversation
-                
+
                 # Prepare message data
                 message_data = message.to_dict()
                 message_data["conversation_uuid"] = str(conversation.uuid)
-                
+
                 # Emit to sender (confirmation)
-                emit("message:sent", {
-                    "message": message_data,
-                    "conversation_id": conversation.id
-                })
-                
+                emit("message:sent", {"message": message_data, "conversation_id": conversation.id})
+
                 # Emit to recipient's private room
                 recipient_room = f"user_{recipient_id}"
-                emit("message:new", {
-                    "message": message_data,
-                    "conversation_id": conversation.id,
-                    "sender": {
-                        "id": current_user["user_id"],
-                        "full_name": current_user["full_name"],
-                        "email": current_user["email"]
-                    }
-                }, room=recipient_room)
-                
+                emit(
+                    "message:new",
+                    {
+                        "message": message_data,
+                        "conversation_id": conversation.id,
+                        "sender": {
+                            "id": current_user["user_id"],
+                            "full_name": current_user["full_name"],
+                            "email": current_user["email"],
+                        },
+                    },
+                    room=recipient_room,
+                )
+
                 logger.info(f"Message sent from user {current_user['user_id']} to user {recipient_id}")
-                
+
             finally:
                 db.close()
-                
+
         except Exception as e:
             logger.error(f"Error sending message: {str(e)}")
             emit("message:error", {"error": "Failed to send message"})
@@ -271,27 +272,29 @@ def register_handlers(socketio):
         try:
             conversation_id = data.get("conversation_id")
             message_ids = data.get("message_ids", [])  # Optional: specific messages
-            
+
             if not conversation_id:
                 emit("message:error", {"error": "Conversation ID is required"})
                 return
-            
+
             db = get_db()
             try:
                 chat_service = ChatService(db.session)
-                
+
                 # If specific message IDs provided, mark those
                 if message_ids:
                     for msg_id in message_ids:
-                        message = db.session.query(ChatMessage).filter_by(
-                            id=msg_id,
-                            receiver_id=current_user["user_id"],
-                            tenant_id=current_user["tenant_id"]
-                        ).first()
-                        
+                        message = (
+                            db.session.query(ChatMessage)
+                            .filter_by(
+                                id=msg_id, receiver_id=current_user["user_id"], tenant_id=current_user["tenant_id"]
+                            )
+                            .first()
+                        )
+
                         if message and not message.read_at:
                             message.mark_as_read()
-                    
+
                     db.session.commit()
                     count = len(message_ids)
                 else:
@@ -299,39 +302,45 @@ def register_handlers(socketio):
                     count = chat_service.mark_messages_as_read(
                         conversation_id=conversation_id,
                         user_id=current_user["user_id"],
-                        tenant_id=current_user["tenant_id"]
+                        tenant_id=current_user["tenant_id"],
                     )
-                
+
                 # Get the conversation to notify the other user
-                conversation = db.session.query(Conversation).filter_by(
-                    id=conversation_id,
-                    tenant_id=current_user["tenant_id"]
-                ).first()
-                
+                conversation = (
+                    db.session.query(Conversation)
+                    .filter_by(id=conversation_id, tenant_id=current_user["tenant_id"])
+                    .first()
+                )
+
                 if conversation:
                     # Determine the other user
-                    other_user_id = conversation.user2_id if conversation.user1_id == current_user["user_id"] else conversation.user1_id
-                    
+                    other_user_id = (
+                        conversation.user2_id
+                        if conversation.user1_id == current_user["user_id"]
+                        else conversation.user1_id
+                    )
+
                     # Emit read receipt to the other user
                     other_user_room = f"user_{other_user_id}"
-                    emit("message:read_receipt", {
-                        "conversation_id": conversation_id,
-                        "reader_id": current_user["user_id"],
-                        "count": count,
-                        "message_ids": message_ids
-                    }, room=other_user_room)
-                
+                    emit(
+                        "message:read_receipt",
+                        {
+                            "conversation_id": conversation_id,
+                            "reader_id": current_user["user_id"],
+                            "count": count,
+                            "message_ids": message_ids,
+                        },
+                        room=other_user_room,
+                    )
+
                 # Confirm to the reader
-                emit("message:marked_as_read", {
-                    "conversation_id": conversation_id,
-                    "count": count
-                })
-                
+                emit("message:marked_as_read", {"conversation_id": conversation_id, "count": count})
+
                 logger.info(f"Marked {count} messages as read for user {current_user['user_id']}")
-                
+
             finally:
                 db.close()
-                
+
         except Exception as e:
             logger.error(f"Error marking messages as read: {str(e)}")
             emit("message:error", {"error": "Failed to mark messages as read"})
@@ -343,43 +352,47 @@ def register_handlers(socketio):
         try:
             conversation_id = data.get("conversation_id")
             is_typing = data.get("is_typing", False)
-            
+
             if not conversation_id:
                 return  # Silently ignore if no conversation ID
-            
+
             db = get_db()
             try:
                 # Get the conversation to find the other user
-                conversation = db.session.query(Conversation).filter_by(
-                    id=conversation_id,
-                    tenant_id=current_user["tenant_id"]
-                ).first()
-                
+                conversation = (
+                    db.session.query(Conversation)
+                    .filter_by(id=conversation_id, tenant_id=current_user["tenant_id"])
+                    .first()
+                )
+
                 if not conversation:
                     return
-                
+
                 # Check if user is part of the conversation
                 if current_user["user_id"] not in [conversation.user1_id, conversation.user2_id]:
                     return
-                
+
                 # Determine the other user
-                other_user_id = conversation.user2_id if conversation.user1_id == current_user["user_id"] else conversation.user1_id
-                
+                other_user_id = (
+                    conversation.user2_id if conversation.user1_id == current_user["user_id"] else conversation.user1_id
+                )
+
                 # Emit typing indicator to the other user
                 other_user_room = f"user_{other_user_id}"
-                emit("message:typing", {
-                    "conversation_id": conversation_id,
-                    "user_id": current_user["user_id"],
-                    "is_typing": is_typing,
-                    "user": {
-                        "id": current_user["user_id"],
-                        "full_name": current_user["full_name"]
-                    }
-                }, room=other_user_room)
-                
+                emit(
+                    "message:typing",
+                    {
+                        "conversation_id": conversation_id,
+                        "user_id": current_user["user_id"],
+                        "is_typing": is_typing,
+                        "user": {"id": current_user["user_id"], "full_name": current_user["full_name"]},
+                    },
+                    room=other_user_room,
+                )
+
             finally:
                 db.close()
-                
+
         except Exception as e:
             logger.error(f"Error handling typing indicator: {str(e)}")
 
@@ -392,23 +405,23 @@ def register_handlers(socketio):
             page = data.get("page", 1)
             per_page = data.get("per_page", 50)
             before_timestamp = data.get("before_timestamp")
-            
+
             if not conversation_id:
                 emit("message:error", {"error": "Conversation ID is required"})
                 return
-            
+
             db = get_db()
             try:
                 chat_service = ChatService(db.session)
-                
+
                 # Convert timestamp string to datetime if provided
                 before_dt = None
                 if before_timestamp:
                     try:
-                        before_dt = datetime.fromisoformat(before_timestamp.replace('Z', '+00:00'))
+                        before_dt = datetime.fromisoformat(before_timestamp.replace("Z", "+00:00"))
                     except:
                         pass
-                
+
                 # Get message history
                 result = chat_service.get_conversation_messages(
                     conversation_id=conversation_id,
@@ -416,15 +429,15 @@ def register_handlers(socketio):
                     tenant_id=current_user["tenant_id"],
                     page=page,
                     per_page=per_page,
-                    before_timestamp=before_dt
+                    before_timestamp=before_dt,
                 )
-                
+
                 # Emit history to the requester
                 emit("message:history", result)
-                
+
             finally:
                 db.close()
-                
+
         except Exception as e:
             logger.error(f"Error getting message history: {str(e)}")
             emit("message:error", {"error": "Failed to get message history"})
@@ -437,26 +450,26 @@ def register_handlers(socketio):
             page = data.get("page", 1)
             per_page = data.get("per_page", 20)
             active_only = data.get("active_only", True)
-            
+
             db = get_db()
             try:
                 chat_service = ChatService(db.session)
-                
+
                 # Get conversations
                 result = chat_service.get_user_conversations(
                     user_id=current_user["user_id"],
                     tenant_id=current_user["tenant_id"],
                     page=page,
                     per_page=per_page,
-                    active_only=active_only
+                    active_only=active_only,
                 )
-                
+
                 # Emit conversations to the requester
                 emit("conversation:list", result)
-                
+
             finally:
                 db.close()
-                
+
         except Exception as e:
             logger.error(f"Error getting conversations: {str(e)}")
             emit("message:error", {"error": "Failed to get conversations"})
@@ -467,39 +480,43 @@ def register_handlers(socketio):
         """Handle message deletion."""
         try:
             message_id = data.get("message_id")
-            
+
             if not message_id:
                 emit("message:error", {"error": "Message ID is required"})
                 return
-            
+
             db = get_db()
             try:
                 chat_service = ChatService(db.session)
-                
+
                 # Delete the message
                 success = chat_service.delete_message(
-                    message_id=message_id,
-                    user_id=current_user["user_id"],
-                    tenant_id=current_user["tenant_id"]
+                    message_id=message_id, user_id=current_user["user_id"], tenant_id=current_user["tenant_id"]
                 )
-                
+
                 if success:
                     # Emit deletion confirmation
-                    emit("message:deleted", {
-                        "message_id": message_id,
-                        "deleted": True
-                    })
-                    
+                    emit("message:deleted", {"message_id": message_id, "deleted": True})
+
                     logger.info(f"Message {message_id} deleted by user {current_user['user_id']}")
                 else:
                     emit("message:error", {"error": "Failed to delete message"})
-                
+
             finally:
                 db.close()
-                
+
         except Exception as e:
             logger.error(f"Error deleting message: {str(e)}")
-            emit("message:error", {"error": str(e) if "not found" in str(e).lower() or "cannot delete" in str(e).lower() else "Failed to delete message"})
+            emit(
+                "message:error",
+                {
+                    "error": (
+                        str(e)
+                        if "not found" in str(e).lower() or "cannot delete" in str(e).lower()
+                        else "Failed to delete message"
+                    )
+                },
+            )
 
 
 def emit_to_user(user_id, event, data):

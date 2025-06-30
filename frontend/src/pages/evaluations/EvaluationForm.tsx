@@ -18,34 +18,18 @@ import { z } from 'zod';
 
 import { Card } from '@/components/ui/Card';
 import { DatePicker } from '@/components/ui/DatePicker';
-import {
-  FormField,
-  Input,
-  Textarea,
-  Select,
-  Button,
-} from '@/components/ui/Form';
+import { FormField, Input, Textarea, Select, Button } from '@/components/ui/Form';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { TagInput } from '@/components/ui/TagInput';
 import { useCourses } from '@/hooks/useCourses';
-import {
-  useEvaluation,
-  useCreateEvaluation,
-  useUpdateEvaluation,
-} from '@/hooks/useEvaluations';
+import { useEvaluation, useCreateEvaluation, useUpdateEvaluation } from '@/hooks/useEvaluations';
 import { usePrograms } from '@/hooks/usePrograms';
-import type {
-  CreateEvaluationRequest,
-  UpdateEvaluationRequest,
-} from '@/types/evaluation';
+import type { CreateEvaluationRequest, UpdateEvaluationRequest } from '@/types/evaluation';
 
 // Zod validation schema
 const evaluationSchema = z
   .object({
-    title: z
-      .string()
-      .min(1, 'Title is required')
-      .max(200, 'Title can be at most 200 characters'),
+    title: z.string().min(1, 'Title is required').max(200, 'Title can be at most 200 characters'),
     description: z.string().optional(),
     instructions: z.string().optional(),
     course_id: z.number().optional(),
@@ -109,11 +93,9 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
   const evaluationId = id ? parseInt(id) : undefined;
 
   // React Query hooks
-  const { data: evaluation, isLoading: evaluationLoading } = useEvaluation(
-    evaluationId!,
-    false,
-    { enabled: mode === 'edit' && !!evaluationId }
-  );
+  const { data: evaluation, isLoading: evaluationLoading } = useEvaluation(evaluationId!, false, {
+    enabled: mode === 'edit' && !!evaluationId,
+  });
   const { data: coursesData } = useCourses({ per_page: 100 });
   const { data: programsData } = usePrograms({ per_page: 100 });
   const createMutation = useCreateEvaluation();
@@ -173,9 +155,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
   const filteredCourses = React.useMemo(() => {
     if (!coursesData?.courses) return [];
     if (!watchedProgramId) return coursesData.courses;
-    return coursesData.courses.filter(
-      (course) => course.program_id === watchedProgramId
-    );
+    return coursesData.courses.filter((course) => course.program_id === watchedProgramId);
   }, [coursesData?.courses, watchedProgramId]);
 
   // Handle form submission
@@ -230,14 +210,10 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
         </button>
         <div>
           <h1 className="text-2xl font-bold">
-            {mode === 'create'
-              ? 'New Evaluation'
-              : 'Edit Evaluation'}
+            {mode === 'create' ? 'New Evaluation' : 'Edit Evaluation'}
           </h1>
           <p className="text-gray-600">
-            {mode === 'create'
-              ? 'Create a new evaluation'
-              : 'Edit existing evaluation'}
+            {mode === 'create' ? 'Create a new evaluation' : 'Edit existing evaluation'}
           </p>
         </div>
       </div>
@@ -256,16 +232,8 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
                 name="title"
                 control={control}
                 render={({ field }) => (
-                  <FormField
-                    label="Title"
-                    error={errors.title?.message}
-                    required
-                  >
-                    <Input
-                      {...field}
-                      placeholder="Enter evaluation title"
-                      error={!!errors.title}
-                    />
+                  <FormField label="Title" error={errors.title?.message} required>
+                    <Input {...field} placeholder="Enter evaluation title" error={!!errors.title} />
                   </FormField>
                 )}
               />
@@ -276,10 +244,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
                 name="description"
                 control={control}
                 render={({ field }) => (
-                  <FormField
-                    label="Description"
-                    error={errors.description?.message}
-                  >
+                  <FormField label="Description" error={errors.description?.message}>
                     <Textarea
                       {...field}
                       placeholder="Brief description about the evaluation"
@@ -296,10 +261,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
                 name="instructions"
                 control={control}
                 render={({ field }) => (
-                  <FormField
-                    label="Instructions"
-                    error={errors.instructions?.message}
-                  >
+                  <FormField label="Instructions" error={errors.instructions?.message}>
                     <Textarea
                       {...field}
                       placeholder="Evaluation instructions for students"
@@ -330,9 +292,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
                     {...field}
                     value={field.value || ''}
                     onChange={(e) => {
-                      const value = e.target.value
-                        ? parseInt(e.target.value)
-                        : undefined;
+                      const value = e.target.value ? parseInt(e.target.value) : undefined;
                       field.onChange(value);
                       // Clear course selection when program changes
                       setValue('course_id', undefined);
@@ -359,9 +319,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
                     {...field}
                     value={field.value || ''}
                     onChange={(e) => {
-                      const value = e.target.value
-                        ? parseInt(e.target.value)
-                        : undefined;
+                      const value = e.target.value ? parseInt(e.target.value) : undefined;
                       field.onChange(value);
                     }}
                     error={!!errors.course_id}
@@ -380,9 +338,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
           </div>
 
           {!watchedProgramId && (
-            <p className="text-sm text-gray-500 mt-2">
-              Select a program first to choose a course
-            </p>
+            <p className="text-sm text-gray-500 mt-2">Select a program first to choose a course</p>
           )}
         </Card>
 
@@ -398,10 +354,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
               name="time_limit_minutes"
               control={control}
               render={({ field }) => (
-                <FormField
-                  label="Time Limit (minutes)"
-                  error={errors.time_limit_minutes?.message}
-                >
+                <FormField label="Time Limit (minutes)" error={errors.time_limit_minutes?.message}>
                   <Input
                     {...field}
                     type="number"
@@ -409,9 +362,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
                     max="1440"
                     placeholder="e.g.: 60"
                     onChange={(e) =>
-                      field.onChange(
-                        e.target.value ? parseInt(e.target.value) : undefined
-                      )
+                      field.onChange(e.target.value ? parseInt(e.target.value) : undefined)
                     }
                     error={!!errors.time_limit_minutes}
                   />
@@ -423,11 +374,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
               name="max_attempts"
               control={control}
               render={({ field }) => (
-                <FormField
-                  label="Maximum Attempts"
-                  error={errors.max_attempts?.message}
-                  required
-                >
+                <FormField label="Maximum Attempts" error={errors.max_attempts?.message} required>
                   <Input
                     {...field}
                     type="number"
@@ -444,11 +391,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
               name="passing_score"
               control={control}
               render={({ field }) => (
-                <FormField
-                  label="Passing Score (%)"
-                  error={errors.passing_score?.message}
-                  required
-                >
+                <FormField label="Passing Score (%)" error={errors.passing_score?.message} required>
                   <Input
                     {...field}
                     type="number"
@@ -491,9 +434,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
                     onChange={field.onChange}
                     className="rounded border-gray-300"
                   />
-                  <span className="text-sm font-medium">
-                    Show results immediately
-                  </span>
+                  <span className="text-sm font-medium">Show results immediately</span>
                 </label>
               )}
             />
@@ -509,9 +450,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
                     onChange={field.onChange}
                     className="rounded border-gray-300"
                   />
-                  <span className="text-sm font-medium">
-                    Allow review
-                  </span>
+                  <span className="text-sm font-medium">Allow review</span>
                 </label>
               )}
             />
@@ -529,9 +468,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
                   />
                   <div className="flex items-center space-x-2">
                     <Brain className="h-4 w-4 text-purple-600" />
-                    <span className="text-sm font-medium">
-                      AI Powered Adaptive Evaluation
-                    </span>
+                    <span className="text-sm font-medium">AI Powered Adaptive Evaluation</span>
                   </div>
                 </label>
               )}
@@ -540,9 +477,8 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
             {watch('is_adaptive') && (
               <div className="mt-2 p-3 bg-purple-50 rounded-lg">
                 <p className="text-sm text-purple-700">
-                  <strong>Adaptive mode enabled:</strong> Questions will be
-                  automatically adjusted by AI based on student performance.
-                  Difficulty level will change dynamically.
+                  <strong>Adaptive mode enabled:</strong> Questions will be automatically adjusted
+                  by AI based on student performance. Difficulty level will change dynamically.
                 </p>
               </div>
             )}
@@ -561,15 +497,8 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
               name="available_from"
               control={control}
               render={({ field }) => (
-                <FormField
-                  label="Start Date"
-                  error={errors.available_from?.message}
-                >
-                  <Input
-                    {...field}
-                    type="datetime-local"
-                    error={!!errors.available_from}
-                  />
+                <FormField label="Start Date" error={errors.available_from?.message}>
+                  <Input {...field} type="datetime-local" error={!!errors.available_from} />
                 </FormField>
               )}
             />
@@ -578,15 +507,8 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ mode }) => {
               name="available_until"
               control={control}
               render={({ field }) => (
-                <FormField
-                  label="End Date"
-                  error={errors.available_until?.message}
-                >
-                  <Input
-                    {...field}
-                    type="datetime-local"
-                    error={!!errors.available_until}
-                  />
+                <FormField label="End Date" error={errors.available_until?.message}>
+                  <Input {...field} type="datetime-local" error={!!errors.available_until} />
                 </FormField>
               )}
             />

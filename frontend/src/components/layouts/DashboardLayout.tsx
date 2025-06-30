@@ -12,6 +12,7 @@ import {
   Target,
   MessageSquare,
   Calendar,
+  FileText,
 } from 'lucide-react';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -19,6 +20,7 @@ import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 
 import { Breadcrumbs } from '@/components/common/Breadcrumbs';
 import { useAuth } from '@/contexts/AuthContext';
+import { hasAnyRole, ROLES, getHighestRole, getRoleDisplayName } from '@/utils/permissions';
 
 const DashboardLayout: React.FC = () => {
   const { user, logout } = useAuth();
@@ -33,87 +35,87 @@ const DashboardLayout: React.FC = () => {
 
   // Define navigation items with role-based access control
   const allNavigationItems = [
-    { 
-      name: t('navigation.dashboard'), 
-      href: '/dashboard', 
+    {
+      name: t('navigation.dashboard'),
+      href: '/dashboard',
       icon: Home,
-      requiredRoles: [] // Accessible to all authenticated users
+      requiredRoles: [], // Accessible to all authenticated users
     },
-    { 
-      name: t('navigation.beneficiaries'), 
-      href: '/beneficiaries', 
+    {
+      name: t('navigation.beneficiaries'),
+      href: '/beneficiaries',
       icon: Users,
-      requiredRoles: ['admin', 'manager', 'trainer', 'instructor']
+      requiredRoles: [ROLES.ADMIN, ROLES.TRAINER],
     },
-    { 
-      name: t('navigation.programs'), 
-      href: '/programs', 
+    {
+      name: t('navigation.programs'),
+      href: '/programs',
       icon: BookOpen,
-      requiredRoles: ['admin', 'manager', 'instructor']
+      requiredRoles: [ROLES.ADMIN, ROLES.TRAINER],
     },
-    { 
-      name: t('navigation.courses'), 
-      href: '/courses', 
+    {
+      name: t('navigation.courses'),
+      href: '/courses',
       icon: GraduationCap,
-      requiredRoles: ['admin', 'manager', 'instructor']
+      requiredRoles: [ROLES.ADMIN, ROLES.TRAINER],
     },
-    { 
-      name: t('navigation.sessions'), 
-      href: '/sessions', 
+    {
+      name: t('navigation.sessions'),
+      href: '/sessions',
       icon: Calendar,
-      requiredRoles: [] // Accessible to all authenticated users
+      requiredRoles: [], // Accessible to all authenticated users
     },
-    { 
-      name: t('navigation.evaluations'), 
-      href: '/evaluations', 
+    {
+      name: 'Coach Notes',
+      href: '/coach-notes',
+      icon: FileText,
+      requiredRoles: [ROLES.ADMIN, ROLES.TRAINER],
+    },
+    {
+      name: t('navigation.evaluations'),
+      href: '/evaluations',
       icon: ClipboardCheck,
-      requiredRoles: ['admin', 'manager', 'instructor', 'student']
+      requiredRoles: [ROLES.ADMIN, ROLES.TRAINER, ROLES.STUDENT],
     },
-    { 
-      name: t('navigation.learningPaths'), 
-      href: '/learning-paths', 
+    {
+      name: t('navigation.learningPaths'),
+      href: '/learning-paths',
       icon: Target,
-      requiredRoles: ['admin', 'manager', 'instructor', 'trainer', 'student']
+      requiredRoles: [ROLES.ADMIN, ROLES.TRAINER, ROLES.STUDENT],
     },
-    { 
-      name: t('navigation.chat'), 
-      href: '/chat', 
+    {
+      name: 'Bilan de Compétence',
+      href: '/bilan',
+      icon: GraduationCap,
+      requiredRoles: [], // Accessible to all authenticated users
+    },
+    {
+      name: t('navigation.chat'),
+      href: '/chat',
       icon: MessageSquare,
-      requiredRoles: [] // Accessible to all authenticated users
+      requiredRoles: [], // Accessible to all authenticated users
     },
-    { 
-      name: t('navigation.reports'), 
-      href: '/reports', 
+    {
+      name: t('navigation.reports'),
+      href: '/reports',
       icon: BarChart3,
-      requiredRoles: ['admin', 'manager', 'instructor', 'trainer', 'student']
+      requiredRoles: [ROLES.ADMIN, ROLES.TRAINER, ROLES.STUDENT],
     },
-    { 
-      name: t('navigation.settings'), 
-      href: '/settings', 
+    {
+      name: t('navigation.settings'),
+      href: '/settings',
       icon: Settings,
-      requiredRoles: [] // Accessible to all authenticated users
+      requiredRoles: [], // Accessible to all authenticated users
     },
   ];
 
-  // Filter navigation based on user roles
-  const getUserRole = () => {
-    return user?.role || user?.primaryRole || 'student';
-  };
-
-  const getUserRoles = () => {
-    if (user?.roles && Array.isArray(user.roles)) {
-      return user.roles.map(role => typeof role === 'string' ? role : role.name);
-    }
-    return [getUserRole()];
-  };
-
+  // Filter navigation based on user roles using centralized permission system
   const hasRequiredRole = (requiredRoles: string[]) => {
     if (requiredRoles.length === 0) return true; // No restrictions
-    const userRoles = getUserRoles();
-    return requiredRoles.some(role => userRoles.includes(role));
+    return hasAnyRole(user, requiredRoles as any);
   };
 
-  const navigation = allNavigationItems.filter(item => hasRequiredRole(item.requiredRoles));
+  const navigation = allNavigationItems.filter((item) => hasRequiredRole(item.requiredRoles));
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -172,7 +174,7 @@ const DashboardLayout: React.FC = () => {
                 <p className="text-sm font-medium text-gray-700">
                   {user?.first_name} {user?.last_name}
                 </p>
-                <p className="text-xs text-gray-500">{getUserRole()}</p>
+                <p className="text-xs text-gray-500">{getRoleDisplayName(getHighestRole(user) || ROLES.STUDENT)}</p>
               </div>
             </div>
             <button
@@ -205,7 +207,7 @@ const DashboardLayout: React.FC = () => {
           <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 lg:px-8 py-3">
             <Breadcrumbs />
           </div>
-          
+
           <div className="p-4 sm:p-6 lg:p-8">
             <Outlet />
           </div>

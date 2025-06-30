@@ -15,10 +15,7 @@ interface ConversationListProps {
   onSelect: (id: number) => void;
 }
 
-export const ConversationList: React.FC<ConversationListProps> = ({
-  selectedId,
-  onSelect,
-}) => {
+export const ConversationList: React.FC<ConversationListProps> = ({ selectedId, onSelect }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState<ConversationFilters>({
     search: '',
@@ -28,7 +25,7 @@ export const ConversationList: React.FC<ConversationListProps> = ({
 
   const handleSearch = (value: string) => {
     setSearchQuery(value);
-    setFilters(prev => ({ ...prev, search: value }));
+    setFilters((prev) => ({ ...prev, search: value }));
   };
 
   const handleNewConversation = () => {
@@ -53,18 +50,17 @@ export const ConversationList: React.FC<ConversationListProps> = ({
       <div className="p-4 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-semibold">Messages</h2>
-          <Button
-            size="sm"
-            onClick={handleNewConversation}
-            title="New Chat"
-          >
+          <Button size="sm" onClick={handleNewConversation} title="New Chat">
             <Plus size={16} />
           </Button>
         </div>
 
         {/* Search */}
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+          <Search
+            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+            size={16}
+          />
           <Input
             type="text"
             placeholder="Search conversations..."
@@ -85,7 +81,11 @@ export const ConversationList: React.FC<ConversationListProps> = ({
           <EmptyState
             icon={MessageSquare}
             title="No Conversations"
-            description={searchQuery ? "No conversations match your search" : "You haven't started any conversations yet"}
+            description={
+              searchQuery
+                ? 'No conversations match your search'
+                : "You haven't started any conversations yet"
+            }
             action={
               !searchQuery
                 ? {

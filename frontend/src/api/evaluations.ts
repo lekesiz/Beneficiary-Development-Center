@@ -177,7 +177,7 @@ export interface CreateQuestionRequest {
   tags?: string[];
 }
 
-export type UpdateQuestionRequest = Partial<CreateQuestionRequest>
+export type UpdateQuestionRequest = Partial<CreateQuestionRequest>;
 
 export interface SaveResponseRequest {
   question_id: number;
@@ -278,14 +278,9 @@ export const evaluationsApi = {
   /**
    * Get evaluation by ID
    */
-  getById: async (
-    id: number,
-    includeQuestions = false
-  ): Promise<Evaluation> => {
+  getById: async (id: number, includeQuestions = false): Promise<Evaluation> => {
     const params = includeQuestions ? '?include_questions=true' : '';
-    const response = await apiClient.get<Evaluation>(
-      `${EVALUATIONS_BASE_URL}/${id}${params}`
-    );
+    const response = await apiClient.get<Evaluation>(`${EVALUATIONS_BASE_URL}/${id}${params}`);
     return response.data;
   },
 
@@ -293,24 +288,15 @@ export const evaluationsApi = {
    * Create new evaluation
    */
   create: async (data: CreateEvaluationRequest): Promise<Evaluation> => {
-    const response = await apiClient.post<Evaluation>(
-      EVALUATIONS_BASE_URL,
-      data
-    );
+    const response = await apiClient.post<Evaluation>(EVALUATIONS_BASE_URL, data);
     return response.data;
   },
 
   /**
    * Update evaluation
    */
-  update: async (
-    id: number,
-    data: UpdateEvaluationRequest
-  ): Promise<Evaluation> => {
-    const response = await apiClient.put<Evaluation>(
-      `${EVALUATIONS_BASE_URL}/${id}`,
-      data
-    );
+  update: async (id: number, data: UpdateEvaluationRequest): Promise<Evaluation> => {
+    const response = await apiClient.put<Evaluation>(`${EVALUATIONS_BASE_URL}/${id}`, data);
     return response.data;
   },
 
@@ -325,9 +311,7 @@ export const evaluationsApi = {
    * Activate evaluation
    */
   activate: async (id: number): Promise<Evaluation> => {
-    const response = await apiClient.post<Evaluation>(
-      `${EVALUATIONS_BASE_URL}/${id}/activate`
-    );
+    const response = await apiClient.post<Evaluation>(`${EVALUATIONS_BASE_URL}/${id}/activate`);
     return response.data;
   },
 
@@ -335,9 +319,7 @@ export const evaluationsApi = {
    * Archive evaluation
    */
   archive: async (id: number): Promise<Evaluation> => {
-    const response = await apiClient.post<Evaluation>(
-      `${EVALUATIONS_BASE_URL}/${id}/archive`
-    );
+    const response = await apiClient.post<Evaluation>(`${EVALUATIONS_BASE_URL}/${id}/archive`);
     return response.data;
   },
 
@@ -366,10 +348,7 @@ export const evaluationsApi = {
     /**
      * Create new question
      */
-    create: async (
-      evaluationId: number,
-      data: CreateQuestionRequest
-    ): Promise<Question> => {
+    create: async (evaluationId: number, data: CreateQuestionRequest): Promise<Question> => {
       const response = await apiClient.post<Question>(
         `${EVALUATIONS_BASE_URL}/${evaluationId}/questions`,
         data
@@ -396,9 +375,7 @@ export const evaluationsApi = {
      * Delete question
      */
     delete: async (evaluationId: number, questionId: number): Promise<void> => {
-      await apiClient.delete(
-        `${EVALUATIONS_BASE_URL}/${evaluationId}/questions/${questionId}`
-      );
+      await apiClient.delete(`${EVALUATIONS_BASE_URL}/${evaluationId}/questions/${questionId}`);
     },
 
     /**
@@ -469,10 +446,7 @@ export const evaluationsApi = {
     /**
      * Get evaluation attempt
      */
-    getById: async (
-      evaluationId: number,
-      attemptId: number
-    ): Promise<EvaluationAttempt> => {
+    getById: async (evaluationId: number, attemptId: number): Promise<EvaluationAttempt> => {
       const response = await apiClient.get<EvaluationAttempt>(
         `${EVALUATIONS_BASE_URL}/${evaluationId}/attempts/${attemptId}`
       );
@@ -482,10 +456,7 @@ export const evaluationsApi = {
     /**
      * Submit evaluation attempt
      */
-    submit: async (
-      evaluationId: number,
-      attemptId: number
-    ): Promise<EvaluationAttempt> => {
+    submit: async (evaluationId: number, attemptId: number): Promise<EvaluationAttempt> => {
       const response = await apiClient.post<EvaluationAttempt>(
         `${EVALUATIONS_BASE_URL}/${evaluationId}/attempts/${attemptId}/submit`
       );

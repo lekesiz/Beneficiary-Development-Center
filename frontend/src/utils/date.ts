@@ -2,7 +2,7 @@ import {
   format,
   formatRelative,
   formatDistanceToNow as formatDistanceToNowFn,
-  parseISO
+  parseISO,
 } from 'date-fns';
 
 export function formatDate(date: string | Date | null | undefined): string {
@@ -29,9 +29,7 @@ export function formatDateTime(date: string | Date | null | undefined): string {
   }
 }
 
-export function formatRelativeDate(
-  date: string | Date | null | undefined
-): string {
+export function formatRelativeDate(date: string | Date | null | undefined): string {
   if (!date) return '-';
 
   try {
@@ -43,9 +41,7 @@ export function formatRelativeDate(
   }
 }
 
-export function formatDistanceFromNow(
-  date: string | Date | null | undefined
-): string {
+export function formatDistanceFromNow(date: string | Date | null | undefined): string {
   if (!date) return '-';
 
   try {
@@ -60,9 +56,7 @@ export function formatDistanceFromNow(
 // Alias for consistency with component usage
 export { formatDistanceFromNow as formatDistanceToNow };
 
-export function formatShortDate(
-  date: string | Date | null | undefined
-): string {
+export function formatShortDate(date: string | Date | null | undefined): string {
   if (!date) return '-';
 
   try {

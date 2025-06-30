@@ -1,5 +1,6 @@
 """Application configuration."""
 
+import secrets
 import os
 from datetime import timedelta
 from dotenv import load_dotenv
@@ -9,20 +10,36 @@ load_dotenv()
 
 
 class Config:
-    """Base configuration."""
+    """Base configuration with security hardening."""
 
-    # Flask
-    SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key-change-in-production")
+    # SECURE SECRET GENERATION
+    SECRET_KEY = os.environ.get("SECRET_KEY") or secrets.token_urlsafe(32)
     DEBUG = False
     TESTING = False
 
-    # Database
+    # SECURITY HEADERS
+    SECURITY_HEADERS = {
+        'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
+        'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline'",
+        'X-Content-Type-Options': 'nosniff',
+        'X-Frame-Options': 'DENY',
+        'X-XSS-Protection': '1; mode=block',
+        'Referrer-Policy': 'strict-origin-when-cross-origin'
+    }
+
+    # ENHANCED DATABASE SECURITY
     SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL", "sqlite:///bdc.db")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SQLALCHEMY_ENGINE_OPTIONS = {"pool_size": 10, "pool_recycle": 3600, "pool_pre_ping": True}
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        "pool_size": 20,
+        "pool_recycle": 1800,
+        "pool_pre_ping": True,
+        "pool_timeout": 30,
+        "max_overflow": 30
+    }
 
     # JWT
-    JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "jwt-secret-key-change-in-production")
+    JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY") or secrets.token_urlsafe(32)
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(seconds=int(os.environ.get("JWT_ACCESS_TOKEN_EXPIRES", 3600)))
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(seconds=int(os.environ.get("JWT_REFRESH_TOKEN_EXPIRES", 2592000)))
     JWT_TOKEN_LOCATION = ["headers", "cookies"]
@@ -54,10 +71,11 @@ class Config:
     OPENAI_MODEL_GPT35 = "gpt-3.5-turbo-1106"
     OPENAI_MODEL_EMBEDDING = "text-embedding-3-small"
 
-    # CORS
+    # CORS SECURITY
     CORS_ORIGINS = os.environ.get("CORS_ORIGINS", "http://localhost:3000").split(",")
     CORS_SUPPORTS_CREDENTIALS = True
     CORS_ALLOW_HEADERS = ["Content-Type", "Authorization", "X-Tenant-ID"]
+    CORS_EXPOSE_HEADERS = ["X-Total-Count", "X-Page-Count"]
 
     # Security
     BCRYPT_LOG_ROUNDS = 12
@@ -142,14 +160,54 @@ class ProductionConfig(Config):
     """Production configuration."""
 
     DEBUG = False
-    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL", "postgresql://bdc_user:bdc_password@localhost:5432/bdc_db")
-
+    
     def __init__(self):
         super().__init__()
+        
+        # Check if running on Google App Engine
+        if os.environ.get("GAE_ENV", "").startswith("standard"):
+            # Running on App Engine, try to get secrets
+            try:
+                from google.cloud import secretmanager
+                client = secretmanager.SecretManagerServiceClient()
+                project_id = os.environ.get("GOOGLE_CLOUD_PROJECT")
+                
+                # Get secrets from Secret Manager
+                def get_secret(secret_id):
+                    try:
+                        name = f"projects/{project_id}/secrets/{secret_id}/versions/latest"
+                        response = client.access_secret_version(request={"name": name})
+                        return response.payload.data.decode("UTF-8")
+                    except Exception as e:
+                        print(f"Warning: Could not access secret {secret_id}: {e}")
+                        return None
+                
+                # Override with secrets from Secret Manager
+                secret_key = get_secret("SECRET_KEY")
+                if secret_key:
+                    self.SECRET_KEY = secret_key
+                    
+                jwt_secret = get_secret("JWT_SECRET_KEY")
+                if jwt_secret:
+                    self.JWT_SECRET_KEY = jwt_secret
+                    
+                db_password = get_secret("DB_PASSWORD")
+                if db_password:
+                    db_name = os.environ.get("DB_NAME", "bdc_production")
+                    db_user = os.environ.get("DB_USER", "bdc_user")
+                    cloud_sql_connection = os.environ.get("CLOUD_SQL_CONNECTION_NAME")
+                    self.SQLALCHEMY_DATABASE_URI = f"postgresql://{db_user}:{db_password}@/{db_name}?host=/cloudsql/{cloud_sql_connection}"
+                
+            except ImportError:
+                print("Warning: google-cloud-secret-manager not installed")
+        else:
+            # Not on App Engine, use environment variables
+            self.SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL", "postgresql://bdc_user:bdc_password@localhost:5432/bdc_db")
+        
         # In production, ensure these are set
-        assert os.environ.get("SECRET_KEY"), "SECRET_KEY is required in production"
-        assert os.environ.get("JWT_SECRET_KEY"), "JWT_SECRET_KEY is required in production"
-        assert os.environ.get("DATABASE_URL"), "DATABASE_URL is required in production"
+        assert self.SECRET_KEY != Config.SECRET_KEY, "SECRET_KEY must be set in production"
+        assert self.JWT_SECRET_KEY != Config.JWT_SECRET_KEY, "JWT_SECRET_KEY must be set in production"
+        assert hasattr(self, 'SQLALCHEMY_DATABASE_URI'), "DATABASE_URL must be configured"
 
 
 # Configuration dictionary

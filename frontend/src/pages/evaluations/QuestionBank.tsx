@@ -1,8 +1,4 @@
-import {
-  ColumnDef,
-  PaginationState,
-  SortingState,
-} from '@tanstack/react-table';
+import { ColumnDef, PaginationState, SortingState } from '@tanstack/react-table';
 import {
   Plus,
   Search,
@@ -105,11 +101,7 @@ const QuestionTypeBadge: React.FC<{ type: string }> = ({ type }) => {
     fill_in_blank: 'Fill in the Blank',
   };
 
-  return (
-    <Badge variant="outline">
-      {labels[type as keyof typeof labels] || type}
-    </Badge>
-  );
+  return <Badge variant="outline">{labels[type as keyof typeof labels] || type}</Badge>;
 };
 
 // Difficulty badge
@@ -145,10 +137,7 @@ const ActionsDropdown: React.FC<{
 
   return (
     <div className="relative">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="p-2 hover:bg-gray-100 rounded-md"
-      >
+      <button onClick={() => setIsOpen(!isOpen)} className="p-2 hover:bg-gray-100 rounded-md">
         <MoreHorizontal className="h-4 w-4" />
       </button>
 
@@ -254,9 +243,7 @@ const QuestionFilters: React.FC<{
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">
-                Question Type
-              </label>
+              <label className="block text-sm font-medium mb-1">Question Type</label>
               <select
                 value={filters.question_type || ''}
                 onChange={(e) =>
@@ -301,9 +288,7 @@ const QuestionFilters: React.FC<{
               <label className="block text-sm font-medium mb-1">Sort By</label>
               <select
                 value={filters.sort_by || 'created_at'}
-                onChange={(e) =>
-                  onFiltersChange({ ...filters, sort_by: e.target.value })
-                }
+                onChange={(e) => onFiltersChange({ ...filters, sort_by: e.target.value })}
                 className="w-full p-2 border rounded-md"
               >
                 <option value="created_at">Creation Date</option>
@@ -319,9 +304,7 @@ const QuestionFilters: React.FC<{
                 type="checkbox"
                 id="sort_desc"
                 checked={filters.sort_desc || false}
-                onChange={(e) =>
-                  onFiltersChange({ ...filters, sort_desc: e.target.checked })
-                }
+                onChange={(e) => onFiltersChange({ ...filters, sort_desc: e.target.checked })}
                 className="mr-2"
               />
               <label htmlFor="sort_desc" className="text-sm">
@@ -408,9 +391,7 @@ export default function QuestionBank() {
           <div className="flex flex-col">
             <span className="font-medium">{row.original.subject}</span>
             {row.original.topic && (
-              <span className="text-sm text-gray-500">
-                {row.original.topic}
-              </span>
+              <span className="text-sm text-gray-500">{row.original.topic}</span>
             )}
           </div>
         ),
@@ -418,16 +399,12 @@ export default function QuestionBank() {
       {
         accessorKey: 'question_type',
         header: 'Type',
-        cell: ({ row }) => (
-          <QuestionTypeBadge type={row.original.question_type} />
-        ),
+        cell: ({ row }) => <QuestionTypeBadge type={row.original.question_type} />,
       },
       {
         accessorKey: 'difficulty_level',
         header: 'Difficulty',
-        cell: ({ row }) => (
-          <DifficultyBadge level={row.original.difficulty_level} />
-        ),
+        cell: ({ row }) => <DifficultyBadge level={row.original.difficulty_level} />,
       },
       {
         accessorKey: 'points',
@@ -517,9 +494,7 @@ export default function QuestionBank() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold">Question Bank</h1>
-          <p className="text-gray-600">
-            Manage reusable questions
-          </p>
+          <p className="text-gray-600">Manage reusable questions</p>
         </div>
         <button
           onClick={() => navigate('/question-bank/create')}
@@ -537,9 +512,7 @@ export default function QuestionBank() {
             <BookOpen className="h-8 w-8 text-blue-600" />
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Total Questions</p>
-              <p className="text-2xl font-bold">
-                {questionsData.pagination.total}
-              </p>
+              <p className="text-2xl font-bold">{questionsData.pagination.total}</p>
             </div>
           </div>
         </Card>
@@ -549,11 +522,7 @@ export default function QuestionBank() {
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Easy Questions</p>
               <p className="text-2xl font-bold">
-                {
-                  questionsData.questions.filter(
-                    (q) => q.difficulty_level === 'easy'
-                  ).length
-                }
+                {questionsData.questions.filter((q) => q.difficulty_level === 'easy').length}
               </p>
             </div>
           </div>
@@ -564,11 +533,7 @@ export default function QuestionBank() {
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Medium Questions</p>
               <p className="text-2xl font-bold">
-                {
-                  questionsData.questions.filter(
-                    (q) => q.difficulty_level === 'medium'
-                  ).length
-                }
+                {questionsData.questions.filter((q) => q.difficulty_level === 'medium').length}
               </p>
             </div>
           </div>
@@ -579,11 +544,7 @@ export default function QuestionBank() {
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Hard Questions</p>
               <p className="text-2xl font-bold">
-                {
-                  questionsData.questions.filter(
-                    (q) => q.difficulty_level === 'hard'
-                  ).length
-                }
+                {questionsData.questions.filter((q) => q.difficulty_level === 'hard').length}
               </p>
             </div>
           </div>
@@ -613,7 +574,7 @@ export default function QuestionBank() {
           columns={columns}
           data={questionsData.questions}
           loading={isLoading}
-          pageCount={questionsData.pagination.pages}
+          pageCount={questionsData.pagination?.pages}
           pagination={pagination}
           onPaginationChange={handlePaginationChange}
           sorting={sorting}
@@ -633,16 +594,12 @@ export default function QuestionBank() {
             <div className="flex items-center space-x-2 mb-4">
               <QuestionTypeBadge type={previewModal.question.question_type} />
               <DifficultyBadge level={previewModal.question.difficulty_level} />
-              <span className="text-sm text-gray-500">
-                {previewModal.question.points} points
-              </span>
+              <span className="text-sm text-gray-500">{previewModal.question.points} points</span>
             </div>
 
             <div>
               <h3 className="font-semibold mb-2">Question:</h3>
-              <p className="text-gray-800">
-                {previewModal.question.question_text}
-              </p>
+              <p className="text-gray-800">{previewModal.question.question_text}</p>
             </div>
 
             {previewModal.question.question_type === 'multiple_choice' && (
@@ -657,17 +614,14 @@ export default function QuestionBank() {
                         </span>
                         <span
                           className={
-                            option ===
-                            previewModal.question.question_data.correct_answer
+                            option === previewModal.question.question_data.correct_answer
                               ? 'text-green-600 font-medium'
                               : ''
                           }
                         >
                           {option}
                         </span>
-                        {option ===
-                          previewModal.question.question_data
-                            .correct_answer && (
+                        {option === previewModal.question.question_data.correct_answer && (
                           <Badge variant="success" className="text-xs">
                             Correct
                           </Badge>
@@ -712,14 +666,11 @@ export default function QuestionBank() {
       >
         <div className="space-y-4">
           <p>
-            Are you sure you want to delete this question from the question bank? This
-            action cannot be undone.
+            Are you sure you want to delete this question from the question bank? This action cannot
+            be undone.
           </p>
           <div className="flex justify-end space-x-2">
-            <Button
-              variant="outline"
-              onClick={() => setDeleteModal({ isOpen: false })}
-            >
+            <Button variant="outline" onClick={() => setDeleteModal({ isOpen: false })}>
               Cancel
             </Button>
             <Button

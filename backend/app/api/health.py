@@ -1,6 +1,7 @@
 """Health check endpoints."""
 
 from flask import Blueprint, jsonify
+from sqlalchemy import text
 from app import db
 from app.extensions import redis_client
 
@@ -19,7 +20,7 @@ def health_check():
 
     # Check database connection
     try:
-        db.session.execute("SELECT 1")
+        db.session.execute(text("SELECT 1"))
         health_status["services"]["database"] = "healthy"
     except Exception as e:
         health_status["status"] = "unhealthy"
@@ -50,7 +51,7 @@ def readiness_check():
     """
     try:
         # Check if database migrations are up to date
-        db.session.execute("SELECT 1")
+        db.session.execute(text("SELECT 1"))
 
         # Check if Redis is available
         if redis_client:

@@ -15,15 +15,7 @@ export const LearningPathTimeline: React.FC<LearningPathTimelineProps> = ({
   startDate,
 }) => {
   const weeks = Object.keys(weeklySchedule).sort();
-  const days = [
-    'monday',
-    'tuesday',
-    'wednesday',
-    'thursday',
-    'friday',
-    'saturday',
-    'sunday',
-  ];
+  const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
   const dayNames = {
     monday: 'Pazartesi',
     tuesday: 'Salı',
@@ -122,19 +114,14 @@ export const LearningPathTimeline: React.FC<LearningPathTimelineProps> = ({
               <div className="grid grid-cols-7 gap-2">
                 {days.map((day) => {
                   const daySchedule = weeklySchedule[weekKey]?.[day];
-                  const hasActivities =
-                    daySchedule && daySchedule.activities.length > 0;
+                  const hasActivities = daySchedule && daySchedule.activities.length > 0;
 
                   return (
                     <div
                       key={day}
                       className={`
                         p-3 rounded-md text-center
-                        ${
-                          hasActivities
-                            ? 'bg-white border border-gray-200'
-                            : 'bg-gray-100'
-                        }
+                        ${hasActivities ? 'bg-white border border-gray-200' : 'bg-gray-100'}
                       `}
                     >
                       <p className="text-xs font-medium text-gray-700 mb-1">
@@ -144,15 +131,10 @@ export const LearningPathTimeline: React.FC<LearningPathTimelineProps> = ({
                       {hasActivities ? (
                         <div className="space-y-1">
                           <Clock className="h-4 w-4 mx-auto text-blue-600" />
-                          <p className="text-xs text-gray-600">
-                            {daySchedule.duration}
-                          </p>
+                          <p className="text-xs text-gray-600">{daySchedule.duration}</p>
                           <div className="mt-2">
                             {daySchedule.activities.map((activity, index) => (
-                              <p
-                                key={index}
-                                className="text-xs text-gray-700 truncate"
-                              >
+                              <p key={index} className="text-xs text-gray-700 truncate">
                                 {activity}
                               </p>
                             ))}
@@ -187,12 +169,7 @@ export const LearningPathTimeline: React.FC<LearningPathTimelineProps> = ({
                   <div className="flex items-center space-x-2">
                     <Clock className="h-4 w-4 text-gray-500" />
                     <span className="text-gray-600">
-                      ~
-                      {weekMilestones.reduce(
-                        (sum, m) => sum + m.estimated_hours,
-                        0
-                      )}{' '}
-                      saat
+                      ~{weekMilestones.reduce((sum, m) => sum + m.estimated_hours, 0)} saat
                     </span>
                   </div>
                 </div>

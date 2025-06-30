@@ -6,8 +6,15 @@ Handles OpenAI GPT integration for intelligent question selection.
 import os
 import json
 from typing import Dict, Any, List, Optional
-from openai import OpenAI
 from flask import current_app
+
+# Optional OpenAI import
+try:
+    from openai import OpenAI
+    HAS_OPENAI = True
+except ImportError:
+    HAS_OPENAI = False
+    OpenAI = None
 
 
 class AIService:
@@ -15,9 +22,14 @@ class AIService:
 
     def __init__(self):
         """Initialize OpenAI client with API key from environment."""
-        api_key = os.getenv("OPENAI_API_KEY", "dummy-key-for-testing")
-        if api_key and api_key != "dummy-key-for-testing":
-            self.client = OpenAI(api_key=api_key)
+        self.client = None
+        self.enabled = False
+        
+        if HAS_OPENAI:
+            api_key = os.getenv("OPENAI_API_KEY", "dummy-key-for-testing")
+            if api_key and api_key != "dummy-key-for-testing":
+                self.client = OpenAI(api_key=api_key)
+                self.enabled = True
         else:
             self.client = None
 
@@ -56,6 +68,10 @@ class AIService:
                 else:
                     return "medium"
 
+            if not self.client:
+                # Return fallback response when AI is not available
+                return self._get_fallback_response()
+                
             # Call OpenAI API
             response = self.client.chat.completions.create(
                 model="gpt-4",
@@ -220,6 +236,10 @@ class AIService:
         prompt = self._build_insights_prompt(summary)
 
         try:
+            if not self.client:
+                # Return fallback response when AI is not available
+                return self._get_fallback_response()
+                
             # Call OpenAI API
             response = self.client.chat.completions.create(
                 model="gpt-4",
@@ -545,6 +565,10 @@ class AIService:
         prompt = self._build_learning_path_prompt(learning_insights, user_info, evaluation_info)
 
         try:
+            if not self.client:
+                # Return fallback response when AI is not available
+                return self._get_fallback_response()
+                
             # Call OpenAI API
             response = self.client.chat.completions.create(
                 model="gpt-4",
@@ -858,6 +882,10 @@ class AIService:
         prompt = self._build_development_report_prompt(report_data)
 
         try:
+            if not self.client:
+                # Return fallback response when AI is not available
+                return self._get_fallback_response()
+                
             # Call OpenAI API
             response = self.client.chat.completions.create(
                 model="gpt-4",
@@ -1215,6 +1243,10 @@ class AIService:
         prompt = self._build_profile_analysis_prompt(profile_data)
 
         try:
+            if not self.client:
+                # Return fallback response when AI is not available
+                return self._get_fallback_response()
+                
             # Call OpenAI API
             response = self.client.chat.completions.create(
                 model="gpt-4",
@@ -1444,6 +1476,10 @@ class AIService:
         prompt = self._build_profile_analysis_prompt(profile_data)
 
         try:
+            if not self.client:
+                # Return fallback response when AI is not available
+                return self._get_fallback_response()
+                
             # Call OpenAI API
             response = self.client.chat.completions.create(
                 model="gpt-4",

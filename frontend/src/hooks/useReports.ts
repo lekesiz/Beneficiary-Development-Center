@@ -65,65 +65,42 @@ export interface InsightsSummary {
 // API client functions
 const reportsApi = {
   // Get development report for a user
-  getDevelopmentReport: async (
-    userId: number,
-    days: number = 30
-  ): Promise<DevelopmentReport> => {
-    const response = await apiClient.get(
-      `${API_BASE_URL}/reports/development/${userId}`,
-      {
-        params: { days },
-      }
-    );
+  getDevelopmentReport: async (userId: number, days: number = 30): Promise<DevelopmentReport> => {
+    const response = await apiClient.get(`/reports/development/${userId}`, {
+      params: { days },
+    });
     return response.data;
   },
 
   // Get my development report
-  getMyDevelopmentReport: async (
-    days: number = 30
-  ): Promise<DevelopmentReport> => {
-    const response = await apiClient.get(
-      `${API_BASE_URL}/reports/my-development`,
-      {
-        params: { days },
-      }
-    );
+  getMyDevelopmentReport: async (days: number = 30): Promise<DevelopmentReport> => {
+    const response = await apiClient.get(`/reports/my-development`, {
+      params: { days },
+    });
     return response.data;
   },
 
   // Get batch reports
   getBatchReports: async (userIds: number[], days: number = 30) => {
-    const response = await apiClient.post(
-      `${API_BASE_URL}/reports/development/batch`,
-      {
-        user_ids: userIds,
-        days,
-      }
-    );
+    const response = await apiClient.post(`/reports/development/batch`, {
+      user_ids: userIds,
+      days,
+    });
     return response.data;
   },
 
   // Get insights summary
   getInsightsSummary: async (): Promise<InsightsSummary> => {
-    const response = await apiClient.get(
-      `${API_BASE_URL}/reports/insights/summary`
-    );
+    const response = await apiClient.get(`/reports/insights/summary`);
     return response.data;
   },
 
   // Download report
-  downloadReport: async (
-    userId: number,
-    days: number = 30,
-    format: 'json' = 'json'
-  ) => {
-    const response = await apiClient.get(
-      `${API_BASE_URL}/reports/development/${userId}/download`,
-      {
-        params: { days, format },
-        responseType: 'blob',
-      }
-    );
+  downloadReport: async (userId: number, days: number = 30, format: 'json' = 'json') => {
+    const response = await apiClient.get(`/reports/development/${userId}/download`, {
+      params: { days, format },
+      responseType: 'blob',
+    });
 
     // Create download link
     const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -131,9 +108,7 @@ const reportsApi = {
     link.href = url;
     link.setAttribute(
       'download',
-      `development_report_${userId}_${
-        new Date().toISOString().split('T')[0]
-      }.${format}`
+      `development_report_${userId}_${new Date().toISOString().split('T')[0]}.${format}`
     );
     document.body.appendChild(link);
     link.click();
@@ -183,14 +158,7 @@ export const useGenerateBatchReports = () => {
 // Download report
 export const useDownloadReport = () => {
   return useMutation({
-    mutationFn: ({
-      userId,
-      days,
-      format,
-    }: {
-      userId: number;
-      days?: number;
-      format?: 'json';
-    }) => reportsApi.downloadReport(userId, days || 30, format || 'json'),
+    mutationFn: ({ userId, days, format }: { userId: number; days?: number; format?: 'json' }) =>
+      reportsApi.downloadReport(userId, days || 30, format || 'json'),
   });
 };

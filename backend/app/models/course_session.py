@@ -43,7 +43,7 @@ class CourseSession(TenantBaseModel):
 
     # Relationships
     course = relationship("Course", back_populates="sessions")
-    instructor = relationship("User", back_populates="instructed_sessions")
+    instructor = relationship("User", foreign_keys=[instructor_id], back_populates="instructed_sessions")
     # attendance_records = relationship('SessionAttendance', back_populates='session')
 
     @property

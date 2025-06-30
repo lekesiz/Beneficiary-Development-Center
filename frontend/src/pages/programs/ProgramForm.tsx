@@ -19,23 +19,12 @@ import { DatePicker } from '../../components/ui/DatePicker';
 import { Button, Select, Textarea } from '../../components/ui/Form';
 import { Input } from '../../components/ui/Input';
 import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
-import {
-  PROGRAM_STATUS_OPTIONS,
-  PROGRAM_TYPE_OPTIONS,
-} from '../../constants/program';
+import { PROGRAM_STATUS_OPTIONS, PROGRAM_TYPE_OPTIONS } from '../../constants/program';
 import { useAuth } from '../../contexts/AuthContext';
-import {
-  useProgram,
-  useCreateProgram,
-  useUpdateProgram,
-} from '../../hooks/usePrograms';
+import { useProgram, useCreateProgram, useUpdateProgram } from '../../hooks/usePrograms';
 import { programFormSchema, type ProgramFormData } from '../../schemas/programForm';
 import { ProgramType, ProgramStatus } from '../../types/program';
-import type {
-  CreateProgramRequest,
-  UpdateProgramRequest,
-} from '../../types/program';
-
+import type { CreateProgramRequest, UpdateProgramRequest } from '../../types/program';
 
 // Remove the duplicate schema definition as we're importing it from schemas/program.ts
 
@@ -65,8 +54,10 @@ export const ProgramForm: React.FC = () => {
   const [newTag, setNewTag] = useState('');
 
   // Permission checks
-  const canEdit = user?.role && ['admin', 'manager'].includes(user.role);
-  const canSetStatus = user?.role && ['admin', 'manager'].includes(user.role);
+  const canEdit = user?.roles?.some(role => ['admin', 'manager', 'trainer'].includes(role.name)) || 
+                  user?.primaryRole && ['admin', 'manager', 'trainer'].includes(user.primaryRole);
+  const canSetStatus = user?.roles?.some(role => ['admin', 'manager'].includes(role.name)) || 
+                       user?.primaryRole && ['admin', 'manager'].includes(user.primaryRole);
 
   // Form setup
   const {
@@ -104,12 +95,8 @@ export const ProgramForm: React.FC = () => {
         status: program.status,
         start_date: program.start_date.split('T')[0],
         end_date: program.end_date.split('T')[0],
-        enrollment_start: program.enrollment_start
-          ? program.enrollment_start.split('T')[0]
-          : '',
-        enrollment_end: program.enrollment_end
-          ? program.enrollment_end.split('T')[0]
-          : '',
+        enrollment_start: program.enrollment_start ? program.enrollment_start.split('T')[0] : '',
+        enrollment_end: program.enrollment_end ? program.enrollment_end.split('T')[0] : '',
         min_participants: program.min_participants,
         max_participants: program.max_participants,
         location: program.location || '',
@@ -185,9 +172,7 @@ export const ProgramForm: React.FC = () => {
         toast.success(t('programs.form.messages.updateSuccess'));
         navigate('/programs');
       } else {
-        await createProgram.mutateAsync(
-          formData as CreateProgramRequest
-        );
+        await createProgram.mutateAsync(formData as CreateProgramRequest);
         toast.success(t('programs.form.messages.createSuccess'));
         navigate('/programs');
       }
@@ -199,9 +184,7 @@ export const ProgramForm: React.FC = () => {
   if (!canEdit) {
     return (
       <Card className="p-6">
-        <div className="text-center text-red-600">
-          {t('programs.form.messages.noPermission')}
-        </div>
+        <div className="text-center text-red-600">{t('programs.form.messages.noPermission')}</div>
       </Card>
     );
   }
@@ -215,11 +198,7 @@ export const ProgramForm: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate('/programs')}
-          >
+          <Button variant="ghost" size="sm" onClick={() => navigate('/programs')}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             {t('common.backTo', { target: t('programs.title') })}
           </Button>
@@ -228,9 +207,7 @@ export const ProgramForm: React.FC = () => {
               {isEdit ? t('programs.form.editProgram') : t('programs.form.newProgram')}
             </h1>
             <p className="text-gray-600">
-              {isEdit
-                ? t('programs.form.updateDescription')
-                : t('programs.form.createDescription')}
+              {isEdit ? t('programs.form.updateDescription') : t('programs.form.createDescription')}
             </p>
           </div>
         </div>
@@ -260,11 +237,7 @@ export const ProgramForm: React.FC = () => {
                     />
                   )}
                 />
-                {errors.title && (
-                  <p className="text-sm text-destructive">
-                    {errors.title.message}
-                  </p>
-                )}
+                {errors.title && <p className="text-sm text-destructive">{errors.title.message}</p>}
               </div>
             </div>
 
@@ -283,11 +256,7 @@ export const ProgramForm: React.FC = () => {
                   />
                 )}
               />
-              {errors.code && (
-                <p className="text-sm text-destructive">
-                  {errors.code.message}
-                </p>
-              )}
+              {errors.code && <p className="text-sm text-destructive">{errors.code.message}</p>}
             </div>
 
             <div className="space-y-2">
@@ -308,9 +277,7 @@ export const ProgramForm: React.FC = () => {
                 )}
               />
               {errors.program_type && (
-                <p className="text-sm text-destructive">
-                  {errors.program_type.message}
-                </p>
+                <p className="text-sm text-destructive">{errors.program_type.message}</p>
               )}
             </div>
 
@@ -333,9 +300,7 @@ export const ProgramForm: React.FC = () => {
                   )}
                 />
                 {errors.status && (
-                  <p className="text-sm text-destructive">
-                    {errors.status.message}
-                  </p>
+                  <p className="text-sm text-destructive">{errors.status.message}</p>
                 )}
               </div>
             )}
@@ -349,17 +314,11 @@ export const ProgramForm: React.FC = () => {
                   name="description"
                   control={control}
                   render={({ field }) => (
-                    <Textarea
-                      {...field}
-                      error={!!errors.description}
-                      rows={4}
-                    />
+                    <Textarea {...field} error={!!errors.description} rows={4} />
                   )}
                 />
                 {errors.description && (
-                  <p className="text-sm text-destructive">
-                    {errors.description.message}
-                  </p>
+                  <p className="text-sm text-destructive">{errors.description.message}</p>
                 )}
               </div>
             </div>
@@ -368,7 +327,9 @@ export const ProgramForm: React.FC = () => {
 
         {/* Dates and Capacity */}
         <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">{t('programs.form.sections.datesCapacity')}</h3>
+          <h3 className="text-lg font-semibold mb-4">
+            {t('programs.form.sections.datesCapacity')}
+          </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Controller
               name="start_date"
@@ -427,9 +388,7 @@ export const ProgramForm: React.FC = () => {
                   type="number"
                   label={t('programs.form.fields.minParticipants')}
                   error={errors.min_participants?.message}
-                  onChange={(e) =>
-                    field.onChange(parseInt(e.target.value) || 0)
-                  }
+                  onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
                 />
               )}
             />
@@ -443,9 +402,7 @@ export const ProgramForm: React.FC = () => {
                   type="number"
                   label={`${t('programs.form.fields.maxParticipants')} *`}
                   error={errors.max_participants?.message}
-                  onChange={(e) =>
-                    field.onChange(parseInt(e.target.value) || 0)
-                  }
+                  onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
                 />
               )}
             />
@@ -454,7 +411,9 @@ export const ProgramForm: React.FC = () => {
 
         {/* Location and Online */}
         <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">{t('programs.form.sections.locationFormat')}</h3>
+          <h3 className="text-lg font-semibold mb-4">
+            {t('programs.form.sections.locationFormat')}
+          </h3>
           <div className="space-y-4">
             <div className="flex items-center space-x-4">
               <Controller
@@ -536,9 +495,7 @@ export const ProgramForm: React.FC = () => {
                   step="0.01"
                   label={t('programs.form.fields.price')}
                   error={errors.price?.message}
-                  onChange={(e) =>
-                    field.onChange(parseFloat(e.target.value) || 0)
-                  }
+                  onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                 />
               )}
             />
@@ -559,9 +516,7 @@ export const ProgramForm: React.FC = () => {
                 )}
               />
               {errors.currency && (
-                <p className="text-sm text-destructive">
-                  {errors.currency.message}
-                </p>
+                <p className="text-sm text-destructive">{errors.currency.message}</p>
               )}
             </div>
           </div>
@@ -576,15 +531,9 @@ export const ProgramForm: React.FC = () => {
                 value={newObjective}
                 onChange={(e) => setNewObjective(e.target.value)}
                 placeholder={t('programs.form.fields.addObjective')}
-                onKeyPress={(e) =>
-                  e.key === 'Enter' && (e.preventDefault(), addObjective())
-                }
+                onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addObjective())}
               />
-              <Button
-                type="button"
-                onClick={addObjective}
-                disabled={!newObjective.trim()}
-              >
+              <Button type="button" onClick={addObjective} disabled={!newObjective.trim()}>
                 <Plus className="h-4 w-4" />
               </Button>
             </div>
@@ -621,9 +570,7 @@ export const ProgramForm: React.FC = () => {
                 value={newTag}
                 onChange={(e) => setNewTag(e.target.value)}
                 placeholder={t('programs.form.fields.addTag')}
-                onKeyPress={(e) =>
-                  e.key === 'Enter' && (e.preventDefault(), addTag())
-                }
+                onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
               />
               <Button type="button" onClick={addTag} disabled={!newTag.trim()}>
                 <Plus className="h-4 w-4" />
@@ -633,11 +580,7 @@ export const ProgramForm: React.FC = () => {
             {tags.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {tags.map((tag, index) => (
-                  <Badge
-                    key={index}
-                    variant="outline"
-                    className="flex items-center space-x-1"
-                  >
+                  <Badge key={index} variant="outline" className="flex items-center space-x-1">
                     <span>{tag}</span>
                     <Button
                       type="button"
@@ -657,18 +600,12 @@ export const ProgramForm: React.FC = () => {
 
         {/* Actions */}
         <div className="flex items-center justify-end space-x-4">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => navigate('/programs')}
-          >
+          <Button type="button" variant="outline" onClick={() => navigate('/programs')}>
             {t('common.cancel')}
           </Button>
           <Button
             type="submit"
-            disabled={
-              isSubmitting || createProgram.isPending || updateProgram.isPending
-            }
+            disabled={isSubmitting || createProgram.isPending || updateProgram.isPending}
           >
             <Save className="h-4 w-4 mr-2" />
             {isEdit ? t('common.update') : t('common.create')}

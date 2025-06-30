@@ -60,7 +60,7 @@ const MockAuthProvider = ({ children, value }: { children: React.ReactNode; valu
     register: vi.fn(),
     updateProfile: vi.fn(),
   };
-  
+
   // Create a React context to provide the mock value
   const AuthContext = React.createContext(mockValue);
   return <AuthContext.Provider value={mockValue}>{children}</AuthContext.Provider>;
@@ -119,11 +119,7 @@ export function AllTheProviders({
 
 export function renderWithProviders(
   ui: ReactElement,
-  {
-    user = defaultUser,
-    initialRoute = '/',
-    ...options
-  }: CustomRenderOptions = {}
+  { user = defaultUser, initialRoute = '/', ...options }: CustomRenderOptions = {}
 ) {
   if (initialRoute !== '/') {
     window.history.pushState({}, 'Test page', initialRoute);
@@ -133,9 +129,7 @@ export function renderWithProviders(
 
   return {
     ...render(ui, {
-      wrapper: ({ children }) => (
-        <AllTheProviders user={mergedUser}>{children}</AllTheProviders>
-      ),
+      wrapper: ({ children }) => <AllTheProviders user={mergedUser}>{children}</AllTheProviders>,
       ...options,
     }),
     user: mergedUser,

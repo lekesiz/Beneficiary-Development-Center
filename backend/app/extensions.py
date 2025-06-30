@@ -17,13 +17,16 @@ from flask_mail import Mail
 # Initialize extensions
 db = SQLAlchemy()
 
+
 # Monkey patch for SQLAlchemy 2.x compatibility
 # Add remove() method to Session class if it doesn't exist
 def _add_remove_method():
     """Add remove() method to Session for backwards compatibility"""
     from sqlalchemy.orm import Session
-    if not hasattr(Session, 'remove'):
+
+    if not hasattr(Session, "remove"):
         Session.remove = Session.close
+
 
 try:
     _add_remove_method()
@@ -33,7 +36,11 @@ migrate = Migrate()
 jwt = JWTManager()
 cors = CORS()
 cache = Cache()
-limiter = Limiter(key_func=get_remote_address)
+
+# Limiter will be configured in app initialization
+# Provide a dummy key_func that will be overridden in app configuration
+limiter = Limiter(key_func=lambda: "dummy")
+
 socketio = SocketIO()
 mail = Mail()
 

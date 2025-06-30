@@ -66,11 +66,7 @@ const QuestionTypeBadge: React.FC<{ type: string }> = ({ type }) => {
     fill_in_blank: 'Fill in the Blank',
   };
 
-  return (
-    <Badge variant="outline">
-      {labels[type as keyof typeof labels] || type}
-    </Badge>
-  );
+  return <Badge variant="outline">{labels[type as keyof typeof labels] || type}</Badge>;
 };
 
 // Difficulty badge
@@ -154,32 +150,29 @@ const QuestionCard: React.FC<{
         <p className="text-gray-800">{question.question_text}</p>
 
         {/* Show question data based on type */}
-        {question.question_type === 'multiple_choice' &&
-          question.question_data.options && (
-            <div className="ml-4 space-y-1">
-              {question.question_data.options.map(
-                (option: string, idx: number) => (
-                  <div key={idx} className="flex items-center space-x-2">
-                    <span className="w-6 h-6 border rounded-full flex items-center justify-center text-xs">
-                      {String.fromCharCode(65 + idx)}
-                    </span>
-                    <span
-                      className={`text-sm ${
-                        option === question.question_data.correct_answer
-                          ? 'text-green-600 font-medium'
-                          : 'text-gray-600'
-                      }`}
-                    >
-                      {option}
-                      {option === question.question_data.correct_answer && (
-                        <CheckCircle className="inline ml-1 h-3 w-3" />
-                      )}
-                    </span>
-                  </div>
-                )
-              )}
-            </div>
-          )}
+        {question.question_type === 'multiple_choice' && question.question_data.options && (
+          <div className="ml-4 space-y-1">
+            {question.question_data.options.map((option: string, idx: number) => (
+              <div key={idx} className="flex items-center space-x-2">
+                <span className="w-6 h-6 border rounded-full flex items-center justify-center text-xs">
+                  {String.fromCharCode(65 + idx)}
+                </span>
+                <span
+                  className={`text-sm ${
+                    option === question.question_data.correct_answer
+                      ? 'text-green-600 font-medium'
+                      : 'text-gray-600'
+                  }`}
+                >
+                  {option}
+                  {option === question.question_data.correct_answer && (
+                    <CheckCircle className="inline ml-1 h-3 w-3" />
+                  )}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
 
         {question.question_type === 'true_false' && (
           <div className="ml-4">
@@ -217,13 +210,8 @@ export default function EvaluationDetail() {
   const evaluationId = parseInt(id!);
 
   // React Query hooks
-  const {
-    data: evaluation,
-    isLoading,
-    error,
-  } = useEvaluation(evaluationId, true);
-  const { data: questions, isLoading: questionsLoading } =
-    useEvaluationQuestions(evaluationId);
+  const { data: evaluation, isLoading, error } = useEvaluation(evaluationId, true);
+  const { data: questions, isLoading: questionsLoading } = useEvaluationQuestions(evaluationId);
   const deleteMutation = useDeleteEvaluation();
   const activateMutation = useActivateEvaluation();
   const archiveMutation = useArchiveEvaluation();
@@ -286,8 +274,7 @@ export default function EvaluationDetail() {
             <div className="flex items-center space-x-4 mt-1">
               <StatusBadge status={evaluation.status} />
               <span className="text-sm text-gray-500">
-                {new Date(evaluation.created_at).toLocaleDateString('tr-TR')}{' '}
-                created on
+                {new Date(evaluation.created_at).toLocaleDateString('tr-TR')} created on
               </span>
             </div>
           </div>
@@ -301,9 +288,7 @@ export default function EvaluationDetail() {
               className="flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50"
             >
               <Play className="mr-2 h-4 w-4" />
-              {activateMutation.isPending
-                ? 'Activating...'
-                : 'Activate'}
+              {activateMutation.isPending ? 'Activating...' : 'Activate'}
             </button>
           )}
 
@@ -365,9 +350,7 @@ export default function EvaluationDetail() {
               <div className="text-center">
                 <FileText className="h-8 w-8 text-blue-600 mx-auto mb-2" />
                 <p className="text-sm text-gray-600">Number of Questions</p>
-                <p className="text-lg font-semibold">
-                  {evaluation.total_questions}
-                </p>
+                <p className="text-lg font-semibold">{evaluation.total_questions}</p>
               </div>
 
               <div className="text-center">
@@ -375,9 +358,7 @@ export default function EvaluationDetail() {
                   <span className="text-green-600 font-bold text-sm">P</span>
                 </div>
                 <p className="text-sm text-gray-600">Total Points</p>
-                <p className="text-lg font-semibold">
-                  {evaluation.total_points}
-                </p>
+                <p className="text-lg font-semibold">{evaluation.total_points}</p>
               </div>
 
               <div className="text-center">
@@ -385,17 +366,13 @@ export default function EvaluationDetail() {
                   <span className="text-yellow-600 font-bold text-sm">%</span>
                 </div>
                 <p className="text-sm text-gray-600">Passing Score</p>
-                <p className="text-lg font-semibold">
-                  {evaluation.passing_score}%
-                </p>
+                <p className="text-lg font-semibold">{evaluation.passing_score}%</p>
               </div>
 
               <div className="text-center">
                 <Clock className="h-8 w-8 text-purple-600 mx-auto mb-2" />
                 <p className="text-sm text-gray-600">Duration</p>
-                <p className="text-lg font-semibold">
-                  {evaluation.duration_display}
-                </p>
+                <p className="text-lg font-semibold">{evaluation.duration_display}</p>
               </div>
             </div>
           </Card>
@@ -403,13 +380,9 @@ export default function EvaluationDetail() {
           {/* Questions Section */}
           <Card className="p-6">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold">
-                Questions ({questions?.length || 0})
-              </h2>
+              <h2 className="text-lg font-semibold">Questions ({questions?.length || 0})</h2>
               <button
-                onClick={() =>
-                  navigate(`/evaluations/${evaluationId}/questions/create`)
-                }
+                onClick={() => navigate(`/evaluations/${evaluationId}/questions/create`)}
                 className="flex items-center px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm"
               >
                 <Plus className="mr-1 h-4 w-4" />
@@ -428,14 +401,8 @@ export default function EvaluationDetail() {
                     key={question.id}
                     question={question}
                     index={index}
-                    onEdit={(id) =>
-                      navigate(
-                        `/evaluations/${evaluationId}/questions/${id}/edit`
-                      )
-                    }
-                    onDelete={(id) =>
-                      setDeleteModal({ isOpen: true, questionId: id })
-                    }
+                    onEdit={(id) => navigate(`/evaluations/${evaluationId}/questions/${id}/edit`)}
+                    onDelete={(id) => setDeleteModal({ isOpen: true, questionId: id })}
                   />
                 ))}
               </div>
@@ -444,9 +411,7 @@ export default function EvaluationDetail() {
                 <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <p className="text-gray-500">No questions added yet</p>
                 <button
-                  onClick={() =>
-                    navigate(`/evaluations/${evaluationId}/questions/create`)
-                  }
+                  onClick={() => navigate(`/evaluations/${evaluationId}/questions/create`)}
                   className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
                 >
                   Add First Question
@@ -480,9 +445,7 @@ export default function EvaluationDetail() {
               </div>
 
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">
-                  Show Results Immediately
-                </span>
+                <span className="text-sm text-gray-600">Show Results Immediately</span>
                 <span className="font-medium">
                   {evaluation.show_results_immediately ? (
                     <CheckCircle className="h-4 w-4 text-green-600" />
@@ -493,9 +456,7 @@ export default function EvaluationDetail() {
               </div>
 
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">
-                  Allow Review
-                </span>
+                <span className="text-sm text-gray-600">Allow Review</span>
                 <span className="font-medium">
                   {evaluation.allow_review ? (
                     <CheckCircle className="h-4 w-4 text-green-600" />
@@ -513,9 +474,7 @@ export default function EvaluationDetail() {
 
             <div className="space-y-3">
               <div className="flex items-center space-x-2">
-                <Badge
-                  variant={evaluation.is_available ? 'success' : 'secondary'}
-                >
+                <Badge variant={evaluation.is_available ? 'success' : 'secondary'}>
                   {evaluation.is_available ? 'Available' : 'Not Available'}
                 </Badge>
               </div>
@@ -524,9 +483,7 @@ export default function EvaluationDetail() {
                 <div>
                   <span className="text-sm text-gray-600">Start:</span>
                   <p className="font-medium">
-                    {new Date(evaluation.available_from).toLocaleString(
-                      'tr-TR'
-                    )}
+                    {new Date(evaluation.available_from).toLocaleString('tr-TR')}
                   </p>
                 </div>
               )}
@@ -535,9 +492,7 @@ export default function EvaluationDetail() {
                 <div>
                   <span className="text-sm text-gray-600">End:</span>
                   <p className="font-medium">
-                    {new Date(evaluation.available_until).toLocaleString(
-                      'tr-TR'
-                    )}
+                    {new Date(evaluation.available_until).toLocaleString('tr-TR')}
                   </p>
                 </div>
               )}
@@ -576,9 +531,7 @@ export default function EvaluationDetail() {
         title="Delete Question"
       >
         <div className="space-y-4">
-          <p>
-            Are you sure you want to delete this question? This action cannot be undone.
-          </p>
+          <p>Are you sure you want to delete this question? This action cannot be undone.</p>
           <div className="flex justify-end space-x-2">
             <button
               onClick={() => setDeleteModal({ isOpen: false })}

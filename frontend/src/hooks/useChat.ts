@@ -27,16 +27,12 @@ export const chatQueryKeys = {
   conversations: () => [...chatQueryKeys.all, 'conversations'] as const,
   conversationsList: (filters?: ConversationFilters) =>
     [...chatQueryKeys.conversations(), filters] as const,
-  conversationDetail: (id: number) =>
-    [...chatQueryKeys.conversations(), id] as const,
+  conversationDetail: (id: number) => [...chatQueryKeys.conversations(), id] as const,
   messages: () => [...chatQueryKeys.all, 'messages'] as const,
-  messagesList: (conversationId: number) =>
-    [...chatQueryKeys.messages(), conversationId] as const,
-  messageDetail: (id: number) =>
-    [...chatQueryKeys.messages(), 'detail', id] as const,
+  messagesList: (conversationId: number) => [...chatQueryKeys.messages(), conversationId] as const,
+  messageDetail: (id: number) => [...chatQueryKeys.messages(), 'detail', id] as const,
   users: () => [...chatQueryKeys.all, 'users'] as const,
-  userSearch: (query: string) =>
-    [...chatQueryKeys.users(), 'search', query] as const,
+  userSearch: (query: string) => [...chatQueryKeys.users(), 'search', query] as const,
   statistics: () => [...chatQueryKeys.all, 'statistics'] as const,
   notifications: () => [...chatQueryKeys.all, 'notifications'] as const,
 };
@@ -145,8 +141,7 @@ export const useCreateConversation = () => {
       toast.success('Sohbet başarıyla oluşturuldu');
     },
     onError: (error: any) => {
-      const message =
-        error.response?.data?.message || 'Sohbet oluşturulurken hata oluştu';
+      const message = error.response?.data?.message || 'Sohbet oluşturulurken hata oluştu';
       toast.error(message);
     },
   });
@@ -174,8 +169,7 @@ export const useUpdateConversation = () => {
       toast.success('Sohbet güncellendi');
     },
     onError: (error: any) => {
-      const message =
-        error.response?.data?.message || 'Sohbet güncellenirken hata oluştu';
+      const message = error.response?.data?.message || 'Sohbet güncellenirken hata oluştu';
       toast.error(message);
     },
   });
@@ -207,8 +201,7 @@ export const useDeleteConversation = () => {
       toast.success('Sohbet silindi');
     },
     onError: (error: any) => {
-      const message =
-        error.response?.data?.message || 'Sohbet silinirken hata oluştu';
+      const message = error.response?.data?.message || 'Sohbet silinirken hata oluştu';
       toast.error(message);
     },
   });
@@ -250,8 +243,7 @@ export const useSendMessage = () => {
       queryClient.invalidateQueries({ queryKey: chatQueryKeys.conversations() });
     },
     onError: (error: any) => {
-      const message =
-        error.response?.data?.message || 'Mesaj gönderilirken hata oluştu';
+      const message = error.response?.data?.message || 'Mesaj gönderilirken hata oluştu';
       toast.error(message);
     },
   });
@@ -287,8 +279,7 @@ export const useUpdateMessage = () => {
       toast.success('Mesaj güncellendi');
     },
     onError: (error: any) => {
-      const message =
-        error.response?.data?.message || 'Mesaj güncellenirken hata oluştu';
+      const message = error.response?.data?.message || 'Mesaj güncellenirken hata oluştu';
       toast.error(message);
     },
   });
@@ -309,8 +300,7 @@ export const useDeleteMessage = () => {
       toast.success('Mesaj silindi');
     },
     onError: (error: any) => {
-      const message =
-        error.response?.data?.message || 'Mesaj silinirken hata oluştu';
+      const message = error.response?.data?.message || 'Mesaj silinirken hata oluştu';
       toast.error(message);
     },
   });
@@ -323,13 +313,8 @@ export const useMarkAsRead = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      conversationId,
-      data,
-    }: {
-      conversationId: number;
-      data: MarkAsReadRequest;
-    }) => chatApi.markAsRead(conversationId, data),
+    mutationFn: ({ conversationId, data }: { conversationId: number; data: MarkAsReadRequest }) =>
+      chatApi.markAsRead(conversationId, data),
     onSuccess: (_, { conversationId }) => {
       // Update conversation unread count
       queryClient.invalidateQueries({
@@ -340,8 +325,7 @@ export const useMarkAsRead = () => {
       queryClient.invalidateQueries({ queryKey: chatQueryKeys.notifications() });
     },
     onError: (error: any) => {
-      const message =
-        error.response?.data?.message || 'Mesajlar okundu olarak işaretlenemedi';
+      const message = error.response?.data?.message || 'Mesajlar okundu olarak işaretlenemedi';
       toast.error(message);
     },
   });
@@ -374,8 +358,7 @@ export const useAddParticipants = () => {
       toast.success('Katılımcılar eklendi');
     },
     onError: (error: any) => {
-      const message =
-        error.response?.data?.message || 'Katılımcılar eklenirken hata oluştu';
+      const message = error.response?.data?.message || 'Katılımcılar eklenirken hata oluştu';
       toast.error(message);
     },
   });
@@ -408,8 +391,7 @@ export const useRemoveParticipant = () => {
       toast.success('Katılımcı çıkarıldı');
     },
     onError: (error: any) => {
-      const message =
-        error.response?.data?.message || 'Katılımcı çıkarılırken hata oluştu';
+      const message = error.response?.data?.message || 'Katılımcı çıkarılırken hata oluştu';
       toast.error(message);
     },
   });
@@ -436,8 +418,7 @@ export const useLeaveConversation = () => {
       toast.success('Sohbetten ayrıldınız');
     },
     onError: (error: any) => {
-      const message =
-        error.response?.data?.message || 'Sohbetten ayrılırken hata oluştu';
+      const message = error.response?.data?.message || 'Sohbetten ayrılırken hata oluştu';
       toast.error(message);
     },
   });
@@ -450,8 +431,7 @@ export const useUploadAttachment = () => {
   return useMutation({
     mutationFn: (file: File) => chatApi.uploadAttachment(file),
     onError: (error: any) => {
-      const message =
-        error.response?.data?.message || 'Dosya yüklenirken hata oluştu';
+      const message = error.response?.data?.message || 'Dosya yüklenirken hata oluştu';
       toast.error(message);
     },
   });
@@ -464,15 +444,13 @@ export const useMarkNotificationAsRead = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (notificationId: number) =>
-      chatApi.markNotificationAsRead(notificationId),
+    mutationFn: (notificationId: number) => chatApi.markNotificationAsRead(notificationId),
     onSuccess: () => {
       // Invalidate notifications
       queryClient.invalidateQueries({ queryKey: chatQueryKeys.notifications() });
     },
     onError: (error: any) => {
-      const message =
-        error.response?.data?.message || 'Bildirim okundu olarak işaretlenemedi';
+      const message = error.response?.data?.message || 'Bildirim okundu olarak işaretlenemedi';
       toast.error(message);
     },
   });
@@ -483,13 +461,8 @@ export const useMarkNotificationAsRead = () => {
  */
 export const useSendTypingStatus = () => {
   return useMutation({
-    mutationFn: ({
-      conversationId,
-      isTyping,
-    }: {
-      conversationId: number;
-      isTyping: boolean;
-    }) => chatApi.sendTypingStatus(conversationId, isTyping),
+    mutationFn: ({ conversationId, isTyping }: { conversationId: number; isTyping: boolean }) =>
+      chatApi.sendTypingStatus(conversationId, isTyping),
   });
 };
 

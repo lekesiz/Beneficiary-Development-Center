@@ -9,7 +9,6 @@ import {
 
 import apiClient from './client';
 
-
 export const beneficiariesApi = {
   // Get all beneficiaries with pagination and filters
   getAll: (params?: BeneficiaryListParams) => {
@@ -23,17 +22,12 @@ export const beneficiariesApi = {
 
   // Get beneficiary by UUID
   getByUuid: (uuid: string) => {
-    return apiClient.get<{ beneficiary: Beneficiary }>(
-      `/beneficiaries/uuid/${uuid}`
-    );
+    return apiClient.get<{ beneficiary: Beneficiary }>(`/beneficiaries/uuid/${uuid}`);
   },
 
   // Create new beneficiary
   create: (data: BeneficiaryCreate) => {
-    return apiClient.post<{ message: string; beneficiary: Beneficiary }>(
-      '/beneficiaries',
-      data
-    );
+    return apiClient.post<{ message: string; beneficiary: Beneficiary }>('/beneficiaries', data);
   },
 
   // Update beneficiary
@@ -74,9 +68,7 @@ export const beneficiariesApi = {
 
   // Get beneficiary statistics
   getStatistics: () => {
-    return apiClient.get<{ statistics: BeneficiaryStatistics }>(
-      '/beneficiaries/statistics'
-    );
+    return apiClient.get<{ statistics: BeneficiaryStatistics }>('/beneficiaries/statistics');
   },
 
   // Assign trainer to beneficiary

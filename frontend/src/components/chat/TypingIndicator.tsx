@@ -24,17 +24,17 @@ export const TypingIndicator: React.FC<TypingIndicatorProps> = ({ conversationId
     const handleTypingStatus = (data: TypingStatus & { user: ChatUser }) => {
       if (data.conversationId !== conversationId || data.userId === currentUserId) return;
 
-      setTypingUsers(prev => {
+      setTypingUsers((prev) => {
         if (data.isTyping) {
           // Add user if not already typing
-          const exists = prev.some(u => u.id === data.userId);
+          const exists = prev.some((u) => u.id === data.userId);
           if (!exists) {
             return [...prev, data.user];
           }
           return prev;
         } else {
           // Remove user from typing
-          return prev.filter(u => u.id !== data.userId);
+          return prev.filter((u) => u.id !== data.userId);
         }
       });
     };
@@ -62,18 +62,25 @@ export const TypingIndicator: React.FC<TypingIndicatorProps> = ({ conversationId
   return (
     <div className="flex items-center gap-2 px-4 py-2">
       <div className="flex -space-x-2">
-        {typingUsers.slice(0, 3).map(user => (
+        {typingUsers.slice(0, 3).map((user) => (
           <MessageAvatar key={user.id} user={user} size="xs" />
         ))}
       </div>
       <div className="flex items-center gap-1">
-        <span className="text-sm text-gray-500 dark:text-gray-400 italic">
-          {getTypingText()}
-        </span>
+        <span className="text-sm text-gray-500 dark:text-gray-400 italic">{getTypingText()}</span>
         <div className="flex gap-1">
-          <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-          <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-          <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+          <span
+            className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"
+            style={{ animationDelay: '0ms' }}
+          />
+          <span
+            className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"
+            style={{ animationDelay: '150ms' }}
+          />
+          <span
+            className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"
+            style={{ animationDelay: '300ms' }}
+          />
         </div>
       </div>
     </div>

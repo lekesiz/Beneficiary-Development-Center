@@ -19,8 +19,7 @@ import type {
 export const evaluationQueryKeys = {
   all: ['evaluations'] as const,
   lists: () => [...evaluationQueryKeys.all, 'list'] as const,
-  list: (filters?: EvaluationFilters) =>
-    [...evaluationQueryKeys.lists(), filters] as const,
+  list: (filters?: EvaluationFilters) => [...evaluationQueryKeys.lists(), filters] as const,
   details: () => [...evaluationQueryKeys.all, 'detail'] as const,
   detail: (id: number, includeQuestions?: boolean) =>
     [...evaluationQueryKeys.details(), id, includeQuestions] as const,
@@ -96,10 +95,7 @@ export const useMyEvaluationAttempts = (evaluationId: number) => {
 /**
  * Hook to get evaluation attempt details
  */
-export const useEvaluationAttempt = (
-  evaluationId: number,
-  attemptId: number
-) => {
+export const useEvaluationAttempt = (evaluationId: number, attemptId: number) => {
   return useQuery({
     queryKey: evaluationQueryKeys.attempt(evaluationId, attemptId),
     queryFn: () => evaluationsApi.attempts.getById(evaluationId, attemptId),
@@ -136,17 +132,12 @@ export const useCreateEvaluation = () => {
       }
 
       // Add to cache
-      queryClient.setQueryData(
-        evaluationQueryKeys.detail(newEvaluation.id),
-        newEvaluation
-      );
+      queryClient.setQueryData(evaluationQueryKeys.detail(newEvaluation.id), newEvaluation);
 
       toast.success('Değerlendirme başarıyla oluşturuldu');
     },
     onError: (error: any) => {
-      const message =
-        error.response?.data?.message ||
-        'Değerlendirme oluşturulurken hata oluştu';
+      const message = error.response?.data?.message || 'Değerlendirme oluşturulurken hata oluştu';
       toast.error(message);
     },
   });
@@ -163,10 +154,7 @@ export const useUpdateEvaluation = () => {
       evaluationsApi.update(id, data),
     onSuccess: (updatedEvaluation) => {
       // Update cached data
-      queryClient.setQueryData(
-        evaluationQueryKeys.detail(updatedEvaluation.id),
-        updatedEvaluation
-      );
+      queryClient.setQueryData(evaluationQueryKeys.detail(updatedEvaluation.id), updatedEvaluation);
 
       // Invalidate lists to refresh
       queryClient.invalidateQueries({ queryKey: evaluationQueryKeys.lists() });
@@ -189,9 +177,7 @@ export const useUpdateEvaluation = () => {
       toast.success('Değerlendirme başarıyla güncellendi');
     },
     onError: (error: any) => {
-      const message =
-        error.response?.data?.message ||
-        'Değerlendirme güncellenirken hata oluştu';
+      const message = error.response?.data?.message || 'Değerlendirme güncellenirken hata oluştu';
       toast.error(message);
     },
   });
@@ -227,8 +213,7 @@ export const useDeleteEvaluation = () => {
       toast.success('Değerlendirme başarıyla silindi');
     },
     onError: (error: any) => {
-      const message =
-        error.response?.data?.message || 'Değerlendirme silinirken hata oluştu';
+      const message = error.response?.data?.message || 'Değerlendirme silinirken hata oluştu';
       toast.error(message);
     },
   });
@@ -244,10 +229,7 @@ export const useActivateEvaluation = () => {
     mutationFn: (id: number) => evaluationsApi.activate(id),
     onSuccess: (updatedEvaluation) => {
       // Update cached data
-      queryClient.setQueryData(
-        evaluationQueryKeys.detail(updatedEvaluation.id),
-        updatedEvaluation
-      );
+      queryClient.setQueryData(evaluationQueryKeys.detail(updatedEvaluation.id), updatedEvaluation);
 
       // Invalidate lists
       queryClient.invalidateQueries({ queryKey: evaluationQueryKeys.lists() });
@@ -259,8 +241,7 @@ export const useActivateEvaluation = () => {
     },
     onError: (error: any) => {
       const message =
-        error.response?.data?.message ||
-        'Değerlendirme aktifleştirilirken hata oluştu';
+        error.response?.data?.message || 'Değerlendirme aktifleştirilirken hata oluştu';
       toast.error(message);
     },
   });
@@ -276,10 +257,7 @@ export const useArchiveEvaluation = () => {
     mutationFn: (id: number) => evaluationsApi.archive(id),
     onSuccess: (updatedEvaluation) => {
       // Update cached data
-      queryClient.setQueryData(
-        evaluationQueryKeys.detail(updatedEvaluation.id),
-        updatedEvaluation
-      );
+      queryClient.setQueryData(evaluationQueryKeys.detail(updatedEvaluation.id), updatedEvaluation);
 
       // Invalidate lists
       queryClient.invalidateQueries({ queryKey: evaluationQueryKeys.lists() });
@@ -290,9 +268,7 @@ export const useArchiveEvaluation = () => {
       toast.success('Değerlendirme arşivlendi');
     },
     onError: (error: any) => {
-      const message =
-        error.response?.data?.message ||
-        'Değerlendirme arşivlenirken hata oluştu';
+      const message = error.response?.data?.message || 'Değerlendirme arşivlenirken hata oluştu';
       toast.error(message);
     },
   });
@@ -305,13 +281,8 @@ export const useCreateQuestion = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      evaluationId,
-      data,
-    }: {
-      evaluationId: number;
-      data: CreateQuestionRequest;
-    }) => evaluationsApi.questions.create(evaluationId, data),
+    mutationFn: ({ evaluationId, data }: { evaluationId: number; data: CreateQuestionRequest }) =>
+      evaluationsApi.questions.create(evaluationId, data),
     onSuccess: (newQuestion, { evaluationId }) => {
       // Invalidate questions list
       queryClient.invalidateQueries({
@@ -326,8 +297,7 @@ export const useCreateQuestion = () => {
       toast.success('Soru başarıyla eklendi');
     },
     onError: (error: any) => {
-      const message =
-        error.response?.data?.message || 'Soru eklenirken hata oluştu';
+      const message = error.response?.data?.message || 'Soru eklenirken hata oluştu';
       toast.error(message);
     },
   });
@@ -363,8 +333,7 @@ export const useUpdateQuestion = () => {
       toast.success('Soru başarıyla güncellendi');
     },
     onError: (error: any) => {
-      const message =
-        error.response?.data?.message || 'Soru güncellenirken hata oluştu';
+      const message = error.response?.data?.message || 'Soru güncellenirken hata oluştu';
       toast.error(message);
     },
   });
@@ -377,13 +346,8 @@ export const useDeleteQuestion = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      evaluationId,
-      questionId,
-    }: {
-      evaluationId: number;
-      questionId: number;
-    }) => evaluationsApi.questions.delete(evaluationId, questionId),
+    mutationFn: ({ evaluationId, questionId }: { evaluationId: number; questionId: number }) =>
+      evaluationsApi.questions.delete(evaluationId, questionId),
     onSuccess: (_, { evaluationId }) => {
       // Invalidate questions list
       queryClient.invalidateQueries({
@@ -398,8 +362,7 @@ export const useDeleteQuestion = () => {
       toast.success('Soru başarıyla silindi');
     },
     onError: (error: any) => {
-      const message =
-        error.response?.data?.message || 'Soru silinirken hata oluştu';
+      const message = error.response?.data?.message || 'Soru silinirken hata oluştu';
       toast.error(message);
     },
   });
@@ -420,8 +383,7 @@ export const useReorderQuestion = () => {
       evaluationId: number;
       questionId: number;
       orderIndex: number;
-    }) =>
-      evaluationsApi.questions.reorder(evaluationId, questionId, orderIndex),
+    }) => evaluationsApi.questions.reorder(evaluationId, questionId, orderIndex),
     onSuccess: (_, { evaluationId }) => {
       // Invalidate questions list
       queryClient.invalidateQueries({
@@ -431,9 +393,7 @@ export const useReorderQuestion = () => {
       toast.success('Soru sırası güncellendi');
     },
     onError: (error: any) => {
-      const message =
-        error.response?.data?.message ||
-        'Soru sırası güncellenirken hata oluştu';
+      const message = error.response?.data?.message || 'Soru sırası güncellenirken hata oluştu';
       toast.error(message);
     },
   });
@@ -446,8 +406,7 @@ export const useStartEvaluationAttempt = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (evaluationId: number) =>
-      evaluationsApi.attempts.start(evaluationId),
+    mutationFn: (evaluationId: number) => evaluationsApi.attempts.start(evaluationId),
     onSuccess: (newAttempt, evaluationId) => {
       // Add to cache
       queryClient.setQueryData(
@@ -463,9 +422,7 @@ export const useStartEvaluationAttempt = () => {
       toast.success('Değerlendirme başlatıldı');
     },
     onError: (error: any) => {
-      const message =
-        error.response?.data?.message ||
-        'Değerlendirme başlatılırken hata oluştu';
+      const message = error.response?.data?.message || 'Değerlendirme başlatılırken hata oluştu';
       toast.error(message);
     },
   });
@@ -478,13 +435,8 @@ export const useSubmitEvaluationAttempt = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      evaluationId,
-      attemptId,
-    }: {
-      evaluationId: number;
-      attemptId: number;
-    }) => evaluationsApi.attempts.submit(evaluationId, attemptId),
+    mutationFn: ({ evaluationId, attemptId }: { evaluationId: number; attemptId: number }) =>
+      evaluationsApi.attempts.submit(evaluationId, attemptId),
     onSuccess: (submittedAttempt, { evaluationId, attemptId }) => {
       // Update cached attempt
       queryClient.setQueryData(
@@ -500,9 +452,7 @@ export const useSubmitEvaluationAttempt = () => {
       toast.success('Değerlendirme tamamlandı');
     },
     onError: (error: any) => {
-      const message =
-        error.response?.data?.message ||
-        'Değerlendirme tamamlanırken hata oluştu';
+      const message = error.response?.data?.message || 'Değerlendirme tamamlanırken hata oluştu';
       toast.error(message);
     },
   });
@@ -531,8 +481,7 @@ export const useSaveQuestionResponse = () => {
       });
     },
     onError: (error: any) => {
-      const message =
-        error.response?.data?.message || 'Cevap kaydedilirken hata oluştu';
+      const message = error.response?.data?.message || 'Cevap kaydedilirken hata oluştu';
       toast.error(message);
     },
   });

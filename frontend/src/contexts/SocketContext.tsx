@@ -50,16 +50,13 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
   useEffect(() => {
     if (isAuthenticated && user) {
       // Initialize socket connection
-      const socketInstance = io(
-        import.meta.env.VITE_API_URL || 'http://localhost:5000',
-        {
-          auth: {
-            token: localStorage.getItem('access_token'),
-            tenantId: localStorage.getItem('tenant_id'),
-          },
-          transports: ['websocket', 'polling'],
-        }
-      );
+      const socketInstance = io(import.meta.env.VITE_API_URL || 'http://localhost:5000', {
+        auth: {
+          token: localStorage.getItem('access_token'),
+          tenantId: localStorage.getItem('tenant_id'),
+        },
+        transports: ['websocket', 'polling'],
+      });
 
       socketInstance.on('connect', () => {
         console.log('Socket connected');
@@ -164,7 +161,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
       });
 
       // Chat event listeners
-      
+
       // New message event
       socketInstance.on('message:new', (message: Message) => {
         // Update messages in the conversation
@@ -172,14 +169,14 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
           chatQueryKeys.messagesList(message.conversationId),
           (oldData: any) => {
             if (!oldData) return oldData;
-            
+
             // Check if message already exists (to prevent duplicates)
             const messageExists = oldData.pages.some((page: any) =>
               page.messages.some((msg: Message) => msg.id === message.id)
             );
-            
+
             if (messageExists) return oldData;
-            
+
             return {
               ...oldData,
               pages: oldData.pages.map((page: any, index: number) => {
@@ -196,14 +193,15 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
         );
 
         // Update conversation list to show latest message
-        queryClient.invalidateQueries({ 
-          queryKey: chatQueryKeys.conversations() 
+        queryClient.invalidateQueries({
+          queryKey: chatQueryKeys.conversations(),
         });
 
         // Show notification for new message if not from current user
         const currentUserId = parseInt(localStorage.getItem('user_id') || '0');
         if (message.sender.id !== currentUserId) {
-          const senderName = message.sender.fullName || `${message.sender.firstName} ${message.sender.lastName}`;
+          const senderName =
+            message.sender.fullName || `${message.sender.firstName} ${message.sender.lastName}`;
           toast(`${senderName}: ${message.content}`, {
             icon: '💬',
             duration: 5000,
@@ -212,24 +210,19 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
       });
 
       // Typing status event
-      socketInstance.on('message:typing', (data: {
-        conversationId: number;
-        userId: number;
-        userName: string;
-        isTyping: boolean;
-      }) => {
-        // You can store typing status in a separate state or context
-        // For now, we'll just log it
-        console.log('Typing status:', data);
-        
-        // Optionally, you can store this in React Query cache
-        queryClient.setQueryData(
-          ['chat', 'typing', data.conversationId],
-          (oldData: any) => {
+      socketInstance.on(
+        'message:typing',
+        (data: { conversationId: number; userId: number; userName: string; isTyping: boolean }) => {
+          // You can store typing status in a separate state or context
+          // For now, we'll just log it
+          console.log('Typing status:', data);
+
+          // Optionally, you can store this in React Query cache
+          queryClient.setQueryData(['chat', 'typing', data.conversationId], (oldData: any) => {
             if (!oldData) {
               return data.isTyping ? [data] : [];
             }
-            
+
             if (data.isTyping) {
               // Add user to typing list
               return [...oldData.filter((t: any) => t.userId !== data.userId), data];
@@ -237,59 +230,60 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
               // Remove user from typing list
               return oldData.filter((t: any) => t.userId !== data.userId);
             }
-          }
-        );
-      });
+          });
+        }
+      );
 
       // Read receipt event
-      socketInstance.on('message:read_receipt', (data: {
-        conversationId: number;
-        messageIds: number[];
-        userId: number;
-        readAt: string;
-      }) => {
-        // Update messages in cache to mark them as read
-        queryClient.setQueryData(
-          chatQueryKeys.messagesList(data.conversationId),
-          (oldData: any) => {
-            if (!oldData) return oldData;
-            
-            return {
-              ...oldData,
-              pages: oldData.pages.map((page: any) => ({
-                ...page,
-                messages: page.messages.map((msg: Message) => {
-                  if (data.messageIds.includes(msg.id)) {
-                    // Add read receipt to message
-                    const readByExists = msg.readBy.some(
-                      (read) => read.userId === data.userId
-                    );
-                    
-                    if (!readByExists) {
-                      return {
-                        ...msg,
-                        readBy: [
-                          ...msg.readBy,
-                          {
-                            userId: data.userId,
-                            readAt: data.readAt,
-                          },
-                        ],
-                      };
-                    }
-                  }
-                  return msg;
-                }),
-              })),
-            };
-          }
-        );
+      socketInstance.on(
+        'message:read_receipt',
+        (data: {
+          conversationId: number;
+          messageIds: number[];
+          userId: number;
+          readAt: string;
+        }) => {
+          // Update messages in cache to mark them as read
+          queryClient.setQueryData(
+            chatQueryKeys.messagesList(data.conversationId),
+            (oldData: any) => {
+              if (!oldData) return oldData;
 
-        // Update conversation unread count
-        queryClient.invalidateQueries({
-          queryKey: chatQueryKeys.conversationDetail(data.conversationId),
-        });
-      });
+              return {
+                ...oldData,
+                pages: oldData.pages.map((page: any) => ({
+                  ...page,
+                  messages: page.messages.map((msg: Message) => {
+                    if (data.messageIds.includes(msg.id)) {
+                      // Add read receipt to message
+                      const readByExists = msg.readBy.some((read) => read.userId === data.userId);
+
+                      if (!readByExists) {
+                        return {
+                          ...msg,
+                          readBy: [
+                            ...msg.readBy,
+                            {
+                              userId: data.userId,
+                              readAt: data.readAt,
+                            },
+                          ],
+                        };
+                      }
+                    }
+                    return msg;
+                  }),
+                })),
+              };
+            }
+          );
+
+          // Update conversation unread count
+          queryClient.invalidateQueries({
+            queryKey: chatQueryKeys.conversationDetail(data.conversationId),
+          });
+        }
+      );
 
       setSocket(socketInstance);
 
@@ -304,7 +298,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
         socketInstance.off('connect');
         socketInstance.off('disconnect');
         socketInstance.off('connect_error');
-        
+
         socketInstance.disconnect();
       };
     } else {
@@ -392,7 +386,5 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
     markAsRead,
   };
 
-  return (
-    <SocketContext.Provider value={value}>{children}</SocketContext.Provider>
-  );
+  return <SocketContext.Provider value={value}>{children}</SocketContext.Provider>;
 };

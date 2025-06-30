@@ -32,13 +32,7 @@ export const MessageActions: React.FC<MessageActionsProps> = ({
 
   return (
     <div className="flex items-center gap-1 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-1">
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={onReply}
-        title="Reply"
-        className="!h-7 !w-7 !p-0"
-      >
+      <Button variant="ghost" size="sm" onClick={onReply} title="Reply" className="!h-7 !w-7 !p-0">
         <Reply size={14} />
       </Button>
 
@@ -55,13 +49,7 @@ export const MessageActions: React.FC<MessageActionsProps> = ({
       )}
 
       {isOwnMessage && message.type === 'text' && (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onEdit}
-          title="Edit"
-          className="!h-7 !w-7 !p-0"
-        >
+        <Button variant="ghost" size="sm" onClick={onEdit} title="Edit" className="!h-7 !w-7 !p-0">
           <Edit2 size={14} />
         </Button>
       )}

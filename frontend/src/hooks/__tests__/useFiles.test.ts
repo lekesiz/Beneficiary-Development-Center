@@ -31,8 +31,8 @@ function createWrapper() {
       mutations: { retry: false },
     },
   });
-  
-  return ({ children }: { children: React.ReactNode }) => 
+
+  return ({ children }: { children: React.ReactNode }) =>
     React.createElement(QueryClientProvider, { client: queryClient }, children);
 }
 
@@ -62,7 +62,7 @@ describe('useFiles hooks', () => {
       });
 
       const files = [new File(['test'], 'test1.txt', { type: 'text/plain' })];
-      
+
       result.current.mutate({
         files,
         entityType: 'course_material',
@@ -73,11 +73,7 @@ describe('useFiles hooks', () => {
         expect(result.current.isSuccess).toBe(true);
       });
 
-      expect(mockFilesApi.uploadFiles).toHaveBeenCalledWith(
-        files,
-        'course_material',
-        '123'
-      );
+      expect(mockFilesApi.uploadFiles).toHaveBeenCalledWith(files, 'course_material', '123');
       expect(mockToast.success).toHaveBeenCalledWith('1 file(s) uploaded successfully');
     });
 
@@ -90,16 +86,14 @@ describe('useFiles hooks', () => {
       });
 
       const files = [new File(['test'], 'test.txt', { type: 'text/plain' })];
-      
+
       result.current.mutate({ files });
 
       await waitFor(() => {
         expect(result.current.isError).toBe(true);
       });
 
-      expect(mockToast.error).toHaveBeenCalledWith(
-        'Failed to upload file(s). Please try again.'
-      );
+      expect(mockToast.error).toHaveBeenCalledWith('Failed to upload file(s). Please try again.');
     });
   });
 
@@ -122,7 +116,7 @@ describe('useFiles hooks', () => {
       });
 
       const file = new File(['test'], 'test.txt', { type: 'text/plain' });
-      
+
       result.current.mutate({
         file,
         entityType: 'user_profile',
@@ -133,11 +127,7 @@ describe('useFiles hooks', () => {
         expect(result.current.isSuccess).toBe(true);
       });
 
-      expect(mockFilesApi.uploadSingleFile).toHaveBeenCalledWith(
-        file,
-        'user_profile',
-        'avatar'
-      );
+      expect(mockFilesApi.uploadSingleFile).toHaveBeenCalledWith(file, 'user_profile', 'avatar');
       expect(mockToast.success).toHaveBeenCalledWith('File uploaded successfully');
     });
   });
@@ -174,9 +164,7 @@ describe('useFiles hooks', () => {
         expect(result.current.isError).toBe(true);
       });
 
-      expect(mockToast.error).toHaveBeenCalledWith(
-        'Failed to delete file. Please try again.'
-      );
+      expect(mockToast.error).toHaveBeenCalledWith('Failed to delete file. Please try again.');
     });
   });
 
@@ -238,22 +226,16 @@ describe('useFiles hooks', () => {
 
       mockFilesApi.getFilesByEntity.mockResolvedValue(mockFiles);
 
-      const { result } = renderHook(
-        () => useFilesByEntity('course_material', '123'),
-        {
-          wrapper: createWrapper(),
-        }
-      );
+      const { result } = renderHook(() => useFilesByEntity('course_material', '123'), {
+        wrapper: createWrapper(),
+      });
 
       await waitFor(() => {
         expect(result.current.isSuccess).toBe(true);
       });
 
       expect(result.current.data).toEqual(mockFiles);
-      expect(mockFilesApi.getFilesByEntity).toHaveBeenCalledWith(
-        'course_material',
-        '123'
-      );
+      expect(mockFilesApi.getFilesByEntity).toHaveBeenCalledWith('course_material', '123');
     });
 
     it('does not fetch when parameters are empty', () => {
@@ -285,7 +267,7 @@ describe('useFiles hooks', () => {
       });
 
       const file = new File(['content'], 'material.pdf', { type: 'application/pdf' });
-      
+
       result.current.mutate({
         file,
         courseId: '456',
@@ -296,9 +278,7 @@ describe('useFiles hooks', () => {
       });
 
       expect(mockFilesApi.uploadCourseMaterial).toHaveBeenCalledWith(file, '456');
-      expect(mockToast.success).toHaveBeenCalledWith(
-        'Course material uploaded successfully'
-      );
+      expect(mockToast.success).toHaveBeenCalledWith('Course material uploaded successfully');
     });
   });
 
@@ -311,13 +291,17 @@ describe('useFiles hooks', () => {
       const mockUrl = 'blob:http://example.com/123';
       global.URL.createObjectURL = vi.fn(() => mockUrl);
       global.URL.revokeObjectURL = vi.fn();
-      
+
       // Mock document methods
       const mockLink = document.createElement('a');
       mockLink.click = vi.fn();
       const mockCreateElement = vi.spyOn(document, 'createElement').mockReturnValue(mockLink);
-      const mockAppendChild = vi.spyOn(document.body, 'appendChild').mockImplementation((node) => node);
-      const mockRemoveChild = vi.spyOn(document.body, 'removeChild').mockImplementation((node) => node);
+      const mockAppendChild = vi
+        .spyOn(document.body, 'appendChild')
+        .mockImplementation((node) => node);
+      const mockRemoveChild = vi
+        .spyOn(document.body, 'removeChild')
+        .mockImplementation((node) => node);
 
       const { result } = renderHook(() => useDownloadFile(), {
         wrapper: createWrapper(),
@@ -360,9 +344,7 @@ describe('useFiles hooks', () => {
         expect(result.current.isError).toBe(true);
       });
 
-      expect(mockToast.error).toHaveBeenCalledWith(
-        'Failed to download file. Please try again.'
-      );
+      expect(mockToast.error).toHaveBeenCalledWith('Failed to download file. Please try again.');
     });
   });
 });

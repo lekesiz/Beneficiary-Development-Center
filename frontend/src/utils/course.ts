@@ -151,11 +151,7 @@ export const formatPrerequisites = (prerequisites: string[]) => {
     return prerequisites[0];
   }
 
-  return (
-    prerequisites.slice(0, -1).join(', ') +
-    ' and ' +
-    prerequisites[prerequisites.length - 1]
-  );
+  return prerequisites.slice(0, -1).join(', ') + ' and ' + prerequisites[prerequisites.length - 1];
 };
 
 /**
@@ -188,10 +184,7 @@ export const getNextSessionDate = (course: Course) => {
   const now = new Date();
   const futureSessions = course
     .sessions!.filter((session) => new Date(session.session_date) > now)
-    .sort(
-      (a, b) =>
-        new Date(a.session_date).getTime() - new Date(b.session_date).getTime()
-    );
+    .sort((a, b) => new Date(a.session_date).getTime() - new Date(b.session_date).getTime());
 
   return futureSessions.length > 0 ? futureSessions[0].session_date : null;
 };
@@ -236,8 +229,7 @@ export const sortCourses = (
         comparison = a.duration_hours - b.duration_hours;
         break;
       case 'created_at':
-        comparison =
-          new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+        comparison = new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
         break;
       case 'participant_count':
         comparison = (a.participant_count || 0) - (b.participant_count || 0);

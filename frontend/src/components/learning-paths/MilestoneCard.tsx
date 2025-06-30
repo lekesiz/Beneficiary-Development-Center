@@ -108,11 +108,7 @@ export const MilestoneCard: React.FC<MilestoneCardProps> = ({
           onClick={() => setIsExpanded(!isExpanded)}
           className="p-2 hover:bg-gray-100 rounded-md ml-4"
         >
-          {isExpanded ? (
-            <ChevronUp className="h-5 w-5" />
-          ) : (
-            <ChevronDown className="h-5 w-5" />
-          )}
+          {isExpanded ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
         </button>
       </div>
 
@@ -145,11 +141,7 @@ export const MilestoneCard: React.FC<MilestoneCardProps> = ({
           )}
           {milestone.status === 'in_progress' && (
             <>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => setShowProgressModal(true)}
-              >
+              <Button size="sm" variant="outline" onClick={() => setShowProgressModal(true)}>
                 <Edit3 className="mr-2 h-4 w-4" />
                 İlerleme Güncelle
               </Button>
@@ -165,9 +157,7 @@ export const MilestoneCard: React.FC<MilestoneCardProps> = ({
               <span className="font-medium">Tamamlandı</span>
               {milestone.completed_at && (
                 <span className="text-sm text-gray-500">
-                  (
-                  {new Date(milestone.completed_at).toLocaleDateString('tr-TR')}
-                  )
+                  ({new Date(milestone.completed_at).toLocaleDateString('tr-TR')})
                 </span>
               )}
             </div>
@@ -198,9 +188,7 @@ export const MilestoneCard: React.FC<MilestoneCardProps> = ({
                     </div>
                     <div className="flex-1">
                       <p className="font-medium">{activity.title}</p>
-                      <p className="text-sm text-gray-600">
-                        {activity.description}
-                      </p>
+                      <p className="text-sm text-gray-600">{activity.description}</p>
                       <div className="flex items-center space-x-2 mt-1">
                         <Badge variant="outline" size="sm">
                           {activity.type === 'practice'
@@ -209,9 +197,7 @@ export const MilestoneCard: React.FC<MilestoneCardProps> = ({
                             ? 'Çalışma'
                             : 'Proje'}
                         </Badge>
-                        <span className="text-xs text-gray-500">
-                          {activity.duration}
-                        </span>
+                        <span className="text-xs text-gray-500">{activity.duration}</span>
                       </div>
                     </div>
                   </div>
@@ -241,9 +227,7 @@ export const MilestoneCard: React.FC<MilestoneCardProps> = ({
                         >
                           {resource.title}
                         </a>
-                        <p className="text-sm text-gray-600">
-                          {resource.description}
-                        </p>
+                        <p className="text-sm text-gray-600">{resource.description}</p>
                       </div>
                     </div>
                     <div className="text-right">
@@ -251,9 +235,7 @@ export const MilestoneCard: React.FC<MilestoneCardProps> = ({
                         {resource.type}
                       </Badge>
                       {resource.duration && (
-                        <p className="text-xs text-gray-500 mt-1">
-                          {resource.duration}
-                        </p>
+                        <p className="text-xs text-gray-500 mt-1">{resource.duration}</p>
                       )}
                     </div>
                   </div>
@@ -265,9 +247,7 @@ export const MilestoneCard: React.FC<MilestoneCardProps> = ({
           {/* Assessment Criteria */}
           {milestone.assessment_criteria.length > 0 && (
             <div>
-              <h4 className="font-medium text-gray-700 mb-2">
-                Değerlendirme Kriterleri
-              </h4>
+              <h4 className="font-medium text-gray-700 mb-2">Değerlendirme Kriterleri</h4>
               <ul className="space-y-1">
                 {milestone.assessment_criteria.map((criteria, index) => (
                   <li key={index} className="flex items-start space-x-2">
@@ -285,12 +265,8 @@ export const MilestoneCard: React.FC<MilestoneCardProps> = ({
               <div className="flex items-start space-x-2">
                 <MessageSquare className="h-5 w-5 text-yellow-600 flex-shrink-0" />
                 <div>
-                  <h4 className="font-medium text-yellow-900 mb-1">
-                    Notlarınız
-                  </h4>
-                  <p className="text-sm text-yellow-800">
-                    {milestone.user_notes}
-                  </p>
+                  <h4 className="font-medium text-yellow-900 mb-1">Notlarınız</h4>
+                  <p className="text-sm text-yellow-800">{milestone.user_notes}</p>
                 </div>
               </div>
             </div>
@@ -299,9 +275,7 @@ export const MilestoneCard: React.FC<MilestoneCardProps> = ({
           {/* Difficulty Rating */}
           {milestone.difficulty_rating && (
             <div className="flex items-center space-x-2">
-              <span className="text-sm text-gray-600">
-                Zorluk Değerlendirmesi:
-              </span>
+              <span className="text-sm text-gray-600">Zorluk Değerlendirmesi:</span>
               <div className="flex items-center space-x-1">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <Star
@@ -343,10 +317,7 @@ export const MilestoneCard: React.FC<MilestoneCardProps> = ({
                 />
               </div>
               <div className="flex justify-end space-x-2">
-                <Button
-                  variant="outline"
-                  onClick={() => setShowProgressModal(false)}
-                >
+                <Button variant="outline" onClick={() => setShowProgressModal(false)}>
                   İptal
                 </Button>
                 <Button

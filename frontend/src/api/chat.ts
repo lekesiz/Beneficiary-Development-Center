@@ -49,9 +49,7 @@ export const chatApi = {
    * Get conversation by ID
    */
   getConversationById: async (id: number): Promise<Conversation> => {
-    const response = await apiClient.get<Conversation>(
-      `${CHAT_BASE_URL}/conversations/${id}`
-    );
+    const response = await apiClient.get<Conversation>(`${CHAT_BASE_URL}/conversations/${id}`);
     return response.data;
   },
 
@@ -59,10 +57,7 @@ export const chatApi = {
    * Create new conversation
    */
   createConversation: async (data: CreateConversationRequest): Promise<Conversation> => {
-    const response = await apiClient.post<Conversation>(
-      `${CHAT_BASE_URL}/conversations`,
-      data
-    );
+    const response = await apiClient.post<Conversation>(`${CHAT_BASE_URL}/conversations`, data);
     return response.data;
   },
 
@@ -109,9 +104,7 @@ export const chatApi = {
    * Get message by ID
    */
   getMessageById: async (id: number): Promise<Message> => {
-    const response = await apiClient.get<Message>(
-      `${CHAT_BASE_URL}/messages/${id}`
-    );
+    const response = await apiClient.get<Message>(`${CHAT_BASE_URL}/messages/${id}`);
     return response.data;
   },
 
@@ -119,10 +112,7 @@ export const chatApi = {
    * Send a message
    */
   sendMessage: async (data: SendMessageRequest): Promise<Message> => {
-    const response = await apiClient.post<Message>(
-      `${CHAT_BASE_URL}/messages`,
-      data
-    );
+    const response = await apiClient.post<Message>(`${CHAT_BASE_URL}/messages`, data);
     return response.data;
   },
 
@@ -130,10 +120,7 @@ export const chatApi = {
    * Update a message
    */
   updateMessage: async (id: number, data: UpdateMessageRequest): Promise<Message> => {
-    const response = await apiClient.put<Message>(
-      `${CHAT_BASE_URL}/messages/${id}`,
-      data
-    );
+    const response = await apiClient.put<Message>(`${CHAT_BASE_URL}/messages/${id}`, data);
     return response.data;
   },
 
@@ -148,10 +135,7 @@ export const chatApi = {
    * Mark messages as read
    */
   markAsRead: async (conversationId: number, data: MarkAsReadRequest): Promise<void> => {
-    await apiClient.post(
-      `${CHAT_BASE_URL}/conversations/${conversationId}/read`,
-      data
-    );
+    await apiClient.post(`${CHAT_BASE_URL}/conversations/${conversationId}/read`, data);
   },
 
   /**
@@ -185,9 +169,7 @@ export const chatApi = {
    * Leave a group conversation
    */
   leaveConversation: async (conversationId: number): Promise<void> => {
-    await apiClient.post(
-      `${CHAT_BASE_URL}/conversations/${conversationId}/leave`
-    );
+    await apiClient.post(`${CHAT_BASE_URL}/conversations/${conversationId}/leave`);
   },
 
   /**
@@ -204,9 +186,7 @@ export const chatApi = {
    * Get chat statistics
    */
   getStatistics: async (): Promise<ChatStatistics> => {
-    const response = await apiClient.get<ChatStatistics>(
-      `${CHAT_BASE_URL}/statistics`
-    );
+    const response = await apiClient.get<ChatStatistics>(`${CHAT_BASE_URL}/statistics`);
     return response.data;
   },
 
@@ -225,9 +205,7 @@ export const chatApi = {
    * Mark notification as read
    */
   markNotificationAsRead: async (notificationId: number): Promise<void> => {
-    await apiClient.put(
-      `${CHAT_BASE_URL}/notifications/${notificationId}/read`
-    );
+    await apiClient.put(`${CHAT_BASE_URL}/notifications/${notificationId}/read`);
   },
 
   /**
@@ -253,10 +231,7 @@ export const chatApi = {
    * Send typing status
    */
   sendTypingStatus: async (conversationId: number, isTyping: boolean): Promise<void> => {
-    await apiClient.post(
-      `${CHAT_BASE_URL}/conversations/${conversationId}/typing`,
-      { isTyping }
-    );
+    await apiClient.post(`${CHAT_BASE_URL}/conversations/${conversationId}/typing`, { isTyping });
   },
 };
 

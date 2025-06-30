@@ -31,11 +31,7 @@ import { DataTable } from '../../components/ui/DataTable';
 import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
 import { useAuth } from '../../hooks/useAuth';
 import { useCourses } from '../../hooks/useCourses';
-import {
-  useProgram,
-  useDeleteProgram,
-  useUpdateProgramStatus,
-} from '../../hooks/usePrograms';
+import { useProgram, useDeleteProgram, useUpdateProgramStatus } from '../../hooks/usePrograms';
 import type { Course } from '../../types/course';
 import {
   getCourseStatusInfo,
@@ -66,8 +62,10 @@ export const ProgramDetail: React.FC = () => {
   const [deleteConfirm, setDeleteConfirm] = useState(false);
 
   // Permission checks
-  const canEdit = user?.role && ['admin', 'manager'].includes(user.role);
-  const canDelete = user?.role === 'admin';
+  const canEdit = user?.roles?.some(role => ['admin', 'manager', 'trainer'].includes(role.name)) || 
+                  user?.primaryRole && ['admin', 'manager', 'trainer'].includes(user.primaryRole);
+  const canDelete = user?.roles?.some(role => ['admin'].includes(role.name)) || 
+                    user?.primaryRole === 'admin';
 
   // Handle delete
   const handleDelete = async () => {
@@ -101,9 +99,7 @@ export const ProgramDetail: React.FC = () => {
           >
             {row.original.title}
           </Link>
-          <span className="text-sm text-gray-500">
-            #{row.original.order_index}
-          </span>
+          <span className="text-sm text-gray-500">#{row.original.order_index}</span>
         </div>
       ),
     },
@@ -132,12 +128,8 @@ export const ProgramDetail: React.FC = () => {
       accessorKey: 'difficulty_level',
       header: 'Zorluk',
       cell: ({ row }) => {
-        const difficultyInfo = getDifficultyLevelInfo(
-          row.original.difficulty_level
-        );
-        return (
-          <Badge color={difficultyInfo.color}>{difficultyInfo.label}</Badge>
-        );
+        const difficultyInfo = getDifficultyLevelInfo(row.original.difficulty_level);
+        return <Badge color={difficultyInfo.color}>{difficultyInfo.label}</Badge>;
       },
     },
     {
@@ -154,11 +146,7 @@ export const ProgramDetail: React.FC = () => {
       id: 'actions',
       header: 'İşlemler',
       cell: ({ row }) => (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => navigate(`/courses/${row.original.id}`)}
-        >
+        <Button variant="ghost" size="sm" onClick={() => navigate(`/courses/${row.original.id}`)}>
           <Eye className="h-4 w-4" />
         </Button>
       ),
@@ -191,27 +179,18 @@ export const ProgramDetail: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate('/programs')}
-          >
+          <Button variant="ghost" size="sm" onClick={() => navigate('/programs')}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             Programlara Dön
           </Button>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">
-              {program.title}
-            </h1>
+            <h1 className="text-2xl font-bold text-gray-900">{program.title}</h1>
             <p className="text-gray-600">#{program.code}</p>
           </div>
         </div>
         <div className="flex items-center space-x-2">
           {canEdit && (
-            <Button
-              variant="outline"
-              onClick={() => navigate(`/programs/${program.id}/edit`)}
-            >
+            <Button variant="outline" onClick={() => navigate(`/programs/${program.id}/edit`)}>
               <Edit className="h-4 w-4 mr-2" />
               Düzenle
             </Button>
@@ -248,15 +227,9 @@ export const ProgramDetail: React.FC = () => {
               <Users className="h-5 w-5 text-blue-600" />
             </div>
             <div>
-              <div className="text-2xl font-bold">
-                {program.enrollment_count || 0}
-              </div>
-              <div className="text-sm text-gray-600">
-                / {program.max_participants} Katılımcı
-              </div>
-              <div className="text-xs text-gray-500">
-                {program.available_spots || 0} kişi boş
-              </div>
+              <div className="text-2xl font-bold">{program.enrollment_count || 0}</div>
+              <div className="text-sm text-gray-600">/ {program.max_participants} Katılımcı</div>
+              <div className="text-xs text-gray-500">{program.available_spots || 0} kişi boş</div>
             </div>
           </div>
         </Card>
@@ -267,9 +240,7 @@ export const ProgramDetail: React.FC = () => {
               <BookOpen className="h-5 w-5 text-green-600" />
             </div>
             <div>
-              <div className="text-2xl font-bold">
-                {program.course_count || 0}
-              </div>
+              <div className="text-2xl font-bold">{program.course_count || 0}</div>
               <div className="text-sm text-gray-600">Kurs</div>
             </div>
           </div>
@@ -293,9 +264,7 @@ export const ProgramDetail: React.FC = () => {
               <Target className="h-5 w-5 text-yellow-600" />
             </div>
             <div>
-              <div className="text-2xl font-bold">
-                {Math.round(program.completion_rate || 0)}%
-              </div>
+              <div className="text-2xl font-bold">{Math.round(program.completion_rate || 0)}%</div>
               <div className="text-sm text-gray-600">Tamamlama</div>
             </div>
           </div>
@@ -372,9 +341,7 @@ export const ProgramDetail: React.FC = () => {
                   <MapPin className="h-4 w-4 text-gray-400" />
                   <div>
                     <div className="text-sm font-medium">Konum</div>
-                    <div className="text-sm text-gray-600">
-                      {program.location}
-                    </div>
+                    <div className="text-sm text-gray-600">{program.location}</div>
                   </div>
                 </div>
               )}
@@ -406,9 +373,7 @@ export const ProgramDetail: React.FC = () => {
                   <User className="h-4 w-4 text-gray-400" />
                   <div>
                     <div className="text-sm font-medium">Koordinatör</div>
-                    <div className="text-sm text-gray-600">
-                      {program.coordinator_name}
-                    </div>
+                    <div className="text-sm text-gray-600">{program.coordinator_name}</div>
                   </div>
                 </div>
               )}
@@ -424,9 +389,7 @@ export const ProgramDetail: React.FC = () => {
                   variant="outline"
                   size="sm"
                   className="w-full justify-start"
-                  onClick={() =>
-                    navigate(`/courses/new?program_id=${program.id}`)
-                  }
+                  onClick={() => navigate(`/courses/new?program_id=${program.id}`)}
                 >
                   <Plus className="h-4 w-4 mr-2" />
                   Kurs Ekle
@@ -437,9 +400,7 @@ export const ProgramDetail: React.FC = () => {
                     variant="outline"
                     size="sm"
                     className="w-full justify-start"
-                    onClick={() =>
-                      navigate(`/programs/${program.id}/courses/reorder`)
-                    }
+                    onClick={() => navigate(`/programs/${program.id}/courses/reorder`)}
                   >
                     <ArrowUpDown className="h-4 w-4 mr-2" />
                     Kurs Sıralaması
@@ -481,12 +442,7 @@ export const ProgramDetail: React.FC = () => {
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold">Program Kursları</h3>
             {canEdit && (
-              <Button
-                onClick={() =>
-                  navigate(`/courses/new?program_id=${program.id}`)
-                }
-                size="sm"
-              >
+              <Button onClick={() => navigate(`/courses/new?program_id=${program.id}`)} size="sm">
                 <Plus className="h-4 w-4 mr-2" />
                 Kurs Ekle
               </Button>

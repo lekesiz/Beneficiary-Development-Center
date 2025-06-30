@@ -20,9 +20,13 @@ export interface FileInfo {
 }
 
 class FilesApi {
-  async uploadFiles(files: File[], entityType?: string, entityId?: string): Promise<UploadResponse[]> {
+  async uploadFiles(
+    files: File[],
+    entityType?: string,
+    entityId?: string
+  ): Promise<UploadResponse[]> {
     const formData = new FormData();
-    
+
     files.forEach((file) => {
       formData.append('files', file);
     });
@@ -44,7 +48,11 @@ class FilesApi {
     return response.data.files;
   }
 
-  async uploadSingleFile(file: File, entityType?: string, entityId?: string): Promise<UploadResponse> {
+  async uploadSingleFile(
+    file: File,
+    entityType?: string,
+    entityId?: string
+  ): Promise<UploadResponse> {
     const files = await this.uploadFiles([file], entityType, entityId);
     return files[0];
   }

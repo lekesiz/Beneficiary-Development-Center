@@ -3,7 +3,7 @@ import { toast } from 'react-hot-toast';
 
 // Create axios instance
 const apiClient: AxiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1',
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5001/api/v1',
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
@@ -17,6 +17,14 @@ apiClient.interceptors.request.use(
     const token = localStorage.getItem('access_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+      
+      // Debug logging
+      console.log('[API Client] Request:', {
+        url: config.url,
+        method: config.method,
+        hasToken: !!token,
+        tokenPreview: token ? `${token.substring(0, 20)}...` : 'none'
+      });
     }
 
     // Add tenant ID
@@ -28,6 +36,7 @@ apiClient.interceptors.request.use(
     return config;
   },
   (error) => {
+    console.error('[API Client] Request error:', error);
     return Promise.reject(error);
   }
 );
@@ -42,14 +51,26 @@ apiClient.interceptors.response.use(
       _retry?: boolean;
     };
 
+    console.error('[API Client] Response error:', {
+      status: error.response?.status,
+      url: error.config?.url,
+      message: error.response?.data,
+    });
+
     // Handle 401 errors
     if (error.response?.status === 401 && !originalRequest._retry) {
+      // Don't retry for auth endpoints
+      if (originalRequest.url?.includes('/auth/')) {
+        return Promise.reject(error);
+      }
+
       originalRequest._retry = true;
 
       try {
         // Try to refresh token
         const refreshToken = localStorage.getItem('refresh_token');
         if (refreshToken) {
+          console.log('[API Client] Attempting token refresh...');
           const response = await axios.post(
             `${apiClient.defaults.baseURL}/auth/refresh`,
             {},
@@ -62,6 +83,7 @@ apiClient.interceptors.response.use(
 
           const { access_token } = response.data;
           localStorage.setItem('access_token', access_token);
+          console.log('[API Client] Token refreshed successfully');
 
           // Retry original request
           if (originalRequest.headers) {
@@ -69,8 +91,11 @@ apiClient.interceptors.response.use(
           }
 
           return apiClient(originalRequest);
+        } else {
+          console.log('[API Client] No refresh token available');
         }
       } catch (refreshError) {
+        console.error('[API Client] Token refresh failed:', refreshError);
         // Refresh failed, redirect to login
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');

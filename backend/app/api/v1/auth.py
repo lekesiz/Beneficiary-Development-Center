@@ -351,9 +351,9 @@ def login():
 
     # Generate tokens
     access_token = create_access_token(
-        identity=user.id, additional_claims={"tenant_id": user.tenant_id, "role": user.role}
+        identity=str(user.id), additional_claims={"tenant_id": user.tenant_id, "role": user.role}
     )
-    refresh_token = create_refresh_token(identity=user.id, additional_claims={"tenant_id": user.tenant_id})
+    refresh_token = create_refresh_token(identity=str(user.id), additional_claims={"tenant_id": user.tenant_id})
 
     # Log successful login with structured data
     log_user_action("login", user_id=user.id, tenant_id=user.tenant_id, email=user.email, role=user.role)
@@ -409,15 +409,21 @@ def refresh():
                 $ref: '#/components/schemas/Error'
     """
     identity = get_jwt_identity()
+    
+    # Convert string identity back to integer
+    try:
+        user_id = int(identity)
+    except (ValueError, TypeError):
+        return jsonify({"message": "Invalid user identity"}), 400
 
     # Get user
-    user = db.session.get(User, identity)
+    user = db.session.get(User, user_id)
     if not user or not user.is_active:
         return jsonify({"message": "Invalid user"}), 401
 
     # Generate new access token
     access_token = create_access_token(
-        identity=user.id, additional_claims={"tenant_id": user.tenant_id, "role": user.role}
+        identity=str(user.id), additional_claims={"tenant_id": user.tenant_id, "role": user.role}
     )
 
     return jsonify({"access_token": access_token}), 200
@@ -570,7 +576,13 @@ def verify_email(token):
 @jwt_required()
 def get_current_user():
     """Get current user information."""
-    user_id = get_jwt_identity()
+    identity = get_jwt_identity()
+    # Convert string identity back to integer
+    try:
+        user_id = int(identity)
+    except (ValueError, TypeError):
+        return jsonify({"message": "Invalid user identity"}), 400
+        
     user = db.session.get(User, user_id)
 
     if not user:
@@ -583,7 +595,13 @@ def get_current_user():
 @jwt_required()
 def change_password():
     """Change user password."""
-    user_id = get_jwt_identity()
+    identity = get_jwt_identity()
+    # Convert string identity back to integer
+    try:
+        user_id = int(identity)
+    except (ValueError, TypeError):
+        return jsonify({"message": "Invalid user identity"}), 400
+        
     user = db.session.get(User, user_id)
 
     if not user:

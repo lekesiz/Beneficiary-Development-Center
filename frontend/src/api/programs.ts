@@ -42,9 +42,7 @@ export const programsApi = {
    */
   getById: async (id: number, includeCourses = false): Promise<Program> => {
     const params = includeCourses ? '?include_courses=true' : '';
-    const response = await apiClient.get<Program>(
-      `${PROGRAMS_BASE_URL}/${id}${params}`
-    );
+    const response = await apiClient.get<Program>(`${PROGRAMS_BASE_URL}/${id}${params}`);
     return response.data;
   },
 
@@ -60,10 +58,7 @@ export const programsApi = {
    * Update program
    */
   update: async (id: number, data: UpdateProgramRequest): Promise<Program> => {
-    const response = await apiClient.put<Program>(
-      `${PROGRAMS_BASE_URL}/${id}`,
-      data
-    );
+    const response = await apiClient.put<Program>(`${PROGRAMS_BASE_URL}/${id}`, data);
     return response.data;
   },
 
@@ -78,10 +73,7 @@ export const programsApi = {
    * Update program status
    */
   updateStatus: async (id: number, status: string): Promise<Program> => {
-    const response = await apiClient.put<Program>(
-      `${PROGRAMS_BASE_URL}/${id}/status`,
-      { status }
-    );
+    const response = await apiClient.put<Program>(`${PROGRAMS_BASE_URL}/${id}/status`, { status });
     return response.data;
   },
 
@@ -103,9 +95,7 @@ export const programsApi = {
    * Get program statistics
    */
   getStatistics: async (): Promise<ProgramStatistics> => {
-    const response = await apiClient.get<ProgramStatistics>(
-      `${PROGRAMS_BASE_URL}/statistics`
-    );
+    const response = await apiClient.get<ProgramStatistics>(`${PROGRAMS_BASE_URL}/statistics`);
     return response.data;
   },
 };

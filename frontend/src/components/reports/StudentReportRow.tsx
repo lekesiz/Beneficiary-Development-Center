@@ -103,9 +103,7 @@ export const StudentReportRow: React.FC<StudentReportRowProps> = ({
 
     const activityDate = new Date(date);
     const now = new Date();
-    const diffDays = Math.floor(
-      (now.getTime() - activityDate.getTime()) / (1000 * 60 * 60 * 24)
-    );
+    const diffDays = Math.floor((now.getTime() - activityDate.getTime()) / (1000 * 60 * 60 * 24));
 
     if (diffDays === 0) return 'Bugün';
     if (diffDays === 1) return 'Dün';
@@ -140,12 +138,8 @@ export const StudentReportRow: React.FC<StudentReportRowProps> = ({
               <User className="h-5 w-5 text-gray-600" />
             </div>
             <div className="ml-4">
-              <div className="text-sm font-medium text-gray-900">
-                {summary.student_name}
-              </div>
-              <div className="text-sm text-gray-500">
-                {summary.student_email}
-              </div>
+              <div className="text-sm font-medium text-gray-900">{summary.student_name}</div>
+              <div className="text-sm text-gray-500">{summary.student_email}</div>
             </div>
           </div>
         </td>
@@ -155,9 +149,7 @@ export const StudentReportRow: React.FC<StudentReportRowProps> = ({
           <div className="flex items-center space-x-2">
             {getPerformanceIcon()}
             <span
-              className={`text-lg font-semibold ${getPerformanceColor(
-                summary.performance_index
-              )}`}
+              className={`text-lg font-semibold ${getPerformanceColor(summary.performance_index)}`}
             >
               {summary.performance_index}
             </span>
@@ -169,9 +161,7 @@ export const StudentReportRow: React.FC<StudentReportRowProps> = ({
 
         {/* Progress Summary */}
         <td className="px-6 py-4">
-          <div className="text-sm text-gray-900">
-            {summary.progress_summary}
-          </div>
+          <div className="text-sm text-gray-900">{summary.progress_summary}</div>
           <div className="text-xs text-gray-500 mt-1">
             <span className="inline-flex items-center">
               <BookOpen className="h-3 w-3 mr-1" />
@@ -246,9 +236,7 @@ export const StudentReportRow: React.FC<StudentReportRowProps> = ({
       {showNoteModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg p-6 max-w-md w-full">
-            <h3 className="text-lg font-semibold mb-4">
-              {summary.student_name} için Not Ekle
-            </h3>
+            <h3 className="text-lg font-semibold mb-4">{summary.student_name} için Not Ekle</h3>
             <textarea
               value={noteText}
               onChange={(e) => setNoteText(e.target.value)}

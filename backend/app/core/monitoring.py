@@ -29,15 +29,16 @@ def init_monitoring(app: Flask):
     app._error_count = 0
     app._active_connections = 0
     
-    @app.route('/health')
-    def health_check():
-        """Basic health check endpoint."""
-        return jsonify({
-            'status': 'healthy',
-            'timestamp': datetime.utcnow().isoformat(),
-            'version': app.config.get('VERSION', '1.0.0'),
-            'environment': app.config.get('FLASK_ENV', 'development')
-        }), 200
+    # Health endpoint is already defined in app/api/health.py
+    # @app.route('/health')
+    # def health_check():
+    #     """Basic health check endpoint."""
+    #     return jsonify({
+    #         'status': 'healthy',
+    #         'timestamp': datetime.utcnow().isoformat(),
+    #         'version': app.config.get('VERSION', '1.0.0'),
+    #         'environment': app.config.get('FLASK_ENV', 'development')
+    #     }), 200
     
     @app.route('/health/detailed')
     def detailed_health_check():

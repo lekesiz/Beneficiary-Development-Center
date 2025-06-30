@@ -68,11 +68,7 @@ const QuestionReview: React.FC<{
           <div
             className={`
             w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold
-            ${
-              isCorrect
-                ? 'bg-green-100 text-green-700'
-                : 'bg-red-100 text-red-700'
-            }
+            ${isCorrect ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}
           `}
           >
             {index + 1}
@@ -81,8 +77,7 @@ const QuestionReview: React.FC<{
             <h3 className="font-medium">{question.question_text}</h3>
             <div className="flex items-center space-x-2 mt-1">
               <Badge variant="outline">
-                {question.question_type === 'multiple_choice' &&
-                  'Çoktan Seçmeli'}
+                {question.question_type === 'multiple_choice' && 'Çoktan Seçmeli'}
                 {question.question_type === 'true_false' && 'Doğru/Yanlış'}
                 {question.question_type === 'short_answer' && 'Kısa Cevap'}
                 {question.question_type === 'essay' && 'Kompozisyon'}
@@ -107,22 +102,15 @@ const QuestionReview: React.FC<{
       <div className="space-y-3">
         {/* User Response */}
         <div>
-          <h4 className="text-sm font-medium text-gray-700 mb-2">
-            Sizin Cevabınız:
-          </h4>
+          <h4 className="text-sm font-medium text-gray-700 mb-2">Sizin Cevabınız:</h4>
           <div className="p-3 bg-gray-50 rounded-lg">
             {question.question_type === 'multiple_choice' && (
-              <p>
-                {response?.response_data?.selected_option || 'Cevaplanmadı'}
-              </p>
+              <p>{response?.response_data?.selected_option || 'Cevaplanmadı'}</p>
             )}
             {question.question_type === 'true_false' && (
-              <p>
-                {response?.response_data?.selected_option ? 'Doğru' : 'Yanlış'}
-              </p>
+              <p>{response?.response_data?.selected_option ? 'Doğru' : 'Yanlış'}</p>
             )}
-            {(question.question_type === 'short_answer' ||
-              question.question_type === 'essay') && (
+            {(question.question_type === 'short_answer' || question.question_type === 'essay') && (
               <p>{response?.response_data?.text || 'Cevaplanmadı'}</p>
             )}
           </div>
@@ -132,14 +120,10 @@ const QuestionReview: React.FC<{
         {(question.question_type === 'multiple_choice' ||
           question.question_type === 'true_false') && (
           <div>
-            <h4 className="text-sm font-medium text-gray-700 mb-2">
-              Doğru Cevap:
-            </h4>
+            <h4 className="text-sm font-medium text-gray-700 mb-2">Doğru Cevap:</h4>
             <div className="p-3 bg-green-50 rounded-lg">
               {question.question_type === 'multiple_choice' && (
-                <p className="text-green-800">
-                  {question.question_data.correct_answer}
-                </p>
+                <p className="text-green-800">{question.question_data.correct_answer}</p>
               )}
               {question.question_type === 'true_false' && (
                 <p className="text-green-800">
@@ -153,9 +137,7 @@ const QuestionReview: React.FC<{
         {/* Explanation */}
         {question.explanation && (
           <div>
-            <h4 className="text-sm font-medium text-gray-700 mb-2">
-              Açıklama:
-            </h4>
+            <h4 className="text-sm font-medium text-gray-700 mb-2">Açıklama:</h4>
             <div className="p-3 bg-blue-50 rounded-lg">
               <p className="text-blue-800 text-sm">{question.explanation}</p>
             </div>
@@ -165,9 +147,7 @@ const QuestionReview: React.FC<{
         {/* AI Feedback */}
         {response?.ai_feedback && (
           <div>
-            <h4 className="text-sm font-medium text-gray-700 mb-2">
-              AI Geri Bildirimi:
-            </h4>
+            <h4 className="text-sm font-medium text-gray-700 mb-2">AI Geri Bildirimi:</h4>
             <div className="p-3 bg-purple-50 rounded-lg">
               <p className="text-purple-800 text-sm">{response.ai_feedback}</p>
             </div>
@@ -277,15 +257,14 @@ const Recommendations: React.FC<{
         </div>
       )}
 
-      {performance.percentage_score >= 70 &&
-        performance.percentage_score < 85 && (
-          <div className="p-4 bg-blue-50 rounded-lg">
-            <p className="text-blue-800 font-medium">👍 İyi Performans</p>
-            <p className="text-blue-700 text-sm mt-1">
-              Başarılı bir sonuç. Biraz daha çalışmayla mükemmel olabilirsiniz.
-            </p>
-          </div>
-        )}
+      {performance.percentage_score >= 70 && performance.percentage_score < 85 && (
+        <div className="p-4 bg-blue-50 rounded-lg">
+          <p className="text-blue-800 font-medium">👍 İyi Performans</p>
+          <p className="text-blue-700 text-sm mt-1">
+            Başarılı bir sonuç. Biraz daha çalışmayla mükemmel olabilirsiniz.
+          </p>
+        </div>
+      )}
 
       {performance.percentage_score < 70 && (
         <div className="p-4 bg-orange-50 rounded-lg">
@@ -298,15 +277,10 @@ const Recommendations: React.FC<{
 
       {weakAreas.length > 0 && (
         <div>
-          <h4 className="font-medium text-gray-700 mb-2">
-            Güçlendirilmesi Gereken Alanlar:
-          </h4>
+          <h4 className="font-medium text-gray-700 mb-2">Güçlendirilmesi Gereken Alanlar:</h4>
           <ul className="space-y-1">
             {weakAreas.map((area, index) => (
-              <li
-                key={index}
-                className="text-sm text-gray-600 flex items-center"
-              >
+              <li key={index} className="text-sm text-gray-600 flex items-center">
                 <div className="w-2 h-2 bg-orange-400 rounded-full mr-2" />
                 {area}
               </li>
@@ -340,9 +314,7 @@ export default function EvaluationResults() {
   const { id, attemptId } = useParams<{ id: string; attemptId: string }>();
   const navigate = useNavigate();
   const [showQuestionReview, setShowQuestionReview] = useState(false);
-  const [activeTab, setActiveTab] = useState<
-    'overview' | 'insights' | 'review'
-  >('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'insights' | 'review'>('overview');
 
   const evaluationId = parseInt(id!);
   const attemptIdNum = parseInt(attemptId!);
@@ -351,8 +323,7 @@ export default function EvaluationResults() {
   const createLearningPathMutation = useCreateLearningPath();
 
   // React Query hooks
-  const { data: evaluation, isLoading: evaluationLoading } =
-    useEvaluation(evaluationId);
+  const { data: evaluation, isLoading: evaluationLoading } = useEvaluation(evaluationId);
   const { data: attempt, isLoading: attemptLoading } = useEvaluationAttempt(
     evaluationId,
     attemptIdNum
@@ -363,12 +334,8 @@ export default function EvaluationResults() {
   const performanceData = React.useMemo(() => {
     if (!attempt || !attempt.responses) return null;
 
-    const correct = attempt.responses.filter(
-      (r) => r.is_correct === true
-    ).length;
-    const incorrect = attempt.responses.filter(
-      (r) => r.is_correct === false
-    ).length;
+    const correct = attempt.responses.filter((r) => r.is_correct === true).length;
+    const incorrect = attempt.responses.filter((r) => r.is_correct === false).length;
     const unanswered = attempt.total_questions - attempt.responses.length;
 
     return { correct, incorrect, unanswered };
@@ -404,9 +371,7 @@ export default function EvaluationResults() {
 
   const isPassed = attempt.passed;
   const canRetake =
-    evaluation.max_attempts > 1 &&
-    allAttempts &&
-    allAttempts.length < evaluation.max_attempts;
+    evaluation.max_attempts > 1 && allAttempts && allAttempts.length < evaluation.max_attempts;
 
   // Handle create learning path
   const handleCreateLearningPath = async () => {
@@ -433,12 +398,9 @@ export default function EvaluationResults() {
             <ArrowLeft className="h-5 w-5" />
           </button>
           <div>
-            <h1 className="text-2xl font-bold">
-              {evaluation.title} - Sonuçlar
-            </h1>
+            <h1 className="text-2xl font-bold">{evaluation.title} - Sonuçlar</h1>
             <p className="text-gray-600">
-              {new Date(attempt.completed_at!).toLocaleString('tr-TR')}{' '}
-              tarihinde tamamlandı
+              {new Date(attempt.completed_at!).toLocaleString('tr-TR')} tarihinde tamamlandı
             </p>
           </div>
         </div>
@@ -453,9 +415,7 @@ export default function EvaluationResults() {
             Paylaş
           </Button>
           {canRetake && (
-            <Button
-              onClick={() => navigate(`/evaluations/${evaluationId}/take`)}
-            >
+            <Button onClick={() => navigate(`/evaluations/${evaluationId}/take`)}>
               <RotateCcw className="mr-2 h-4 w-4" />
               Tekrar Dene
             </Button>
@@ -499,9 +459,7 @@ export default function EvaluationResults() {
 
       {/* Pass/Fail Status */}
       <Card
-        className={`p-6 ${
-          isPassed ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
-        }`}
+        className={`p-6 ${isPassed ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}
       >
         <div className="flex items-center justify-center space-x-3">
           {isPassed ? (
@@ -510,14 +468,8 @@ export default function EvaluationResults() {
             <XCircle className="h-8 w-8 text-red-600" />
           )}
           <div className="text-center">
-            <h2
-              className={`text-2xl font-bold ${
-                isPassed ? 'text-green-800' : 'text-red-800'
-              }`}
-            >
-              {isPassed
-                ? 'Tebrikler! Başarılı oldunuz.'
-                : 'Maalesef başarısız oldunuz.'}
+            <h2 className={`text-2xl font-bold ${isPassed ? 'text-green-800' : 'text-red-800'}`}>
+              {isPassed ? 'Tebrikler! Başarılı oldunuz.' : 'Maalesef başarısız oldunuz.'}
             </h2>
             <p className={`${isPassed ? 'text-green-700' : 'text-red-700'}`}>
               Geçme puanı: {attempt.passing_score}% | Sizin puanınız:{' '}
@@ -599,26 +551,18 @@ export default function EvaluationResults() {
                       className="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
                     >
                       <div>
-                        <p className="font-medium">
-                          Deneme {att.attempt_number}
-                        </p>
+                        <p className="font-medium">Deneme {att.attempt_number}</p>
                         <p className="text-sm text-gray-600">
-                          {new Date(att.completed_at!).toLocaleDateString(
-                            'tr-TR'
-                          )}
+                          {new Date(att.completed_at!).toLocaleDateString('tr-TR')}
                         </p>
                       </div>
                       <div className="text-right">
                         <p
-                          className={`font-bold ${
-                            att.passed ? 'text-green-600' : 'text-red-600'
-                          }`}
+                          className={`font-bold ${att.passed ? 'text-green-600' : 'text-red-600'}`}
                         >
                           {att.percentage_score.toFixed(1)}%
                         </p>
-                        <p className="text-sm text-gray-600">
-                          {att.passed ? 'Geçti' : 'Kaldı'}
-                        </p>
+                        <p className="text-sm text-gray-600">{att.passed ? 'Geçti' : 'Kaldı'}</p>
                       </div>
                     </div>
                   ))}
@@ -632,10 +576,7 @@ export default function EvaluationResults() {
       {/* Insights Tab */}
       {activeTab === 'insights' && (
         <div className="space-y-6">
-          <LearningInsights
-            evaluationId={evaluationId}
-            attemptId={attemptIdNum}
-          />
+          <LearningInsights evaluationId={evaluationId} attemptId={attemptIdNum} />
 
           {/* Create Learning Path Button */}
           <Card className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
@@ -647,8 +588,7 @@ export default function EvaluationResults() {
                     Kişiselleştirilmiş Öğrenme Planı Oluştur
                   </h3>
                   <p className="text-blue-700">
-                    AI, performansınıza göre size özel bir öğrenme planı
-                    hazırlayacak
+                    AI, performansınıza göre size özel bir öğrenme planı hazırlayacak
                   </p>
                 </div>
               </div>
@@ -680,20 +620,14 @@ export default function EvaluationResults() {
           {attempt.responses && attempt.responses.length > 0 ? (
             <div className="space-y-4">
               {attempt.responses.map((response, index) => (
-                <QuestionResponse
-                  key={response.id}
-                  response={response}
-                  index={index}
-                />
+                <QuestionResponse key={response.id} response={response} index={index} />
               ))}
             </div>
           ) : (
             <Card className="p-6">
               <div className="text-center py-8">
                 <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600">
-                  Henüz cevaplanmış soru bulunmuyor.
-                </p>
+                <p className="text-gray-600">Henüz cevaplanmış soru bulunmuyor.</p>
               </div>
             </Card>
           )}
@@ -721,7 +655,5 @@ const QuestionResponse: React.FC<{
     },
   };
 
-  return (
-    <QuestionReview question={mockQuestion} response={response} index={index} />
-  );
+  return <QuestionReview question={mockQuestion} response={response} index={index} />;
 };

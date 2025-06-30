@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BDC Auth Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        button { margin: 5px; padding: 10px; cursor: pointer; }
+        .success { color: green; }
+        .error { color: red; }
+        pre { background: #f0f0f0; padding: 10px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>BDC Authentication Test</h1>
+    
+    <div>
+        <button onclick="clearAll()">Clear All Storage</button>
+        <button onclick="testLogin()">Test Login</button>
+        <button onclick="checkAuth()">Check Auth Status</button>
+        <button onclick="goToApp()">Go to App</button>
+    </div>
+    
+    <h2>Status:</h2>
+    <pre id="status"></pre>
+    
+    <h2>Console:</h2>
+    <pre id="console"></pre>
+
+    <script>
+        const log = (msg, type = 'info') => {
+            const consoleEl = document.getElementById('console');
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type === 'error' ? 'error' : type === 'success' ? 'success' : '';
+            consoleEl.innerHTML += `<span class="${className}">[${timestamp}] ${msg}</span>\n`;
+            consoleEl.scrollTop = consoleEl.scrollHeight;
+        };
+
+        const updateStatus = () => {
+            const status = {
+                accessToken: localStorage.getItem('access_token') ? 'Present' : 'Missing',
+                refreshToken: localStorage.getItem('refresh_token') ? 'Present' : 'Missing',
+                tenantId: localStorage.getItem('tenant_id'),
+                tokenLength: localStorage.getItem('access_token')?.length || 0
+            };
+            document.getElementById('status').textContent = JSON.stringify(status, null, 2);
+        };
+
+        const clearAll = () => {
+            localStorage.clear();
+            log('Cleared all localStorage', 'success');
+            updateStatus();
+        };
+
+        const testLogin = async () => {
+            log('Starting login test...');
+            try {
+                const response = await fetch('/api/v1/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: 'admin@bdc.local',
+                        password: 'admin123',
+                        tenant_id: 1
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    localStorage.setItem('access_token', data.access_token);
+                    localStorage.setItem('refresh_token', data.refresh_token);
+                    localStorage.setItem('tenant_id', '1');
+                    
+                    log(`Login successful! User: ${data.user.email}`, 'success');
+                    updateStatus();
+                } else {
+                    log(`Login failed: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                log(`Error: ${error.message}`, 'error');
+            }
+        };
+
+        const checkAuth = async () => {
+            log('Checking authentication status...');
+            const token = localStorage.getItem('access_token');
+            
+            if (!token) {
+                log('No token found in localStorage', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/v1/auth/me', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'X-Tenant-ID': '1'
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    log(`Auth valid! User: ${data.user.email} (${data.user.primary_role})`, 'success');
+                } else {
+                    log(`Auth check failed: ${response.status} - ${data.message}`, 'error');
+                }
+            } catch (error) {
+                log(`Error checking auth: ${error.message}`, 'error');
+            }
+        };
+
+        const goToApp = () => {
+            window.location.href = '/';
+        };
+
+        // Initial status update
+        updateStatus();
+        log('Test page loaded. Backend should be on port 5001.');
+    </script>
+</body>
+</html>

@@ -19,11 +19,11 @@ export const ConversationItem: React.FC<ConversationItemProps> = ({
   onClick,
 }) => {
   const currentUserId = parseInt(localStorage.getItem('user_id') || '0');
-  
+
   // Get display name and avatar
   const getDisplayInfo = () => {
     if (conversation.type === 'direct') {
-      const otherUser = conversation.participants.find(p => p.id !== currentUserId);
+      const otherUser = conversation.participants.find((p) => p.id !== currentUserId);
       return {
         name: otherUser?.fullName || 'User',
         avatar: otherUser?.avatarUrl,
@@ -44,20 +44,22 @@ export const ConversationItem: React.FC<ConversationItemProps> = ({
   // Format last message
   const getLastMessagePreview = () => {
     if (!conversation.lastMessage) return 'No messages yet';
-    
+
     const isSentByMe = conversation.lastMessage.sender.id === currentUserId;
     const prefix = isSentByMe ? 'You: ' : `${conversation.lastMessage.sender.firstName}: `;
-    
+
     if (conversation.lastMessage.type === 'image') {
       return `${prefix}📷 Photo`;
     }
     if (conversation.lastMessage.type === 'file') {
       return `${prefix}📎 File`;
     }
-    
+
     const maxLength = 50;
     const content = conversation.lastMessage.content;
-    return prefix + (content.length > maxLength ? content.substring(0, maxLength) + '...' : content);
+    return (
+      prefix + (content.length > maxLength ? content.substring(0, maxLength) + '...' : content)
+    );
   };
 
   return (
@@ -89,35 +91,35 @@ export const ConversationItem: React.FC<ConversationItemProps> = ({
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between mb-1">
           <div className="flex items-center gap-2">
-            <h3 className={cn(
-              'font-medium truncate',
-              conversation.unreadCount > 0 && 'text-gray-900 dark:text-white'
-            )}>
+            <h3
+              className={cn(
+                'font-medium truncate',
+                conversation.unreadCount > 0 && 'text-gray-900 dark:text-white'
+              )}
+            >
               {displayInfo.name}
             </h3>
-            {conversation.isPinned && (
-              <Pin className="text-gray-400" size={14} />
-            )}
-            {conversation.isMuted && (
-              <VolumeX className="text-gray-400" size={14} />
-            )}
+            {conversation.isPinned && <Pin className="text-gray-400" size={14} />}
+            {conversation.isMuted && <VolumeX className="text-gray-400" size={14} />}
           </div>
           {conversation.lastMessageAt && (
             <span className="text-xs text-gray-500 dark:text-gray-400 flex-shrink-0">
               {formatDistanceToNow(new Date(conversation.lastMessageAt), {
-                addSuffix: true
+                addSuffix: true,
               })}
             </span>
           )}
         </div>
-        
+
         <div className="flex items-center justify-between">
-          <p className={cn(
-            'text-sm truncate',
-            conversation.unreadCount > 0 
-              ? 'text-gray-900 dark:text-white font-medium' 
-              : 'text-gray-600 dark:text-gray-400'
-          )}>
+          <p
+            className={cn(
+              'text-sm truncate',
+              conversation.unreadCount > 0
+                ? 'text-gray-900 dark:text-white font-medium'
+                : 'text-gray-600 dark:text-gray-400'
+            )}
+          >
             {getLastMessagePreview()}
           </p>
           {conversation.unreadCount > 0 && (

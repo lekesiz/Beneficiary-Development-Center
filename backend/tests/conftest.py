@@ -27,7 +27,7 @@ def app():
     os.environ["SECRET_KEY"] = "test-secret-key"
     os.environ["JWT_SECRET_KEY"] = "test-jwt-secret"
 
-    app = create_app(config_name='testing')
+    app = create_app(config_name="testing")
     app.config["TESTING"] = True
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
     app.config["WTF_CSRF_ENABLED"] = False
@@ -63,12 +63,15 @@ def db_session(app, tables):
 
         # Configure session to use this transaction
         from sqlalchemy.orm import sessionmaker
+
         Session = sessionmaker(bind=connection, expire_on_commit=False)
         session = Session()
 
         # Make session available to db
         original_session = db.session
-        db.session = session
+        # Use patching for better compatibility
+        import app.extensions
+        app.extensions.db.session = session
 
         yield session
 
@@ -76,7 +79,7 @@ def db_session(app, tables):
         session.close()
         transaction.rollback()
         connection.close()
-        db.session = original_session
+        app.extensions.db.session = original_session
 
 
 @pytest.fixture(scope="function")
@@ -108,14 +111,14 @@ def test_tenant(db_session):
 def super_admin_user(db_session, test_tenant):
     """Create super admin user."""
     from app.models.user import Role
-    
+
     # Create role if it doesn't exist
     role = db_session.query(Role).filter_by(name="super_admin").first()
     if not role:
         role = Role(name="super_admin", description="Super Admin")
         db_session.add(role)
         db_session.commit()
-    
+
     user = User(
         email="superadmin@test.com",
         password_hash=generate_password_hash("Test123!@#"),
@@ -135,14 +138,14 @@ def super_admin_user(db_session, test_tenant):
 def admin_user(db_session, test_tenant):
     """Create admin user."""
     from app.models.user import Role
-    
+
     # Create role if it doesn't exist
     role = db_session.query(Role).filter_by(name="admin").first()
     if not role:
         role = Role(name="admin", description="Admin")
         db_session.add(role)
         db_session.commit()
-    
+
     user = User(
         email="admin@test.com",
         password_hash=generate_password_hash("password123"),
@@ -163,14 +166,14 @@ def admin_user(db_session, test_tenant):
 def manager_user(db_session, test_tenant):
     """Create manager user."""
     from app.models.user import Role
-    
+
     # Create or get admin role (manager gets admin permissions)
     admin_role = db_session.query(Role).filter_by(name=Role.ADMIN).first()
     if not admin_role:
         admin_role = Role(name=Role.ADMIN, permissions=Role.get_default_permissions(Role.ADMIN))
         db_session.add(admin_role)
         db_session.commit()
-    
+
     user = User(
         email="manager@test.com",
         password_hash=generate_password_hash("password123"),
@@ -191,14 +194,14 @@ def manager_user(db_session, test_tenant):
 def instructor_user(db_session, test_tenant):
     """Create instructor user."""
     from app.models.user import Role
-    
+
     # Create or get trainer role
     trainer_role = db_session.query(Role).filter_by(name=Role.TRAINER).first()
     if not trainer_role:
         trainer_role = Role(name=Role.TRAINER, permissions=Role.get_default_permissions(Role.TRAINER))
         db_session.add(trainer_role)
         db_session.commit()
-    
+
     user = User(
         email="instructor@test.com",
         password_hash=generate_password_hash("password123"),
@@ -219,14 +222,14 @@ def instructor_user(db_session, test_tenant):
 def staff_user(db_session, test_tenant):
     """Create staff user."""
     from app.models.user import Role
-    
+
     # Create or get trainer role (staff gets trainer permissions)
     trainer_role = db_session.query(Role).filter_by(name=Role.TRAINER).first()
     if not trainer_role:
         trainer_role = Role(name=Role.TRAINER, permissions=Role.get_default_permissions(Role.TRAINER))
         db_session.add(trainer_role)
         db_session.commit()
-    
+
     user = User(
         email="staff@test.com",
         password_hash=generate_password_hash("password123"),
@@ -247,14 +250,14 @@ def staff_user(db_session, test_tenant):
 def trainer_user(db_session, test_tenant):
     """Create trainer user."""
     from app.models.user import Role
-    
+
     # Create or get trainer role
     trainer_role = db_session.query(Role).filter_by(name=Role.TRAINER).first()
     if not trainer_role:
         trainer_role = Role(name=Role.TRAINER, permissions=Role.get_default_permissions(Role.TRAINER))
         db_session.add(trainer_role)
         db_session.commit()
-    
+
     user = User(
         email="trainer@test.com",
         password_hash=generate_password_hash("Test123!@#"),
@@ -274,14 +277,14 @@ def trainer_user(db_session, test_tenant):
 def student_user(db_session, test_tenant):
     """Create student user."""
     from app.models.user import Role
-    
+
     # Create or get student role
     student_role = db_session.query(Role).filter_by(name=Role.STUDENT).first()
     if not student_role:
         student_role = Role(name=Role.STUDENT, permissions=Role.get_default_permissions(Role.STUDENT))
         db_session.add(student_role)
         db_session.commit()
-    
+
     user = User(
         email="student@test.com",
         password_hash=generate_password_hash("Test123!@#"),

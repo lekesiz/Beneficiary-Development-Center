@@ -146,7 +146,7 @@ export interface BeneficiaryCreate {
   tags?: string[];
 }
 
-export type BeneficiaryUpdate = Partial<BeneficiaryCreate>
+export type BeneficiaryUpdate = Partial<BeneficiaryCreate>;
 
 export interface BeneficiaryListParams {
   page?: number;

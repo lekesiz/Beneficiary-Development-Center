@@ -1,4 +1,14 @@
-import { CheckCircle, Clock, Target, TrendingUp, Filter, Search, Eye, Calendar, User } from 'lucide-react';
+import {
+  CheckCircle,
+  Clock,
+  Target,
+  TrendingUp,
+  Filter,
+  Search,
+  Eye,
+  Calendar,
+  User,
+} from 'lucide-react';
 import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 
@@ -68,30 +78,35 @@ export default function LearningPathsList() {
   const [statusFilter, setStatusFilter] = useState(searchParams.get('status') || '');
 
   // Fetch learning paths with filters
-  const { data: learningPathsData, isLoading, error } = useMyLearningPaths({
+  const {
+    data: learningPathsData,
+    isLoading,
+    error,
+  } = useMyLearningPaths({
     status: statusFilter as LearningPathStatus,
   });
 
   const learningPaths = learningPathsData?.learning_paths || [];
 
   // Filter paths by search term
-  const filteredPaths = learningPaths.filter(path =>
-    path.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    path.description?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredPaths = learningPaths.filter(
+    (path) =>
+      path.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      path.description?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Update URL params when filters change
   const updateFilters = (newSearchTerm?: string, newStatus?: string) => {
     const params = new URLSearchParams();
-    
+
     if (newSearchTerm !== undefined ? newSearchTerm : searchTerm) {
       params.set('search', newSearchTerm !== undefined ? newSearchTerm : searchTerm);
     }
-    
+
     if (newStatus !== undefined ? newStatus : statusFilter) {
       params.set('status', newStatus !== undefined ? newStatus : statusFilter);
     }
-    
+
     setSearchParams(params);
   };
 
@@ -114,9 +129,9 @@ export default function LearningPathsList() {
   // Calculate summary statistics
   const stats = {
     total: learningPaths.length,
-    inProgress: learningPaths.filter(p => p.status === 'in_progress').length,
-    completed: learningPaths.filter(p => p.status === 'completed').length,
-    proposed: learningPaths.filter(p => p.status === 'proposed').length,
+    inProgress: learningPaths.filter((p) => p.status === 'in_progress').length,
+    completed: learningPaths.filter((p) => p.status === 'completed').length,
+    proposed: learningPaths.filter((p) => p.status === 'proposed').length,
   };
 
   if (error) {
@@ -137,9 +152,7 @@ export default function LearningPathsList() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Learning Paths</h1>
-          <p className="text-gray-600">
-            Discover and track your personalized learning journey
-          </p>
+          <p className="text-gray-600">Discover and track your personalized learning journey</p>
         </div>
       </div>
 
@@ -208,13 +221,10 @@ export default function LearningPathsList() {
               />
             </div>
           </div>
-          
+
           <div className="w-full md:w-48">
-            <Select
-              value={statusFilter}
-              onChange={(e) => handleStatusChange(e.target.value)}
-            >
-              {statusOptions.map(option => (
+            <Select value={statusFilter} onChange={(e) => handleStatusChange(e.target.value)}>
+              {statusOptions.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
                 </option>
@@ -246,7 +256,7 @@ export default function LearningPathsList() {
             <p className="text-gray-600 mb-6">
               {learningPaths.length === 0
                 ? 'Complete an evaluation to get personalized learning path recommendations.'
-                : 'Try adjusting your search terms or filters to find what you\'re looking for.'}
+                : "Try adjusting your search terms or filters to find what you're looking for."}
             </p>
             {learningPaths.length === 0 && (
               <Button asChild>
@@ -265,9 +275,7 @@ export default function LearningPathsList() {
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center space-x-3 mb-2">
-                    <h3 className="text-lg font-semibold text-gray-900">
-                      {path.title}
-                    </h3>
+                    <h3 className="text-lg font-semibold text-gray-900">{path.title}</h3>
                     <Badge
                       variant={getStatusColor(path.status) as any}
                       className="flex items-center space-x-1"
@@ -278,9 +286,7 @@ export default function LearningPathsList() {
                   </div>
 
                   {path.description && (
-                    <p className="text-gray-600 mb-4 line-clamp-2">
-                      {path.description}
-                    </p>
+                    <p className="text-gray-600 mb-4 line-clamp-2">{path.description}</p>
                   )}
 
                   <div className="flex flex-wrap gap-4 text-sm text-gray-500 mb-4">
@@ -288,7 +294,7 @@ export default function LearningPathsList() {
                       <Target className="h-4 w-4" />
                       <span>{path.total_milestones || 0} milestones</span>
                     </div>
-                    
+
                     {path.duration_weeks && (
                       <div className="flex items-center space-x-1">
                         <Calendar className="h-4 w-4" />
@@ -303,24 +309,28 @@ export default function LearningPathsList() {
                   </div>
 
                   {/* Progress Bar */}
-                  {path.status === 'in_progress' && path.completed_milestones !== undefined && path.total_milestones && (
-                    <div className="mb-4">
-                      <div className="flex items-center justify-between text-sm mb-1">
-                        <span className="text-gray-600">Progress</span>
-                        <span className="text-gray-900 font-medium">
-                          {path.completed_milestones}/{path.total_milestones} milestones
-                        </span>
+                  {path.status === 'in_progress' &&
+                    path.completed_milestones !== undefined &&
+                    path.total_milestones && (
+                      <div className="mb-4">
+                        <div className="flex items-center justify-between text-sm mb-1">
+                          <span className="text-gray-600">Progress</span>
+                          <span className="text-gray-900 font-medium">
+                            {path.completed_milestones}/{path.total_milestones} milestones
+                          </span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div
+                            className="bg-blue-600 h-2 rounded-full transition-all"
+                            style={{
+                              width: `${
+                                (path.completed_milestones / path.total_milestones) * 100
+                              }%`,
+                            }}
+                          />
+                        </div>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div
-                          className="bg-blue-600 h-2 rounded-full transition-all"
-                          style={{
-                            width: `${(path.completed_milestones / path.total_milestones) * 100}%`,
-                          }}
-                        />
-                      </div>
-                    </div>
-                  )}
+                    )}
 
                   {/* Resources and Skills */}
                   <div className="flex flex-wrap gap-2">

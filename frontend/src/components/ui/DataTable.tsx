@@ -11,13 +11,7 @@ import {
   VisibilityState,
   PaginationState,
 } from '@tanstack/react-table';
-import {
-  ChevronDown,
-  ChevronUp,
-  ChevronsUpDown,
-  ChevronLeft,
-  ChevronRight,
-} from 'lucide-react';
+import { ChevronDown, ChevronUp, ChevronsUpDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import * as React from 'react';
 
 import { cn } from '@/lib/utils';
@@ -47,29 +41,20 @@ export function DataTable<TData, TValue>({
   globalFilter,
   onGlobalFilterChange,
 }: DataTableProps<TData, TValue>) {
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  );
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
-  const [internalSorting, setInternalSorting] = React.useState<SortingState>(
-    []
-  );
-  const [internalPagination, setInternalPagination] =
-    React.useState<PaginationState>({
-      pageIndex: 0,
-      pageSize: 10,
-    });
+  const [internalSorting, setInternalSorting] = React.useState<SortingState>([]);
+  const [internalPagination, setInternalPagination] = React.useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 10,
+  });
 
   const table = useReactTable({
     data,
     columns,
     pageCount:
-      pageCount ??
-      Math.ceil(
-        data.length / (pagination?.pageSize || internalPagination.pageSize)
-      ),
+      pageCount ?? Math.ceil(data.length / (pagination?.pageSize || internalPagination.pageSize)),
     state: {
       sorting: sorting ?? internalSorting,
       columnFilters,
@@ -122,10 +107,7 @@ export function DataTable<TData, TValue>({
                   >
                     {header.isPlaceholder ? null : (
                       <div className="flex items-center space-x-2">
-                        {flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
+                        {flexRender(header.column.columnDef.header, header.getContext())}
                         {header.column.getCanSort() && (
                           <span className="ml-2">
                             {{
@@ -162,10 +144,7 @@ export function DataTable<TData, TValue>({
                 >
                   {row.getVisibleCells().map((cell) => (
                     <td key={cell.id} className="px-4 py-3 text-sm">
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </td>
                   ))}
                 </tr>
@@ -208,8 +187,7 @@ export function DataTable<TData, TValue>({
             </select>
           </div>
           <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-            Page {table.getState().pagination.pageIndex + 1} of{' '}
-            {table.getPageCount()}
+            Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
           </div>
           <div className="flex items-center space-x-2">
             <button

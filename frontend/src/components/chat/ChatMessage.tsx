@@ -8,7 +8,6 @@ import type { Message } from '@/types/chat';
 import { MessageActions } from './MessageActions';
 import { MessageAvatar } from './MessageAvatar';
 
-
 interface ChatMessageProps {
   message: Message;
   isFirstInSequence: boolean;
@@ -46,7 +45,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
             </button>
           </div>
         );
-      
+
       case 'file':
         return (
           <a
@@ -57,40 +56,28 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
           >
             <span className="text-2xl">📎</span>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">
-                {message.attachments?.[0]?.name}
-              </p>
+              <p className="text-sm font-medium truncate">{message.attachments?.[0]?.name}</p>
               <p className="text-xs text-gray-500 dark:text-gray-400">
                 {formatFileSize(message.attachments?.[0]?.size || 0)}
               </p>
             </div>
           </a>
         );
-      
+
       case 'system':
         return (
           <div className="text-center">
-            <p className="text-sm text-gray-500 dark:text-gray-400 italic">
-              {message.content}
-            </p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 italic">{message.content}</p>
           </div>
         );
-      
+
       default:
-        return (
-          <div className="break-words whitespace-pre-wrap">
-            {message.content}
-          </div>
-        );
+        return <div className="break-words whitespace-pre-wrap">{message.content}</div>;
     }
   };
 
   if (message.type === 'system') {
-    return (
-      <div className="flex justify-center my-4">
-        {renderContent()}
-      </div>
-    );
+    return <div className="flex justify-center my-4">{renderContent()}</div>;
   }
 
   return (
@@ -106,9 +93,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
       {/* Avatar for other users */}
       {!isOwnMessage && (
         <div className="flex-shrink-0 w-8">
-          {isLastInSequence && (
-            <MessageAvatar user={message.sender} size="sm" />
-          )}
+          {isLastInSequence && <MessageAvatar user={message.sender} size="sm" />}
         </div>
       )}
 
@@ -125,10 +110,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
           {/* Actions (shown on hover) */}
           {showActions && (
             <div className={cn('opacity-0 animate-fadeIn', isOwnMessage && 'order-2')}>
-              <MessageActions
-                message={message}
-                isOwnMessage={isOwnMessage}
-              />
+              <MessageActions message={message} isOwnMessage={isOwnMessage} />
             </div>
           )}
 
@@ -147,21 +129,19 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
           >
             {/* Reply indicator */}
             {message.replyTo && (
-              <div className={cn(
-                'mb-2 p-2 -mx-2 -mt-1 rounded-lg border-l-2',
-                isOwnMessage 
-                  ? 'bg-blue-400/20 border-blue-300' 
-                  : 'bg-gray-200 dark:bg-gray-600 border-gray-400 dark:border-gray-500'
-              )}>
+              <div
+                className={cn(
+                  'mb-2 p-2 -mx-2 -mt-1 rounded-lg border-l-2',
+                  isOwnMessage
+                    ? 'bg-blue-400/20 border-blue-300'
+                    : 'bg-gray-200 dark:bg-gray-600 border-gray-400 dark:border-gray-500'
+                )}
+              >
                 <div className="flex items-center gap-1 mb-1">
                   <Reply size={12} />
-                  <span className="text-xs font-medium">
-                    {message.replyTo.sender.firstName}
-                  </span>
+                  <span className="text-xs font-medium">{message.replyTo.sender.firstName}</span>
                 </div>
-                <p className="text-xs opacity-75 line-clamp-2">
-                  {message.replyTo.content}
-                </p>
+                <p className="text-xs opacity-75 line-clamp-2">{message.replyTo.content}</p>
               </div>
             )}
 
@@ -170,10 +150,12 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
 
             {/* Edit indicator */}
             {message.isEdited && (
-              <span className={cn(
-                'text-xs ml-2',
-                isOwnMessage ? 'text-blue-100' : 'text-gray-500 dark:text-gray-400'
-              )}>
+              <span
+                className={cn(
+                  'text-xs ml-2',
+                  isOwnMessage ? 'text-blue-100' : 'text-gray-500 dark:text-gray-400'
+                )}
+              >
                 (edited)
               </span>
             )}
@@ -182,10 +164,9 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
 
         {/* Time and read status */}
         {isLastInSequence && (
-          <div className={cn(
-            'flex items-center gap-1 mt-1 text-xs',
-            isOwnMessage ? 'mr-3' : 'ml-3'
-          )}>
+          <div
+            className={cn('flex items-center gap-1 mt-1 text-xs', isOwnMessage ? 'mr-3' : 'ml-3')}
+          >
             <span className="text-gray-500 dark:text-gray-400">
               {format(new Date(message.createdAt), 'HH:mm')}
             </span>

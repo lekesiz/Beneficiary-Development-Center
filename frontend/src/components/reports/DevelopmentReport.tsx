@@ -47,7 +47,6 @@ import {
   type DevelopmentReport as DevelopmentReportType,
 } from '@/hooks/useReports';
 
-
 interface DevelopmentReportProps {
   userId: number;
   userName?: string;
@@ -61,16 +60,12 @@ export const DevelopmentReport: React.FC<DevelopmentReportProps> = ({
   dateRange = 30,
   onClose,
 }) => {
-  const [activeTab, setActiveTab] = useState<
-    'overview' | 'analysis' | 'recommendations'
-  >('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'analysis' | 'recommendations'>(
+    'overview'
+  );
 
   // Fetch report data
-  const {
-    data: report,
-    isLoading,
-    refetch,
-  } = useDevelopmentReport(userId, dateRange);
+  const { data: report, isLoading, refetch } = useDevelopmentReport(userId, dateRange);
   const downloadMutation = useDownloadReport();
 
   if (isLoading) {
@@ -133,9 +128,7 @@ export const DevelopmentReport: React.FC<DevelopmentReportProps> = ({
             <User className="mr-2 h-6 w-6" />
             {report.student_name} - Gelişim Raporu
           </h2>
-          <p className="text-gray-600 mt-1">
-            Son {dateRange} günlük performans analizi
-          </p>
+          <p className="text-gray-600 mt-1">Son {dateRange} günlük performans analizi</p>
         </div>
 
         <div className="flex items-center space-x-2">
@@ -160,12 +153,8 @@ export const DevelopmentReport: React.FC<DevelopmentReportProps> = ({
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">
-                Tamamlama Oranı
-              </p>
-              <p className="text-2xl font-bold">
-                {report.summary_score.completion_rate}
-              </p>
+              <p className="text-sm font-medium text-gray-600">Tamamlama Oranı</p>
+              <p className="text-2xl font-bold">{report.summary_score.completion_rate}</p>
             </div>
             <CheckCircle className="h-8 w-8 text-green-600 opacity-80" />
           </div>
@@ -174,12 +163,8 @@ export const DevelopmentReport: React.FC<DevelopmentReportProps> = ({
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">
-                Performans İndeksi
-              </p>
-              <p className="text-2xl font-bold">
-                {report.summary_score.performance_index}
-              </p>
+              <p className="text-sm font-medium text-gray-600">Performans İndeksi</p>
+              <p className="text-2xl font-bold">{report.summary_score.performance_index}</p>
             </div>
             <Activity className="h-8 w-8 text-blue-600 opacity-80" />
           </div>
@@ -189,9 +174,7 @@ export const DevelopmentReport: React.FC<DevelopmentReportProps> = ({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Risk Durumu</p>
-              <div className="mt-1">
-                {getRiskBadge(report.summary_score.risk_score)}
-              </div>
+              <div className="mt-1">{getRiskBadge(report.summary_score.risk_score)}</div>
             </div>
             <Shield className="h-8 w-8 text-orange-600 opacity-80" />
           </div>
@@ -212,13 +195,9 @@ export const DevelopmentReport: React.FC<DevelopmentReportProps> = ({
 
       {/* Progress Summary */}
       <Card className="p-6 bg-blue-50 border-blue-200">
-        <h3 className="font-semibold text-blue-900 mb-2">
-          Genel Değerlendirme
-        </h3>
+        <h3 className="font-semibold text-blue-900 mb-2">Genel Değerlendirme</h3>
         <p className="text-blue-800">{report.progress_summary}</p>
-        <p className="text-blue-700 text-sm mt-2">
-          {report.summary_score.overall_assessment}
-        </p>
+        <p className="text-blue-700 text-sm mt-2">{report.summary_score.overall_assessment}</p>
       </Card>
 
       {/* Tab Navigation */}
@@ -278,9 +257,7 @@ export const DevelopmentReport: React.FC<DevelopmentReportProps> = ({
                   />
                   <YAxis domain={[0, 100]} />
                   <Tooltip
-                    labelFormatter={(date) =>
-                      new Date(date).toLocaleDateString('tr-TR')
-                    }
+                    labelFormatter={(date) => new Date(date).toLocaleDateString('tr-TR')}
                     formatter={(value) => [`${value}%`, 'Puan']}
                   />
                   <Line
@@ -298,25 +275,17 @@ export const DevelopmentReport: React.FC<DevelopmentReportProps> = ({
           {/* Milestone Progress */}
           {report.visualization_data?.milestone_progress && (
             <Card className="p-6">
-              <h3 className="text-lg font-semibold mb-4">
-                Öğrenme Yolu İlerlemesi
-              </h3>
+              <h3 className="text-lg font-semibold mb-4">Öğrenme Yolu İlerlemesi</h3>
               <div className="space-y-3">
-                {report.visualization_data.milestone_progress.map(
-                  (milestone, index) => (
-                    <div key={index}>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span className="font-medium truncate pr-2">
-                          {milestone.path}
-                        </span>
-                        <span className="text-gray-600">
-                          {milestone.progress}%
-                        </span>
-                      </div>
-                      <ProgressBar value={milestone.progress} />
+                {report.visualization_data.milestone_progress.map((milestone, index) => (
+                  <div key={index}>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span className="font-medium truncate pr-2">{milestone.path}</span>
+                      <span className="text-gray-600">{milestone.progress}%</span>
                     </div>
-                  )
-                )}
+                    <ProgressBar value={milestone.progress} />
+                  </div>
+                ))}
               </div>
             </Card>
           )}
@@ -344,9 +313,7 @@ export const DevelopmentReport: React.FC<DevelopmentReportProps> = ({
               {report.suggested_interventions.map((intervention, index) => (
                 <div
                   key={index}
-                  className={`p-4 rounded-lg ${getPriorityColor(
-                    intervention.priority
-                  )}`}
+                  className={`p-4 rounded-lg ${getPriorityColor(intervention.priority)}`}
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
@@ -368,9 +335,7 @@ export const DevelopmentReport: React.FC<DevelopmentReportProps> = ({
                             : 'Düşük'}{' '}
                           Öncelik
                         </Badge>
-                        <span className="text-sm text-gray-600">
-                          {intervention.timeline}
-                        </span>
+                        <span className="text-sm text-gray-600">{intervention.timeline}</span>
                       </div>
                       <p className="font-medium">{intervention.intervention}</p>
                       <p className="text-sm mt-1">
@@ -460,10 +425,7 @@ export const DevelopmentReport: React.FC<DevelopmentReportProps> = ({
             </h3>
             <div className="space-y-2">
               {report.recommendations.immediate_actions.map((action, index) => (
-                <div
-                  key={index}
-                  className="flex items-center space-x-3 p-3 bg-red-50 rounded-lg"
-                >
+                <div key={index} className="flex items-center space-x-3 p-3 bg-red-50 rounded-lg">
                   <ChevronRight className="h-5 w-5 text-red-600 flex-shrink-0" />
                   <p className="text-red-800">{action}</p>
                 </div>
@@ -479,10 +441,7 @@ export const DevelopmentReport: React.FC<DevelopmentReportProps> = ({
             </h3>
             <div className="space-y-2">
               {report.recommendations.long_term_goals.map((goal, index) => (
-                <div
-                  key={index}
-                  className="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg"
-                >
+                <div key={index} className="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg">
                   <Award className="h-5 w-5 text-blue-600 flex-shrink-0" />
                   <p className="text-blue-800">{goal}</p>
                 </div>
@@ -498,10 +457,7 @@ export const DevelopmentReport: React.FC<DevelopmentReportProps> = ({
             </h3>
             <div className="space-y-2">
               {report.recommendations.support_needed.map((support, index) => (
-                <div
-                  key={index}
-                  className="flex items-center space-x-3 p-3 bg-green-50 rounded-lg"
-                >
+                <div key={index} className="flex items-center space-x-3 p-3 bg-green-50 rounded-lg">
                   <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" />
                   <p className="text-green-800">{support}</p>
                 </div>
@@ -537,8 +493,7 @@ export const DevelopmentReport: React.FC<DevelopmentReportProps> = ({
             <div className="flex items-center space-x-4">
               <span>
                 <Calendar className="inline-block h-4 w-4 mr-1" />
-                Oluşturulma:{' '}
-                {new Date(report.metadata.generated_at).toLocaleString('tr-TR')}
+                Oluşturulma: {new Date(report.metadata.generated_at).toLocaleString('tr-TR')}
               </span>
               <span>
                 <User className="inline-block h-4 w-4 mr-1" />

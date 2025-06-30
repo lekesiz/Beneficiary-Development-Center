@@ -1,0 +1,482 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "update": "Update",
+    "create": "Create",
+    "add": "Add",
+    "new": "New",
+    "search": "Search",
+    "filter": "Filter",
+    "filters": "Filters",
+    "back": "Back",
+    "next": "Next",
+    "close": "Close",
+    "open": "Open",
+    "confirm": "Confirm",
+    "reject": "Reject",
+    "success": "Success",
+    "error": "Error",
+    "warning": "Warning",
+    "info": "Info",
+    "loading": "Loading",
+    "yes": "Yes",
+    "no": "No",
+    "ok": "OK",
+    "view": "View",
+    "select": "Select",
+    "selectAll": "Select All",
+    "clear": "Clear",
+    "reset": "Reset",
+    "upload": "Upload",
+    "download": "Download",
+    "export": "Export",
+    "import": "Import",
+    "print": "Print",
+    "share": "Share",
+    "copy": "Copy",
+    "actions": "Actions",
+    "status": "Status",
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "address": "Address",
+    "date": "Date",
+    "time": "Time",
+    "description": "Description",
+    "details": "Details",
+    "notes": "Notes",
+    "tags": "Tags",
+    "total": "Total",
+    "amount": "Amount",
+    "price": "Price",
+    "duration": "Duration",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "createdAt": "Created At",
+    "updatedAt": "Updated At",
+    "all": "All",
+    "none": "None",
+    "other": "Other",
+    "more": "More",
+    "less": "Less",
+    "showMore": "Show More",
+    "showLess": "Show Less",
+    "required": "Required",
+    "optional": "Optional",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "active": "Active",
+    "inactive": "Inactive",
+    "completed": "Completed",
+    "pending": "Pending",
+    "inProgress": "In Progress",
+    "draft": "Draft",
+    "published": "Published",
+    "archived": "Archived",
+    "suspended": "Suspended",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "cancelled": "Cancelled",
+    "moreFilters": "More Filters",
+    "noResults": "No results found",
+    "backTo": "Back to {{target}}",
+    "goBack": "Go Back",
+    "continue": "Continue"
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "beneficiaries": "Beneficiaries",
+    "programs": "Programs",
+    "courses": "Courses",
+    "sessions": "Sessions",
+    "evaluations": "Evaluations",
+    "learningPaths": "Learning Paths",
+    "chat": "Chat",
+    "reports": "Reports",
+    "settings": "Settings",
+    "profile": "Profile",
+    "logout": "Logout",
+    "login": "Login"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome back, {{name}}",
+    "overview": "Overview",
+    "recentActivity": "Recent Activity",
+    "statistics": "Statistics"
+  },
+  "programs": {
+    "title": "Programs",
+    "titleSingular": "Program",
+    "subtitle": "View and manage training programs",
+    "list": {
+      "title": "Programs",
+      "newProgram": "New Program",
+      "searchPlaceholder": "Search by program name, code or description...",
+      "noPrograms": "No Programs Found",
+      "noProgramsDescription": "Get started by creating your first training program. Programs help you organize courses and track student progress.",
+      "createNewProgram": "Create New Program",
+      "columns": {
+        "name": "Program Name",
+        "type": "Type",
+        "status": "Status",
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "participants": "Participants",
+        "price": "Price",
+        "coordinator": "Coordinator",
+        "createdAt": "Created"
+      },
+      "filters": {
+        "allStatuses": "All Statuses",
+        "allTypes": "All Types",
+        "upcomingOnly": "Upcoming Only",
+        "activeOnly": "Active Only"
+      },
+      "stats": {
+        "totalPrograms": "Total Programs",
+        "activePrograms": "Active",
+        "completedPrograms": "Completed",
+        "upcomingPrograms": "Upcoming"
+      }
+    },
+    "form": {
+      "editProgram": "Edit Program",
+      "newProgram": "New Program",
+      "updateDescription": "Update program information",
+      "createDescription": "Create a new program",
+      "sections": {
+        "basicInfo": "Basic Information",
+        "datesCapacity": "Dates and Capacity",
+        "locationFormat": "Location and Format",
+        "pricing": "Pricing",
+        "objectives": "Program Objectives",
+        "tags": "Tags"
+      },
+      "fields": {
+        "title": "Program Name",
+        "code": "Program Code",
+        "codePlaceholder": "Auto-generated",
+        "type": "Program Type",
+        "status": "Status",
+        "description": "Description",
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "enrollmentStart": "Enrollment Start",
+        "enrollmentEnd": "Enrollment End",
+        "minParticipants": "Minimum Participants",
+        "maxParticipants": "Maximum Participants",
+        "location": "Location",
+        "locationPlaceholder": "Program location",
+        "onlineProgram": "Online Program",
+        "hybridProgram": "Hybrid Program",
+        "onlineLink": "Online Link",
+        "price": "Price",
+        "currency": "Currency",
+        "coordinator": "Coordinator",
+        "addObjective": "Add new objective",
+        "addTag": "Add new tag"
+      },
+      "messages": {
+        "createSuccess": "Program created successfully",
+        "updateSuccess": "Program updated successfully",
+        "deleteConfirmTitle": "Delete Program",
+        "deleteConfirmMessage": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone.",
+        "noPermission": "You don't have permission to access this page"
+      }
+    },
+    "types": {
+      "training": "Training",
+      "workshop": "Workshop",
+      "certification": "Certification",
+      "bootcamp": "Bootcamp",
+      "mentorship": "Mentorship",
+      "other": "Other"
+    },
+    "statuses": {
+      "draft": "Draft",
+      "published": "Published",
+      "active": "Active",
+      "completed": "Completed",
+      "archived": "Archived"
+    }
+  },
+  "courses": {
+    "title": "Courses",
+    "titleSingular": "Course",
+    "subtitle": "View and manage training courses",
+    "list": {
+      "title": "Courses",
+      "newCourse": "New Course",
+      "searchPlaceholder": "Search by course name, code or description...",
+      "noCourses": "No Courses Found",
+      "noCoursesDescription": "Create your first course to start building engaging learning experiences. Courses can include videos, documents, assessments, and more.",
+      "createNewCourse": "Create New Course",
+      "copyCourse": "Copy Course",
+      "columns": {
+        "name": "Course Name",
+        "program": "Program",
+        "status": "Status",
+        "format": "Format",
+        "difficulty": "Difficulty",
+        "duration": "Duration",
+        "participants": "Participants",
+        "instructor": "Instructor",
+        "completion": "completion"
+      },
+      "filters": {
+        "allPrograms": "All Programs",
+        "allStatuses": "All Statuses",
+        "allFormats": "All Formats",
+        "allLevels": "All Levels",
+        "selectProgram": "Select program",
+        "selectStatus": "Select status",
+        "selectFormat": "Select format",
+        "selectDifficulty": "Select difficulty"
+      },
+      "stats": {
+        "totalCourses": "Total Courses",
+        "published": "Published",
+        "draft": "Draft",
+        "withAssessment": "With Assessment"
+      }
+    },
+    "form": {
+      "editCourse": "Edit Course",
+      "newCourse": "New Course",
+      "updateDescription": "Update course information",
+      "createDescription": "Create a new course",
+      "messages": {
+        "createSuccess": "Course created successfully",
+        "updateSuccess": "Course updated successfully",
+        "deleteConfirmTitle": "Delete Course",
+        "deleteConfirmMessage": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone.",
+        "loadError": "Failed to load courses. Please try again."
+      }
+    },
+    "formats": {
+      "lecture": "Lecture",
+      "workshop": "Workshop",
+      "practical": "Practical",
+      "online": "Online",
+      "selfPaced": "Self-paced",
+      "hybrid": "Hybrid"
+    },
+    "difficulty": {
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced",
+      "expert": "Expert"
+    },
+    "statuses": {
+      "draft": "Draft",
+      "published": "Published",
+      "archived": "Archived"
+    }
+  },
+  "beneficiaries": {
+    "title": "Beneficiaries",
+    "titleSingular": "Beneficiary",
+    "subtitle": "Manage program beneficiaries and track their progress",
+    "list": {
+      "title": "Beneficiaries",
+      "addBeneficiary": "Add Beneficiary",
+      "searchPlaceholder": "Search by name, email, phone...",
+      "noBeneficiaries": "No Beneficiaries Found",
+      "noBeneficiariesDescription": "Start building your community by adding your first beneficiary. Track their progress, manage enrollments, and support their learning journey.",
+      "addNewBeneficiary": "Add New Beneficiary",
+      "columns": {
+        "name": "Name",
+        "phone": "Phone",
+        "status": "Status",
+        "trainer": "Trainer",
+        "tags": "Tags",
+        "created": "Created",
+        "actions": "Actions"
+      },
+      "filters": {
+        "allStatus": "All Status",
+        "moreFilters": "More Filters"
+      },
+      "actions": {
+        "viewDetails": "View details",
+        "edit": "Edit",
+        "delete": "Delete",
+        "deleteConfirm": "Are you sure you want to delete this beneficiary?"
+      }
+    },
+    "form": {
+      "editBeneficiary": "Edit Beneficiary",
+      "addNewBeneficiary": "Add New Beneficiary",
+      "updateDescription": "Update beneficiary information",
+      "createDescription": "Create a new beneficiary profile",
+      "backToBeneficiaries": "Back to Beneficiaries",
+      "sections": {
+        "basicInfo": "Basic Information",
+        "personalInfo": "Personal Information",
+        "address": "Address",
+        "professionalInfo": "Professional Information",
+        "education": "Education",
+        "skillsInterests": "Skills & Interests",
+        "management": "Management",
+        "documents": "Documents"
+      },
+      "fields": {
+        "firstName": "First Name",
+        "lastName": "Last Name",
+        "email": "Email",
+        "phone": "Phone",
+        "mobilePhone": "Mobile Phone",
+        "externalId": "External ID",
+        "dateOfBirth": "Date of Birth",
+        "gender": "Gender",
+        "nationality": "Nationality",
+        "birthplace": "Birthplace",
+        "street": "Street",
+        "city": "City",
+        "state": "State/Region",
+        "postalCode": "Postal Code",
+        "country": "Country",
+        "employmentStatus": "Employment Status",
+        "jobTitle": "Job Title",
+        "company": "Company",
+        "industry": "Industry",
+        "yearsOfExperience": "Years of Experience",
+        "educationLevel": "Education Level",
+        "fieldOfStudy": "Field of Study",
+        "certifications": "Certifications",
+        "skills": "Skills",
+        "interests": "Interests",
+        "goals": "Goals",
+        "status": "Status",
+        "tags": "Tags",
+        "selectGender": "Select gender",
+        "selectStatus": "Select status",
+        "selectLevel": "Select level",
+        "addCertification": "Add certification...",
+        "addSkill": "Add skill...",
+        "addInterest": "Add interest...",
+        "addGoal": "Add goal...",
+        "addTag": "Add tag..."
+      },
+      "placeholders": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "email": "john.doe@example.com",
+        "phone": "+33 1 23 45 67 89",
+        "mobilePhone": "+33 6 12 34 56 78",
+        "externalId": "External system ID",
+        "nationality": "French",
+        "birthplace": "Paris, France",
+        "street": "123 Main Street",
+        "city": "Paris",
+        "state": "Île-de-France",
+        "postalCode": "75001",
+        "country": "France",
+        "jobTitle": "Software Developer",
+        "company": "Tech Corp",
+        "industry": "Technology",
+        "yearsOfExperience": "5",
+        "fieldOfStudy": "Computer Science"
+      },
+      "documents": {
+        "title": "Documents",
+        "description": "Upload identification documents, certificates, CVs, and other relevant files.",
+        "uploadNote": "Document Upload",
+        "uploadNoteDescription": "After creating the beneficiary profile, you'll be able to upload documents such as ID cards, certificates, CVs, and other relevant files."
+      },
+      "messages": {
+        "createBeneficiary": "Create Beneficiary",
+        "updateBeneficiary": "Update Beneficiary"
+      }
+    },
+    "gender": {
+      "male": "Male",
+      "female": "Female",
+      "other": "Other"
+    },
+    "statuses": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "completed": "Completed",
+      "suspended": "Suspended"
+    }
+  },
+  "confirmDialog": {
+    "defaultConfirm": "Confirm",
+    "defaultCancel": "Cancel"
+  },
+  "currency": {
+    "eur": "Euro (€)",
+    "usd": "Dollar ($)",
+    "try": "Turkish Lira (₺)",
+    "gbp": "British Pound (£)"
+  },
+  "dateTime": {
+    "formats": {
+      "date": "MM/dd/yyyy",
+      "dateTime": "MM/dd/yyyy HH:mm",
+      "time": "HH:mm"
+    }
+  },
+  "errors": {
+    "general": "An error occurred. Please try again.",
+    "loadFailed": "Failed to load data. Please try again.",
+    "saveFailed": "Failed to save. Please try again.",
+    "deleteFailed": "Failed to delete. Please try again.",
+    "unauthorized": "You are not authorized to perform this action.",
+    "notFound": "The requested resource was not found.",
+    "validation": "Please check your input and try again.",
+    "network": "Network error. Please check your connection."
+  },
+  "validation": {
+    "required": "This field is required",
+    "email": "Please enter a valid email address",
+    "minLength": "Must be at least {{min}} characters",
+    "maxLength": "Must be at most {{max}} characters",
+    "min": "Must be at least {{min}}",
+    "max": "Must be at most {{max}}",
+    "pattern": "Invalid format",
+    "unique": "This value already exists"
+  },
+  "pagination": {
+    "showing": "Showing",
+    "of": "of",
+    "results": "results",
+    "page": "Page",
+    "perPage": "Per page",
+    "first": "First",
+    "previous": "Previous",
+    "next": "Next",
+    "last": "Last"
+  },
+  "table": {
+    "noData": "No data available",
+    "loading": "Loading...",
+    "sortAsc": "Sort ascending",
+    "sortDesc": "Sort descending",
+    "columns": "Columns",
+    "selectColumns": "Select columns to display"
+  },
+  "fileUpload": {
+    "dropzone": "Drop files here or click to browse",
+    "maxSize": "Maximum file size: {{size}}",
+    "acceptedFormats": "Accepted formats: {{formats}}",
+    "uploading": "Uploading...",
+    "uploadFailed": "Upload failed",
+    "remove": "Remove"
+  },
+  "assessment": {
+    "types": {
+      "quiz": "Quiz",
+      "project": "Project",
+      "presentation": "Presentation",
+      "exam": "Exam",
+      "assignment": "Assignment",
+      "portfolio": "Portfolio"
+    }
+  }
+}

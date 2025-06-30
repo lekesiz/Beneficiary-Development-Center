@@ -84,9 +84,7 @@ export const NotificationSettings: React.FC = () => {
   if (!localPreferences) {
     return (
       <Card>
-        <div className="p-6 text-center text-gray-500">
-          Failed to load notification preferences
-        </div>
+        <div className="p-6 text-center text-gray-500">Failed to load notification preferences</div>
       </Card>
     );
   }
@@ -138,9 +136,10 @@ export const NotificationSettings: React.FC = () => {
                       className={`
                         relative inline-flex h-6 w-11 items-center rounded-full
                         transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2
-                        ${localPreferences.notifications.email[category.key] 
-                          ? 'bg-primary-600' 
-                          : 'bg-gray-200'
+                        ${
+                          localPreferences.notifications.email[category.key]
+                            ? 'bg-primary-600'
+                            : 'bg-gray-200'
                         }
                         ${isUpdating ? 'opacity-50 cursor-not-allowed' : ''}
                       `}
@@ -149,9 +148,10 @@ export const NotificationSettings: React.FC = () => {
                       <span
                         className={`
                           inline-block h-4 w-4 transform rounded-full bg-white transition-transform
-                          ${localPreferences.notifications.email[category.key] 
-                            ? 'translate-x-6' 
-                            : 'translate-x-1'
+                          ${
+                            localPreferences.notifications.email[category.key]
+                              ? 'translate-x-6'
+                              : 'translate-x-1'
                           }
                         `}
                       />
@@ -165,9 +165,10 @@ export const NotificationSettings: React.FC = () => {
                       className={`
                         relative inline-flex h-6 w-11 items-center rounded-full
                         transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2
-                        ${localPreferences.notifications.in_app[category.key] 
-                          ? 'bg-primary-600' 
-                          : 'bg-gray-200'
+                        ${
+                          localPreferences.notifications.in_app[category.key]
+                            ? 'bg-primary-600'
+                            : 'bg-gray-200'
                         }
                         ${isUpdating ? 'opacity-50 cursor-not-allowed' : ''}
                       `}
@@ -176,9 +177,10 @@ export const NotificationSettings: React.FC = () => {
                       <span
                         className={`
                           inline-block h-4 w-4 transform rounded-full bg-white transition-transform
-                          ${localPreferences.notifications.in_app[category.key] 
-                            ? 'translate-x-6' 
-                            : 'translate-x-1'
+                          ${
+                            localPreferences.notifications.in_app[category.key]
+                              ? 'translate-x-6'
+                              : 'translate-x-1'
                           }
                         `}
                       />
@@ -199,7 +201,8 @@ export const NotificationSettings: React.FC = () => {
           <div className="ml-3">
             <h3 className="text-sm font-medium text-blue-800">SMS Notifications</h3>
             <div className="mt-2 text-sm text-blue-700">
-              SMS notifications are not currently available. We'll notify you when this feature becomes available.
+              SMS notifications are not currently available. We'll notify you when this feature
+              becomes available.
             </div>
           </div>
         </div>

@@ -30,9 +30,7 @@ export const useNotificationPreferences = () => {
       toast.success('Notification preferences updated successfully');
     },
     onError: (error: any) => {
-      toast.error(
-        error.response?.data?.message || 'Failed to update notification preferences'
-      );
+      toast.error(error.response?.data?.message || 'Failed to update notification preferences');
     },
   });
 

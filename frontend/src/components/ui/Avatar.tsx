@@ -51,9 +51,7 @@ export const Avatar: React.FC<AvatarProps> = ({
           className="h-full w-full object-cover"
         />
       ) : (
-        <span className="font-medium text-gray-600 dark:text-gray-300">
-          {initials}
-        </span>
+        <span className="font-medium text-gray-600 dark:text-gray-300">{initials}</span>
       )}
     </div>
   );

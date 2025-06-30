@@ -44,9 +44,9 @@ class Tenant(BaseModel):
 
     # Features and limits
     features = Column(JSON, default=dict)
-    
+
     # Relationships
-    users = relationship("User", back_populates="tenant")
+    users = relationship("User", foreign_keys="User.tenant_id", back_populates="tenant")
 
     def __init__(self, **kwargs):
         """Initialize tenant with default settings."""

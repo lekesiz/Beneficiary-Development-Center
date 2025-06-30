@@ -13,44 +13,39 @@ interface ChatComponentExampleProps {
   conversationId: number;
 }
 
-export const ChatComponentExample: React.FC<ChatComponentExampleProps> = ({
-  conversationId,
-}) => {
+export const ChatComponentExample: React.FC<ChatComponentExampleProps> = ({ conversationId }) => {
   const [message, setMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  
+
   // Socket connection and methods
   const { socket, on, off } = useSocket();
-  
+
   // Custom hook for chat socket features
-  const {
-    isConnected,
-    sendChatMessage,
-    sendTyping,
-    markMessagesAsRead,
-  } = useChatSocket({ conversationId });
+  const { isConnected, sendChatMessage, sendTyping, markMessagesAsRead } = useChatSocket({
+    conversationId,
+  });
 
   // React Query hooks
   const { data: messagesData, isLoading } = useMessages(conversationId);
   const sendMessageMutation = useSendMessage();
-  
+
   // Get typing users
   const { data: typingUsers = [] } = useTypingStatus(conversationId);
-  
+
   // Auto-mark messages as read
   useAutoMarkAsRead(conversationId);
 
   // Handle typing indicator
   useEffect(() => {
     let typingTimeout: NodeJS.Timeout;
-    
+
     const handleInputChange = () => {
       if (!isTyping) {
         setIsTyping(true);
         sendTyping(true);
       }
-      
+
       clearTimeout(typingTimeout);
       typingTimeout = setTimeout(() => {
         setIsTyping(false);
@@ -64,17 +59,17 @@ export const ChatComponentExample: React.FC<ChatComponentExampleProps> = ({
   // Send message handler
   const handleSendMessage = async () => {
     if (!message.trim()) return;
-    
+
     try {
       // Send through API (will also emit socket event from backend)
       await sendMessageMutation.mutateAsync({
         conversationId,
         content: message.trim(),
       });
-      
+
       // Alternatively, you can send directly through socket
       // sendChatMessage(message.trim());
-      
+
       setMessage('');
       setIsTyping(false);
       sendTyping(false);
@@ -86,14 +81,14 @@ export const ChatComponentExample: React.FC<ChatComponentExampleProps> = ({
   // Listen for custom events (example)
   useEffect(() => {
     if (!socket) return;
-    
+
     // Example: Listen for user joined conversation
     const handleUserJoined = (data: { userId: number; userName: string }) => {
       console.log(`${data.userName} joined the conversation`);
     };
-    
+
     on('conversation:user_joined', handleUserJoined);
-    
+
     return () => {
       off('conversation:user_joined', handleUserJoined);
     };
@@ -105,18 +100,14 @@ export const ChatComponentExample: React.FC<ChatComponentExampleProps> = ({
   }, [messagesData]);
 
   // Get all messages from paginated data
-  const allMessages = messagesData?.pages.flatMap(page => page.messages) || [];
+  const allMessages = messagesData?.pages.flatMap((page) => page.messages) || [];
 
   return (
     <div className="flex flex-col h-full">
       {/* Connection Status */}
       <div className="px-4 py-2 bg-gray-100 dark:bg-gray-800">
         <div className="flex items-center gap-2">
-          <div
-            className={`w-2 h-2 rounded-full ${
-              isConnected ? 'bg-green-500' : 'bg-red-500'
-            }`}
-          />
+          <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`} />
           <span className="text-sm text-gray-600 dark:text-gray-400">
             {isConnected ? 'Connected' : 'Disconnected'}
           </span>
@@ -130,18 +121,13 @@ export const ChatComponentExample: React.FC<ChatComponentExampleProps> = ({
         ) : (
           <>
             {allMessages.map((msg) => (
-              <div
-                key={msg.id}
-                className="mb-4 p-3 rounded-lg bg-gray-100 dark:bg-gray-800"
-              >
+              <div key={msg.id} className="mb-4 p-3 rounded-lg bg-gray-100 dark:bg-gray-800">
                 <div className="font-semibold">{msg.sender.fullName}</div>
                 <div>{msg.content}</div>
                 <div className="text-xs text-gray-500 mt-1">
                   {new Date(msg.createdAt).toLocaleTimeString()}
                   {msg.readBy.length > 0 && (
-                    <span className="ml-2">
-                      ✓✓ Read by {msg.readBy.length}
-                    </span>
+                    <span className="ml-2">✓✓ Read by {msg.readBy.length}</span>
                   )}
                 </div>
               </div>
@@ -154,7 +140,8 @@ export const ChatComponentExample: React.FC<ChatComponentExampleProps> = ({
       {/* Typing Indicator */}
       {typingUsers.length > 0 && (
         <div className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400">
-          {typingUsers.map(user => user.userName).join(', ')} {typingUsers.length === 1 ? 'is' : 'are'} typing...
+          {typingUsers.map((user) => user.userName).join(', ')}{' '}
+          {typingUsers.length === 1 ? 'is' : 'are'} typing...
         </div>
       )}
 
@@ -193,12 +180,12 @@ export const ChatComponentExample: React.FC<ChatComponentExampleProps> = ({
 
 /**
  * Usage example in a parent component:
- * 
+ *
  * import { ChatComponentExample } from '@/examples/ChatComponentExample';
- * 
+ *
  * function ChatPage() {
  *   const [selectedConversationId, setSelectedConversationId] = useState<number>(1);
- *   
+ *
  *   return (
  *     <div className="h-screen">
  *       <ChatComponentExample conversationId={selectedConversationId} />

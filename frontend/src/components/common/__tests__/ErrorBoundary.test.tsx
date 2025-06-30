@@ -104,7 +104,7 @@ describe('ErrorBoundary', () => {
 
   it('calls window.location.reload when refresh button is clicked', () => {
     const reloadMock = vi.fn();
-    
+
     // Mock window.location.reload
     Object.defineProperty(window, 'location', {
       value: {
@@ -161,9 +161,7 @@ describe('ErrorBoundary', () => {
     const reportButton = screen.getByText('Report this error');
     fireEvent.click(reportButton);
 
-    expect(window.open).toHaveBeenCalledWith(
-      expect.stringContaining('mailto:support@bdc.com')
-    );
+    expect(window.open).toHaveBeenCalledWith(expect.stringContaining('mailto:support@bdc.com'));
 
     window.open = originalOpen;
   });

@@ -1,41 +1,78 @@
-# Backend Dockerfile
-FROM python:3.11-slim
+# Production Dockerfile for BDC Backend
+# Optimized for Google App Engine deployment
 
-# Set working directory
-WORKDIR /app
+ARG PYTHON_VERSION=3.12
+FROM python:${PYTHON_VERSION}-slim as builder
 
-# Install system dependencies
+# Install build dependencies
 RUN apt-get update && apt-get install -y \
     gcc \
     g++ \
     libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create wheels for dependencies
+WORKDIR /wheels
+COPY requirements.txt .
+RUN pip wheel --no-cache-dir --no-deps --wheel-dir /wheels -r requirements.txt
+
+# Final stage
+FROM python:${PYTHON_VERSION}-slim
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y \
+    libpq5 \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements
-COPY requirements.txt .
+# Create non-root user
+RUN groupadd -r appuser && useradd -r -g appuser appuser
 
-# Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# Set working directory
+WORKDIR /app
+
+# Copy wheels and install
+COPY --from=builder /wheels /wheels
+COPY requirements.txt .
+RUN pip install --no-cache-dir --no-index --find-links=/wheels -r requirements.txt && \
+    rm -rf /wheels
 
 # Copy application code
 COPY . .
 
 # Create necessary directories
-RUN mkdir -p uploads logs
+RUN mkdir -p /app/logs /app/uploads && \
+    chown -R appuser:appuser /app
 
-# Create non-root user
-RUN useradd -m -u 1000 bdc && chown -R bdc:bdc /app
-
-# Switch to non-root user
-USER bdc
-
-# Expose port
-EXPOSE 5000
+# Set environment variables
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    FLASK_APP=wsgi.py \
+    PORT=8080
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:5000/api/v1/ || exit 1
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:${PORT}/_ah/health || exit 1
 
-# Run application
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "4", "--threads", "2", "--worker-class", "gevent", "--timeout", "120", "wsgi:app"]
+# Switch to non-root user
+USER appuser
+
+# Expose port
+EXPOSE 8080
+
+# Gunicorn configuration for production
+CMD exec gunicorn \
+    --bind :${PORT} \
+    --workers 4 \
+    --worker-class gevent \
+    --worker-connections 1000 \
+    --max-requests 1000 \
+    --max-requests-jitter 50 \
+    --timeout 30 \
+    --graceful-timeout 30 \
+    --keep-alive 5 \
+    --log-level info \
+    --access-logfile - \
+    --error-logfile - \
+    --access-logformat '%(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s" %(D)s' \
+    wsgi:app

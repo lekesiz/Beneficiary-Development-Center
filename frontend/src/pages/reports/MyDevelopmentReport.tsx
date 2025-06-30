@@ -20,17 +20,12 @@ export default function MyDevelopmentReport() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-4">
-          <button
-            onClick={() => navigate(-1)}
-            className="p-2 hover:bg-gray-100 rounded-md"
-          >
+          <button onClick={() => navigate(-1)} className="p-2 hover:bg-gray-100 rounded-md">
             <ArrowLeft className="h-5 w-5" />
           </button>
           <div>
             <h1 className="text-2xl font-bold">Gelişim Raporum</h1>
-            <p className="text-gray-600">
-              Kişisel performans ve öğrenme analizi
-            </p>
+            <p className="text-gray-600">Kişisel performans ve öğrenme analizi</p>
           </div>
         </div>
 

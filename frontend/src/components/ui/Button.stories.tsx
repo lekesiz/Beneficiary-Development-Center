@@ -19,16 +19,7 @@ const meta: Meta<typeof Button> = {
   argTypes: {
     variant: {
       control: 'select',
-      options: [
-        'primary',
-        'secondary',
-        'danger',
-        'success',
-        'warning',
-        'ghost',
-        'outline',
-        'link',
-      ],
+      options: ['primary', 'secondary', 'danger', 'success', 'warning', 'ghost', 'outline', 'link'],
       description: 'Butonun görsel stili',
     },
     size: {
@@ -229,11 +220,7 @@ export const ActionButtons: Story = {
       <Button variant="ghost" size="sm">
         <Eye size={14} />
       </Button>
-      <Button
-        variant="ghost"
-        size="sm"
-        className="text-red-600 hover:text-red-800"
-      >
+      <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-800">
         <Trash2 size={14} />
       </Button>
     </div>

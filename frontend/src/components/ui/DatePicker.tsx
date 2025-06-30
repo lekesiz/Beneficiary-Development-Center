@@ -17,13 +17,7 @@ export const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
             {props.required && <span className="text-destructive ml-1">*</span>}
           </label>
         )}
-        <Input
-          {...props}
-          type="date"
-          className={className}
-          error={!!error}
-          ref={ref}
-        />
+        <Input {...props} type="date" className={className} error={!!error} ref={ref} />
         {error && <p className="text-sm text-destructive">{error}</p>}
       </div>
     );

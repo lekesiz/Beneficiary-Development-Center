@@ -1,12 +1,4 @@
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 interface SkillData {
   skill: string;
@@ -37,9 +29,7 @@ interface BarProps {
   payload?: SkillData;
 }
 
-export default function SkillDistributionChart({
-  data,
-}: SkillDistributionChartProps) {
+export default function SkillDistributionChart({ data }: SkillDistributionChartProps) {
   // Take top 8 skills
   const chartData = data.slice(0, 8);
 
@@ -66,21 +56,13 @@ export default function SkillDistributionChart({
       return (
         <div className="bg-white p-3 border rounded-lg shadow-lg">
           <p className="font-medium">{label}</p>
-          <p className="text-sm text-gray-600">
-            Total Focus: {data.total_focus}
-          </p>
+          <p className="text-sm text-gray-600">Total Focus: {data.total_focus}</p>
           <p className="text-sm text-green-600">Completed: {data.completed}</p>
-          <p className="text-sm text-yellow-600">
-            In Progress: {data.in_progress}
-          </p>
-          <p className="text-sm text-blue-600">
-            Average Progress: {data.average_progress}%
-          </p>
+          <p className="text-sm text-yellow-600">In Progress: {data.in_progress}</p>
+          <p className="text-sm text-blue-600">Average Progress: {data.average_progress}%</p>
           <p className="text-sm font-medium mt-1">
             Mastery:{' '}
-            <span style={{ color: getMasteryColor(data.mastery_level) }}>
-              {data.mastery_level}
-            </span>
+            <span style={{ color: getMasteryColor(data.mastery_level) }}>{data.mastery_level}</span>
           </p>
         </div>
       );
@@ -94,14 +76,7 @@ export default function SkillDistributionChart({
 
     return (
       <g>
-        <rect
-          x={x}
-          y={y}
-          width={width}
-          height={height}
-          fill={color}
-          opacity={0.8}
-        />
+        <rect x={x} y={y} width={width} height={height} fill={color} opacity={0.8} />
       </g>
     );
   };
@@ -109,10 +84,7 @@ export default function SkillDistributionChart({
   return (
     <div className="h-64">
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart
-          data={chartData}
-          margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-        >
+        <BarChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
           <XAxis
             dataKey="skill"
@@ -133,49 +105,30 @@ export default function SkillDistributionChart({
             }}
           />
           <Tooltip content={<CustomTooltip />} />
-          <Bar
-            dataKey="average_progress"
-            shape={<CustomBar />}
-            name="Average Progress"
-          />
+          <Bar dataKey="average_progress" shape={<CustomBar />} name="Average Progress" />
         </BarChart>
       </ResponsiveContainer>
 
       {/* Legend */}
       <div className="flex flex-wrap justify-center gap-3 mt-4">
         <div className="flex items-center text-xs">
-          <div
-            className="w-3 h-3 rounded mr-1"
-            style={{ backgroundColor: '#10B981' }}
-          />
+          <div className="w-3 h-3 rounded mr-1" style={{ backgroundColor: '#10B981' }} />
           <span>Expert</span>
         </div>
         <div className="flex items-center text-xs">
-          <div
-            className="w-3 h-3 rounded mr-1"
-            style={{ backgroundColor: '#3B82F6' }}
-          />
+          <div className="w-3 h-3 rounded mr-1" style={{ backgroundColor: '#3B82F6' }} />
           <span>Proficient</span>
         </div>
         <div className="flex items-center text-xs">
-          <div
-            className="w-3 h-3 rounded mr-1"
-            style={{ backgroundColor: '#F59E0B' }}
-          />
+          <div className="w-3 h-3 rounded mr-1" style={{ backgroundColor: '#F59E0B' }} />
           <span>Intermediate</span>
         </div>
         <div className="flex items-center text-xs">
-          <div
-            className="w-3 h-3 rounded mr-1"
-            style={{ backgroundColor: '#6B7280' }}
-          />
+          <div className="w-3 h-3 rounded mr-1" style={{ backgroundColor: '#6B7280' }} />
           <span>Beginner</span>
         </div>
         <div className="flex items-center text-xs">
-          <div
-            className="w-3 h-3 rounded mr-1"
-            style={{ backgroundColor: '#EF4444' }}
-          />
+          <div className="w-3 h-3 rounded mr-1" style={{ backgroundColor: '#EF4444' }} />
           <span>Novice</span>
         </div>
       </div>

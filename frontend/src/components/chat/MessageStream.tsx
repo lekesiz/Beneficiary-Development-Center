@@ -10,7 +10,6 @@ import { useMessages } from '@/hooks/useChat';
 import { ChatMessage } from './ChatMessage';
 import { TypingIndicator } from './TypingIndicator';
 
-
 interface MessageStreamProps {
   conversationId: number;
 }
@@ -20,14 +19,8 @@ export const MessageStream: React.FC<MessageStreamProps> = ({ conversationId }) 
   const bottomRef = useRef<HTMLDivElement>(null);
   const [autoScroll, setAutoScroll] = useState(true);
 
-  const {
-    data,
-    isLoading,
-    error,
-    hasNextPage,
-    fetchNextPage,
-    isFetchingNextPage,
-  } = useMessages(conversationId);
+  const { data, isLoading, error, hasNextPage, fetchNextPage, isFetchingNextPage } =
+    useMessages(conversationId);
 
   // Intersection observer for infinite scroll
   const { ref: topRef } = useInView({
@@ -56,7 +49,7 @@ export const MessageStream: React.FC<MessageStreamProps> = ({ conversationId }) 
 
     allMessages.forEach((message) => {
       const messageDate = formatDateHeader(new Date(message.createdAt));
-      const existingGroup = groups.find(g => g.date === messageDate);
+      const existingGroup = groups.find((g) => g.date === messageDate);
 
       if (existingGroup) {
         existingGroup.messages.push(message);
@@ -154,20 +147,20 @@ export const MessageStream: React.FC<MessageStreamProps> = ({ conversationId }) 
           {/* Date Header */}
           <div className="flex items-center justify-center my-4">
             <div className="bg-gray-200 dark:bg-gray-700 px-3 py-1 rounded-full">
-              <span className="text-xs text-gray-600 dark:text-gray-400">
-                {group.date}
-              </span>
+              <span className="text-xs text-gray-600 dark:text-gray-400">{group.date}</span>
             </div>
           </div>
 
           {/* Messages */}
           {group.messages.map((message, messageIndex) => {
             const previousMessage = messageIndex > 0 ? group.messages[messageIndex - 1] : null;
-            const nextMessage = messageIndex < group.messages.length - 1 ? group.messages[messageIndex + 1] : null;
-            
+            const nextMessage =
+              messageIndex < group.messages.length - 1 ? group.messages[messageIndex + 1] : null;
+
             // Check if this is the first message from this sender in a sequence
-            const isFirstInSequence = !previousMessage || previousMessage.sender.id !== message.sender.id;
-            
+            const isFirstInSequence =
+              !previousMessage || previousMessage.sender.id !== message.sender.id;
+
             // Check if this is the last message from this sender in a sequence
             const isLastInSequence = !nextMessage || nextMessage.sender.id !== message.sender.id;
 

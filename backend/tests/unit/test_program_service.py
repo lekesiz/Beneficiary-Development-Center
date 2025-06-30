@@ -27,7 +27,7 @@ class TestProgramService:
     @pytest.fixture
     def admin_user(self):
         """Create admin user."""
-        user = Mock(spec=User)
+        user = Mock()
         user.id = 1
         user.role = "admin"
         user.full_name = "Admin User"
@@ -36,7 +36,7 @@ class TestProgramService:
     @pytest.fixture
     def manager_user(self):
         """Create manager user."""
-        user = Mock(spec=User)
+        user = Mock()
         user.id = 2
         user.role = "manager"
         user.full_name = "Manager User"
@@ -45,7 +45,7 @@ class TestProgramService:
     @pytest.fixture
     def staff_user(self):
         """Create staff user."""
-        user = Mock(spec=User)
+        user = Mock()
         user.id = 3
         user.role = "staff"
         user.full_name = "Staff User"
@@ -54,7 +54,7 @@ class TestProgramService:
     @pytest.fixture
     def sample_program(self):
         """Create sample program."""
-        program = Mock(spec=Program)
+        program = Mock()
         program.id = 1
         program.tenant_id = 1
         program.code = "TRA-202401-A1B2"
@@ -83,7 +83,7 @@ class TestProgramService:
     def test_get_all_programs(self, service, mock_db, admin_user):
         """Test getting all programs."""
         # Setup
-        programs = [Mock(spec=Program) for _ in range(3)]
+        programs = [Mock() for _ in range(3)]
         mock_query = Mock()
         mock_query.filter.return_value = mock_query
         mock_query.order_by.return_value = mock_query
@@ -102,7 +102,7 @@ class TestProgramService:
     def test_get_all_with_filters(self, service, mock_db, admin_user):
         """Test getting programs with filters."""
         # Setup
-        programs = [Mock(spec=Program)]
+        programs = [Mock()]
         mock_query = Mock()
         mock_query.filter.return_value = mock_query
         mock_query.order_by.return_value = mock_query
@@ -165,12 +165,13 @@ class TestProgramService:
             "max_participants": 20,
         }
 
-        created_program = Mock(spec=Program)
+        created_program = Mock()
         created_program.id = 1
         created_program.code = "TRA-202401-NEW1"
 
         # Mock the Program class instantiation
         from unittest.mock import patch
+
         with patch("app.services.program_service.Program") as MockProgram:
             MockProgram.return_value = created_program
 
@@ -274,7 +275,7 @@ class TestProgramService:
     def test_delete_program_with_active_enrollments(self, service, mock_db, admin_user, sample_program):
         """Test deleting program with active enrollments."""
         # Setup
-        active_enrollment = Mock(spec=Enrollment)
+        active_enrollment = Mock()
         active_enrollment.status = EnrollmentStatus.ENROLLED
         sample_program.enrollments = [active_enrollment]
 

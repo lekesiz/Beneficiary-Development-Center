@@ -35,7 +35,7 @@ export const useSessions = (params: UseSessionsParams = {}) => {
       // This endpoint would need to be created in the backend
       // For now, we'll assume it exists at /api/v1/sessions
       const queryParams = new URLSearchParams();
-      
+
       if (params.include_past !== undefined) {
         queryParams.append('include_past', params.include_past.toString());
       }
@@ -51,7 +51,7 @@ export const useSessions = (params: UseSessionsParams = {}) => {
       if (params.program_id) {
         queryParams.append('program_id', params.program_id.toString());
       }
-      
+
       const response = await apiClient.get(`/sessions?${queryParams.toString()}`);
       return response.data.sessions;
     },
@@ -70,14 +70,14 @@ export const useCourseSessions = (
     queryKey: ['course-sessions', programId, courseId, params],
     queryFn: async () => {
       const queryParams = new URLSearchParams();
-      
+
       if (params.include_past !== undefined) {
         queryParams.append('include_past', params.include_past.toString());
       }
       if (params.include_cancelled !== undefined) {
         queryParams.append('include_cancelled', params.include_cancelled.toString());
       }
-      
+
       const response = await apiClient.get(
         `/programs/${programId}/courses/${courseId}/sessions?${queryParams.toString()}`
       );

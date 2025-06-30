@@ -1,10 +1,6 @@
 import { z } from 'zod';
 
-import {
-  BeneficiaryStatus,
-  EmploymentStatus,
-  EducationLevel,
-} from '@/types/beneficiary';
+import { BeneficiaryStatus, EmploymentStatus, EducationLevel } from '@/types/beneficiary';
 
 export const addressSchema = z.object({
   street: z.string().optional(),

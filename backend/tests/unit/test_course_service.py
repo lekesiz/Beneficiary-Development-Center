@@ -274,7 +274,7 @@ class TestCourseService:
         # Setup
         # Make instructor the coordinator
         sample_program.coordinator_id = instructor_user.id
-        
+
         mock_query = Mock()
         mock_query.filter.return_value = mock_query
         mock_query.first.return_value = sample_program
@@ -422,12 +422,12 @@ class TestCourseService:
         mock_query1.options.return_value = mock_query1
         mock_query1.filter.return_value = mock_query1
         mock_query1.first.return_value = sample_course
-        
+
         # Second query gets the target program (without options)
         mock_query2 = Mock()
         mock_query2.filter.return_value = mock_query2
         mock_query2.first.return_value = sample_program
-        
+
         # Alternate between the two query mocks
         mock_db.query.side_effect = [mock_query1, mock_query2]
 

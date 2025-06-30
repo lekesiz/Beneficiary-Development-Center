@@ -20,7 +20,8 @@ const meta = {
     layout: 'centered',
     docs: {
       description: {
-        component: 'A comprehensive file upload component with drag-and-drop, validation, and progress tracking.',
+        component:
+          'A comprehensive file upload component with drag-and-drop, validation, and progress tracking.',
       },
     },
   },
@@ -62,8 +63,8 @@ const meta = {
   args: {
     onUpload: async (files: File[]) => {
       // Simulate upload delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       return files.map((file, index) => ({
         id: `file-${Date.now()}-${index}`,
         name: file.name,
@@ -95,7 +96,7 @@ const FileUploadDemo = (props: any) => {
   };
 
   const handleRemove = (fileId: string) => {
-    setUploadedFiles(uploadedFiles.filter(f => f.id !== fileId));
+    setUploadedFiles(uploadedFiles.filter((f) => f.id !== fileId));
     props.onRemove?.(fileId);
   };
 
@@ -108,9 +109,7 @@ const FileUploadDemo = (props: any) => {
         uploadedFiles={uploadedFiles}
         disabled={props.disabled || isUploading}
       />
-      {isUploading && (
-        <p className="mt-2 text-sm text-gray-500">Uploading...</p>
-      )}
+      {isUploading && <p className="mt-2 text-sm text-gray-500">Uploading...</p>}
     </div>
   );
 };
@@ -225,21 +224,17 @@ export const WithProgress: Story = {
         progress: 0,
       }));
 
-      setUploadedFiles(prev => [...prev, ...newFiles]);
+      setUploadedFiles((prev) => [...prev, ...newFiles]);
 
       // Simulate upload progress
       for (let i = 0; i <= 100; i += 10) {
-        await new Promise(resolve => setTimeout(resolve, 200));
-        setUploadedFiles(prev =>
-          prev.map(f =>
-            newFiles.find(nf => nf.id === f.id)
-              ? { ...f, progress: i }
-              : f
-          )
+        await new Promise((resolve) => setTimeout(resolve, 200));
+        setUploadedFiles((prev) =>
+          prev.map((f) => (newFiles.find((nf) => nf.id === f.id) ? { ...f, progress: i } : f))
         );
       }
 
-      return newFiles.map(f => ({ ...f, progress: 100 }));
+      return newFiles.map((f) => ({ ...f, progress: 100 }));
     };
 
     return (
@@ -247,7 +242,7 @@ export const WithProgress: Story = {
         <FileUpload
           onUpload={handleUpload}
           onRemove={(fileId) => {
-            setUploadedFiles(uploadedFiles.filter(f => f.id !== fileId));
+            setUploadedFiles(uploadedFiles.filter((f) => f.id !== fileId));
           }}
           uploadedFiles={uploadedFiles}
           multiple
@@ -285,7 +280,7 @@ export const WithError: Story = {
             return newFiles;
           }}
           onRemove={(fileId) => {
-            setUploadedFiles(uploadedFiles.filter(f => f.id !== fileId));
+            setUploadedFiles(uploadedFiles.filter((f) => f.id !== fileId));
           }}
           uploadedFiles={uploadedFiles}
           multiple

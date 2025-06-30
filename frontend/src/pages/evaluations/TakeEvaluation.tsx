@@ -14,7 +14,6 @@ import * as React from 'react';
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
-
 import { Badge } from '@/components/ui/Badge';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Form';
@@ -28,14 +27,9 @@ import {
   useSaveQuestionResponse,
   useEvaluationAttempt,
 } from '@/hooks/useEvaluations';
-import type {
-  Question,
-  EvaluationAttempt,
-  QuestionResponse,
-} from '@/types/evaluation';
+import type { Question, EvaluationAttempt, QuestionResponse } from '@/types/evaluation';
 
 import TakeEvaluationAdaptive from './TakeEvaluationAdaptive';
-
 
 // Question types components
 interface QuestionComponentProps {
@@ -66,9 +60,7 @@ const MultipleChoiceQuestion: React.FC<QuestionComponentProps> = ({
             name={`question-${question.id}`}
             value={option}
             checked={response?.selected_option === option}
-            onChange={(e) =>
-              onResponseChange({ selected_option: e.target.value })
-            }
+            onChange={(e) => onResponseChange({ selected_option: e.target.value })}
             disabled={disabled}
             className="text-blue-600"
           />
@@ -136,8 +128,7 @@ const ShortAnswerQuestion: React.FC<QuestionComponentProps> = ({
       />
       {question.question_data.max_length && (
         <p className="text-sm text-gray-500 mt-1">
-          {(response?.text || '').length} / {question.question_data.max_length}{' '}
-          characters
+          {(response?.text || '').length} / {question.question_data.max_length} characters
         </p>
       )}
     </div>
@@ -253,8 +244,7 @@ export default function TakeEvaluation() {
   const evaluationId = parseInt(id!);
 
   // Check if we should render adaptive version
-  const { data: evaluationData, isLoading: checkLoading } =
-    useEvaluation(evaluationId);
+  const { data: evaluationData, isLoading: checkLoading } = useEvaluation(evaluationId);
 
   // If evaluation is adaptive, render adaptive component
   if (!checkLoading && evaluationData?.is_adaptive) {
@@ -267,14 +257,11 @@ export default function TakeEvaluation() {
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const [showNavigator, setShowNavigator] = useState(false);
-  const [currentAttempt, setCurrentAttempt] =
-    useState<EvaluationAttempt | null>(null);
+  const [currentAttempt, setCurrentAttempt] = useState<EvaluationAttempt | null>(null);
 
   // React Query hooks
-  const { data: evaluation, isLoading: evaluationLoading } =
-    useEvaluation(evaluationId);
-  const { data: questions, isLoading: questionsLoading } =
-    useEvaluationQuestions(evaluationId);
+  const { data: evaluation, isLoading: evaluationLoading } = useEvaluation(evaluationId);
+  const { data: questions, isLoading: questionsLoading } = useEvaluationQuestions(evaluationId);
   const startAttemptMutation = useStartEvaluationAttempt();
   const submitAttemptMutation = useSubmitEvaluationAttempt();
   const saveResponseMutation = useSaveQuestionResponse();
@@ -348,9 +335,7 @@ export default function TakeEvaluation() {
 
   const handleNext = () => {
     if (questions) {
-      setCurrentQuestionIndex((prev) =>
-        Math.min(questions.length - 1, prev + 1)
-      );
+      setCurrentQuestionIndex((prev) => Math.min(questions.length - 1, prev + 1));
     }
   };
 
@@ -376,8 +361,7 @@ export default function TakeEvaluation() {
     const commonProps = {
       question,
       response: responses[question.id],
-      onResponseChange: (response: any) =>
-        handleResponseChange(question.id, response),
+      onResponseChange: (response: any) => handleResponseChange(question.id, response),
       disabled: submitAttemptMutation.isPending,
     };
 
@@ -425,9 +409,7 @@ export default function TakeEvaluation() {
       <div className="p-6">
         <div className="text-center py-12">
           <AlertCircle className="h-12 w-12 text-yellow-500 mx-auto mb-4" />
-          <p className="text-yellow-600">
-            This evaluation is not currently available.
-          </p>
+          <p className="text-yellow-600">This evaluation is not currently available.</p>
           <button
             onClick={() => navigate('/evaluations')}
             className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
@@ -461,9 +443,7 @@ export default function TakeEvaluation() {
                     style={{ width: `${progressPercentage}%` }}
                   />
                 </div>
-                <span className="text-sm text-gray-600">
-                  {answeredCount} answered
-                </span>
+                <span className="text-sm text-gray-600">{answeredCount} answered</span>
               </div>
             </div>
 
@@ -480,11 +460,7 @@ export default function TakeEvaluation() {
                 onClick={() => setShowNavigator(!showNavigator)}
                 className="flex items-center px-3 py-2 border rounded-md hover:bg-gray-50"
               >
-                {showNavigator ? (
-                  <EyeOff className="h-4 w-4" />
-                ) : (
-                  <Eye className="h-4 w-4" />
-                )}
+                {showNavigator ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 <span className="ml-2 hidden sm:inline">Questions</span>
               </button>
 
@@ -527,25 +503,15 @@ export default function TakeEvaluation() {
                 <div>
                   <div className="flex items-center space-x-2 mb-2">
                     <Badge variant="outline">
-                      {currentQuestion.question_type === 'multiple_choice' &&
-                        'Multiple Choice'}
-                      {currentQuestion.question_type === 'true_false' &&
-                        'True/False'}
-                      {currentQuestion.question_type === 'short_answer' &&
-                        'Short Answer'}
-                      {currentQuestion.question_type === 'essay' &&
-                        'Essay'}
+                      {currentQuestion.question_type === 'multiple_choice' && 'Multiple Choice'}
+                      {currentQuestion.question_type === 'true_false' && 'True/False'}
+                      {currentQuestion.question_type === 'short_answer' && 'Short Answer'}
+                      {currentQuestion.question_type === 'essay' && 'Essay'}
                     </Badge>
-                    <Badge variant="secondary">
-                      {currentQuestion.points} Points
-                    </Badge>
-                    {currentQuestion.is_required && (
-                      <Badge variant="warning">Required</Badge>
-                    )}
+                    <Badge variant="secondary">{currentQuestion.points} Points</Badge>
+                    {currentQuestion.is_required && <Badge variant="warning">Required</Badge>}
                   </div>
-                  <h2 className="text-lg font-medium mb-4">
-                    {currentQuestion.question_text}
-                  </h2>
+                  <h2 className="text-lg font-medium mb-4">{currentQuestion.question_text}</h2>
                 </div>
               </div>
 
@@ -582,9 +548,7 @@ export default function TakeEvaluation() {
                     <CheckCircle className="h-5 w-5 text-green-600" />
                   )}
                   <span className="text-sm text-gray-600">
-                    {responses[currentQuestion.id]
-                      ? 'Answered'
-                      : 'Not Answered'}
+                    {responses[currentQuestion.id] ? 'Answered' : 'Not Answered'}
                   </span>
                 </div>
 
@@ -614,8 +578,7 @@ export default function TakeEvaluation() {
               <div>
                 <h4 className="font-medium text-yellow-800">Attention!</h4>
                 <p className="text-yellow-700 text-sm mt-1">
-                  You cannot change your answers after finishing
-                  the evaluation.
+                  You cannot change your answers after finishing the evaluation.
                 </p>
               </div>
             </div>
@@ -628,16 +591,14 @@ export default function TakeEvaluation() {
             </div>
             <div className="bg-gray-50 p-3 rounded">
               <div className="font-medium">Answered</div>
-              <div className="text-lg font-bold text-green-600">
-                {answeredCount}
-              </div>
+              <div className="text-lg font-bold text-green-600">{answeredCount}</div>
             </div>
           </div>
 
           {answeredCount < questions.length && (
             <p className="text-orange-600 text-sm">
-              {questions.length - answeredCount} questions not answered.
-              Do you still want to finish the evaluation?
+              {questions.length - answeredCount} questions not answered. Do you still want to finish
+              the evaluation?
             </p>
           )}
 
@@ -645,10 +606,7 @@ export default function TakeEvaluation() {
             <Button variant="outline" onClick={() => setShowSubmitModal(false)}>
               Continue
             </Button>
-            <Button
-              onClick={handleSubmit}
-              loading={submitAttemptMutation.isPending}
-            >
+            <Button onClick={handleSubmit} loading={submitAttemptMutation.isPending}>
               Finish and Submit
             </Button>
           </div>

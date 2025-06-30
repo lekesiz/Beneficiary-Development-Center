@@ -1,12 +1,7 @@
 /**
  * Program utility functions
  */
-import {
-  format,
-  isAfter,
-  isBefore,
-  isWithinInterval,
-} from 'date-fns';
+import { format, isAfter, isBefore, isWithinInterval } from 'date-fns';
 
 import {
   PROGRAM_STATUS_OPTIONS,
@@ -18,10 +13,7 @@ import type { Program, ProgramStatus } from '../types/program';
 /**
  * Format program dates for display
  */
-export const formatProgramDate = (
-  dateString: string,
-  formatStr = 'dd MMMM yyyy'
-) => {
+export const formatProgramDate = (dateString: string, formatStr = 'dd MMMM yyyy') => {
   return format(new Date(dateString), formatStr);
 };
 
@@ -134,8 +126,7 @@ export const isProgramActive = (program: Program) => {
 export const isProgramUpcoming = (program: Program) => {
   const now = new Date();
   return (
-    ['published', 'active'].includes(program.status) &&
-    isAfter(new Date(program.start_date), now)
+    ['published', 'active'].includes(program.status) && isAfter(new Date(program.start_date), now)
   );
 };
 
@@ -164,9 +155,7 @@ export const getEnrollmentPeriodText = (program: Program) => {
 /**
  * Get program phase (upcoming, active, past)
  */
-export const getProgramPhase = (
-  program: Program
-): 'upcoming' | 'active' | 'past' => {
+export const getProgramPhase = (program: Program): 'upcoming' | 'active' | 'past' => {
   if (isProgramPast(program)) return 'past';
   if (isProgramActive(program)) return 'active';
   return 'upcoming';
@@ -177,9 +166,7 @@ export const getProgramPhase = (
  */
 export const calculateEnrollmentPercentage = (program: Program) => {
   if (!program.enrollment_count) return 0;
-  return Math.round(
-    (program.enrollment_count / program.max_participants) * 100
-  );
+  return Math.round((program.enrollment_count / program.max_participants) * 100);
 };
 
 /**
@@ -209,12 +196,10 @@ export const sortPrograms = (
         comparison = a.title.localeCompare(b.title);
         break;
       case 'start_date':
-        comparison =
-          new Date(a.start_date).getTime() - new Date(b.start_date).getTime();
+        comparison = new Date(a.start_date).getTime() - new Date(b.start_date).getTime();
         break;
       case 'created_at':
-        comparison =
-          new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+        comparison = new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
         break;
       case 'enrollment_count':
         comparison = (a.enrollment_count || 0) - (b.enrollment_count || 0);

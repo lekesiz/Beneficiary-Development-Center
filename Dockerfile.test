@@ -1,0 +1,109 @@
+# Multi-stage Dockerfile for testing
+# Used by Cloud Build to run comprehensive tests
+
+# Stage 1: Backend test environment
+FROM python:3.12-slim as backend-test
+
+WORKDIR /app/backend
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    libpq-dev \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy backend files
+COPY backend/requirements.txt backend/requirements-dev.txt ./
+RUN pip install --no-cache-dir -r requirements.txt -r requirements-dev.txt
+
+COPY backend/ .
+
+# Run backend tests
+RUN python -m pytest tests/ \
+    --cov=app \
+    --cov-report=xml \
+    --cov-report=term \
+    --junitxml=test-results.xml \
+    -v
+
+# Run linting and type checking
+RUN python -m flake8 app/ --max-line-length=120
+RUN python -m mypy app/ --ignore-missing-imports
+
+# Stage 2: Frontend test environment
+FROM node:18-alpine as frontend-test
+
+WORKDIR /app/frontend
+
+# Copy package files
+COPY frontend/package*.json ./
+RUN npm ci --legacy-peer-deps
+
+# Copy frontend files
+COPY frontend/ .
+
+# Run frontend tests
+RUN npm run test:ci
+
+# Run linting
+RUN npm run lint
+
+# Run type checking
+RUN npm run typecheck
+
+# Stage 3: Integration test environment
+FROM python:3.12-slim as integration-test
+
+WORKDIR /app
+
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    libpq-dev \
+    curl \
+    chromium \
+    chromium-driver \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy backend
+COPY --from=backend-test /app/backend /app/backend
+WORKDIR /app/backend
+
+# Install integration test dependencies
+RUN pip install --no-cache-dir \
+    selenium \
+    requests \
+    pytest-xdist \
+    pytest-timeout
+
+# Copy frontend build
+COPY --from=frontend-test /app/frontend/dist /app/frontend/dist
+
+# Copy integration tests
+COPY tests/integration /app/tests/integration
+
+# Run integration tests
+ENV HEADLESS=true
+RUN python -m pytest /app/tests/integration \
+    --maxfail=5 \
+    --timeout=300 \
+    -v
+
+# Final stage: Test results collector
+FROM alpine:latest as test
+
+# Copy all test results
+COPY --from=backend-test /app/backend/coverage.xml /results/backend-coverage.xml
+COPY --from=backend-test /app/backend/test-results.xml /results/backend-tests.xml
+COPY --from=frontend-test /app/frontend/coverage /results/frontend-coverage/
+COPY --from=integration-test /app/tests/integration/results /results/integration/
+
+# Create summary
+RUN echo "Test Results Summary" > /results/summary.txt && \
+    echo "===================" >> /results/summary.txt && \
+    echo "All tests passed successfully!" >> /results/summary.txt
+
+CMD ["cat", "/results/summary.txt"]

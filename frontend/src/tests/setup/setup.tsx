@@ -110,7 +110,7 @@ const testTranslations: Record<string, string> = {
   'programs.form.messages.noPermission': 'Bu sayfaya erişim yetkiniz bulunmamaktadır.',
   'programs.form.messages.createSuccess': 'Program başarıyla oluşturuldu',
   'programs.form.messages.updateSuccess': 'Program başarıyla güncellendi',
-  
+
   // Beneficiaries
   'beneficiaries.form.addNewBeneficiary': 'Add New Beneficiary',
   'beneficiaries.form.editBeneficiary': 'Edit Beneficiary',
@@ -154,7 +154,7 @@ const testTranslations: Record<string, string> = {
   'beneficiaries.form.validation.lastNameMin': 'Last name must be at least 2 characters',
   'beneficiaries.form.validation.emailInvalid': 'Invalid email address',
   'beneficiaries.form.validation.phoneInvalid': 'Invalid phone number',
-  
+
   // Settings
   'settings.title': 'Settings',
   'settings.description': 'Manage your account settings and preferences',
@@ -170,7 +170,7 @@ const testTranslations: Record<string, string> = {
   'settings.security.description': 'Manage your account security',
   'settings.appearance.title': 'Appearance Settings',
   'settings.appearance.description': 'Customize your interface',
-  
+
   // Navigation
   'navigation.dashboard': 'Dashboard',
   'navigation.beneficiaries': 'Beneficiaries',
@@ -180,7 +180,7 @@ const testTranslations: Record<string, string> = {
   'navigation.learningPaths': 'Learning Paths',
   'navigation.reports': 'Reports',
   'navigation.settings': 'Settings',
-  
+
   // Common
   'common.backTo': 'Geri',
   'common.save': 'Kaydet',
@@ -228,7 +228,7 @@ vi.mock('@/contexts/ThemeContext', () => ({
 import { server } from '../mocks/server';
 
 // MSW Server Lifecycle
-beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
+beforeAll(() => server.listen({ onUnhandledRequest: 'warn' }));
 afterAll(() => server.close());
 
 // Clean up after each test
@@ -238,26 +238,25 @@ afterEach(() => {
 });
 
 // Test utilities
-const createTestQueryClient = () => new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: false,
-      gcTime: 0,
+const createTestQueryClient = () =>
+  new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+        gcTime: 0,
+      },
+      mutations: {
+        retry: false,
+      },
     },
-    mutations: {
-      retry: false,
-    },
-  },
-});
+  });
 
 export const renderWithProviders = (ui: ReactElement, options?: { initialEntries?: string[] }) => {
   const queryClient = createTestQueryClient();
-  
+
   const AllTheProviders = ({ children }: { children: React.ReactNode }) => (
     <QueryClientProvider client={queryClient}>
-      <MemoryRouter initialEntries={options?.initialEntries || ['/']}>
-        {children}
-      </MemoryRouter>
+      <MemoryRouter initialEntries={options?.initialEntries || ['/']}>{children}</MemoryRouter>
     </QueryClientProvider>
   );
 

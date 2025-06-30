@@ -2,7 +2,6 @@ import { LoginCredentials, RegisterData, User } from '@/types/user';
 
 import apiClient from './client';
 
-
 export const authApi = {
   login: (credentials: LoginCredentials) => {
     return apiClient.post('/auth/login', credentials);

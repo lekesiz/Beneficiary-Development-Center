@@ -44,9 +44,7 @@ export const coursesApi = {
    */
   getById: async (id: number, includeSessions = false): Promise<Course> => {
     const params = includeSessions ? '?include_sessions=true' : '';
-    const response = await apiClient.get<Course>(
-      `${COURSES_BASE_URL}/${id}${params}`
-    );
+    const response = await apiClient.get<Course>(`${COURSES_BASE_URL}/${id}${params}`);
     return response.data;
   },
 
@@ -62,10 +60,7 @@ export const coursesApi = {
    * Update course
    */
   update: async (id: number, data: UpdateCourseRequest): Promise<Course> => {
-    const response = await apiClient.put<Course>(
-      `${COURSES_BASE_URL}/${id}`,
-      data
-    );
+    const response = await apiClient.put<Course>(`${COURSES_BASE_URL}/${id}`, data);
     return response.data;
   },
 
@@ -93,10 +88,7 @@ export const coursesApi = {
   /**
    * Duplicate course
    */
-  duplicate: async (
-    courseId: number,
-    data?: DuplicateCourseRequest
-  ): Promise<Course> => {
+  duplicate: async (courseId: number, data?: DuplicateCourseRequest): Promise<Course> => {
     const response = await apiClient.post<Course>(
       `${COURSES_BASE_URL}/${courseId}/duplicate`,
       data || {}
@@ -107,14 +99,8 @@ export const coursesApi = {
   /**
    * Reorder course within program
    */
-  reorder: async (
-    courseId: number,
-    data: ReorderCourseRequest
-  ): Promise<Course> => {
-    const response = await apiClient.put<Course>(
-      `${COURSES_BASE_URL}/${courseId}/reorder`,
-      data
-    );
+  reorder: async (courseId: number, data: ReorderCourseRequest): Promise<Course> => {
+    const response = await apiClient.put<Course>(`${COURSES_BASE_URL}/${courseId}/reorder`, data);
     return response.data;
   },
 

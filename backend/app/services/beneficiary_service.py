@@ -161,6 +161,15 @@ class BeneficiaryService:
             except ValueError:
                 raise ValidationError(f"Invalid education level: {data['education_level']}")
 
+        # Parse date fields
+        if "date_of_birth" in data and data["date_of_birth"]:
+            if isinstance(data["date_of_birth"], str):
+                from datetime import datetime
+                try:
+                    data["date_of_birth"] = datetime.strptime(data["date_of_birth"], "%Y-%m-%d").date()
+                except ValueError:
+                    raise ValidationError("Invalid date format for date_of_birth. Use YYYY-MM-DD")
+
         # Set tenant and creator
         data["tenant_id"] = self.current_user.tenant_id
         data["created_by"] = self.current_user.id

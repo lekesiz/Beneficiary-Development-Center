@@ -28,9 +28,12 @@ interface LearningPathAcceptanceFlowProps {
   isLoading?: boolean;
 }
 
-export const LearningPathAcceptanceFlow: React.FC<
-  LearningPathAcceptanceFlowProps
-> = ({ learningPath, onAccept, onCancel, isLoading = false }) => {
+export const LearningPathAcceptanceFlow: React.FC<LearningPathAcceptanceFlowProps> = ({
+  learningPath,
+  onAccept,
+  onCancel,
+  isLoading = false,
+}) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [customizationNotes, setCustomizationNotes] = useState('');
   const [acceptanceConfirmed, setAcceptanceConfirmed] = useState(false);
@@ -59,17 +62,12 @@ export const LearningPathAcceptanceFlow: React.FC<
         {/* Header */}
         <div className="px-6 py-4 border-b flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-semibold">
-              Öğrenme Planını İncele ve Kabul Et
-            </h2>
+            <h2 className="text-xl font-semibold">Öğrenme Planını İncele ve Kabul Et</h2>
             <p className="text-sm text-gray-600 mt-1">
               Adım {currentStep} / {totalSteps}
             </p>
           </div>
-          <button
-            onClick={onCancel}
-            className="p-2 hover:bg-gray-100 rounded-md"
-          >
+          <button onClick={onCancel} className="p-2 hover:bg-gray-100 rounded-md">
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -81,57 +79,34 @@ export const LearningPathAcceptanceFlow: React.FC<
               <React.Fragment key={step}>
                 <div
                   className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium ${
-                    step <= currentStep
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-200 text-gray-600'
+                    step <= currentStep ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'
                   }`}
                 >
-                  {step < currentStep ? (
-                    <CheckCircle className="h-5 w-5" />
-                  ) : (
-                    step
-                  )}
+                  {step < currentStep ? <CheckCircle className="h-5 w-5" /> : step}
                 </div>
                 {step < 3 && (
                   <div
-                    className={`flex-1 h-1 ${
-                      step < currentStep ? 'bg-blue-600' : 'bg-gray-200'
-                    }`}
+                    className={`flex-1 h-1 ${step < currentStep ? 'bg-blue-600' : 'bg-gray-200'}`}
                   />
                 )}
               </React.Fragment>
             ))}
           </div>
           <div className="flex justify-between mt-2 text-sm">
-            <span
-              className={
-                currentStep >= 1 ? 'text-blue-600 font-medium' : 'text-gray-600'
-              }
-            >
+            <span className={currentStep >= 1 ? 'text-blue-600 font-medium' : 'text-gray-600'}>
               Plan Özeti
             </span>
-            <span
-              className={
-                currentStep >= 2 ? 'text-blue-600 font-medium' : 'text-gray-600'
-              }
-            >
+            <span className={currentStep >= 2 ? 'text-blue-600 font-medium' : 'text-gray-600'}>
               Detaylı İnceleme
             </span>
-            <span
-              className={
-                currentStep >= 3 ? 'text-blue-600 font-medium' : 'text-gray-600'
-              }
-            >
+            <span className={currentStep >= 3 ? 'text-blue-600 font-medium' : 'text-gray-600'}>
               Kabul ve Özelleştir
             </span>
           </div>
         </div>
 
         {/* Content */}
-        <div
-          className="px-6 py-6 overflow-y-auto"
-          style={{ maxHeight: 'calc(90vh - 200px)' }}
-        >
+        <div className="px-6 py-6 overflow-y-auto" style={{ maxHeight: 'calc(90vh - 200px)' }}>
           {/* Step 1: Overview */}
           {currentStep === 1 && (
             <div className="space-y-6">
@@ -141,8 +116,7 @@ export const LearningPathAcceptanceFlow: React.FC<
                   Kişiselleştirilmiş Öğrenme Planınız Hazır!
                 </h3>
                 <p className="text-gray-600">
-                  AI, değerlendirme sonuçlarınıza göre size özel bir öğrenme
-                  planı oluşturdu.
+                  AI, değerlendirme sonuçlarınıza göre size özel bir öğrenme planı oluşturdu.
                 </p>
               </div>
 
@@ -182,11 +156,7 @@ export const LearningPathAcceptanceFlow: React.FC<
                     <div>
                       <h4 className="font-semibold">Kaynaklar</h4>
                       <p className="text-2xl font-bold text-purple-600">
-                        {learningPath.resources.reduce(
-                          (acc, cat) => acc + cat.items.length,
-                          0
-                        )}
-                        +
+                        {learningPath.resources.reduce((acc, cat) => acc + cat.items.length, 0)}+
                       </p>
                       <p className="text-sm text-gray-600">Öğrenme materyali</p>
                     </div>
@@ -205,9 +175,7 @@ export const LearningPathAcceptanceFlow: React.FC<
                           ? 'Dengeli'
                           : 'Zorlu'}
                       </p>
-                      <p className="text-sm text-gray-600">
-                        Kişiselleştirilmiş
-                      </p>
+                      <p className="text-sm text-gray-600">Kişiselleştirilmiş</p>
                     </div>
                   </div>
                 </Card>
@@ -215,9 +183,7 @@ export const LearningPathAcceptanceFlow: React.FC<
 
               {/* Main Objective */}
               <Card className="p-6 bg-blue-50 border-blue-200">
-                <h4 className="font-semibold text-blue-900 mb-2">
-                  Ana Öğrenme Hedefi
-                </h4>
+                <h4 className="font-semibold text-blue-900 mb-2">Ana Öğrenme Hedefi</h4>
                 <p className="text-blue-800">{learningPath.objective}</p>
               </Card>
             </div>
@@ -226,9 +192,7 @@ export const LearningPathAcceptanceFlow: React.FC<
           {/* Step 2: Detailed Review */}
           {currentStep === 2 && (
             <div className="space-y-6">
-              <h3 className="text-xl font-semibold mb-4">
-                Haftalık Plan ve Hedefler
-              </h3>
+              <h3 className="text-xl font-semibold mb-4">Haftalık Plan ve Hedefler</h3>
 
               {/* Weekly Milestones */}
               <div className="space-y-4">
@@ -237,37 +201,22 @@ export const LearningPathAcceptanceFlow: React.FC<
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center space-x-2 mb-2">
-                          <Badge variant="primary">
-                            Hafta {milestone.week_number}
-                          </Badge>
-                          <Badge variant="outline">
-                            {milestone.estimated_hours} saat
-                          </Badge>
+                          <Badge variant="primary">Hafta {milestone.week_number}</Badge>
+                          <Badge variant="outline">{milestone.estimated_hours} saat</Badge>
                         </div>
-                        <h4 className="font-semibold mb-1">
-                          {milestone.title}
-                        </h4>
-                        <p className="text-sm text-gray-600 mb-3">
-                          {milestone.description}
-                        </p>
+                        <h4 className="font-semibold mb-1">{milestone.title}</h4>
+                        <p className="text-sm text-gray-600 mb-3">{milestone.description}</p>
 
                         {/* Activities */}
                         <div className="mb-3">
-                          <h5 className="text-sm font-medium text-gray-700 mb-2">
-                            Aktiviteler:
-                          </h5>
+                          <h5 className="text-sm font-medium text-gray-700 mb-2">Aktiviteler:</h5>
                           <ul className="space-y-1">
-                            {milestone.activities
-                              .slice(0, 2)
-                              .map((activity, aIndex) => (
-                                <li
-                                  key={aIndex}
-                                  className="text-sm text-gray-600 flex items-start"
-                                >
-                                  <div className="w-1.5 h-1.5 bg-blue-400 rounded-full mt-1.5 mr-2 flex-shrink-0" />
-                                  {activity.title}
-                                </li>
-                              ))}
+                            {milestone.activities.slice(0, 2).map((activity, aIndex) => (
+                              <li key={aIndex} className="text-sm text-gray-600 flex items-start">
+                                <div className="w-1.5 h-1.5 bg-blue-400 rounded-full mt-1.5 mr-2 flex-shrink-0" />
+                                {activity.title}
+                              </li>
+                            ))}
                           </ul>
                         </div>
 
@@ -278,26 +227,19 @@ export const LearningPathAcceptanceFlow: React.FC<
                               Başarı Kriterleri:
                             </h5>
                             <ul className="space-y-1">
-                              {milestone.assessment_criteria
-                                .slice(0, 2)
-                                .map((criteria, cIndex) => (
-                                  <li
-                                    key={cIndex}
-                                    className="text-sm text-gray-600 flex items-start"
-                                  >
-                                    <CheckCircle className="h-3 w-3 text-green-500 mt-0.5 mr-2 flex-shrink-0" />
-                                    {criteria}
-                                  </li>
-                                ))}
+                              {milestone.assessment_criteria.slice(0, 2).map((criteria, cIndex) => (
+                                <li key={cIndex} className="text-sm text-gray-600 flex items-start">
+                                  <CheckCircle className="h-3 w-3 text-green-500 mt-0.5 mr-2 flex-shrink-0" />
+                                  {criteria}
+                                </li>
+                              ))}
                             </ul>
                           </div>
                         )}
                       </div>
 
                       <div className="ml-4 text-right">
-                        <div className="text-3xl font-bold text-gray-300">
-                          {index + 1}
-                        </div>
+                        <div className="text-3xl font-bold text-gray-300">{index + 1}</div>
                       </div>
                     </div>
                   </Card>
@@ -305,25 +247,19 @@ export const LearningPathAcceptanceFlow: React.FC<
               </div>
 
               {/* Success Metrics */}
-              {learningPath.success_metrics &&
-                learningPath.success_metrics.length > 0 && (
-                  <Card className="p-4 bg-green-50 border-green-200">
-                    <h4 className="font-semibold text-green-900 mb-2">
-                      Başarı Ölçütleri
-                    </h4>
-                    <ul className="space-y-1">
-                      {learningPath.success_metrics.map((metric, index) => (
-                        <li
-                          key={index}
-                          className="text-sm text-green-800 flex items-start"
-                        >
-                          <Award className="h-4 w-4 mt-0.5 mr-2 flex-shrink-0" />
-                          {metric}
-                        </li>
-                      ))}
-                    </ul>
-                  </Card>
-                )}
+              {learningPath.success_metrics && learningPath.success_metrics.length > 0 && (
+                <Card className="p-4 bg-green-50 border-green-200">
+                  <h4 className="font-semibold text-green-900 mb-2">Başarı Ölçütleri</h4>
+                  <ul className="space-y-1">
+                    {learningPath.success_metrics.map((metric, index) => (
+                      <li key={index} className="text-sm text-green-800 flex items-start">
+                        <Award className="h-4 w-4 mt-0.5 mr-2 flex-shrink-0" />
+                        {metric}
+                      </li>
+                    ))}
+                  </ul>
+                </Card>
+              )}
             </div>
           )}
 
@@ -332,9 +268,7 @@ export const LearningPathAcceptanceFlow: React.FC<
             <div className="space-y-6">
               <div className="text-center mb-6">
                 <CheckCircle className="h-16 w-16 text-green-600 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold mb-2">
-                  Planı Kabul Etmek Üzeresiniz
-                </h3>
+                <h3 className="text-xl font-semibold mb-2">Planı Kabul Etmek Üzeresiniz</h3>
                 <p className="text-gray-600">
                   Planı kabul ettikten sonra öğrenmeye başlayabilirsiniz.
                 </p>
@@ -353,8 +287,8 @@ export const LearningPathAcceptanceFlow: React.FC<
                   className="w-full"
                 />
                 <p className="text-sm text-gray-500 mt-1">
-                  Örnek: "Akşamları çalışmayı tercih ederim" veya "Video
-                  içeriklere öncelik vermek istiyorum"
+                  Örnek: "Akşamları çalışmayı tercih ederim" veya "Video içeriklere öncelik vermek
+                  istiyorum"
                 </p>
               </div>
 
@@ -363,25 +297,12 @@ export const LearningPathAcceptanceFlow: React.FC<
                 <div className="flex items-start space-x-3">
                   <AlertCircle className="h-5 w-5 text-yellow-600 flex-shrink-0 mt-0.5" />
                   <div>
-                    <h4 className="font-semibold text-yellow-900 mb-1">
-                      Önemli Notlar
-                    </h4>
+                    <h4 className="font-semibold text-yellow-900 mb-1">Önemli Notlar</h4>
                     <ul className="space-y-1 text-sm text-yellow-800">
-                      <li>
-                        • Plan kabul edildikten sonra öğrenme takibiniz
-                        başlayacak
-                      </li>
-                      <li>
-                        • İstediğiniz zaman planı düzenleyebilir ve
-                        özelleştirebilirsiniz
-                      </li>
-                      <li>
-                        • Haftalık ilerlemeniz otomatik olarak kaydedilecek
-                      </li>
-                      <li>
-                        • Tamamladığınız hedefler için başarı rozetleri
-                        kazanacaksınız
-                      </li>
+                      <li>• Plan kabul edildikten sonra öğrenme takibiniz başlayacak</li>
+                      <li>• İstediğiniz zaman planı düzenleyebilir ve özelleştirebilirsiniz</li>
+                      <li>• Haftalık ilerlemeniz otomatik olarak kaydedilecek</li>
+                      <li>• Tamamladığınız hedefler için başarı rozetleri kazanacaksınız</li>
                     </ul>
                   </div>
                 </div>
@@ -397,8 +318,8 @@ export const LearningPathAcceptanceFlow: React.FC<
                     className="mt-1"
                   />
                   <span className="text-sm">
-                    Öğrenme planını inceledim ve {learningPath.duration_weeks}{' '}
-                    haftalık bu programa başlamaya hazırım.
+                    Öğrenme planını inceledim ve {learningPath.duration_weeks} haftalık bu programa
+                    başlamaya hazırım.
                   </span>
                 </label>
               </Card>

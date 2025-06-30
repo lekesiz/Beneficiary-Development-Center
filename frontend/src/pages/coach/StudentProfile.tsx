@@ -38,19 +38,10 @@ export default function StudentProfile() {
   const { studentId } = useParams<{ studentId: string }>();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<
-    | 'overview'
-    | 'activities'
-    | 'analysis'
-    | 'insights'
-    | 'learning-path'
-    | 'notes'
+    'overview' | 'activities' | 'analysis' | 'insights' | 'learning-path' | 'notes'
   >('overview');
 
-  const {
-    data: profile,
-    isLoading,
-    error,
-  } = useStudentProfile(Number(studentId));
+  const { data: profile, isLoading, error } = useStudentProfile(Number(studentId));
   const exportMutation = useExportStudentProfile();
 
   if (isLoading) {
@@ -121,11 +112,7 @@ export default function StudentProfile() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <Button
-            variant="ghost"
-            onClick={() => navigate('/coach/dashboard')}
-            size="sm"
-          >
+          <Button variant="ghost" onClick={() => navigate('/coach/dashboard')} size="sm">
             <ChevronLeft className="mr-2 h-4 w-4" />
             Listeye Dön
           </Button>
@@ -139,10 +126,7 @@ export default function StudentProfile() {
           </div>
         </div>
 
-        <Button
-          onClick={() => handleExport('json')}
-          disabled={exportMutation.isPending}
-        >
+        <Button onClick={() => handleExport('json')} disabled={exportMutation.isPending}>
           <Download className="mr-2 h-4 w-4" />
           Raporu İndir
         </Button>
@@ -153,9 +137,7 @@ export default function StudentProfile() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <div>
             <p className="text-sm text-gray-600">Kayıt Tarihi</p>
-            <p className="font-medium">
-              {formatDate(profile.student_info.registration_date)}
-            </p>
+            <p className="font-medium">{formatDate(profile.student_info.registration_date)}</p>
           </div>
           <div>
             <p className="text-sm text-gray-600">Son Giriş</p>
@@ -167,19 +149,13 @@ export default function StudentProfile() {
           </div>
           <div>
             <p className="text-sm text-gray-600">Durum</p>
-            <Badge
-              variant={
-                profile.student_info.status === 'active' ? 'success' : 'default'
-              }
-            >
+            <Badge variant={profile.student_info.status === 'active' ? 'success' : 'default'}>
               {profile.student_info.status === 'active' ? 'Aktif' : 'Pasif'}
             </Badge>
           </div>
           <div>
             <p className="text-sm text-gray-600">Öğrenme Stili</p>
-            <p className="font-medium capitalize">
-              {profile.student_info.learning_style}
-            </p>
+            <p className="font-medium capitalize">{profile.student_info.learning_style}</p>
           </div>
         </div>
       </Card>
@@ -189,16 +165,9 @@ export default function StudentProfile() {
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">
-                Performans İndeksi
-              </p>
-              <p className="text-2xl font-bold">
-                {profile.development_scores.performance_index}
-              </p>
-              <ProgressBar
-                value={profile.development_scores.performance_index}
-                className="mt-2"
-              />
+              <p className="text-sm font-medium text-gray-600">Performans İndeksi</p>
+              <p className="text-2xl font-bold">{profile.development_scores.performance_index}</p>
+              <ProgressBar value={profile.development_scores.performance_index} className="mt-2" />
             </div>
             <TrendingUp className="h-8 w-8 text-blue-600 opacity-80" />
           </div>
@@ -208,9 +177,7 @@ export default function StudentProfile() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Katılım Skoru</p>
-              <p className="text-2xl font-bold">
-                {profile.development_scores.engagement_score}
-              </p>
+              <p className="text-2xl font-bold">{profile.development_scores.engagement_score}</p>
               <ProgressBar
                 value={profile.development_scores.engagement_score}
                 className="mt-2"
@@ -224,12 +191,8 @@ export default function StudentProfile() {
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">
-                Tamamlama Oranı
-              </p>
-              <p className="text-2xl font-bold">
-                {profile.development_scores.completion_rate}%
-              </p>
+              <p className="text-sm font-medium text-gray-600">Tamamlama Oranı</p>
+              <p className="text-2xl font-bold">{profile.development_scores.completion_rate}%</p>
               <ProgressBar
                 value={profile.development_scores.completion_rate}
                 className="mt-2"
@@ -241,17 +204,13 @@ export default function StudentProfile() {
         </Card>
 
         <Card
-          className={`p-4 border-${getRiskBadgeVariant(
-            profile.development_scores.risk_score
-          )}-200`}
+          className={`p-4 border-${getRiskBadgeVariant(profile.development_scores.risk_score)}-200`}
         >
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Risk Skoru</p>
               <Badge
-                variant={getRiskBadgeVariant(
-                  profile.development_scores.risk_score
-                )}
+                variant={getRiskBadgeVariant(profile.development_scores.risk_score)}
                 size="lg"
                 className="mt-1"
               >
@@ -362,11 +321,7 @@ export default function StudentProfile() {
                         >
                           <span className="font-medium">{program.title}</span>
                           <Badge
-                            variant={
-                              program.status === 'active'
-                                ? 'success'
-                                : 'default'
-                            }
+                            variant={program.status === 'active' ? 'success' : 'default'}
                             size="sm"
                           >
                             {program.status}
@@ -392,9 +347,7 @@ export default function StudentProfile() {
                         >
                           <span className="font-medium">{course.title}</span>
                           <Badge
-                            variant={
-                              course.status === 'active' ? 'success' : 'default'
-                            }
+                            variant={course.status === 'active' ? 'success' : 'default'}
                             size="sm"
                           >
                             {course.status}
@@ -412,19 +365,13 @@ export default function StudentProfile() {
             {/* Visualizations */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Card className="p-6">
-                <h3 className="text-lg font-semibold mb-4">
-                  Performans Trendi
-                </h3>
-                <PerformanceTrendChart
-                  data={profile.visualization_data.performance_trend}
-                />
+                <h3 className="text-lg font-semibold mb-4">Performans Trendi</h3>
+                <PerformanceTrendChart data={profile.visualization_data.performance_trend} />
               </Card>
 
               <Card className="p-6">
                 <h3 className="text-lg font-semibold mb-4">Beceri Dağılımı</h3>
-                <SkillDistributionChart
-                  data={profile.visualization_data.skill_distribution}
-                />
+                <SkillDistributionChart data={profile.visualization_data.skill_distribution} />
               </Card>
             </div>
           </>
@@ -434,76 +381,51 @@ export default function StudentProfile() {
           <div className="space-y-6">
             {/* Recent Evaluations */}
             <Card className="p-6">
-              <h3 className="text-lg font-semibold mb-4">
-                Son Değerlendirmeler
-              </h3>
+              <h3 className="text-lg font-semibold mb-4">Son Değerlendirmeler</h3>
               {profile.recent_activities.recent_evaluations.length > 0 ? (
                 <div className="space-y-3">
-                  {profile.recent_activities.recent_evaluations.map(
-                    (evaluation) => (
-                      <div
-                        key={evaluation.id}
-                        className="p-4 border rounded-lg"
-                      >
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <h4 className="font-medium">
-                              {evaluation.evaluation_title}
-                            </h4>
-                            <p className="text-sm text-gray-600">
-                              {formatDate(evaluation.completed_at!)} •{' '}
-                              {evaluation.duration_minutes} dakika
-                            </p>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-2xl font-bold">
-                              {evaluation.score}%
-                            </p>
-                            <Badge
-                              variant={evaluation.passed ? 'success' : 'danger'}
-                              size="sm"
-                            >
-                              {evaluation.passed ? 'Başarılı' : 'Başarısız'}
-                            </Badge>
-                          </div>
+                  {profile.recent_activities.recent_evaluations.map((evaluation) => (
+                    <div key={evaluation.id} className="p-4 border rounded-lg">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="font-medium">{evaluation.evaluation_title}</h4>
+                          <p className="text-sm text-gray-600">
+                            {formatDate(evaluation.completed_at!)} • {evaluation.duration_minutes}{' '}
+                            dakika
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-2xl font-bold">{evaluation.score}%</p>
+                          <Badge variant={evaluation.passed ? 'success' : 'danger'} size="sm">
+                            {evaluation.passed ? 'Başarılı' : 'Başarısız'}
+                          </Badge>
                         </div>
                       </div>
-                    )
-                  )}
+                    </div>
+                  ))}
                 </div>
               ) : (
-                <p className="text-gray-500">
-                  Henüz değerlendirme tamamlanmamış
-                </p>
+                <p className="text-gray-500">Henüz değerlendirme tamamlanmamış</p>
               )}
             </Card>
 
             {/* Recent Learning Sessions */}
             <Card className="p-6">
-              <h3 className="text-lg font-semibold mb-4">
-                Son Öğrenme Oturumları
-              </h3>
+              <h3 className="text-lg font-semibold mb-4">Son Öğrenme Oturumları</h3>
               {profile.recent_activities.recent_sessions.length > 0 ? (
                 <div className="space-y-3">
                   {profile.recent_activities.recent_sessions.map((session) => (
                     <div key={session.id} className="p-4 border rounded-lg">
                       <div className="flex items-center justify-between">
                         <div>
-                          <h4 className="font-medium">
-                            {session.milestone_title}
-                          </h4>
+                          <h4 className="font-medium">{session.milestone_title}</h4>
                           <p className="text-sm text-gray-600">
                             {session.path_title} • Hafta {session.week_number}
                           </p>
-                          <p className="text-sm text-gray-600">
-                            {formatDate(session.updated_at!)}
-                          </p>
+                          <p className="text-sm text-gray-600">{formatDate(session.updated_at!)}</p>
                         </div>
                         <div className="text-right">
-                          <ProgressBar
-                            value={session.progress!}
-                            className="w-24"
-                          />
+                          <ProgressBar value={session.progress!} className="w-24" />
                           <Badge variant="default" size="sm" className="mt-1">
                             {session.status}
                           </Badge>
@@ -528,9 +450,7 @@ export default function StudentProfile() {
               <div className="space-y-6">
                 {/* Strengths */}
                 <div>
-                  <h4 className="font-medium text-green-700 mb-2">
-                    Güçlü Yönler
-                  </h4>
+                  <h4 className="font-medium text-green-700 mb-2">Güçlü Yönler</h4>
                   <ul className="space-y-1">
                     {profile.ai_analysis.strengths.map((strength, index) => (
                       <li key={index} className="flex items-start">
@@ -543,9 +463,7 @@ export default function StudentProfile() {
 
                 {/* Weaknesses */}
                 <div>
-                  <h4 className="font-medium text-red-700 mb-2">
-                    Gelişim Alanları
-                  </h4>
+                  <h4 className="font-medium text-red-700 mb-2">Gelişim Alanları</h4>
                   <ul className="space-y-1">
                     {profile.ai_analysis.weaknesses.map((weakness, index) => (
                       <li key={index} className="flex items-start">
@@ -560,14 +478,12 @@ export default function StudentProfile() {
                 <div>
                   <h4 className="font-medium text-blue-700 mb-2">Öneriler</h4>
                   <ul className="space-y-1">
-                    {profile.ai_analysis.recommendations.map(
-                      (recommendation, index) => (
-                        <li key={index} className="flex items-start">
-                          <span className="text-blue-500 mr-2">•</span>
-                          <span>{recommendation}</span>
-                        </li>
-                      )
-                    )}
+                    {profile.ai_analysis.recommendations.map((recommendation, index) => (
+                      <li key={index} className="flex items-start">
+                        <span className="text-blue-500 mr-2">•</span>
+                        <span>{recommendation}</span>
+                      </li>
+                    ))}
                   </ul>
                 </div>
 
@@ -575,15 +491,11 @@ export default function StudentProfile() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
                   <div className="p-4 bg-gray-50 rounded-lg">
                     <p className="text-sm text-gray-600">Öğrenme Modeli</p>
-                    <p className="font-medium">
-                      {profile.ai_analysis.learning_pattern}
-                    </p>
+                    <p className="font-medium">{profile.ai_analysis.learning_pattern}</p>
                   </div>
                   <div className="p-4 bg-gray-50 rounded-lg">
                     <p className="text-sm text-gray-600">Motivasyon Seviyesi</p>
-                    <p className="font-medium">
-                      {profile.ai_analysis.motivation_level}
-                    </p>
+                    <p className="font-medium">{profile.ai_analysis.motivation_level}</p>
                   </div>
                 </div>
               </div>
@@ -595,38 +507,27 @@ export default function StudentProfile() {
 
               {profile.next_recommendations.next_evaluation && (
                 <div className="mb-4 p-4 bg-blue-50 rounded-lg">
-                  <h4 className="font-medium text-blue-800 mb-1">
-                    Önerilen Değerlendirme
-                  </h4>
+                  <h4 className="font-medium text-blue-800 mb-1">Önerilen Değerlendirme</h4>
                   <p className="text-sm">
-                    {profile.next_recommendations.next_evaluation.type ===
-                    'remedial'
+                    {profile.next_recommendations.next_evaluation.type === 'remedial'
                       ? 'Telafi'
                       : 'İleri Seviye'}{' '}
                     - {profile.next_recommendations.next_evaluation.focus}
                   </p>
                   <p className="text-sm text-blue-600">
                     Önerilen Tarih:{' '}
-                    {formatDate(
-                      profile.next_recommendations.next_evaluation
-                        .suggested_date
-                    )}
+                    {formatDate(profile.next_recommendations.next_evaluation.suggested_date)}
                   </p>
                 </div>
               )}
 
               <div className="space-y-2">
-                {profile.next_recommendations.action_items.map(
-                  (item, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center p-3 bg-gray-50 rounded"
-                    >
-                      <Calendar className="h-4 w-4 text-gray-500 mr-3" />
-                      <span>{item}</span>
-                    </div>
-                  )
-                )}
+                {profile.next_recommendations.action_items.map((item, index) => (
+                  <div key={index} className="flex items-center p-3 bg-gray-50 rounded">
+                    <Calendar className="h-4 w-4 text-gray-500 mr-3" />
+                    <span>{item}</span>
+                  </div>
+                ))}
               </div>
             </Card>
           </div>
@@ -635,200 +536,174 @@ export default function StudentProfile() {
         {activeTab === 'insights' && (
           <div className="space-y-6">
             {/* Alerts Section */}
-            {profile.ai_analysis.alerts &&
-              profile.ai_analysis.alerts.length > 0 && (
-                <Card className="p-6">
-                  <h3 className="text-lg font-semibold mb-4 flex items-center">
-                    <AlertCircle className="mr-2 h-5 w-5 text-red-500" />
-                    Sistem Uyarıları
-                  </h3>
-                  <div className="space-y-3">
-                    {profile.ai_analysis.alerts
-                      .sort((a, b) => {
-                        const priorityOrder = { high: 0, medium: 1, low: 2 };
-                        return (
-                          priorityOrder[a.priority] - priorityOrder[b.priority]
-                        );
-                      })
-                      .map((alert, index) => (
-                        <div
-                          key={index}
-                          className={`p-4 rounded-lg border-l-4 ${
-                            alert.type === 'danger'
-                              ? 'bg-red-50 border-red-500'
-                              : 'bg-yellow-50 border-yellow-500'
-                          }`}
-                        >
-                          <div className="flex items-start">
-                            <AlertCircle
-                              className={`h-5 w-5 mt-0.5 mr-3 ${
-                                alert.type === 'danger'
-                                  ? 'text-red-600'
-                                  : 'text-yellow-600'
+            {profile.ai_analysis.alerts && profile.ai_analysis.alerts.length > 0 && (
+              <Card className="p-6">
+                <h3 className="text-lg font-semibold mb-4 flex items-center">
+                  <AlertCircle className="mr-2 h-5 w-5 text-red-500" />
+                  Sistem Uyarıları
+                </h3>
+                <div className="space-y-3">
+                  {profile.ai_analysis.alerts
+                    .sort((a, b) => {
+                      const priorityOrder = { high: 0, medium: 1, low: 2 };
+                      return priorityOrder[a.priority] - priorityOrder[b.priority];
+                    })
+                    .map((alert, index) => (
+                      <div
+                        key={index}
+                        className={`p-4 rounded-lg border-l-4 ${
+                          alert.type === 'danger'
+                            ? 'bg-red-50 border-red-500'
+                            : 'bg-yellow-50 border-yellow-500'
+                        }`}
+                      >
+                        <div className="flex items-start">
+                          <AlertCircle
+                            className={`h-5 w-5 mt-0.5 mr-3 ${
+                              alert.type === 'danger' ? 'text-red-600' : 'text-yellow-600'
+                            }`}
+                          />
+                          <div className="flex-1">
+                            <p
+                              className={`font-medium ${
+                                alert.type === 'danger' ? 'text-red-800' : 'text-yellow-800'
                               }`}
-                            />
-                            <div className="flex-1">
-                              <p
-                                className={`font-medium ${
-                                  alert.type === 'danger'
-                                    ? 'text-red-800'
-                                    : 'text-yellow-800'
-                                }`}
-                              >
-                                {alert.message}
-                              </p>
+                            >
+                              {alert.message}
+                            </p>
+                            <Badge
+                              variant={
+                                alert.priority === 'high'
+                                  ? 'danger'
+                                  : alert.priority === 'medium'
+                                  ? 'warning'
+                                  : 'default'
+                              }
+                              size="sm"
+                              className="mt-2"
+                            >
+                              {alert.priority === 'high'
+                                ? 'Yüksek Öncelik'
+                                : alert.priority === 'medium'
+                                ? 'Orta Öncelik'
+                                : 'Düşük Öncelik'}
+                            </Badge>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </Card>
+            )}
+
+            {/* Interventions Section */}
+            {profile.ai_analysis.interventions && profile.ai_analysis.interventions.length > 0 && (
+              <Card className="p-6">
+                <h3 className="text-lg font-semibold mb-4 flex items-center">
+                  <Shield className="mr-2 h-5 w-5 text-blue-600" />
+                  Müdahale Önerileri
+                </h3>
+                <div className="space-y-4">
+                  {profile.ai_analysis.interventions
+                    .sort((a, b) => {
+                      const priorityOrder = {
+                        critical: 0,
+                        high: 1,
+                        medium: 2,
+                      };
+                      return priorityOrder[a.priority] - priorityOrder[b.priority];
+                    })
+                    .map((intervention, index) => (
+                      <Card
+                        key={index}
+                        className={`p-5 ${
+                          intervention.priority === 'critical'
+                            ? 'border-red-200 bg-red-50'
+                            : intervention.priority === 'high'
+                            ? 'border-orange-200 bg-orange-50'
+                            : 'border-gray-200'
+                        }`}
+                      >
+                        <div className="space-y-3">
+                          <div className="flex items-start justify-between">
+                            <h4 className="font-semibold text-lg">{intervention.title}</h4>
+                            <div className="flex items-center space-x-2">
                               <Badge
                                 variant={
-                                  alert.priority === 'high'
+                                  intervention.type === 'immediate'
                                     ? 'danger'
-                                    : alert.priority === 'medium'
+                                    : intervention.type === 'short_term'
                                     ? 'warning'
                                     : 'default'
                                 }
                                 size="sm"
-                                className="mt-2"
                               >
-                                {alert.priority === 'high'
-                                  ? 'Yüksek Öncelik'
-                                  : alert.priority === 'medium'
-                                  ? 'Orta Öncelik'
-                                  : 'Düşük Öncelik'}
+                                {intervention.type === 'immediate'
+                                  ? 'Acil'
+                                  : intervention.type === 'short_term'
+                                  ? 'Kısa Vadeli'
+                                  : 'Uzun Vadeli'}
+                              </Badge>
+                              <Badge
+                                variant={
+                                  intervention.priority === 'critical'
+                                    ? 'danger'
+                                    : intervention.priority === 'high'
+                                    ? 'warning'
+                                    : 'default'
+                                }
+                                size="sm"
+                              >
+                                {intervention.priority === 'critical'
+                                  ? 'Kritik'
+                                  : intervention.priority === 'high'
+                                  ? 'Yüksek'
+                                  : 'Orta'}{' '}
+                                Öncelik
                               </Badge>
                             </div>
                           </div>
-                        </div>
-                      ))}
-                  </div>
-                </Card>
-              )}
 
-            {/* Interventions Section */}
-            {profile.ai_analysis.interventions &&
-              profile.ai_analysis.interventions.length > 0 && (
-                <Card className="p-6">
-                  <h3 className="text-lg font-semibold mb-4 flex items-center">
-                    <Shield className="mr-2 h-5 w-5 text-blue-600" />
-                    Müdahale Önerileri
-                  </h3>
-                  <div className="space-y-4">
-                    {profile.ai_analysis.interventions
-                      .sort((a, b) => {
-                        const priorityOrder = {
-                          critical: 0,
-                          high: 1,
-                          medium: 2,
-                        };
-                        return (
-                          priorityOrder[a.priority] - priorityOrder[b.priority]
-                        );
-                      })
-                      .map((intervention, index) => (
-                        <Card
-                          key={index}
-                          className={`p-5 ${
-                            intervention.priority === 'critical'
-                              ? 'border-red-200 bg-red-50'
-                              : intervention.priority === 'high'
-                              ? 'border-orange-200 bg-orange-50'
-                              : 'border-gray-200'
-                          }`}
-                        >
-                          <div className="space-y-3">
-                            <div className="flex items-start justify-between">
-                              <h4 className="font-semibold text-lg">
-                                {intervention.title}
-                              </h4>
-                              <div className="flex items-center space-x-2">
-                                <Badge
-                                  variant={
-                                    intervention.type === 'immediate'
-                                      ? 'danger'
-                                      : intervention.type === 'short_term'
-                                      ? 'warning'
-                                      : 'default'
-                                  }
-                                  size="sm"
-                                >
-                                  {intervention.type === 'immediate'
-                                    ? 'Acil'
-                                    : intervention.type === 'short_term'
-                                    ? 'Kısa Vadeli'
-                                    : 'Uzun Vadeli'}
-                                </Badge>
-                                <Badge
-                                  variant={
-                                    intervention.priority === 'critical'
-                                      ? 'danger'
-                                      : intervention.priority === 'high'
-                                      ? 'warning'
-                                      : 'default'
-                                  }
-                                  size="sm"
-                                >
-                                  {intervention.priority === 'critical'
-                                    ? 'Kritik'
-                                    : intervention.priority === 'high'
-                                    ? 'Yüksek'
-                                    : 'Orta'}{' '}
-                                  Öncelik
-                                </Badge>
-                              </div>
+                          <p className="text-gray-700">{intervention.description}</p>
+
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              <p className="text-sm font-medium text-gray-600">Beklenen Etki:</p>
+                              <p className="text-sm bg-green-100 text-green-800 p-2 rounded">
+                                {intervention.expected_impact}
+                              </p>
                             </div>
-
-                            <p className="text-gray-700">
-                              {intervention.description}
-                            </p>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                              <div className="space-y-2">
-                                <p className="text-sm font-medium text-gray-600">
-                                  Beklenen Etki:
-                                </p>
-                                <p className="text-sm bg-green-100 text-green-800 p-2 rounded">
-                                  {intervention.expected_impact}
-                                </p>
-                              </div>
-                              <div className="space-y-2">
-                                <p className="text-sm font-medium text-gray-600">
-                                  Zaman Çizelgesi:
-                                </p>
-                                <p className="text-sm bg-blue-100 text-blue-800 p-2 rounded flex items-center">
-                                  <Calendar className="h-4 w-4 mr-1" />
-                                  {intervention.timeline}
-                                </p>
-                              </div>
+                            <div className="space-y-2">
+                              <p className="text-sm font-medium text-gray-600">Zaman Çizelgesi:</p>
+                              <p className="text-sm bg-blue-100 text-blue-800 p-2 rounded flex items-center">
+                                <Calendar className="h-4 w-4 mr-1" />
+                                {intervention.timeline}
+                              </p>
                             </div>
-
-                            {intervention.action_items.length > 0 && (
-                              <div className="space-y-2">
-                                <p className="text-sm font-medium text-gray-600">
-                                  Yapılacaklar:
-                                </p>
-                                <ul className="space-y-1">
-                                  {intervention.action_items.map(
-                                    (item, itemIndex) => (
-                                      <li
-                                        key={itemIndex}
-                                        className="flex items-start text-sm"
-                                      >
-                                        <ChevronRight className="h-4 w-4 text-gray-400 mt-0.5 mr-2 flex-shrink-0" />
-                                        <span>{item}</span>
-                                      </li>
-                                    )
-                                  )}
-                                </ul>
-                              </div>
-                            )}
                           </div>
-                        </Card>
-                      ))}
-                  </div>
-                </Card>
-              )}
+
+                          {intervention.action_items.length > 0 && (
+                            <div className="space-y-2">
+                              <p className="text-sm font-medium text-gray-600">Yapılacaklar:</p>
+                              <ul className="space-y-1">
+                                {intervention.action_items.map((item, itemIndex) => (
+                                  <li key={itemIndex} className="flex items-start text-sm">
+                                    <ChevronRight className="h-4 w-4 text-gray-400 mt-0.5 mr-2 flex-shrink-0" />
+                                    <span>{item}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                        </div>
+                      </Card>
+                    ))}
+                </div>
+              </Card>
+            )}
 
             {/* No Alerts or Interventions */}
-            {(!profile.ai_analysis.alerts ||
-              profile.ai_analysis.alerts.length === 0) &&
+            {(!profile.ai_analysis.alerts || profile.ai_analysis.alerts.length === 0) &&
               (!profile.ai_analysis.interventions ||
                 profile.ai_analysis.interventions.length === 0) && (
                 <Card className="p-12">
@@ -838,8 +713,8 @@ export default function StudentProfile() {
                       Müdahale Gerektirmiyor
                     </h3>
                     <p className="text-gray-600">
-                      Öğrenci şu anda sağlıklı bir gelişim gösteriyor. Düzenli
-                      takip devam ettirilmeli.
+                      Öğrenci şu anda sağlıklı bir gelişim gösteriyor. Düzenli takip devam
+                      ettirilmeli.
                     </p>
                   </div>
                 </Card>
@@ -852,10 +727,7 @@ export default function StudentProfile() {
         )}
 
         {activeTab === 'notes' && (
-          <CoachNotesSection
-            studentId={Number(studentId!)}
-            notes={profile.coach_notes}
-          />
+          <CoachNotesSection studentId={Number(studentId!)} notes={profile.coach_notes} />
         )}
       </div>
     </div>

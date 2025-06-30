@@ -2,7 +2,6 @@ import userEvent from '@testing-library/user-event';
 import { useNavigate, useParams } from 'react-router-dom';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-
 import { useAuth } from '@/contexts/AuthContext';
 import * as beneficiaryHooks from '@/hooks/useBeneficiaries';
 import { mockBeneficiary } from '@/tests/mocks/beneficiary';
@@ -119,9 +118,7 @@ describe('BeneficiaryDetail', () => {
     render(<BeneficiaryDetail />);
 
     expect(screen.getByText('Beneficiary not found')).toBeInTheDocument();
-    expect(
-      screen.getByText(/doesn't exist or you don't have permission/)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/doesn't exist or you don't have permission/)).toBeInTheDocument();
   });
 
   it('displays beneficiary basic information', () => {
@@ -208,9 +205,7 @@ describe('BeneficiaryDetail', () => {
   it('displays notes', () => {
     render(<BeneficiaryDetail />);
 
-    expect(
-      screen.getByText('Initial assessment completed')
-    ).toBeInTheDocument();
+    expect(screen.getByText('Initial assessment completed')).toBeInTheDocument();
   });
 
   it('navigates back when clicking back button', async () => {
@@ -283,9 +278,7 @@ describe('BeneficiaryDetail', () => {
       await user.click(deleteButton);
 
       expect(screen.getByText('Delete Beneficiary')).toBeInTheDocument();
-      expect(
-        screen.getByText(/Are you sure you want to delete John Doe/)
-      ).toBeInTheDocument();
+      expect(screen.getByText(/Are you sure you want to delete John Doe/)).toBeInTheDocument();
     });
 
     it('deletes beneficiary on confirmation', async () => {
@@ -321,9 +314,7 @@ describe('BeneficiaryDetail', () => {
       await user.click(cancelButton);
 
       await waitFor(() => {
-        expect(
-          screen.queryByText('Delete Beneficiary')
-        ).not.toBeInTheDocument();
+        expect(screen.queryByText('Delete Beneficiary')).not.toBeInTheDocument();
       });
     });
   });

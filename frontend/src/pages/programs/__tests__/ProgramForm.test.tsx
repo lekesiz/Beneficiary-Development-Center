@@ -106,7 +106,7 @@ describe('ProgramForm - Create Mode', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockUseParams.mockReturnValue({ id: undefined });
-    
+
     mockUseAuth.mockReturnValue({
       user: {
         id: 1,
@@ -139,7 +139,7 @@ describe('ProgramForm - Create Mode', () => {
 
     expect(screen.getByText('Yeni Program')).toBeInTheDocument();
     expect(screen.getByText('Yeni bir program oluşturun')).toBeInTheDocument();
-    
+
     // Check sections
     expect(screen.getByText('Temel Bilgiler')).toBeInTheDocument();
     expect(screen.getByText('Tarihler ve Kapasite')).toBeInTheDocument();
@@ -166,7 +166,7 @@ describe('ProgramForm - Create Mode', () => {
     // Check for the asterisk in a separate span
     const requiredMarkers = screen.getAllByText('*');
     expect(requiredMarkers.length).toBeGreaterThan(0);
-    
+
     // Verify key sections exist
     expect(screen.getByText('Temel Bilgiler')).toBeInTheDocument();
     expect(screen.getByText('Tarihler ve Kapasite')).toBeInTheDocument();
@@ -206,10 +206,10 @@ describe('ProgramForm - Create Mode', () => {
 
     // Test that create mutation is properly configured
     expect(createMutation).not.toHaveBeenCalled();
-    
+
     // Verify navigation function is available
     expect(mockNavigate).toBeDefined();
-    
+
     // Verify form has required fields
     expect(screen.getByText(/Program Adı/)).toBeInTheDocument();
     expect(screen.getByText('Temel Bilgiler')).toBeInTheDocument();
@@ -283,7 +283,7 @@ describe('ProgramForm - Create Mode', () => {
     // Verify the checkboxes exist
     expect(screen.getByText('Online Program')).toBeInTheDocument();
     expect(screen.getByText('Hibrit Program')).toBeInTheDocument();
-    
+
     // The toggle functionality is handled by react-hook-form and conditional rendering
     // We've verified the UI elements exist and can be interacted with
   });

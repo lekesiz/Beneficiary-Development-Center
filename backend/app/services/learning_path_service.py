@@ -6,7 +6,13 @@ from typing import Dict, Any, List, Optional
 from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
 
-from app.models.learning_path import LearningPath, LearningMilestone, LearningPathStatus, LearningPathUpdate, MilestoneStatus
+from app.models.learning_path import (
+    LearningPath,
+    LearningMilestone,
+    LearningPathStatus,
+    LearningPathUpdate,
+    MilestoneStatus,
+)
 from app.models.evaluation import EvaluationAttempt
 from app.models.user import User
 from app.services.base import BaseService

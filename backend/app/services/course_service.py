@@ -36,7 +36,7 @@ class CourseService(BaseService[Course]):
     ) -> List[Course]:
         """
         Get all courses with filtering (backward compatibility method).
-        
+
         Args:
             tenant_id: Tenant ID
             user: Current user
@@ -50,20 +50,17 @@ class CourseService(BaseService[Course]):
             search: Search in title, subtitle, and description
             sort_by: Field to sort by
             sort_order: Sort order (asc or desc)
-            
+
         Returns:
             List of courses
         """
         # Build query
-        query = self.db.query(Course).filter(
-            Course.tenant_id == tenant_id, 
-            Course.deleted_at.is_(None)
-        )
-        
+        query = self.db.query(Course).filter(Course.tenant_id == tenant_id, Course.deleted_at.is_(None))
+
         # Apply program filter if provided
         if program_id:
             query = query.filter(Course.program_id == program_id)
-            
+
         # Apply role-based access control
         if user.role == "instructor":
             # Instructors only see courses they teach
@@ -72,7 +69,7 @@ class CourseService(BaseService[Course]):
             # Students only see published courses
             query = query.filter(Course.status == CourseStatus.PUBLISHED)
         # Admin, manager, staff see all courses
-        
+
         # Apply filters
         if status:
             if isinstance(status, str):
@@ -120,10 +117,10 @@ class CourseService(BaseService[Course]):
             "difficulty_level": Course.difficulty_level,
             "duration_hours": Course.duration_hours,
         }
-        
+
         # Default to created_at if invalid sort field
         sort_field = sort_mapping.get(sort_by, Course.created_at)
-        
+
         # Apply sort order
         if sort_order.lower() == "asc":
             query = query.order_by(sort_field.asc())
@@ -139,27 +136,23 @@ class CourseService(BaseService[Course]):
     def get_by_id_compat(self, tenant_id: int, course_id: int, user: User) -> Course:
         """
         Get a course by ID (backward compatibility method).
-        
+
         Args:
             tenant_id: Tenant ID
             course_id: Course ID
             user: Current user
-            
+
         Returns:
             Course if found
-            
+
         Raises:
             NotFoundError: If course not found
         """
         from sqlalchemy.orm import joinedload
-        
+
         course = (
             self.db.query(Course)
-            .options(
-                joinedload(Course.sessions),
-                joinedload(Course.instructor),
-                joinedload(Course.program)
-            )
+            .options(joinedload(Course.sessions), joinedload(Course.instructor), joinedload(Course.program))
             .filter(
                 Course.id == course_id,
                 Course.tenant_id == tenant_id,
@@ -182,15 +175,15 @@ class CourseService(BaseService[Course]):
     def create(self, tenant_id: int, data: Dict[str, Any], user: User) -> Course:
         """
         Create a new course (backward compatibility method).
-        
+
         Args:
             tenant_id: Tenant ID
             data: Course data (must include program_id)
             user: Current user
-            
+
         Returns:
             Created course
-            
+
         Raises:
             BadRequestError: If validation fails
             ForbiddenError: If user doesn't have permission
@@ -200,7 +193,7 @@ class CourseService(BaseService[Course]):
         program_id = data.get("program_id")
         if not program_id:
             raise BadRequestError("program_id is required")
-            
+
         # Call the enhanced create method
         return self.create_for_program(tenant_id, program_id, data, user)
 
@@ -306,10 +299,10 @@ class CourseService(BaseService[Course]):
             "difficulty_level": Course.difficulty_level,
             "duration_hours": Course.duration_hours,
         }
-        
+
         # Default to created_at if invalid sort field
         sort_field = sort_mapping.get(sort_by, Course.created_at)
-        
+
         # Apply sort order
         if sort_order.lower() == "asc":
             query = query.order_by(sort_field.asc())
@@ -322,94 +315,85 @@ class CourseService(BaseService[Course]):
         logger.info(f"Retrieved {len(courses)} courses for program {program_id}")
         return courses
 
-    def count_by_program(
-        self,
-        tenant_id: int,
-        program_id: int,
-        filters: dict = None
-    ) -> int:
+    def count_by_program(self, tenant_id: int, program_id: int, filters: dict = None) -> int:
         """
         Count courses for a program with filtering.
 
         Args:
             tenant_id: Tenant ID
-            program_id: Program ID  
+            program_id: Program ID
             filters: Dictionary of filters to apply
 
         Returns:
             Total count of courses matching filters
         """
         from app.models.program import Program
-        
+
         # First verify program exists and user has access
-        program = (
-            self.db.query(Program)
-            .filter_by(id=program_id, tenant_id=tenant_id, deleted_at=None)
-            .first()
-        )
-        
+        program = self.db.query(Program).filter_by(id=program_id, tenant_id=tenant_id, deleted_at=None).first()
+
         if not program:
             raise NotFoundError(f"Program {program_id} not found")
 
         # Build base query
-        query = self.db.query(Course).filter_by(
-            tenant_id=tenant_id,
-            program_id=program_id,
-            deleted_at=None
-        )
+        query = self.db.query(Course).filter_by(tenant_id=tenant_id, program_id=program_id, deleted_at=None)
 
         # Apply filters if provided
         if filters:
             # Apply status filter
-            if 'status' in filters and filters['status']:
-                if isinstance(filters['status'], str):
+            if "status" in filters and filters["status"]:
+                if isinstance(filters["status"], str):
                     try:
                         from app.models.course import CourseStatus
-                        status_enum = CourseStatus(filters['status'])
+
+                        status_enum = CourseStatus(filters["status"])
                         query = query.filter(Course.status == status_enum)
                     except ValueError:
                         pass
                 else:
-                    query = query.filter(Course.status == filters['status'])
-            
+                    query = query.filter(Course.status == filters["status"])
+
             # Apply format filter
-            if 'format' in filters and filters['format']:
-                if isinstance(filters['format'], str):
+            if "format" in filters and filters["format"]:
+                if isinstance(filters["format"], str):
                     try:
                         from app.models.course import CourseFormat
-                        format_enum = CourseFormat(filters['format'])
+
+                        format_enum = CourseFormat(filters["format"])
                         query = query.filter(Course.format == format_enum)
                     except ValueError:
                         pass
                 else:
-                    query = query.filter(Course.format == filters['format'])
-            
+                    query = query.filter(Course.format == filters["format"])
+
             # Apply difficulty filter
-            if 'difficulty_level' in filters and filters['difficulty_level']:
-                if isinstance(filters['difficulty_level'], str):
+            if "difficulty_level" in filters and filters["difficulty_level"]:
+                if isinstance(filters["difficulty_level"], str):
                     try:
                         from app.models.course import DifficultyLevel
-                        difficulty_enum = DifficultyLevel(filters['difficulty_level'])
+
+                        difficulty_enum = DifficultyLevel(filters["difficulty_level"])
                         query = query.filter(Course.difficulty_level == difficulty_enum)
                     except ValueError:
                         pass
                 else:
-                    query = query.filter(Course.difficulty_level == filters['difficulty_level'])
-            
+                    query = query.filter(Course.difficulty_level == filters["difficulty_level"])
+
             # Apply instructor filter
-            if 'instructor_id' in filters and filters['instructor_id']:
-                query = query.filter(Course.instructor_id == filters['instructor_id'])
-            
+            if "instructor_id" in filters and filters["instructor_id"]:
+                query = query.filter(Course.instructor_id == filters["instructor_id"])
+
             # Apply search filter
-            if 'search' in filters and filters['search']:
+            if "search" in filters and filters["search"]:
                 from sqlalchemy import or_
+
                 search_pattern = f"%{filters['search']}%"
                 query = query.filter(
                     or_(
                         Course.title.ilike(search_pattern),
                         Course.subtitle.ilike(search_pattern),
                         Course.description.ilike(search_pattern),
-                        Course.code.ilike(search_pattern)
+                        Course.code.ilike(search_pattern),
                     )
                 )
 
@@ -432,14 +416,10 @@ class CourseService(BaseService[Course]):
             NotFoundError: If course not found
         """
         from sqlalchemy.orm import joinedload
-        
+
         course = (
             self.db.query(Course)
-            .options(
-                joinedload(Course.sessions),
-                joinedload(Course.instructor),
-                joinedload(Course.program)
-            )
+            .options(joinedload(Course.sessions), joinedload(Course.instructor), joinedload(Course.program))
             .filter(
                 Course.id == course_id,
                 Course.program_id == program_id,
@@ -554,13 +534,13 @@ class CourseService(BaseService[Course]):
                 course_data["status"] = CourseStatus(course_data["status"])
             except ValueError:
                 raise BadRequestError(f"Invalid status: {course_data['status']}")
-                
+
         if "format" in course_data and isinstance(course_data["format"], str):
             try:
                 course_data["format"] = CourseFormat(course_data["format"])
             except ValueError:
                 raise BadRequestError(f"Invalid format: {course_data['format']}")
-                
+
         if "difficulty_level" in course_data and isinstance(course_data["difficulty_level"], str):
             try:
                 course_data["difficulty_level"] = DifficultyLevel(course_data["difficulty_level"])
@@ -579,13 +559,13 @@ class CourseService(BaseService[Course]):
     def update(self, tenant_id: int, course_id: int, data: Dict[str, Any], user: User) -> Course:
         """
         Update a course (backward compatibility method).
-        
+
         Args:
             tenant_id: Tenant ID
             course_id: Course ID
             data: Update data
             user: Current user
-            
+
         Returns:
             Updated course
         """
@@ -593,7 +573,9 @@ class CourseService(BaseService[Course]):
         course = self.get_by_id_compat(tenant_id, course_id, user)
         return self._update_original(tenant_id, course.program_id, course_id, data, user)
 
-    def _update_original(self, tenant_id: int, program_id: int, course_id: int, data: Dict[str, Any], user: User) -> Course:
+    def _update_original(
+        self, tenant_id: int, program_id: int, course_id: int, data: Dict[str, Any], user: User
+    ) -> Course:
         """
         Update a course.
 
@@ -655,12 +637,12 @@ class CourseService(BaseService[Course]):
     def delete(self, tenant_id: int, course_id: int, user: User) -> bool:
         """
         Delete a course (backward compatibility method).
-        
+
         Args:
             tenant_id: Tenant ID
             course_id: Course ID
             user: Current user
-            
+
         Returns:
             True if deleted
         """
@@ -977,137 +959,134 @@ class CourseService(BaseService[Course]):
     def add_session(self, tenant_id: int, course_id: int, session_data: Dict[str, Any], user: User) -> Course:
         """
         Add a session to a course (backward compatibility method).
-        
+
         Args:
             tenant_id: Tenant ID
             course_id: Course ID
             session_data: Session data
             user: Current user
-            
+
         Returns:
             Updated course
         """
         # Get the course first
         course = self.get_by_id_compat(tenant_id, course_id, user)
-        
+
         # Check permissions
         if user.role == "instructor" and course.instructor_id != user.id:
             raise ForbiddenError("You can only add sessions to courses you teach")
         elif user.role not in ["admin", "manager", "instructor"]:
             raise ForbiddenError("Insufficient permissions to add sessions")
-        
+
         # Add session using course model method
         course.add_session(session_data)
-        
+
         self.db.commit()
         self.db.refresh(course)
-        
+
         logger.info(f"Added session to course {course.code}")
         return course
 
     def duplicate(self, tenant_id: int, course_id: int, target_program_id: int, user: User) -> Course:
         """
         Duplicate a course (backward compatibility method).
-        
+
         Args:
             tenant_id: Tenant ID
             course_id: Course ID
             target_program_id: Target program ID
             user: Current user
-            
+
         Returns:
             Duplicated course
         """
         # Get the original course
         course = self.get_by_id_compat(tenant_id, course_id, user)
-        
+
         # Check permissions
         if user.role not in ["admin", "manager"]:
             raise ForbiddenError("Only admins and managers can duplicate courses")
-        
+
         # Verify target program exists
         target_program = (
             self.db.query(Program)
             .filter(Program.id == target_program_id, Program.tenant_id == tenant_id, Program.deleted_at.is_(None))
             .first()
         )
-        
+
         if not target_program:
             raise NotFoundError("Target program not found")
-        
+
         # Create duplicate using course model method
         duplicate = course.duplicate(new_program_id=target_program_id)
         duplicate.created_by = user.id
-        
+
         self.db.add(duplicate)
         self.db.commit()
         self.db.refresh(duplicate)
-        
+
         logger.info(f"Duplicated course {course.code} as {duplicate.code}")
         return duplicate
 
     def reorder(self, tenant_id: int, course_id: int, new_order: int, user: User) -> Course:
         """
         Reorder a course (backward compatibility method).
-        
+
         Args:
             tenant_id: Tenant ID
             course_id: Course ID
             new_order: New order index
             user: Current user
-            
+
         Returns:
             Updated course
         """
         # Get the course
         course = self.get_by_id_compat(tenant_id, course_id, user)
-        
+
         # Check permissions
         if user.role not in ["admin", "manager"]:
             raise ForbiddenError("Only admins and managers can reorder courses")
-        
+
         # Update order using course model method
         course.update_order(new_order)
-        
+
         self.db.commit()
         self.db.refresh(course)
-        
+
         logger.info(f"Reordered course {course.code} to position {new_order}")
         return course
 
     def get_statistics(self, tenant_id: int, program_id: Optional[int], user: User) -> Dict[str, Any]:
         """
         Get course statistics (backward compatibility method).
-        
+
         Args:
             tenant_id: Tenant ID
             program_id: Program ID (optional)
             user: Current user
-            
+
         Returns:
             Statistics dictionary
         """
         # Build query
-        query = self.db.query(Course).filter(
-            Course.tenant_id == tenant_id,
-            Course.deleted_at.is_(None)
-        )
-        
+        query = self.db.query(Course).filter(Course.tenant_id == tenant_id, Course.deleted_at.is_(None))
+
         # Filter by program if provided
         if program_id:
             query = query.filter(Course.program_id == program_id)
-        
+
         # Apply role-based filtering
         if user.role == "instructor":
             query = query.filter(Course.instructor_id == user.id)
         elif user.role == "student":
             query = query.filter(Course.status == CourseStatus.PUBLISHED)
-        
+
         courses = query.all()
-        
+
         # Calculate statistics
         total_courses = len(courses)
-        
+
         status_breakdown = {}
         format_breakdown = {}
         difficulty_breakdown = {}
@@ -1115,27 +1094,27 @@ class CourseService(BaseService[Course]):
         total_sessions = 0
         completion_rates = []
         assessment_scores = []
-        
+
         for course in courses:
             # Status breakdown
             status_key = course.status.value if course.status else "unknown"
             status_breakdown[status_key] = status_breakdown.get(status_key, 0) + 1
-            
+
             # Format breakdown
             format_key = course.format.value if course.format else "unknown"
             format_breakdown[format_key] = format_breakdown.get(format_key, 0) + 1
-            
+
             # Difficulty breakdown
             difficulty_key = course.difficulty_level.value if course.difficulty_level else "unknown"
             difficulty_breakdown[difficulty_key] = difficulty_breakdown.get(difficulty_key, 0) + 1
-            
+
             # Assessment count
             if course.has_assessment:
                 courses_with_assessment += 1
-            
+
             # Session count
             total_sessions += len(course.sessions)
-            
+
             # Completion rates
             try:
                 completion_rate = course.get_completion_rate()
@@ -1143,7 +1122,7 @@ class CourseService(BaseService[Course]):
                     completion_rates.append(completion_rate)
             except:
                 pass
-            
+
             # Assessment scores
             try:
                 avg_score = course.get_average_score()
@@ -1151,11 +1130,11 @@ class CourseService(BaseService[Course]):
                     assessment_scores.append(avg_score)
             except:
                 pass
-        
+
         # Calculate averages
         average_completion_rate = sum(completion_rates) / len(completion_rates) if completion_rates else 0
         average_assessment_score = sum(assessment_scores) / len(assessment_scores) if assessment_scores else 0
-        
+
         return {
             "total_courses": total_courses,
             "status_breakdown": status_breakdown,

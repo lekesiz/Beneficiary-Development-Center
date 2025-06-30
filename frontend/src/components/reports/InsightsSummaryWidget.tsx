@@ -17,7 +17,6 @@ import { Button } from '@/components/ui/Form';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { useInsightsSummary } from '@/hooks/useReports';
 
-
 export const InsightsSummaryWidget: React.FC = () => {
   const navigate = useNavigate();
   const { data: summary, isLoading, error } = useInsightsSummary();
@@ -41,10 +40,8 @@ export const InsightsSummaryWidget: React.FC = () => {
       return <Minus className="h-5 w-5 text-gray-500" />;
     }
 
-    const recent =
-      summary.performance_trend[summary.performance_trend.length - 1].score;
-    const previous =
-      summary.performance_trend[summary.performance_trend.length - 2].score;
+    const recent = summary.performance_trend[summary.performance_trend.length - 1].score;
+    const previous = summary.performance_trend[summary.performance_trend.length - 2].score;
 
     if (recent > previous) {
       return <TrendingUp className="h-5 w-5 text-green-600" />;
@@ -121,9 +118,7 @@ export const InsightsSummaryWidget: React.FC = () => {
         )}
 
         {/* Summary Text */}
-        <p className="text-sm text-gray-700 line-clamp-2">
-          {summary.progress_summary}
-        </p>
+        <p className="text-sm text-gray-700 line-clamp-2">{summary.progress_summary}</p>
 
         {/* Scores */}
         <div className="grid grid-cols-2 gap-3">
@@ -134,9 +129,7 @@ export const InsightsSummaryWidget: React.FC = () => {
             <p className="text-xs text-gray-600">Performans İndeksi</p>
           </div>
           <div className="text-center p-3 bg-gray-50 rounded-lg">
-            <p className="text-lg font-bold">
-              {summary.summary_score.completion_rate}
-            </p>
+            <p className="text-lg font-bold">{summary.summary_score.completion_rate}</p>
             <p className="text-xs text-gray-600">Tamamlama</p>
           </div>
         </div>
@@ -156,10 +149,7 @@ export const InsightsSummaryWidget: React.FC = () => {
             </h4>
             <ul className="space-y-1">
               {summary.immediate_actions.slice(0, 2).map((action, index) => (
-                <li
-                  key={index}
-                  className="text-xs text-gray-600 flex items-start"
-                >
+                <li key={index} className="text-xs text-gray-600 flex items-start">
                   <ChevronRight className="h-3 w-3 mr-1 mt-0.5 flex-shrink-0" />
                   <span className="line-clamp-1">{action}</span>
                 </li>

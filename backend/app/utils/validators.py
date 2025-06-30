@@ -188,3 +188,26 @@ def validate_file_extension(filename: str, allowed_extensions: set) -> bool:
 
     extension = filename.rsplit(".", 1)[1].lower()
     return extension in allowed_extensions
+
+
+def validate_file_size(file) -> bool:
+    """
+    Validate file size against configured maximum.
+    
+    Args:
+        file: FileStorage object
+        
+    Returns:
+        True if file size is valid
+    """
+    import os
+    from flask import current_app
+    
+    max_size = current_app.config.get('MAX_CONTENT_LENGTH', 16 * 1024 * 1024)  # Default 16MB
+    
+    # Get file size
+    file.seek(0, os.SEEK_END)
+    size = file.tell()
+    file.seek(0)  # Reset file pointer
+    
+    return size <= max_size

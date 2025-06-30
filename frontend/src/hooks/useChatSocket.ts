@@ -39,7 +39,7 @@ export const useChatSocket = ({
   const sendChatMessage = useCallback(
     (content: string, attachments?: any[]) => {
       if (!conversationId) return;
-      
+
       sendMessage(conversationId, content, attachments);
     },
     [conversationId, sendMessage]
@@ -71,7 +71,7 @@ export const useChatSocket = ({
   const markMessagesAsRead = useCallback(
     (messageIds: number[]) => {
       if (!conversationId || messageIds.length === 0) return;
-      
+
       markAsRead(conversationId, messageIds);
     },
     [conversationId, markAsRead]

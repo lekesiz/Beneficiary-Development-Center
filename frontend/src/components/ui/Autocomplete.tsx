@@ -5,7 +5,6 @@ import { cn } from '@/lib/utils';
 
 import { Input } from './Form';
 
-
 interface AutocompleteOption {
   value: string | number;
   label: string;
@@ -59,9 +58,7 @@ export const Autocomplete: React.FC<AutocompleteProps> = ({
 
   return (
     <div className="relative space-y-2">
-      {label && (
-        <label className="text-sm font-medium leading-none">{label}</label>
-      )}
+      {label && <label className="text-sm font-medium leading-none">{label}</label>}
 
       <div className="relative">
         <Input

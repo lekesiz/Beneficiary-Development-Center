@@ -21,10 +21,7 @@ interface CoachNotesSectionProps {
   notes: CoachNote[];
 }
 
-export default function CoachNotesSection({
-  studentId,
-  notes,
-}: CoachNotesSectionProps) {
+export default function CoachNotesSection({ studentId, notes }: CoachNotesSectionProps) {
   const [isAddingNote, setIsAddingNote] = useState(false);
   const [newNote, setNewNote] = useState('');
   const [newCategory, setNewCategory] = useState<string>('general');
@@ -94,9 +91,7 @@ export default function CoachNotesSection({
         <div className="mb-6 p-4 bg-gray-50 rounded-lg">
           <div className="space-y-3">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Kategori
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Kategori</label>
               <select
                 value={newCategory}
                 onChange={(e) => setNewCategory(e.target.value)}
@@ -110,9 +105,7 @@ export default function CoachNotesSection({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Not
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Not</label>
               <textarea
                 value={newNote}
                 onChange={(e) => setNewNote(e.target.value)}
@@ -156,19 +149,14 @@ export default function CoachNotesSection({
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center mb-2">
-                    <Badge
-                      variant={getCategoryBadgeVariant(note.category)}
-                      size="sm"
-                    >
+                    <Badge variant={getCategoryBadgeVariant(note.category)} size="sm">
                       {getCategoryLabel(note.category)}
                     </Badge>
                     <span className="ml-2 text-sm text-gray-500">
                       {formatDate(note.created_at)}
                     </span>
                   </div>
-                  <p className="text-gray-700 whitespace-pre-wrap">
-                    {note.note}
-                  </p>
+                  <p className="text-gray-700 whitespace-pre-wrap">{note.note}</p>
                 </div>
                 {/* In a real app, you'd add edit/delete functionality here */}
               </div>

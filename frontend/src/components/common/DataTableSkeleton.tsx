@@ -26,16 +26,13 @@ export const DataTableSkeleton: React.FC<DataTableSkeletonProps> = ({
             <thead className="border-b bg-gray-50 dark:bg-gray-800">
               <tr>
                 {Array.from({ length: columns }).map((_, index) => (
-                  <th
-                    key={`header-${index}`}
-                    className="px-6 py-3 text-left"
-                  >
+                  <th key={`header-${index}`} className="px-6 py-3 text-left">
                     <Skeleton className="h-4 w-24" />
                   </th>
                 ))}
               </tr>
             </thead>
-            
+
             {/* Table Body */}
             <tbody>
               {Array.from({ length: rows }).map((_, rowIndex) => (
@@ -44,10 +41,7 @@ export const DataTableSkeleton: React.FC<DataTableSkeletonProps> = ({
                   className="border-b transition-colors hover:bg-gray-50/50 dark:hover:bg-gray-800/50"
                 >
                   {Array.from({ length: columns }).map((_, colIndex) => (
-                    <td
-                      key={`cell-${rowIndex}-${colIndex}`}
-                      className="px-6 py-4"
-                    >
+                    <td key={`cell-${rowIndex}-${colIndex}`} className="px-6 py-4">
                       {/* Vary skeleton widths for more realistic appearance */}
                       {colIndex === 0 ? (
                         // First column - typically title/name

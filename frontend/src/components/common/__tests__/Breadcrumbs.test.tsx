@@ -15,24 +15,30 @@ vi.mock('@/hooks/useBreadcrumbs', () => ({
       // Return single active breadcrumb for dashboard - this should not render
       return [{ label: 'Dashboard', path: '/dashboard', isActive: true }];
     }
-    
-    const breadcrumbs = [
-      { label: 'Dashboard', path: '/dashboard', isActive: false },
-    ];
-    
+
+    const breadcrumbs = [{ label: 'Dashboard', path: '/dashboard', isActive: false }];
+
     if (currentTestPath.includes('/programs')) {
-      breadcrumbs.push({ label: 'Programs', path: '/programs', isActive: currentTestPath === '/programs' });
-      
+      breadcrumbs.push({
+        label: 'Programs',
+        path: '/programs',
+        isActive: currentTestPath === '/programs',
+      });
+
       if (currentTestPath.includes('/new')) {
         breadcrumbs.push({ label: 'New Program', path: currentTestPath, isActive: true });
       } else if (currentTestPath.includes('/edit')) {
-        breadcrumbs.push({ label: 'Test Program', path: currentTestPath.replace('/edit', ''), isActive: false });
+        breadcrumbs.push({
+          label: 'Test Program',
+          path: currentTestPath.replace('/edit', ''),
+          isActive: false,
+        });
         breadcrumbs.push({ label: 'Edit', path: currentTestPath, isActive: true });
       } else if (currentTestPath !== '/programs') {
         breadcrumbs.push({ label: 'Test Program', path: currentTestPath, isActive: true });
       }
     }
-    
+
     return breadcrumbs;
   }),
 }));

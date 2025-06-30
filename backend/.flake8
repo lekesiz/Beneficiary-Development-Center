@@ -1,64 +1,30 @@
 [flake8]
-# Maximum line length
-max-line-length = 120
-
-# Ignore specific error codes
-ignore = 
-    # E203: whitespace before ':' (conflicts with black)
-    E203,
-    # E226: Missing whitespace around operator
-    E226,
-    # W503: line break before binary operator (conflicts with black)
-    W503,
-    # E501: line too long (we use max-line-length instead)
-    E501,
-    # E731: Lambda assignment (useful for simple cases)
-    E731
-
-# Exclude directories and files
-exclude =
+max-line-length = 99
+# E203: whitespace before ':' (conflicts with Black)
+# W503: line break before binary operator (conflicts with Black)
+# E266: too many leading '#' for block comment
+# E501: line too long (handled by Black)
+# W391: blank line at end of file
+ignore = E203,W503,E266,E501,W391
+exclude = 
     .git,
     __pycache__,
-    .venv,
     venv,
     env,
+    .venv,
+    .env,
+    build,
+    dist,
     migrations,
     .pytest_cache,
     .mypy_cache,
-    .coverage,
     htmlcov,
-    dist,
-    build,
-    *.egg-info,
-    .tox,
-    docs,
-    scripts,
-    tests/fixtures,
-    .eggs,
-    *.egg
-
-# Per-file ignores
+    .coverage
 per-file-ignores =
-    # Ignore import errors in __init__.py files
-    **/__init__.py:F401,F403
-    # Ignore complexity in settings/config files
-    app/config.py:C901,E402
-    */settings/*.py:E402
-    */config/*.py:E402
-    # Allow longer lines in test files
-    tests/*.py:E501
-
-# McCabe complexity threshold
-max-complexity = 10
-
-# Format for error output
-format = %(path)s:%(row)d:%(col)d: %(code)s %(text)s
-
-# Show source code for errors
-show-source = True
-
-# Count errors
-statistics = True
-
-# Configure flake8-docstrings (if installed)
-docstring-convention = google
+    # Imported but unused
+    __init__.py: F401
+    # Import not at top of file
+    app/extensions.py: E402
+    # Line too long in tests
+    tests/*: E501
+EOF < /dev/null

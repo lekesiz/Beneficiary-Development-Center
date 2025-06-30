@@ -69,7 +69,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
     }
 
     if (acceptedTypes.length > 0 && !acceptedTypes.includes('*/*')) {
-      const isAccepted = acceptedTypes.some(type => {
+      const isAccepted = acceptedTypes.some((type) => {
         if (type.endsWith('/*')) {
           return file.type.startsWith(type.slice(0, -1));
         }
@@ -84,72 +84,84 @@ export const FileUpload: React.FC<FileUploadProps> = ({
     return null;
   };
 
-  const handleFiles = useCallback(async (files: FileList) => {
-    const fileArray = Array.from(files);
-    const newErrors: string[] = [];
+  const handleFiles = useCallback(
+    async (files: FileList) => {
+      const fileArray = Array.from(files);
+      const newErrors: string[] = [];
 
-    // Check file limit
-    if (uploadedFiles.length + fileArray.length > maxFiles) {
-      newErrors.push(`Maximum ${maxFiles} files allowed`);
-    }
-
-    // Validate each file
-    const validFiles: File[] = [];
-    fileArray.forEach(file => {
-      const error = validateFile(file);
-      if (error) {
-        newErrors.push(`${file.name}: ${error}`);
-      } else {
-        validFiles.push(file);
+      // Check file limit
+      if (uploadedFiles.length + fileArray.length > maxFiles) {
+        newErrors.push(`Maximum ${maxFiles} files allowed`);
       }
-    });
 
-    setErrors(newErrors);
+      // Validate each file
+      const validFiles: File[] = [];
+      fileArray.forEach((file) => {
+        const error = validateFile(file);
+        if (error) {
+          newErrors.push(`${file.name}: ${error}`);
+        } else {
+          validFiles.push(file);
+        }
+      });
 
-    if (validFiles.length > 0) {
-      setUploading(true);
-      try {
-        await onUpload(validFiles);
-      } catch (error) {
-        setErrors(prev => [...prev, 'Upload failed. Please try again.']);
-      } finally {
-        setUploading(false);
+      setErrors(newErrors);
+
+      if (validFiles.length > 0) {
+        setUploading(true);
+        try {
+          await onUpload(validFiles);
+        } catch (error) {
+          setErrors((prev) => [...prev, 'Upload failed. Please try again.']);
+        } finally {
+          setUploading(false);
+        }
       }
-    }
-  }, [uploadedFiles.length, maxFiles, onUpload]);
+    },
+    [uploadedFiles.length, maxFiles, onUpload]
+  );
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(false);
-    
-    if (disabled || uploading) return;
-    
-    const files = e.dataTransfer.files;
-    if (files.length > 0) {
-      handleFiles(files);
-    }
-  }, [disabled, uploading, handleFiles]);
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      setIsDragOver(false);
 
-  const handleDragOver = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    if (!disabled && !uploading) {
-      setIsDragOver(true);
-    }
-  }, [disabled, uploading]);
+      if (disabled || uploading) return;
+
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        handleFiles(files);
+      }
+    },
+    [disabled, uploading, handleFiles]
+  );
+
+  const handleDragOver = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      if (!disabled && !uploading) {
+        setIsDragOver(true);
+      }
+    },
+    [disabled, uploading]
+  );
 
   const handleDragLeave = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     setIsDragOver(false);
   }, []);
 
-  const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files && files.length > 0) {
-      handleFiles(files);
-    }
-    // Reset the input value so the same file can be selected again
-    e.target.value = '';
-  }, [handleFiles]);
+  const handleFileSelect = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const files = e.target.files;
+      if (files && files.length > 0) {
+        handleFiles(files);
+      }
+      // Reset the input value so the same file can be selected again
+      e.target.value = '';
+    },
+    [handleFiles]
+  );
 
   const canUpload = !disabled && !uploading && uploadedFiles.length < maxFiles;
 
@@ -159,9 +171,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
       <div
         className={cn(
           'border-2 border-dashed rounded-lg p-6 transition-colors',
-          isDragOver
-            ? 'border-primary bg-primary/5'
-            : 'border-gray-300 hover:border-gray-400',
+          isDragOver ? 'border-primary bg-primary/5' : 'border-gray-300 hover:border-gray-400',
           disabled && 'opacity-50 cursor-not-allowed',
           !canUpload && 'bg-gray-50'
         )}
@@ -171,12 +181,9 @@ export const FileUpload: React.FC<FileUploadProps> = ({
       >
         <div className="text-center">
           <Upload
-            className={cn(
-              'mx-auto h-12 w-12 mb-4',
-              canUpload ? 'text-gray-400' : 'text-gray-300'
-            )}
+            className={cn('mx-auto h-12 w-12 mb-4', canUpload ? 'text-gray-400' : 'text-gray-300')}
           />
-          
+
           <div className="mb-4">
             <p className="text-sm text-gray-600 mb-1">
               {canUpload
@@ -184,13 +191,9 @@ export const FileUpload: React.FC<FileUploadProps> = ({
                 : `Maximum ${maxFiles} files reached`}
             </p>
             {acceptedTypes.length > 0 && acceptedTypes[0] !== '*/*' && (
-              <p className="text-xs text-gray-500">
-                Accepted: {acceptedTypes.join(', ')}
-              </p>
+              <p className="text-xs text-gray-500">Accepted: {acceptedTypes.join(', ')}</p>
             )}
-            <p className="text-xs text-gray-500">
-              Max size: {formatFileSize(maxSize)}
-            </p>
+            <p className="text-xs text-gray-500">Max size: {formatFileSize(maxSize)}</p>
           </div>
 
           {canUpload && (
@@ -249,16 +252,10 @@ export const FileUpload: React.FC<FileUploadProps> = ({
                 className="flex items-center justify-between p-3 bg-gray-50 rounded-md"
               >
                 <div className="flex items-center space-x-3">
-                  <div className="text-gray-500">
-                    {getFileIcon(file.type)}
-                  </div>
+                  <div className="text-gray-500">{getFileIcon(file.type)}</div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 truncate">
-                      {file.name}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {formatFileSize(file.size)}
-                    </p>
+                    <p className="text-sm font-medium text-gray-900 truncate">{file.name}</p>
+                    <p className="text-xs text-gray-500">{formatFileSize(file.size)}</p>
                   </div>
                 </div>
 
@@ -272,9 +269,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
                     </div>
                   )}
 
-                  {file.error && (
-                    <span className="text-xs text-red-600">{file.error}</span>
-                  )}
+                  {file.error && <span className="text-xs text-red-600">{file.error}</span>}
 
                   {file.url && (
                     <Button

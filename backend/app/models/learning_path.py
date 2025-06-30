@@ -80,6 +80,7 @@ class LearningPath(TenantBaseModel, TimestampMixin):
     evaluation = relationship("Evaluation", back_populates="learning_paths")
     evaluation_attempt = relationship("EvaluationAttempt", back_populates="learning_paths")
     milestones = relationship("LearningMilestone", back_populates="learning_path", cascade="all, delete-orphan")
+    updates = relationship("LearningPathUpdate", back_populates="learning_path", cascade="all, delete-orphan")
 
     def to_dict(self):
         """Convert to dictionary for API responses"""
@@ -230,7 +231,7 @@ class LearningPathUpdate(TenantBaseModel, TimestampMixin):
     student_metrics = Column(JSON)  # Student metrics at time of suggestion
 
     # Relationships
-    learning_path = relationship("LearningPath")
+    learning_path = relationship("LearningPath", back_populates="updates")
     suggested_by = relationship(
         "User", foreign_keys=[suggested_by_user_id], back_populates="suggested_learning_path_updates"
     )

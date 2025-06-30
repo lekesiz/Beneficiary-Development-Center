@@ -201,4 +201,8 @@ cython_debug/
 uploads/
 htmlcov/
 .coverage
-.pytest_cache/ 
+.pytest_cache/
+
+# App Engine secrets
+app_secrets.yaml
+.env.production 

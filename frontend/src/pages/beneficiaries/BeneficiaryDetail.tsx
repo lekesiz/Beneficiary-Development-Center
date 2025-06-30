@@ -24,11 +24,7 @@ import { ConfirmDialog } from '@/components/ui/Modal';
 import { useAuth } from '@/contexts/AuthContext';
 import { useBeneficiary, useDeleteBeneficiary } from '@/hooks/useBeneficiaries';
 import { formatDate } from '@/lib/utils';
-import {
-  BeneficiaryStatus,
-  EmploymentStatus,
-  EducationLevel,
-} from '@/types/beneficiary';
+import { BeneficiaryStatus, EmploymentStatus, EducationLevel } from '@/types/beneficiary';
 
 export default function BeneficiaryDetail() {
   const { id } = useParams();
@@ -36,11 +32,7 @@ export default function BeneficiaryDetail() {
   const { user } = useAuth();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-  const {
-    data: beneficiaryData,
-    isLoading,
-    error,
-  } = useBeneficiary(Number(id));
+  const { data: beneficiaryData, isLoading, error } = useBeneficiary(Number(id));
   const deleteMutation = useDeleteBeneficiary();
 
   if (isLoading) {
@@ -57,8 +49,8 @@ export default function BeneficiaryDetail() {
         <div className="text-center">
           <h2 className="text-lg font-semibold">Beneficiary not found</h2>
           <p className="text-muted-foreground mt-2">
-            The beneficiary you're looking for doesn't exist or you don't have
-            permission to view it.
+            The beneficiary you're looking for doesn't exist or you don't have permission to view
+            it.
           </p>
           <Button onClick={() => navigate('/beneficiaries')} className="mt-4">
             Back to Beneficiaries
@@ -128,9 +120,7 @@ export default function BeneficiaryDetail() {
             <div>
               <h1 className="text-2xl font-bold">{beneficiary.full_name}</h1>
               <div className="flex items-center gap-4 mt-2">
-                <Badge variant={statusVariants[beneficiary.status]}>
-                  {beneficiary.status}
-                </Badge>
+                <Badge variant={statusVariants[beneficiary.status]}>{beneficiary.status}</Badge>
                 {beneficiary.external_id && (
                   <span className="text-sm text-muted-foreground">
                     ID: {beneficiary.external_id}
@@ -141,19 +131,13 @@ export default function BeneficiaryDetail() {
 
             <div className="flex items-center gap-2">
               {canEdit && (
-                <Button
-                  onClick={() => navigate(`/beneficiaries/${id}/edit`)}
-                  variant="outline"
-                >
+                <Button onClick={() => navigate(`/beneficiaries/${id}/edit`)} variant="outline">
                   <Edit className="h-4 w-4 mr-2" />
                   Edit
                 </Button>
               )}
               {canDelete && (
-                <Button
-                  onClick={() => setShowDeleteDialog(true)}
-                  variant="destructive"
-                >
+                <Button onClick={() => setShowDeleteDialog(true)} variant="destructive">
                   <Trash2 className="h-4 w-4 mr-2" />
                   Delete
                 </Button>
@@ -172,50 +156,22 @@ export default function BeneficiaryDetail() {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <InfoItem
-                    icon={Mail}
-                    label="Email"
-                    value={beneficiary.email}
-                  />
-                  <InfoItem
-                    icon={Phone}
-                    label="Phone"
-                    value={beneficiary.phone}
-                  />
-                  <InfoItem
-                    icon={Phone}
-                    label="Mobile"
-                    value={beneficiary.mobile_phone}
-                  />
+                  <InfoItem icon={Mail} label="Email" value={beneficiary.email} />
+                  <InfoItem icon={Phone} label="Phone" value={beneficiary.phone} />
+                  <InfoItem icon={Phone} label="Mobile" value={beneficiary.mobile_phone} />
                   <InfoItem
                     icon={Calendar}
                     label="Date of Birth"
-                    value={
-                      beneficiary.date_of_birth
-                        ? formatDate(beneficiary.date_of_birth)
-                        : null
-                    }
+                    value={beneficiary.date_of_birth ? formatDate(beneficiary.date_of_birth) : null}
                   />
                   <InfoItem
                     icon={User}
                     label="Age"
                     value={beneficiary.age ? `${beneficiary.age} years` : null}
                   />
-                  <InfoItem
-                    icon={User}
-                    label="Gender"
-                    value={beneficiary.gender}
-                  />
-                  <InfoItem
-                    icon={MapPin}
-                    label="Nationality"
-                    value={beneficiary.nationality}
-                  />
-                  <InfoItem
-                    icon={MapPin}
-                    label="Birthplace"
-                    value={beneficiary.birthplace}
-                  />
+                  <InfoItem icon={User} label="Gender" value={beneficiary.gender} />
+                  <InfoItem icon={MapPin} label="Nationality" value={beneficiary.nationality} />
+                  <InfoItem icon={MapPin} label="Birthplace" value={beneficiary.birthplace} />
                 </div>
               </CardContent>
             </Card>
@@ -230,9 +186,7 @@ export default function BeneficiaryDetail() {
                   <div className="flex items-start gap-3">
                     <MapPin className="h-5 w-5 text-muted-foreground mt-0.5" />
                     <div>
-                      {beneficiary.address.street && (
-                        <p>{beneficiary.address.street}</p>
-                      )}
+                      {beneficiary.address.street && <p>{beneficiary.address.street}</p>}
                       <p>
                         {[
                           beneficiary.address.city,
@@ -242,9 +196,7 @@ export default function BeneficiaryDetail() {
                           .filter(Boolean)
                           .join(', ')}
                       </p>
-                      {beneficiary.address.country && (
-                        <p>{beneficiary.address.country}</p>
-                      )}
+                      {beneficiary.address.country && <p>{beneficiary.address.country}</p>}
                     </div>
                   </div>
                 </CardContent>
@@ -263,31 +215,14 @@ export default function BeneficiaryDetail() {
                     label="Employment Status"
                     value={
                       beneficiary.employment_status
-                        ? beneficiary.employment_status
-                            .replace(/_/g, ' ')
-                            .charAt(0)
-                            .toUpperCase() +
-                          beneficiary.employment_status
-                            .replace(/_/g, ' ')
-                            .slice(1)
+                        ? beneficiary.employment_status.replace(/_/g, ' ').charAt(0).toUpperCase() +
+                          beneficiary.employment_status.replace(/_/g, ' ').slice(1)
                         : null
                     }
                   />
-                  <InfoItem
-                    icon={Briefcase}
-                    label="Job Title"
-                    value={beneficiary.job_title}
-                  />
-                  <InfoItem
-                    icon={Briefcase}
-                    label="Company"
-                    value={beneficiary.company}
-                  />
-                  <InfoItem
-                    icon={Briefcase}
-                    label="Industry"
-                    value={beneficiary.industry}
-                  />
+                  <InfoItem icon={Briefcase} label="Job Title" value={beneficiary.job_title} />
+                  <InfoItem icon={Briefcase} label="Company" value={beneficiary.company} />
+                  <InfoItem icon={Briefcase} label="Industry" value={beneficiary.industry} />
                   <InfoItem
                     icon={Briefcase}
                     label="Years of Experience"
@@ -314,13 +249,8 @@ export default function BeneficiaryDetail() {
                       label="Education Level"
                       value={
                         beneficiary.education_level
-                          ? beneficiary.education_level
-                              .replace(/_/g, ' ')
-                              .charAt(0)
-                              .toUpperCase() +
-                            beneficiary.education_level
-                              .replace(/_/g, ' ')
-                              .slice(1)
+                          ? beneficiary.education_level.replace(/_/g, ' ').charAt(0).toUpperCase() +
+                            beneficiary.education_level.replace(/_/g, ' ').slice(1)
                           : null
                       }
                     />
@@ -331,21 +261,20 @@ export default function BeneficiaryDetail() {
                     />
                   </div>
 
-                  {beneficiary.certifications &&
-                    beneficiary.certifications.length > 0 && (
-                      <div>
-                        <p className="text-sm font-medium text-muted-foreground mb-2">
-                          Certifications
-                        </p>
-                        <div className="flex flex-wrap gap-2">
-                          {beneficiary.certifications.map((cert, index) => (
-                            <Badge key={index} variant="outline">
-                              {cert}
-                            </Badge>
-                          ))}
-                        </div>
+                  {beneficiary.certifications && beneficiary.certifications.length > 0 && (
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-2">
+                        Certifications
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {beneficiary.certifications.map((cert, index) => (
+                          <Badge key={index} variant="outline">
+                            {cert}
+                          </Badge>
+                        ))}
                       </div>
-                    )}
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -371,9 +300,7 @@ export default function BeneficiaryDetail() {
                   <div>
                     <div className="flex items-center gap-2 mb-2">
                       <Tag className="h-4 w-4 text-muted-foreground" />
-                      <p className="text-sm font-medium text-muted-foreground">
-                        Tags
-                      </p>
+                      <p className="text-sm font-medium text-muted-foreground">Tags</p>
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {beneficiary.tags.map((tag, index) => (
@@ -404,9 +331,7 @@ export default function BeneficiaryDetail() {
               <CardContent className="space-y-4">
                 {beneficiary.skills && beneficiary.skills.length > 0 && (
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground mb-2">
-                      Skills
-                    </p>
+                    <p className="text-sm font-medium text-muted-foreground mb-2">Skills</p>
                     <div className="flex flex-wrap gap-2">
                       {beneficiary.skills.map((skill, index) => (
                         <Badge key={index} variant="outline" size="sm">
@@ -419,9 +344,7 @@ export default function BeneficiaryDetail() {
 
                 {beneficiary.interests && beneficiary.interests.length > 0 && (
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground mb-2">
-                      Interests
-                    </p>
+                    <p className="text-sm font-medium text-muted-foreground mb-2">Interests</p>
                     <div className="flex flex-wrap gap-2">
                       {beneficiary.interests.map((interest, index) => (
                         <Badge key={index} variant="outline" size="sm">
@@ -434,9 +357,7 @@ export default function BeneficiaryDetail() {
 
                 {beneficiary.goals && beneficiary.goals.length > 0 && (
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground mb-2">
-                      Goals
-                    </p>
+                    <p className="text-sm font-medium text-muted-foreground mb-2">Goals</p>
                     <ul className="list-disc list-inside space-y-1">
                       {beneficiary.goals.map((goal, index) => (
                         <li key={index} className="text-sm">
@@ -458,28 +379,19 @@ export default function BeneficiaryDetail() {
                 <CardContent>
                   <div className="text-center mb-4">
                     <div className="text-3xl font-bold">
-                      {Math.round(
-                        beneficiary.progress_summary.overall_progress
-                      )}
-                      %
+                      {Math.round(beneficiary.progress_summary.overall_progress)}%
                     </div>
-                    <p className="text-sm text-muted-foreground">
-                      Overall Progress
-                    </p>
+                    <p className="text-sm text-muted-foreground">Overall Progress</p>
                   </div>
 
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span>Active Enrollments</span>
-                      <span className="font-medium">
-                        {beneficiary.active_enrollments || 0}
-                      </span>
+                      <span className="font-medium">{beneficiary.active_enrollments || 0}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span>Completed Programs</span>
-                      <span className="font-medium">
-                        {beneficiary.completed_programs || 0}
-                      </span>
+                      <span className="font-medium">{beneficiary.completed_programs || 0}</span>
                     </div>
                   </div>
                 </CardContent>
@@ -495,10 +407,7 @@ export default function BeneficiaryDetail() {
                 <CardContent>
                   <div className="space-y-3">
                     {beneficiary.notes.slice(0, 3).map((note) => (
-                      <div
-                        key={note.id}
-                        className="border-l-2 border-primary/20 pl-3"
-                      >
+                      <div key={note.id} className="border-l-2 border-primary/20 pl-3">
                         <p className="text-sm">{note.text}</p>
                         <p className="text-xs text-muted-foreground mt-1">
                           {formatDate(note.created_at)}

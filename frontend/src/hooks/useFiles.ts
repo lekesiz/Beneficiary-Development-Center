@@ -21,7 +21,7 @@ export const useFileUpload = () => {
     },
     onSuccess: (data, variables) => {
       toast.success(`${data.length} file(s) uploaded successfully`);
-      
+
       // Invalidate relevant queries
       if (variables.entityType && variables.entityId) {
         queryClient.invalidateQueries({
@@ -54,7 +54,7 @@ export const useSingleFileUpload = () => {
     },
     onSuccess: (data, variables) => {
       toast.success('File uploaded successfully');
-      
+
       // Invalidate relevant queries
       if (variables.entityType && variables.entityId) {
         queryClient.invalidateQueries({
@@ -227,7 +227,7 @@ export const useDownloadFile = () => {
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
-      
+
       toast.success('File downloaded successfully');
     },
     onError: (error) => {

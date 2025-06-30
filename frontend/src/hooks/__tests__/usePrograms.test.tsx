@@ -19,7 +19,7 @@ const createWrapper = () => {
       queries: { retry: false },
     },
   });
-  
+
   return ({ children }: { children: React.ReactNode }) => (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   );
@@ -125,13 +125,10 @@ describe('usePrograms', () => {
 
     vi.mocked(programsApi.getAll).mockResolvedValue(mockPrograms);
 
-    const { result, rerender } = renderHook(
-      ({ filters }) => usePrograms(filters),
-      {
-        wrapper: createWrapper(),
-        initialProps: { filters: initialFilters },
-      }
-    );
+    const { result, rerender } = renderHook(({ filters }) => usePrograms(filters), {
+      wrapper: createWrapper(),
+      initialProps: { filters: initialFilters },
+    });
 
     await waitFor(() => {
       expect(result.current.isSuccess).toBe(true);

@@ -22,7 +22,7 @@ def test_get_all_programs_basic():
     service = ProgramService(mock_db)
 
     # Mock user
-    user = Mock(spec=User)
+    user = Mock()
     user.role = "admin"
 
     # Mock query chain
@@ -46,7 +46,7 @@ def test_create_program_validation():
     service = ProgramService(mock_db)
 
     # Mock admin user
-    admin_user = Mock(spec=User)
+    admin_user = Mock()
     admin_user.id = 1
     admin_user.role = "admin"
 
@@ -67,7 +67,7 @@ def test_create_program_permission_check():
     service = ProgramService(mock_db)
 
     # Mock staff user (insufficient permissions)
-    staff_user = Mock(spec=User)
+    staff_user = Mock()
     staff_user.role = "staff"
 
     data = {"title": "Test Program"}

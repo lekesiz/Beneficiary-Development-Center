@@ -38,7 +38,8 @@ export const Default: Story = {
   args: {
     icon: FileText,
     title: 'No Documents Found',
-    description: 'Upload your first document to get started. You can upload PDFs, Word documents, and more.',
+    description:
+      'Upload your first document to get started. You can upload PDFs, Word documents, and more.',
     action: {
       text: 'Upload Document',
       onClick: () => console.log('Upload clicked'),
@@ -86,7 +87,7 @@ export const NoSearchResults: Story = {
   args: {
     icon: Search,
     title: 'No Results Found',
-    description: 'Try adjusting your search terms or filters to find what you\'re looking for.',
+    description: "Try adjusting your search terms or filters to find what you're looking for.",
     action: {
       text: 'Clear Search',
       onClick: () => console.log('Clear search clicked'),
@@ -126,7 +127,8 @@ export const LongDescription: Story = {
   args: {
     icon: BookOpen,
     title: 'Welcome to Your Library',
-    description: 'Your personal library is empty right now. Start by adding books, articles, or documents that interest you. You can organize them into collections, add tags for easy searching, and even share them with others. Building your library helps you keep track of your learning journey and reference materials.',
+    description:
+      'Your personal library is empty right now. Start by adding books, articles, or documents that interest you. You can organize them into collections, add tags for easy searching, and even share them with others. Building your library helps you keep track of your learning journey and reference materials.',
     action: {
       text: 'Add Your First Item',
       onClick: () => console.log('Add item clicked'),

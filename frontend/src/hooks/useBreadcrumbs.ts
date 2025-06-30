@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useMemo, useEffect, useState } from 'react';
-import { useLocation, useMatches, useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 
 import { useBeneficiary, beneficiaryKeys } from './useBeneficiaries';
 import { useCourse, courseQueryKeys } from './useCourses';
@@ -61,7 +61,8 @@ const dynamicSegmentPatterns = {
 const dynamicLabels: Record<string, (params: any, data?: any) => string> = {
   '/programs/:id': (params, data) => data?.title || `Program ${params.id}`,
   '/programs/:id/edit': (params, data) => `Edit ${data?.title || 'Program'}`,
-  '/programs/:programId/courses/reorder': (params, data) => `Reorder Courses - ${data?.title || 'Program'}`,
+  '/programs/:programId/courses/reorder': (params, data) =>
+    `Reorder Courses - ${data?.title || 'Program'}`,
   '/courses/:id': (params, data) => data?.title || `Course ${params.id}`,
   '/courses/:id/edit': (params, data) => `Edit ${data?.title || 'Course'}`,
   '/courses/:courseId/sessions/new': (params, data) => `New Session - ${data?.title || 'Course'}`,
@@ -70,8 +71,10 @@ const dynamicLabels: Record<string, (params: any, data?: any) => string> = {
   '/learning-paths/:id': (params, data) => data?.title || `Learning Path ${params.id}`,
   '/learning-paths/:id/edit': (params, data) => `Edit ${data?.title || 'Learning Path'}`,
   '/evaluations/:id/take': (params, data) => `Take ${data?.title || 'Evaluation'}`,
-  '/evaluations/:id/take-adaptive': (params, data) => `Take ${data?.title || 'Evaluation'} (Adaptive)`,
-  '/evaluations/:id/results/:attemptId': (params, data) => `Results - ${data?.title || 'Evaluation'}`,
+  '/evaluations/:id/take-adaptive': (params, data) =>
+    `Take ${data?.title || 'Evaluation'} (Adaptive)`,
+  '/evaluations/:id/results/:attemptId': (params, data) =>
+    `Results - ${data?.title || 'Evaluation'}`,
   '/coach/student/:studentId': (params, data) => data?.full_name || `Student ${params.studentId}`,
 };
 
@@ -91,11 +94,11 @@ function useDynamicBreadcrumbData() {
   const queryClient = useQueryClient();
   const [cachedData, setCachedData] = useState<CachedEntityData>({});
   const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({});
-  
+
   // Determine which IDs we need based on the current path and params
   const idsToFetch = useMemo(() => {
     const ids: Record<string, number> = {};
-    
+
     // Check for program ID
     if (location.pathname.includes('/programs')) {
       const id = Number(params.id || params.programId);
@@ -103,7 +106,7 @@ function useDynamicBreadcrumbData() {
     } else if (params.programId) {
       ids.programId = Number(params.programId);
     }
-    
+
     // Check for course ID
     if (location.pathname.includes('/courses')) {
       const id = Number(params.id || params.courseId);
@@ -111,7 +114,7 @@ function useDynamicBreadcrumbData() {
     } else if (params.courseId) {
       ids.courseId = Number(params.courseId);
     }
-    
+
     // Check for beneficiary ID
     if (location.pathname.includes('/beneficiaries')) {
       const id = Number(params.id);
@@ -120,33 +123,33 @@ function useDynamicBreadcrumbData() {
       const id = Number(params.studentId);
       if (id) ids.beneficiaryId = id;
     }
-    
+
     // Check for evaluation ID
     if (location.pathname.includes('/evaluations')) {
       const id = Number(params.id);
       if (id) ids.evaluationId = id;
     }
-    
+
     // Check for learning path ID
     if (location.pathname.includes('/learning-paths')) {
       const id = Number(params.id);
       if (id) ids.learningPathId = id;
     }
-    
+
     return ids;
   }, [location.pathname, params]);
-  
+
   // Check cache and fetch data if needed
   useEffect(() => {
     const fetchData = async () => {
       const newData: CachedEntityData = {};
       const newLoadingStates: Record<string, boolean> = {};
-      
+
       // Check and fetch program data
       if (idsToFetch.programId) {
         const cacheKey = programQueryKeys.detail(idsToFetch.programId, false);
         const cachedProgram = queryClient.getQueryData(cacheKey);
-        
+
         if (cachedProgram) {
           newData.program = cachedProgram;
         } else {
@@ -167,12 +170,12 @@ function useDynamicBreadcrumbData() {
           newLoadingStates.program = false;
         }
       }
-      
+
       // Check and fetch course data
       if (idsToFetch.courseId) {
         const cacheKey = courseQueryKeys.detail(idsToFetch.courseId, false);
         const cachedCourse = queryClient.getQueryData(cacheKey);
-        
+
         if (cachedCourse) {
           newData.course = cachedCourse;
         } else {
@@ -193,12 +196,12 @@ function useDynamicBreadcrumbData() {
           newLoadingStates.course = false;
         }
       }
-      
+
       // Check and fetch beneficiary data
       if (idsToFetch.beneficiaryId) {
         const cacheKey = beneficiaryKeys.detail(idsToFetch.beneficiaryId);
         const cachedBeneficiary = queryClient.getQueryData(cacheKey);
-        
+
         if (cachedBeneficiary) {
           newData.beneficiary = cachedBeneficiary;
         } else {
@@ -219,12 +222,12 @@ function useDynamicBreadcrumbData() {
           newLoadingStates.beneficiary = false;
         }
       }
-      
+
       // Check and fetch evaluation data
       if (idsToFetch.evaluationId) {
         const cacheKey = evaluationQueryKeys.detail(idsToFetch.evaluationId, false);
         const cachedEvaluation = queryClient.getQueryData(cacheKey);
-        
+
         if (cachedEvaluation) {
           newData.evaluation = cachedEvaluation;
         } else {
@@ -245,12 +248,12 @@ function useDynamicBreadcrumbData() {
           newLoadingStates.evaluation = false;
         }
       }
-      
+
       // Check and fetch learning path data
       if (idsToFetch.learningPathId) {
         const cacheKey = ['learning-paths', 'detail', idsToFetch.learningPathId] as const;
         const cachedLearningPath = queryClient.getQueryData(cacheKey);
-        
+
         if (cachedLearningPath) {
           newData.learningPath = cachedLearningPath;
         } else {
@@ -260,7 +263,9 @@ function useDynamicBreadcrumbData() {
               queryKey: cacheKey,
               queryFn: async () => {
                 const apiClient = (await import('../api/client')).default;
-                const response = await apiClient.get(`/api/learning-paths/${idsToFetch.learningPathId}`);
+                const response = await apiClient.get(
+                  `/api/learning-paths/${idsToFetch.learningPathId}`
+                );
                 return response.data;
               },
               staleTime: 5 * 60 * 1000,
@@ -272,35 +277,32 @@ function useDynamicBreadcrumbData() {
           newLoadingStates.learningPath = false;
         }
       }
-      
+
       setCachedData(newData);
       setLoadingStates(newLoadingStates);
     };
-    
+
     fetchData();
   }, [idsToFetch, queryClient]);
-  
+
   // Use React Query hooks for real-time updates (these will use cached data if available)
   const { data: programData, isLoading: programLoading } = useProgram(
     idsToFetch.programId || 0,
     false
   );
-  
-  const { data: courseData, isLoading: courseLoading } = useCourse(
-    idsToFetch.courseId || 0,
-    false
-  );
-  
+
+  const { data: courseData, isLoading: courseLoading } = useCourse(idsToFetch.courseId || 0, false);
+
   const { data: beneficiaryData, isLoading: beneficiaryLoading } = useBeneficiary(
     idsToFetch.beneficiaryId || 0,
     !!idsToFetch.beneficiaryId
   );
-  
+
   const { data: evaluationData, isLoading: evaluationLoading } = useEvaluation(
     idsToFetch.evaluationId || 0,
     false
   );
-  
+
   return {
     data: {
       program: programData || cachedData.program,
@@ -321,13 +323,13 @@ function useDynamicBreadcrumbData() {
 
 export function useBreadcrumbs(): Breadcrumb[] {
   const location = useLocation();
-  const matches = useMatches();
+  const params = useParams();
   const { data: dynamicData, loading } = useDynamicBreadcrumbData();
 
   return useMemo(() => {
     const breadcrumbs: Breadcrumb[] = [];
     const pathSegments = location.pathname.split('/').filter(Boolean);
-    
+
     // Always add Dashboard as the first breadcrumb
     breadcrumbs.push({
       label: 'Dashboard',
@@ -337,73 +339,58 @@ export function useBreadcrumbs(): Breadcrumb[] {
 
     // Build breadcrumbs from path segments
     let currentPath = '';
-    
+
     pathSegments.forEach((segment, index) => {
       currentPath += `/${segment}`;
-      
+
       // Skip dashboard since we already added it
       if (currentPath === '/dashboard') {
         return;
       }
 
-      // Find the matching route pattern
-      const match = matches.find(m => {
-        const pattern = m.pathname;
-        const regex = new RegExp(
-          '^' + pattern.replace(/:[^/]+/g, '[^/]+') + '$'
-        );
-        return regex.test(currentPath);
-      });
+      // Get label for this path
+      let label = routeLabels[currentPath] || segment;
+      let isLoading = false;
 
-      if (match) {
-        let label = routeLabels[match.pathname] || segment;
-        let isLoading = false;
-        
-        // Check if this route has a dynamic label generator
-        const dynamicLabelFn = dynamicLabels[match.pathname];
-        if (dynamicLabelFn && match.params) {
-          // Determine which data to use based on the route
-          let data = null;
-          let entityType: string | null = null;
-          
-          if (match.pathname.includes('programs')) {
-            data = dynamicData.program;
-            entityType = 'program';
-          } else if (match.pathname.includes('courses')) {
-            data = dynamicData.course;
-            entityType = 'course';
-          } else if (match.pathname.includes('beneficiaries') || match.pathname.includes('student')) {
-            data = dynamicData.beneficiary;
-            entityType = 'beneficiary';
-          } else if (match.pathname.includes('evaluations')) {
-            data = dynamicData.evaluation;
-            entityType = 'evaluation';
-          } else if (match.pathname.includes('learning-paths')) {
-            data = dynamicData.learningPath;
-            entityType = 'learningPath';
-          }
-          
-          // Check if we're loading this entity type
-          if (entityType && loading[entityType as keyof typeof loading]) {
-            isLoading = true;
-          }
-          
-          label = dynamicLabelFn(match.params, data);
+      // Check for dynamic labels based on current path
+      if (currentPath.includes('/programs/') && params.id) {
+        if (dynamicData.program) {
+          label = dynamicData.program.title || dynamicData.program.name || 'Program';
+        } else if (loading.program) {
+          label = 'Loading...';
+          isLoading = true;
         }
-
-        // Don't add duplicate breadcrumbs
-        const lastBreadcrumb = breadcrumbs[breadcrumbs.length - 1];
-        if (lastBreadcrumb?.path !== currentPath) {
-          breadcrumbs.push({
-            label,
-            path: currentPath,
-            isActive: index === pathSegments.length - 1,
-            isLoading,
-          });
+      } else if (currentPath.includes('/beneficiaries/') && params.id) {
+        if (dynamicData.beneficiary) {
+          label = `${dynamicData.beneficiary.first_name} ${dynamicData.beneficiary.last_name}` || 'Beneficiary';
+        } else if (loading.beneficiary) {
+          label = 'Loading...';
+          isLoading = true;
+        }
+      } else if (currentPath.includes('/evaluations/') && params.id) {
+        if (dynamicData.evaluation) {
+          label = dynamicData.evaluation.title || 'Evaluation';
+        } else if (loading.evaluation) {
+          label = 'Loading...';
+          isLoading = true;
         }
       }
+
+      // Capitalize first letter of segment if no specific label found
+      if (label === segment) {
+        label = segment.charAt(0).toUpperCase() + segment.slice(1);
+      }
+
+      // Add breadcrumb
+      const isActive = index === pathSegments.length - 1;
+      breadcrumbs.push({
+        label,
+        path: currentPath,
+        isActive,
+        isLoading,
+      });
     });
 
     return breadcrumbs;
-  }, [location.pathname, matches, dynamicData, loading]);
+  }, [location.pathname, params, dynamicData, loading]);
 }

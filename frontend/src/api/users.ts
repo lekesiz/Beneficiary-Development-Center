@@ -27,9 +27,9 @@ export const usersApi = {
 
   // Update current user's notification preferences
   updatePreferences: (preferences: NotificationPreferences) => {
-    return apiClient.put<{ 
-      message: string; 
-      preferences: NotificationPreferences 
+    return apiClient.put<{
+      message: string;
+      preferences: NotificationPreferences;
     }>('/users/me/preferences', preferences);
   },
 };

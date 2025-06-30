@@ -2,18 +2,13 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
 
 import { beneficiariesApi } from '@/api/beneficiaries';
-import {
-  BeneficiaryCreate,
-  BeneficiaryUpdate,
-  BeneficiaryListParams,
-} from '@/types/beneficiary';
+import { BeneficiaryCreate, BeneficiaryUpdate, BeneficiaryListParams } from '@/types/beneficiary';
 
 // Query keys
 export const beneficiaryKeys = {
   all: ['beneficiaries'] as const,
   lists: () => [...beneficiaryKeys.all, 'list'] as const,
-  list: (params: BeneficiaryListParams) =>
-    [...beneficiaryKeys.lists(), params] as const,
+  list: (params: BeneficiaryListParams) => [...beneficiaryKeys.lists(), params] as const,
   details: () => [...beneficiaryKeys.all, 'detail'] as const,
   detail: (id: number) => [...beneficiaryKeys.details(), id] as const,
   statistics: () => [...beneficiaryKeys.all, 'statistics'] as const,
@@ -56,14 +51,10 @@ export const useCreateBeneficiary = () => {
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: beneficiaryKeys.lists() });
       queryClient.invalidateQueries({ queryKey: beneficiaryKeys.statistics() });
-      toast.success(
-        response.data.message || 'Beneficiary created successfully'
-      );
+      toast.success(response.data.message || 'Beneficiary created successfully');
     },
     onError: (error: any) => {
-      toast.error(
-        error.response?.data?.error || 'Failed to create beneficiary'
-      );
+      toast.error(error.response?.data?.error || 'Failed to create beneficiary');
     },
   });
 };
@@ -78,14 +69,10 @@ export const useUpdateBeneficiary = () => {
     onSuccess: (response, { id }) => {
       queryClient.invalidateQueries({ queryKey: beneficiaryKeys.lists() });
       queryClient.invalidateQueries({ queryKey: beneficiaryKeys.detail(id) });
-      toast.success(
-        response.data.message || 'Beneficiary updated successfully'
-      );
+      toast.success(response.data.message || 'Beneficiary updated successfully');
     },
     onError: (error: any) => {
-      toast.error(
-        error.response?.data?.error || 'Failed to update beneficiary'
-      );
+      toast.error(error.response?.data?.error || 'Failed to update beneficiary');
     },
   });
 };
@@ -99,14 +86,10 @@ export const useDeleteBeneficiary = () => {
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: beneficiaryKeys.lists() });
       queryClient.invalidateQueries({ queryKey: beneficiaryKeys.statistics() });
-      toast.success(
-        response.data.message || 'Beneficiary deleted successfully'
-      );
+      toast.success(response.data.message || 'Beneficiary deleted successfully');
     },
     onError: (error: any) => {
-      toast.error(
-        error.response?.data?.error || 'Failed to delete beneficiary'
-      );
+      toast.error(error.response?.data?.error || 'Failed to delete beneficiary');
     },
   });
 };
@@ -116,8 +99,7 @@ export const useAddNote = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, note }: { id: number; note: string }) =>
-      beneficiariesApi.addNote(id, note),
+    mutationFn: ({ id, note }: { id: number; note: string }) => beneficiariesApi.addNote(id, note),
     onSuccess: (response, { id }) => {
       queryClient.invalidateQueries({ queryKey: beneficiaryKeys.detail(id) });
       toast.success('Note added successfully');
@@ -133,8 +115,7 @@ export const useAddTag = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, tag }: { id: number; tag: string }) =>
-      beneficiariesApi.addTag(id, tag),
+    mutationFn: ({ id, tag }: { id: number; tag: string }) => beneficiariesApi.addTag(id, tag),
     onSuccess: (response, { id }) => {
       queryClient.invalidateQueries({ queryKey: beneficiaryKeys.detail(id) });
       queryClient.invalidateQueries({ queryKey: beneficiaryKeys.lists() });
@@ -151,8 +132,7 @@ export const useRemoveTag = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, tag }: { id: number; tag: string }) =>
-      beneficiariesApi.removeTag(id, tag),
+    mutationFn: ({ id, tag }: { id: number; tag: string }) => beneficiariesApi.removeTag(id, tag),
     onSuccess: (response, { id }) => {
       queryClient.invalidateQueries({ queryKey: beneficiaryKeys.detail(id) });
       queryClient.invalidateQueries({ queryKey: beneficiaryKeys.lists() });

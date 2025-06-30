@@ -16,14 +16,21 @@ from app.core.decorators import require_tenant, check_role, rate_limit, audit_lo
 from app.extensions import db, cache
 from app.core.logging import logger
 from app.core.exceptions import (
-    NotFoundError, BadRequestError, ForbiddenError,
-    ConflictError, BusinessLogicError, InvalidStateError
+    NotFoundError,
+    BadRequestError,
+    ForbiddenError,
+    ConflictError,
+    BusinessLogicError,
+    InvalidStateError,
 )
 from app.core.error_handlers import ErrorResponse
 from app.schemas.enhanced_program import (
-    ProgramCreateSchema, ProgramUpdateSchema, ProgramQuerySchema,
-    ProgramResponseSchema, ProgramBatchOperationSchema,
-    ProgramStatisticsResponseSchema
+    ProgramCreateSchema,
+    ProgramUpdateSchema,
+    ProgramQuerySchema,
+    ProgramResponseSchema,
+    ProgramBatchOperationSchema,
+    ProgramStatisticsResponseSchema,
 )
 
 bp = Blueprint("enhanced_programs", __name__)
@@ -50,14 +57,14 @@ def get_current_user() -> User:
 def serialize_program(program: Program, include_stats: bool = False) -> Dict[str, Any]:
     """Serialize a program with optional statistics"""
     data = program_response_schema.dump(program.to_dict(include_related=True))
-    
+
     if include_stats:
         # Add real-time statistics
-        data['current_participants'] = program.get_enrollment_count()
-        data['available_seats'] = program.get_available_spots()
-        data['is_enrollment_open'] = program.is_enrollment_open
-        data['progress_percentage'] = program.get_progress_percentage()
-    
+        data["current_participants"] = program.get_enrollment_count()
+        data["available_seats"] = program.get_available_spots()
+        data["is_enrollment_open"] = program.is_enrollment_open
+        data["progress_percentage"] = program.get_progress_percentage()
+
     return data
 
 
@@ -69,7 +76,7 @@ def serialize_program(program: Program, include_stats: bool = False) -> Dict[str
 def list_programs():
     """
     List all programs with advanced filtering, sorting, and pagination
-    
+
     Query Parameters:
     - page: Page number (default: 1)
     - per_page: Items per page (default: 20, max: 100)
@@ -95,46 +102,42 @@ def list_programs():
             filters = program_query_schema.load(request.args)
         except ValidationError as e:
             return jsonify({"error": "Invalid query parameters", "details": e.messages}), 400
-        
+
         # Get tenant and user info
         jwt_payload = get_jwt()
         tenant_id = jwt_payload.get("tenant_id")
         user = get_current_user()
-        
+
         # Extract filters
-        page = filters.get('page', 1)
-        per_page = filters.get('per_page', 20)
-        include_stats = request.args.get('include_stats', 'false').lower() == 'true'
-        
+        page = filters.get("page", 1)
+        per_page = filters.get("per_page", 20)
+        include_stats = request.args.get("include_stats", "false").lower() == "true"
+
         # Check cache for non-filtered results
         cache_key = f"programs:{tenant_id}:{page}:{per_page}:{hash(frozenset(filters.items()))}"
         cached_result = cache.get(cache_key) if not include_stats else None
-        
+
         if cached_result:
             logger.info(f"Returning cached programs for tenant {tenant_id}")
             return jsonify(cached_result), 200
-        
+
         # Get programs from service
         service = ProgramService(db.session)
-        
+
         # Filter out parameters that the service doesn't support
-        supported_params = ['status', 'program_type', 'search', 'upcoming_only', 'active_only', 'sort_by', 'sort_order']
+        supported_params = ["status", "program_type", "search", "upcoming_only", "active_only", "sort_by", "sort_order"]
         service_params = {k: v for k, v in filters.items() if k in supported_params}
-        
+
         programs = service.get_all(
-            tenant_id=tenant_id,
-            user=user,
-            skip=(page - 1) * per_page,
-            limit=per_page,
-            **service_params
+            tenant_id=tenant_id, user=user, skip=(page - 1) * per_page, limit=per_page, **service_params
         )
-        
+
         # Get total count for pagination
         total = service.count(tenant_id=tenant_id, filters=filters)
-        
+
         # Serialize programs
         programs_data = [serialize_program(p, include_stats) for p in programs]
-        
+
         # Build response
         response = {
             "programs": programs_data,
@@ -144,24 +147,22 @@ def list_programs():
                 "total": total,
                 "pages": (total + per_page - 1) // per_page,
                 "has_next": page * per_page < total,
-                "has_prev": page > 1
+                "has_prev": page > 1,
             },
-            "filters_applied": {k: v for k, v in filters.items() if v is not None}
+            "filters_applied": {k: v for k, v in filters.items() if v is not None},
         }
-        
+
         # Cache the result for 5 minutes (if not including stats)
         if not include_stats:
             cache.set(cache_key, response, timeout=300)
-        
+
         logger.info(f"Retrieved {len(programs)} programs for tenant {tenant_id}")
         return jsonify(response), 200
-        
+
     except Exception as e:
         logger.error(f"Error listing programs: {str(e)}")
         error_response, status_code = ErrorResponse.create(
-            error="InternalError",
-            message="Failed to retrieve programs",
-            status_code=500
+            error="InternalError", message="Failed to retrieve programs", status_code=500
         )
         return jsonify(error_response), status_code
 
@@ -173,7 +174,7 @@ def list_programs():
 def get_program(program_id: int):
     """
     Get a specific program by ID
-    
+
     Query Parameters:
     - include_courses: Include course list (default: false)
     - include_stats: Include real-time statistics (default: false)
@@ -183,57 +184,49 @@ def get_program(program_id: int):
         jwt_payload = get_jwt()
         tenant_id = jwt_payload.get("tenant_id")
         user = get_current_user()
-        
+
         # Parse query parameters
-        include_courses = request.args.get('include_courses', 'false').lower() == 'true'
-        include_stats = request.args.get('include_stats', 'false').lower() == 'true'
-        include_enrollments = request.args.get('include_enrollments', 'false').lower() == 'true'
-        
+        include_courses = request.args.get("include_courses", "false").lower() == "true"
+        include_stats = request.args.get("include_stats", "false").lower() == "true"
+        include_enrollments = request.args.get("include_enrollments", "false").lower() == "true"
+
         # Get program
         service = ProgramService(db.session)
         program = service.get_by_id(tenant_id, program_id, user)
-        
+
         # Serialize program
         data = serialize_program(program, include_stats)
-        
+
         # Add optional data
         if include_courses:
-            data['courses'] = [
+            data["courses"] = [
                 {
-                    'id': c.id,
-                    'code': c.code,
-                    'title': c.title,
-                    'status': c.status.value,
-                    'duration_hours': c.duration_hours,
-                    'instructor_name': c.instructor.full_name if c.instructor else None
+                    "id": c.id,
+                    "code": c.code,
+                    "title": c.title,
+                    "status": c.status.value,
+                    "duration_hours": c.duration_hours,
+                    "instructor_name": c.instructor.full_name if c.instructor else None,
                 }
-                for c in program.courses if not c.deleted_at
+                for c in program.courses
+                if not c.deleted_at
             ]
-        
-        if include_enrollments and user.role in ['admin', 'manager']:
-            data['enrollments'] = {
-                'total': len(program.enrollments),
-                'active': len([e for e in program.enrollments if e.status in ['enrolled', 'in_progress']]),
-                'completed': len([e for e in program.enrollments if e.status == 'completed'])
+
+        if include_enrollments and user.role in ["admin", "manager"]:
+            data["enrollments"] = {
+                "total": len(program.enrollments),
+                "active": len([e for e in program.enrollments if e.status in ["enrolled", "in_progress"]]),
+                "completed": len([e for e in program.enrollments if e.status == "completed"]),
             }
-        
+
         logger.info(f"Retrieved program {program_id} for user {user.id}")
         return jsonify(data), 200
-        
+
     except NotFoundError as e:
-        return ErrorResponse.create(
-            error="NotFound",
-            message=str(e),
-            status_code=404,
-            error_code="PROGRAM_NOT_FOUND"
-        )
+        return ErrorResponse.create(error="NotFound", message=str(e), status_code=404, error_code="PROGRAM_NOT_FOUND")
     except Exception as e:
         logger.error(f"Error retrieving program {program_id}: {str(e)}")
-        return ErrorResponse.create(
-            error="InternalError",
-            message="Failed to retrieve program",
-            status_code=500
-        )
+        return ErrorResponse.create(error="InternalError", message="Failed to retrieve program", status_code=500)
 
 
 @bp.route("", methods=["POST"])
@@ -245,64 +238,50 @@ def get_program(program_id: int):
 def create_program():
     """
     Create a new program
-    
+
     Request Body: ProgramCreateSchema
     """
     try:
         jwt_payload = get_jwt()
         tenant_id = jwt_payload.get("tenant_id")
         user = get_current_user()
-        
+
         # Validate request data
         try:
             data = program_create_schema.load(request.json)
         except ValidationError as e:
             return jsonify({"error": "Validation error", "details": e.messages}), 400
-        
+
         # Check for duplicate code
-        existing = db.session.query(Program).filter_by(
-            tenant_id=tenant_id,
-            code=data.get('code'),
-            deleted_at=None
-        ).first()
-        
+        existing = (
+            db.session.query(Program).filter_by(tenant_id=tenant_id, code=data.get("code"), deleted_at=None).first()
+        )
+
         if existing:
             raise ConflictError(f"Program with code '{data.get('code')}' already exists")
-        
+
         # Create program
         service = ProgramService(db.session)
         program = service.create(tenant_id, data, user)
-        
+
         # Return created program
         response_data = serialize_program(program, include_stats=True)
-        
+
         logger.info(f"Created program {program.code} by user {user.id}")
         return jsonify(response_data), 201
-        
+
     except ValidationError as e:
         return jsonify({"error": "Validation error", "details": e.messages}), 400
     except ConflictError as e:
-        return ErrorResponse.create(
-            error="Conflict",
-            message=str(e),
-            status_code=409,
-            error_code="DUPLICATE_PROGRAM"
-        )
+        return ErrorResponse.create(error="Conflict", message=str(e), status_code=409, error_code="DUPLICATE_PROGRAM")
     except BusinessLogicError as e:
         return ErrorResponse.create(
-            error="BusinessLogicError",
-            message=str(e),
-            status_code=400,
-            error_code="BUSINESS_RULE_VIOLATION"
+            error="BusinessLogicError", message=str(e), status_code=400, error_code="BUSINESS_RULE_VIOLATION"
         )
     except Exception as e:
         logger.error(f"Error creating program: {str(e)}")
         db.session.rollback()
-        return ErrorResponse.create(
-            error="InternalError",
-            message="Failed to create program",
-            status_code=500
-        )
+        return ErrorResponse.create(error="InternalError", message="Failed to create program", status_code=500)
 
 
 @bp.route("/<int:program_id>", methods=["PUT", "PATCH"])
@@ -314,73 +293,57 @@ def create_program():
 def update_program(program_id: int):
     """
     Update a program (PUT for full update, PATCH for partial update)
-    
+
     Request Body: ProgramUpdateSchema
     """
     try:
         jwt_payload = get_jwt()
         tenant_id = jwt_payload.get("tenant_id")
         user = get_current_user()
-        
+
         # Determine if partial update
-        partial = request.method == 'PATCH'
-        
+        partial = request.method == "PATCH"
+
         # Validate request data
         try:
             data = program_update_schema.load(request.json, partial=partial)
         except ValidationError as e:
             return jsonify({"error": "Validation error", "details": e.messages}), 400
-        
+
         # Check if trying to update code to existing one
-        if 'code' in data:
-            existing = db.session.query(Program).filter_by(
-                tenant_id=tenant_id,
-                code=data['code'],
-                deleted_at=None
-            ).filter(Program.id != program_id).first()
-            
+        if "code" in data:
+            existing = (
+                db.session.query(Program)
+                .filter_by(tenant_id=tenant_id, code=data["code"], deleted_at=None)
+                .filter(Program.id != program_id)
+                .first()
+            )
+
             if existing:
                 raise ConflictError(f"Program with code '{data['code']}' already exists")
-        
+
         # Update program
         service = ProgramService(db.session)
         program = service.update(tenant_id, program_id, data, user)
-        
+
         # Return updated program
         response_data = serialize_program(program, include_stats=True)
-        
+
         logger.info(f"Updated program {program_id} by user {user.id}")
         return jsonify(response_data), 200
-        
+
     except NotFoundError as e:
-        return ErrorResponse.create(
-            error="NotFound",
-            message=str(e),
-            status_code=404,
-            error_code="PROGRAM_NOT_FOUND"
-        )
+        return ErrorResponse.create(error="NotFound", message=str(e), status_code=404, error_code="PROGRAM_NOT_FOUND")
     except ConflictError as e:
-        return ErrorResponse.create(
-            error="Conflict",
-            message=str(e),
-            status_code=409,
-            error_code="DUPLICATE_PROGRAM"
-        )
+        return ErrorResponse.create(error="Conflict", message=str(e), status_code=409, error_code="DUPLICATE_PROGRAM")
     except InvalidStateError as e:
         return ErrorResponse.create(
-            error="InvalidState",
-            message=str(e),
-            status_code=400,
-            error_code="INVALID_PROGRAM_STATE"
+            error="InvalidState", message=str(e), status_code=400, error_code="INVALID_PROGRAM_STATE"
         )
     except Exception as e:
         logger.error(f"Error updating program {program_id}: {str(e)}")
         db.session.rollback()
-        return ErrorResponse.create(
-            error="InternalError",
-            message="Failed to update program",
-            status_code=500
-        )
+        return ErrorResponse.create(error="InternalError", message="Failed to update program", status_code=500)
 
 
 @bp.route("/<int:program_id>", methods=["DELETE"])
@@ -392,7 +355,7 @@ def update_program(program_id: int):
 def delete_program(program_id: int):
     """
     Delete a program (soft delete)
-    
+
     Query Parameters:
     - force: Force delete even with active enrollments (admin only)
     """
@@ -400,56 +363,44 @@ def delete_program(program_id: int):
         jwt_payload = get_jwt()
         tenant_id = jwt_payload.get("tenant_id")
         user = get_current_user()
-        
-        force_delete = request.args.get('force', 'false').lower() == 'true'
-        
+
+        force_delete = request.args.get("force", "false").lower() == "true"
+
         # Only super admins can force delete
-        if force_delete and user.role != 'admin':
+        if force_delete and user.role != "admin":
             raise ForbiddenError("Only administrators can force delete programs")
-        
+
         # Delete program
         service = ProgramService(db.session)
-        
+
         # Check if program has active enrollments
         program = service.get_by_id(tenant_id, program_id, user)
-        active_enrollments = [e for e in program.enrollments if e.status in ['enrolled', 'in_progress']]
-        
+        active_enrollments = [e for e in program.enrollments if e.status in ["enrolled", "in_progress"]]
+
         if active_enrollments and not force_delete:
             return ErrorResponse.create(
                 error="Conflict",
                 message=f"Cannot delete program with {len(active_enrollments)} active enrollments",
                 status_code=409,
                 error_code="ACTIVE_ENROLLMENTS_EXIST",
-                details={"active_enrollments": len(active_enrollments)}
+                details={"active_enrollments": len(active_enrollments)},
             )
-        
+
         service.delete(tenant_id, program_id, user)
-        
+
         logger.info(f"Deleted program {program_id} by user {user.id}")
-        return '', 204
-        
+        return "", 204
+
     except NotFoundError as e:
-        return ErrorResponse.create(
-            error="NotFound",
-            message=str(e),
-            status_code=404,
-            error_code="PROGRAM_NOT_FOUND"
-        )
+        return ErrorResponse.create(error="NotFound", message=str(e), status_code=404, error_code="PROGRAM_NOT_FOUND")
     except ForbiddenError as e:
         return ErrorResponse.create(
-            error="Forbidden",
-            message=str(e),
-            status_code=403,
-            error_code="INSUFFICIENT_PERMISSIONS"
+            error="Forbidden", message=str(e), status_code=403, error_code="INSUFFICIENT_PERMISSIONS"
         )
     except Exception as e:
         logger.error(f"Error deleting program {program_id}: {str(e)}")
         db.session.rollback()
-        return ErrorResponse.create(
-            error="InternalError",
-            message="Failed to delete program",
-            status_code=500
-        )
+        return ErrorResponse.create(error="InternalError", message="Failed to delete program", status_code=500)
 
 
 # Additional endpoints
@@ -462,7 +413,7 @@ def delete_program(program_id: int):
 def update_program_status(program_id: int):
     """
     Update program status with validation
-    
+
     Request Body:
     {
         "status": "draft|published|active|completed|archived",
@@ -473,50 +424,38 @@ def update_program_status(program_id: int):
         jwt_payload = get_jwt()
         tenant_id = jwt_payload.get("tenant_id")
         user = get_current_user()
-        
+
         # Get request data
         data = request.json
-        if not data or 'status' not in data:
+        if not data or "status" not in data:
             raise BadRequestError("Status is required")
-        
+
         try:
-            new_status = ProgramStatus(data['status'])
+            new_status = ProgramStatus(data["status"])
         except ValueError:
             raise BadRequestError(f"Invalid status: {data['status']}")
-        
-        reason = data.get('reason')
-        
+
+        reason = data.get("reason")
+
         # Update status
         service = ProgramService(db.session)
         program = service.update_status(tenant_id, program_id, new_status, user)
-        
+
         # Log status change
         logger.info(f"Updated program {program_id} status to {new_status.value} by user {user.id}. Reason: {reason}")
-        
+
         return jsonify(serialize_program(program, include_stats=True)), 200
-        
+
     except NotFoundError as e:
-        return ErrorResponse.create(
-            error="NotFound",
-            message=str(e),
-            status_code=404,
-            error_code="PROGRAM_NOT_FOUND"
-        )
+        return ErrorResponse.create(error="NotFound", message=str(e), status_code=404, error_code="PROGRAM_NOT_FOUND")
     except InvalidStateError as e:
         return ErrorResponse.create(
-            error="InvalidState",
-            message=str(e),
-            status_code=400,
-            error_code="INVALID_STATUS_TRANSITION"
+            error="InvalidState", message=str(e), status_code=400, error_code="INVALID_STATUS_TRANSITION"
         )
     except Exception as e:
         logger.error(f"Error updating program status: {str(e)}")
         db.session.rollback()
-        return ErrorResponse.create(
-            error="InternalError",
-            message="Failed to update program status",
-            status_code=500
-        )
+        return ErrorResponse.create(error="InternalError", message="Failed to update program status", status_code=500)
 
 
 @bp.route("/batch", methods=["POST"])
@@ -528,81 +467,74 @@ def update_program_status(program_id: int):
 def batch_program_operation():
     """
     Perform batch operations on multiple programs
-    
+
     Request Body: ProgramBatchOperationSchema
     """
     try:
         jwt_payload = get_jwt()
         tenant_id = jwt_payload.get("tenant_id")
         user = get_current_user()
-        
+
         # Validate request
         try:
             data = program_batch_schema.load(request.json)
         except ValidationError as e:
             return jsonify({"error": "Validation error", "details": e.messages}), 400
-        
-        if not data['confirm']:
+
+        if not data["confirm"]:
             raise BadRequestError("Confirmation is required for batch operations")
-        
-        program_ids = data['program_ids']
-        operation = data['operation']
-        reason = data.get('reason')
-        
+
+        program_ids = data["program_ids"]
+        operation = data["operation"]
+        reason = data.get("reason")
+
         # Perform batch operation
         service = ProgramService(db.session)
-        results = {
-            'success': [],
-            'failed': []
-        }
-        
+        results = {"success": [], "failed": []}
+
         for program_id in program_ids:
             try:
-                if operation == 'archive':
+                if operation == "archive":
                     service.update_status(tenant_id, program_id, ProgramStatus.ARCHIVED, user)
-                elif operation == 'delete':
+                elif operation == "delete":
                     service.delete(tenant_id, program_id, user)
-                elif operation == 'publish':
+                elif operation == "publish":
                     service.update_status(tenant_id, program_id, ProgramStatus.PUBLISHED, user)
-                elif operation == 'activate':
+                elif operation == "activate":
                     service.update_status(tenant_id, program_id, ProgramStatus.ACTIVE, user)
-                
-                results['success'].append(program_id)
-                
+
+                results["success"].append(program_id)
+
             except Exception as e:
-                results['failed'].append({
-                    'program_id': program_id,
-                    'error': str(e)
-                })
-        
+                results["failed"].append({"program_id": program_id, "error": str(e)})
+
         # Commit all changes
         db.session.commit()
-        
-        logger.info(f"Batch operation '{operation}' on {len(program_ids)} programs by user {user.id}. "
-                   f"Success: {len(results['success'])}, Failed: {len(results['failed'])}")
-        
-        return jsonify({
-            'operation': operation,
-            'total': len(program_ids),
-            'success_count': len(results['success']),
-            'failed_count': len(results['failed']),
-            'results': results
-        }), 200
-        
-    except BadRequestError as e:
-        return ErrorResponse.create(
-            error="BadRequest",
-            message=str(e),
-            status_code=400
+
+        logger.info(
+            f"Batch operation '{operation}' on {len(program_ids)} programs by user {user.id}. "
+            f"Success: {len(results['success'])}, Failed: {len(results['failed'])}"
         )
+
+        return (
+            jsonify(
+                {
+                    "operation": operation,
+                    "total": len(program_ids),
+                    "success_count": len(results["success"]),
+                    "failed_count": len(results["failed"]),
+                    "results": results,
+                }
+            ),
+            200,
+        )
+
+    except BadRequestError as e:
+        return ErrorResponse.create(error="BadRequest", message=str(e), status_code=400)
     except Exception as e:
         logger.error(f"Error in batch operation: {str(e)}")
         db.session.rollback()
-        return ErrorResponse.create(
-            error="InternalError",
-            message="Failed to perform batch operation",
-            status_code=500
-        )
+        return ErrorResponse.create(error="InternalError", message="Failed to perform batch operation", status_code=500)
 
 
 @bp.route("/statistics", methods=["GET"])
@@ -613,7 +545,7 @@ def batch_program_operation():
 def get_program_statistics():
     """
     Get comprehensive program statistics
-    
+
     Query Parameters:
     - start_date: Start date for statistics
     - end_date: End date for statistics
@@ -623,34 +555,26 @@ def get_program_statistics():
         jwt_payload = get_jwt()
         tenant_id = jwt_payload.get("tenant_id")
         user = get_current_user()
-        
+
         # Parse query parameters
-        start_date = request.args.get('start_date')
-        end_date = request.args.get('end_date')
-        group_by = request.args.get('group_by', 'month')
-        
+        start_date = request.args.get("start_date")
+        end_date = request.args.get("end_date")
+        group_by = request.args.get("group_by", "month")
+
         # Get statistics
         service = ProgramService(db.session)
         stats = service.get_statistics(
-            tenant_id=tenant_id,
-            user=user,
-            start_date=start_date,
-            end_date=end_date,
-            group_by=group_by
+            tenant_id=tenant_id, user=user, start_date=start_date, end_date=end_date, group_by=group_by
         )
-        
+
         # Add additional computed statistics
-        stats['generated_at'] = datetime.utcnow()
-        
+        stats["generated_at"] = datetime.utcnow()
+
         return jsonify(program_stats_schema.dump(stats)), 200
-        
+
     except Exception as e:
         logger.error(f"Error fetching program statistics: {str(e)}")
-        return ErrorResponse.create(
-            error="InternalError",
-            message="Failed to fetch statistics",
-            status_code=500
-        )
+        return ErrorResponse.create(error="InternalError", message="Failed to fetch statistics", status_code=500)
 
 
 @bp.route("/search", methods=["POST"])
@@ -660,7 +584,7 @@ def get_program_statistics():
 def search_programs():
     """
     Advanced search endpoint with full-text search capabilities
-    
+
     Request Body:
     {
         "query": "search terms",
@@ -673,33 +597,24 @@ def search_programs():
         jwt_payload = get_jwt()
         tenant_id = jwt_payload.get("tenant_id")
         user = get_current_user()
-        
+
         data = request.json or {}
-        query = data.get('query', '')
-        filters = data.get('filters', {})
-        facets = data.get('facets', [])
-        highlight = data.get('highlight', False)
-        
+        query = data.get("query", "")
+        filters = data.get("filters", {})
+        facets = data.get("facets", [])
+        highlight = data.get("highlight", False)
+
         # Perform search
         service = ProgramService(db.session)
         results = service.search(
-            tenant_id=tenant_id,
-            user=user,
-            query=query,
-            filters=filters,
-            facets=facets,
-            highlight=highlight
+            tenant_id=tenant_id, user=user, query=query, filters=filters, facets=facets, highlight=highlight
         )
-        
+
         return jsonify(results), 200
-        
+
     except Exception as e:
         logger.error(f"Error searching programs: {str(e)}")
-        return ErrorResponse.create(
-            error="InternalError",
-            message="Failed to search programs",
-            status_code=500
-        )
+        return ErrorResponse.create(error="InternalError", message="Failed to search programs", status_code=500)
 
 
 @bp.route("/export", methods=["GET"])
@@ -710,7 +625,7 @@ def search_programs():
 def export_programs():
     """
     Export programs data in various formats
-    
+
     Query Parameters:
     - format: Export format (csv|excel|json)
     - fields: Comma-separated list of fields to export
@@ -720,53 +635,55 @@ def export_programs():
         jwt_payload = get_jwt()
         tenant_id = jwt_payload.get("tenant_id")
         user = get_current_user()
-        
-        export_format = request.args.get('format', 'csv')
-        fields = request.args.get('fields', '').split(',') if request.args.get('fields') else None
-        
+
+        export_format = request.args.get("format", "csv")
+        fields = request.args.get("fields", "").split(",") if request.args.get("fields") else None
+
         # Apply filters
         filters = program_query_schema.load(request.args)
-        
+
         # Generate export
         service = ProgramService(db.session)
         export_data = service.export(
-            tenant_id=tenant_id,
-            user=user,
-            format=export_format,
-            fields=fields,
-            filters=filters
+            tenant_id=tenant_id, user=user, format=export_format, fields=fields, filters=filters
         )
-        
+
         # Return appropriate response based on format
-        if export_format == 'json':
+        if export_format == "json":
             return jsonify(export_data), 200
         else:
             # For CSV/Excel, return file response
             from flask import Response
+
             return Response(
                 export_data,
-                mimetype='text/csv' if export_format == 'csv' else 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                mimetype=(
+                    "text/csv"
+                    if export_format == "csv"
+                    else "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                ),
                 headers={
-                    'Content-Disposition': f'attachment; filename=programs_export_{datetime.utcnow().strftime("%Y%m%d_%H%M%S")}.{export_format}'
-                }
+                    "Content-Disposition": f'attachment; filename=programs_export_{datetime.utcnow().strftime("%Y%m%d_%H%M%S")}.{export_format}'
+                },
             )
-            
+
     except Exception as e:
         logger.error(f"Error exporting programs: {str(e)}")
-        return ErrorResponse.create(
-            error="InternalError",
-            message="Failed to export programs",
-            status_code=500
-        )
+        return ErrorResponse.create(error="InternalError", message="Failed to export programs", status_code=500)
 
 
 # Health check endpoint
 @bp.route("/health", methods=["GET"])
 def health_check():
     """API health check endpoint"""
-    return jsonify({
-        "status": "healthy",
-        "service": "programs-api",
-        "version": "1.0.0",
-        "timestamp": datetime.utcnow().isoformat()
-    }), 200
+    return (
+        jsonify(
+            {
+                "status": "healthy",
+                "service": "programs-api",
+                "version": "1.0.0",
+                "timestamp": datetime.utcnow().isoformat(),
+            }
+        ),
+        200,
+    )

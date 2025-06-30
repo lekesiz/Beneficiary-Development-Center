@@ -9,7 +9,8 @@ const meta = {
     layout: 'padded',
     docs: {
       description: {
-        component: 'A skeleton loader for forms that displays placeholder content while form data is loading.',
+        component:
+          'A skeleton loader for forms that displays placeholder content while form data is loading.',
       },
     },
   },
@@ -79,7 +80,8 @@ export const ProfileForm: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Example configuration for a user profile form with personal information and settings sections.',
+        story:
+          'Example configuration for a user profile form with personal information and settings sections.',
       },
     },
   },
@@ -95,7 +97,8 @@ export const RegistrationForm: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Example configuration for a multi-step registration form with account details, personal info, and preferences.',
+        story:
+          'Example configuration for a multi-step registration form with account details, personal info, and preferences.',
       },
     },
   },
@@ -111,7 +114,8 @@ export const SettingsForm: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Example configuration for an application settings form with multiple configuration sections.',
+        story:
+          'Example configuration for an application settings form with multiple configuration sections.',
       },
     },
   },

@@ -9,14 +9,28 @@ from app.core.socketio import init_socketio as setup_socketio
 from app.core.security import init_security_middleware
 from app.core.monitoring import init_monitoring
 from app.core.logging_config import security_logger, performance_logger, business_logger
-import sentry_sdk
-from sentry_sdk.integrations.flask import FlaskIntegration
 from config.config import get_config
+
+# Optional Sentry import
+try:
+    import sentry_sdk
+    from sentry_sdk.integrations.flask import FlaskIntegration
+    HAS_SENTRY = True
+except ImportError:
+    HAS_SENTRY = False
 
 
 def create_app(config_name=None):
     """Create Flask application."""
-    app = Flask(__name__)
+    import tempfile
+    
+    # Create app with custom instance path for App Engine
+    if os.environ.get('GAE_ENV', '').startswith('standard'):
+        instance_path = tempfile.gettempdir()
+    else:
+        instance_path = None
+        
+    app = Flask(__name__, instance_path=instance_path)
 
     # Load configuration
     config = get_config(config_name)
@@ -31,7 +45,7 @@ def create_app(config_name=None):
             app.logger.warning(f"Failed to initialize secrets: {str(e)}")
 
     # Initialize Sentry for error tracking
-    if app.config.get("SENTRY_DSN"):
+    if HAS_SENTRY and app.config.get("SENTRY_DSN"):
         sentry_sdk.init(
             dsn=app.config["SENTRY_DSN"],
             integrations=[FlaskIntegration()],
@@ -104,8 +118,12 @@ def create_app(config_name=None):
     # Register CLI commands
     register_cli_commands(app)
 
-    # Create upload folder
-    os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
+    # Create upload folder (skip in App Engine)
+    if not os.environ.get('GAE_ENV', '').startswith('standard'):
+        try:
+            os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
+        except OSError:
+            pass
     
     # Import all models to ensure they are registered with SQLAlchemy
     # This is important for migrations to detect all models
@@ -183,10 +201,12 @@ def register_blueprints(app):
     app.register_blueprint(learning_advanced_bp)  # /api/v1/learning
     app.register_blueprint(bilan_dashboard_bp)    # /api/v1/bilan
 
-    # Initialize Swagger documentation
-    from app.core.swagger import init_swagger
-
-    init_swagger(app)
+    # Initialize Swagger documentation (optional)
+    try:
+        from app.core.swagger import init_swagger
+        init_swagger(app)
+    except ImportError:
+        app.logger.warning("Swagger dependencies not available, API documentation disabled")
 
 
 def register_error_handlers(app):

@@ -145,7 +145,7 @@ class User(TenantBaseModel):
     api_key_created_at = Column(DateTime)
 
     # Relationships
-    tenant = relationship("Tenant", foreign_keys="User.tenant_id")
+    tenant = relationship("Tenant", foreign_keys="User.tenant_id", back_populates="users")
     roles = relationship(
         "Role",
         secondary=user_roles,
@@ -168,7 +168,7 @@ class User(TenantBaseModel):
     approved_learning_path_updates = relationship(
         "LearningPathUpdate", foreign_keys="LearningPathUpdate.approved_by_user_id", back_populates="approved_by"
     )
-    instructed_sessions = relationship("CourseSession", back_populates="instructor")
+    instructed_sessions = relationship("CourseSession", foreign_keys="CourseSession.instructor_id", back_populates="instructor")
     created_enrollments = relationship("Enrollment", foreign_keys="Enrollment.created_by", back_populates="creator")
     created_evaluations = relationship("Evaluation", foreign_keys="Evaluation.created_by", back_populates="creator")
     learning_paths = relationship("LearningPath", foreign_keys="LearningPath.user_id", back_populates="user")
@@ -177,7 +177,7 @@ class User(TenantBaseModel):
     milestone_progress = relationship("MilestoneProgress", back_populates="user")
     # notifications = relationship('Notification', back_populates='user')
     # activity_logs = relationship('ActivityLog', back_populates='user')
-    
+
     # Chat relationships - defined in chat.py using backref
     # conversations_as_user1 = relationship defined via backref in Conversation
     # conversations_as_user2 = relationship defined via backref in Conversation

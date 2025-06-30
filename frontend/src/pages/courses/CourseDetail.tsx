@@ -33,11 +33,7 @@ import { Button } from '../../components/ui/Form';
 import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
 import { ConfirmDialog } from '../../components/ui/Modal';
 import { useAuth } from '../../contexts/AuthContext';
-import {
-  useCourse,
-  useDeleteCourse,
-  useUpdateCourseStatus,
-} from '../../hooks/useCourses';
+import { useCourse, useDeleteCourse, useUpdateCourseStatus } from '../../hooks/useCourses';
 import type { CourseSession } from '../../types/course';
 import {
   getCourseStatusInfo,
@@ -61,8 +57,7 @@ export const CourseDetail: React.FC = () => {
   // Permission checks
   const canEdit = (course: any) => {
     if (user?.role === 'admin' || user?.role === 'manager') return true;
-    if (user?.role === 'instructor' && course?.instructor_id === user.id)
-      return true;
+    if (user?.role === 'instructor' && course?.instructor_id === user.id) return true;
     return false;
   };
   const canDelete = user?.role === 'admin';
@@ -95,9 +90,7 @@ export const CourseDetail: React.FC = () => {
         <div className="flex flex-col">
           <span className="font-medium">{row.original.title}</span>
           {row.original.description && (
-            <span className="text-sm text-gray-500">
-              {row.original.description}
-            </span>
+            <span className="text-sm text-gray-500">{row.original.description}</span>
           )}
         </div>
       ),
@@ -107,9 +100,7 @@ export const CourseDetail: React.FC = () => {
       header: 'Date',
       cell: ({ row }) => (
         <div className="flex flex-col">
-          <span>
-            {new Date(row.original.session_date).toLocaleDateString('tr-TR')}
-          </span>
+          <span>{new Date(row.original.session_date).toLocaleDateString('tr-TR')}</span>
           <span className="text-sm text-gray-500">
             {new Date(row.original.session_date).toLocaleTimeString('tr-TR', {
               hour: '2-digit',
@@ -188,9 +179,7 @@ export const CourseDetail: React.FC = () => {
   if (error || !course) {
     return (
       <Card className="p-6">
-        <div className="text-center text-red-600">
-          Course not found or error loading.
-        </div>
+        <div className="text-center text-red-600">Course not found or error loading.</div>
       </Card>
     );
   }
@@ -204,11 +193,7 @@ export const CourseDetail: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate('/courses')}
-          >
+          <Button variant="ghost" size="sm" onClick={() => navigate('/courses')}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Courses
           </Button>
@@ -232,10 +217,7 @@ export const CourseDetail: React.FC = () => {
         </div>
         <div className="flex items-center space-x-2">
           {canEdit(course) && (
-            <Button
-              variant="outline"
-              onClick={() => navigate(`/courses/${course.id}/edit`)}
-            >
+            <Button variant="outline" onClick={() => navigate(`/courses/${course.id}/edit`)}>
               <Edit className="h-4 w-4 mr-2" />
               Edit
             </Button>
@@ -273,12 +255,9 @@ export const CourseDetail: React.FC = () => {
               <Users className="h-5 w-5 text-blue-600" />
             </div>
             <div>
-              <div className="text-2xl font-bold">
-                {course.participant_count || 0}
-              </div>
+              <div className="text-2xl font-bold">{course.participant_count || 0}</div>
               <div className="text-sm text-gray-600">
-                {course.max_participants ? `/ ${course.max_participants}` : ''}{' '}
-                Participants
+                {course.max_participants ? `/ ${course.max_participants}` : ''} Participants
               </div>
               <div className="text-xs text-gray-500">
                 {course.available_spots || 0} spots available
@@ -296,9 +275,7 @@ export const CourseDetail: React.FC = () => {
               <div className="text-2xl font-bold">{course.duration_hours}</div>
               <div className="text-sm text-gray-600">Hours</div>
               {course.duration_weeks && (
-                <div className="text-xs text-gray-500">
-                  {course.duration_weeks} weeks
-                </div>
+                <div className="text-xs text-gray-500">{course.duration_weeks} weeks</div>
               )}
             </div>
           </div>
@@ -310,9 +287,7 @@ export const CourseDetail: React.FC = () => {
               <BookOpen className="h-5 w-5 text-purple-600" />
             </div>
             <div>
-              <div className="text-2xl font-bold">
-                {course.session_count || 0}
-              </div>
+              <div className="text-2xl font-bold">{course.session_count || 0}</div>
               <div className="text-sm text-gray-600">Sessions</div>
             </div>
           </div>
@@ -324,9 +299,7 @@ export const CourseDetail: React.FC = () => {
               <Target className="h-5 w-5 text-yellow-600" />
             </div>
             <div>
-              <div className="text-2xl font-bold">
-                {Math.round(course.completion_rate || 0)}%
-              </div>
+              <div className="text-2xl font-bold">{Math.round(course.completion_rate || 0)}%</div>
               <div className="text-sm text-gray-600">Completion</div>
               {course.average_score && (
                 <div className="text-xs text-gray-500">
@@ -416,9 +389,7 @@ export const CourseDetail: React.FC = () => {
                 <BookOpen className="h-4 w-4 text-gray-400" />
                 <div>
                   <div className="text-sm font-medium">Order</div>
-                  <div className="text-sm text-gray-600">
-                    #{course.order_index}
-                  </div>
+                  <div className="text-sm text-gray-600">#{course.order_index}</div>
                 </div>
               </div>
 
@@ -427,9 +398,7 @@ export const CourseDetail: React.FC = () => {
                   <User className="h-4 w-4 text-gray-400" />
                   <div>
                     <div className="text-sm font-medium">Instructor</div>
-                    <div className="text-sm text-gray-600">
-                      {course.instructor_name}
-                    </div>
+                    <div className="text-sm text-gray-600">{course.instructor_name}</div>
                   </div>
                 </div>
               )}
@@ -441,8 +410,7 @@ export const CourseDetail: React.FC = () => {
                     <div className="text-sm font-medium">Assessment</div>
                     <div className="text-sm text-gray-600">
                       {course.assessment_type || 'Yes'}
-                      {course.passing_score &&
-                        ` (Min: ${course.passing_score})`}
+                      {course.passing_score && ` (Min: ${course.passing_score})`}
                     </div>
                   </div>
                 </div>
@@ -536,10 +504,7 @@ export const CourseDetail: React.FC = () => {
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold">Course Sessions</h3>
             {canEdit(course) && (
-              <Button
-                onClick={() => navigate(`/courses/${course.id}/sessions/new`)}
-                size="sm"
-              >
+              <Button onClick={() => navigate(`/courses/${course.id}/sessions/new`)} size="sm">
                 <Plus className="h-4 w-4 mr-2" />
                 Oturum Ekle
               </Button>

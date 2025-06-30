@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Auth Test</title>
+</head>
+<body>
+    <h1>Authentication Test</h1>
+    <button onclick="testLogin()">Test Login</button>
+    <button onclick="checkAuth()">Check Auth Status</button>
+    <button onclick="clearStorage()">Clear Storage</button>
+    <pre id="output"></pre>
+
+    <script>
+        const API_URL = 'http://localhost:5001/api/v1';
+        
+        async function testLogin() {
+            try {
+                const response = await fetch(`${API_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: 'admin@bdc.local',
+                        password: 'admin123',
+                        tenant_id: 1
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    localStorage.setItem('access_token', data.access_token);
+                    localStorage.setItem('refresh_token', data.refresh_token);
+                    localStorage.setItem('tenant_id', '1');
+                    
+                    document.getElementById('output').textContent = 
+                        'Login successful!\n\n' +
+                        'User: ' + data.user.email + '\n' +
+                        'Role: ' + data.user.primary_role + '\n' +
+                        'Token stored: ' + (data.access_token ? 'Yes' : 'No');
+                } else {
+                    document.getElementById('output').textContent = 'Login failed: ' + data.message;
+                }
+            } catch (error) {
+                document.getElementById('output').textContent = 'Error: ' + error.message;
+            }
+        }
+        
+        async function checkAuth() {
+            const token = localStorage.getItem('access_token');
+            
+            if (!token) {
+                document.getElementById('output').textContent = 'No token found';
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/auth/me`, {
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'X-Tenant-ID': '1'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('output').textContent = 
+                        'Auth check successful!\n\n' +
+                        'User: ' + data.user.email + '\n' +
+                        'Authenticated: Yes';
+                } else {
+                    document.getElementById('output').textContent = 
+                        'Auth check failed: ' + data.message + '\n' +
+                        'Status: ' + response.status;
+                }
+            } catch (error) {
+                document.getElementById('output').textContent = 'Error: ' + error.message;
+            }
+        }
+        
+        function clearStorage() {
+            localStorage.clear();
+            document.getElementById('output').textContent = 'Storage cleared';
+        }
+    </script>
+</body>
+</html>

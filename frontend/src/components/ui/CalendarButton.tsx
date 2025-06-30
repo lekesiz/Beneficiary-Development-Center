@@ -12,7 +12,6 @@ import { downloadSessionCalendar, openInCalendar } from '../../utils/calendar';
 
 import { Button } from './Form';
 
-
 interface CalendarButtonProps {
   session: CourseSession;
   courseTitle: string;
@@ -100,35 +99,31 @@ export const CalendarButton: React.FC<CalendarButtonProps> = ({
               <Download className="h-4 w-4" />
               .ics Dosyası İndir
             </button>
-            
+
             <div className="border-t border-gray-100 my-1" />
-            
+
             <button
               onClick={() => handleOpenInCalendar('google')}
               className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
               role="menuitem"
             >
-              <img 
-                src="https://www.google.com/favicon.ico" 
-                alt="Google Calendar" 
+              <img
+                src="https://www.google.com/favicon.ico"
+                alt="Google Calendar"
                 className="h-4 w-4"
               />
               Google Calendar
             </button>
-            
+
             <button
               onClick={() => handleOpenInCalendar('outlook')}
               className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
               role="menuitem"
             >
-              <img 
-                src="https://outlook.live.com/favicon.ico" 
-                alt="Outlook" 
-                className="h-4 w-4"
-              />
+              <img src="https://outlook.live.com/favicon.ico" alt="Outlook" className="h-4 w-4" />
               Outlook
             </button>
-            
+
             <button
               onClick={() => handleOpenInCalendar('apple')}
               className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"

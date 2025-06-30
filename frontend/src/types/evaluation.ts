@@ -12,11 +12,7 @@ export type QuestionType =
   | 'ordering'
   | 'fill_in_blank';
 export type EvaluationDifficultyLevel = 'easy' | 'medium' | 'hard';
-export type AttemptStatus =
-  | 'in_progress'
-  | 'completed'
-  | 'abandoned'
-  | 'timed_out';
+export type AttemptStatus = 'in_progress' | 'completed' | 'abandoned' | 'timed_out';
 
 export interface Evaluation {
   id: number;
@@ -169,7 +165,7 @@ export interface CreateQuestionRequest {
   tags?: string[];
 }
 
-export type UpdateQuestionRequest = Partial<CreateQuestionRequest>
+export type UpdateQuestionRequest = Partial<CreateQuestionRequest>;
 
 export interface SaveResponseRequest {
   question_id: number;

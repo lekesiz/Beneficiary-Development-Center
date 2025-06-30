@@ -1,7 +1,7 @@
 """API v1 blueprint initialization."""
 
 from flask import Blueprint
-from app.api.v1 import auth, beneficiaries, evaluations, learning_paths, reports, dashboard, chat, users
+from app.api.v1 import auth, beneficiaries, evaluations, learning_paths, reports, dashboard, chat, users, files, admin, coach_notes, analytics, notifications
 
 # Create main API v1 blueprint
 api_v1_bp = Blueprint("api_v1", __name__)
@@ -15,6 +15,11 @@ api_v1_bp.register_blueprint(learning_paths.learning_paths_bp)
 api_v1_bp.register_blueprint(reports.reports_bp)
 api_v1_bp.register_blueprint(dashboard.dashboard_bp)
 api_v1_bp.register_blueprint(chat.bp)
+api_v1_bp.register_blueprint(files.files_bp)
+api_v1_bp.register_blueprint(admin.admin_bp)
+api_v1_bp.register_blueprint(coach_notes.coach_notes_bp)
+api_v1_bp.register_blueprint(analytics.analytics_bp)
+api_v1_bp.register_blueprint(notifications.notifications_bp)
 
 # API metadata
 API_VERSION = "1.0.0"
@@ -35,5 +40,10 @@ def api_info():
             "evaluations": "/api/v1/evaluations",
             "ai": "/api/v1/ai",
             "chat": "/api/v1/chat",
+            "files": "/api/v1/files",
+            "admin": "/api/v1/admin",
+            "coach_notes": "/api/v1/coach-notes",
+            "analytics": "/api/v1/analytics",
+            "notifications": "/api/v1/notifications",
         },
     }

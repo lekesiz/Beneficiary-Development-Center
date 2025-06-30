@@ -3,10 +3,7 @@ import { renderHook, waitFor } from '@testing-library/react';
 import { rest } from 'msw';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-import {
-  mockBeneficiary,
-  mockBeneficiaryList,
-} from '@/tests/mocks/beneficiary';
+import { mockBeneficiary, mockBeneficiaryList } from '@/tests/mocks/beneficiary';
 import { server } from '@/tests/mocks/server';
 
 import {
@@ -74,9 +71,7 @@ describe('useBeneficiaries hooks', () => {
 
       // Should filter by search and status
       expect(result.current.data?.data.beneficiaries).toHaveLength(1);
-      expect(result.current.data?.data.beneficiaries[0].full_name).toBe(
-        'John Doe'
-      );
+      expect(result.current.data?.data.beneficiaries[0].full_name).toBe('John Doe');
     });
 
     it('handles API errors', async () => {
@@ -151,9 +146,7 @@ describe('useBeneficiaries hooks', () => {
         expect(result.current.isSuccess).toBe(true);
       });
 
-      expect(result.current.data?.data.message).toBe(
-        'Beneficiary created successfully'
-      );
+      expect(result.current.data?.data.message).toBe('Beneficiary created successfully');
       expect(result.current.data?.data.beneficiary.first_name).toBe('New');
     });
 
@@ -162,9 +155,7 @@ describe('useBeneficiaries hooks', () => {
         wrapper: createWrapper(),
       });
 
-      await expect(
-        result.current.mutateAsync({ email: 'test@example.com' })
-      ).rejects.toThrow();
+      await expect(result.current.mutateAsync({ email: 'test@example.com' })).rejects.toThrow();
     });
   });
 
@@ -185,9 +176,7 @@ describe('useBeneficiaries hooks', () => {
         expect(result.current.isSuccess).toBe(true);
       });
 
-      expect(result.current.data?.data.message).toBe(
-        'Beneficiary updated successfully'
-      );
+      expect(result.current.data?.data.message).toBe('Beneficiary updated successfully');
     });
 
     it('handles 404 error', async () => {
@@ -213,9 +202,7 @@ describe('useBeneficiaries hooks', () => {
         expect(result.current.isSuccess).toBe(true);
       });
 
-      expect(result.current.data?.data.message).toBe(
-        'Beneficiary deleted successfully'
-      );
+      expect(result.current.data?.data.message).toBe('Beneficiary deleted successfully');
     });
   });
 
@@ -225,22 +212,23 @@ describe('useBeneficiaries hooks', () => {
         wrapper: createWrapper(),
       });
 
-      await waitFor(() => {
-        console.log('Statistics query status:', {
-          isSuccess: result.current.isSuccess,
-          isError: result.current.isError,
-          isLoading: result.current.isLoading,
-          error: result.current.error,
-          data: result.current.data
-        });
-        expect(result.current.isSuccess).toBe(true);
-      }, { timeout: 3000 });
+      await waitFor(
+        () => {
+          console.log('Statistics query status:', {
+            isSuccess: result.current.isSuccess,
+            isError: result.current.isError,
+            isLoading: result.current.isLoading,
+            error: result.current.error,
+            data: result.current.data,
+          });
+          expect(result.current.isSuccess).toBe(true);
+        },
+        { timeout: 3000 }
+      );
 
       expect(result.current.data?.data.statistics.total).toBe(3);
       expect(result.current.data?.data.statistics.by_status.active).toBe(1);
-      expect(result.current.data?.data.statistics.by_employment.employed).toBe(
-        2
-      );
+      expect(result.current.data?.data.statistics.by_employment.employed).toBe(2);
     });
   });
 });

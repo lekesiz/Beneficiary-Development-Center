@@ -1,0 +1,83 @@
+runtime: python312
+env: standard
+
+handlers:
+# Serve the built React app from the dist directory
+- url: /static
+  static_dir: frontend/dist/assets
+  secure: always
+
+# Serve locales
+- url: /locales
+  static_dir: locales
+  secure: always
+
+# Serve manifest.json
+- url: /manifest.json
+  static_files: frontend/dist/manifest.json
+  upload: frontend/dist/manifest.json
+  secure: always
+
+# Serve vite.svg
+- url: /vite.svg
+  static_files: vite.svg
+  upload: vite.svg
+  secure: always
+
+- url: /(.*\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot))$
+  static_files: frontend/dist/\1
+  upload: frontend/dist/.*\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$
+  secure: always
+
+# API routes handled by Flask backend
+- url: /api/.*
+  script: auto
+  secure: always
+
+# All other routes serve the React app
+- url: /.*
+  static_files: frontend/dist/index.html
+  upload: frontend/dist/index.html
+  secure: always
+
+automatic_scaling:
+  min_instances: 1
+  max_instances: 10
+  target_cpu_utilization: 0.65
+  min_pending_latency: 30ms
+  max_pending_latency: automatic
+  max_concurrent_requests: 50
+
+instance_class: F2
+
+env_variables:
+  FLASK_ENV: "production"
+  FLASK_APP: "wsgi.py"
+  GOOGLE_CLOUD_PROJECT: "bilan-competence-449414"
+  GAE_ENV: "standard"
+  CLOUD_SQL_CONNECTION_NAME: "bilan-competence-449414:europe-west1:bdc-db"
+  DB_NAME: "bdc_production"
+  DB_USER: "bdc_user"
+  CORS_ORIGINS: "https://bilan-competence-449414.ew.r.appspot.com"
+
+beta_settings:
+  cloud_sql_instances: "bilan-competence-449414:europe-west1:bdc-db"
+
+vpc_access_connector:
+  name: projects/bilan-competence-449414/locations/europe-west1/connectors/bdc-connector
+
+# Health check configuration
+readiness_check:
+  path: "/ready"
+  check_interval_sec: 5
+  timeout_sec: 4
+  failure_threshold: 2
+  success_threshold: 2
+  app_start_timeout_sec: 300
+
+liveness_check:
+  path: "/health"
+  check_interval_sec: 30
+  timeout_sec: 4
+  failure_threshold: 2
+  success_threshold: 2

@@ -145,9 +145,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
             <p className="text-xs text-gray-500 dark:text-gray-400">
               {editingMessage ? 'Edit message' : `Reply to ${replyTo?.sender.firstName}`}
             </p>
-            <p className="text-sm truncate">
-              {editingMessage?.content || replyTo?.content}
-            </p>
+            <p className="text-sm truncate">{editingMessage?.content || replyTo?.content}</p>
           </div>
           <Button
             variant="ghost"
@@ -190,15 +188,20 @@ export const ChatInput: React.FC<ChatInputProps> = ({
             rows={1}
             style={{ minHeight: '40px', maxHeight: '120px' }}
           />
-          
+
           {/* Emoji picker button */}
           <Button
             variant="ghost"
             size="sm"
             className="absolute right-2 bottom-2 !h-7 !w-7 !p-0"
-            onClick={() => {/* TODO: Open emoji picker */}}
+            onClick={() => {
+              /* TODO: Open emoji picker */
+            }}
           >
-            <Smile size={20} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" />
+            <Smile
+              size={20}
+              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+            />
           </Button>
         </div>
 

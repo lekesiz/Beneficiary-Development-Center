@@ -21,7 +21,8 @@ const meta = {
     layout: 'padded',
     docs: {
       description: {
-        component: 'Breadcrumbs component provides hierarchical navigation showing the user\'s current location within the application. It supports dynamic segments that fetch actual names from the API.',
+        component:
+          "Breadcrumbs component provides hierarchical navigation showing the user's current location within the application. It supports dynamic segments that fetch actual names from the API.",
       },
     },
   },
@@ -52,17 +53,19 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Dashboard: Story = {
-  args: {},  parameters: {
+  args: {},
+  parameters: {
     docs: {
       description: {
-        story: 'Breadcrumbs on the dashboard page. No breadcrumbs are shown as it\'s the root page.',
+        story: "Breadcrumbs on the dashboard page. No breadcrumbs are shown as it's the root page.",
       },
     },
   },
 };
 
 export const ProgramsList: Story = {
-  args: {},  parameters: {
+  args: {},
+  parameters: {
     docs: {
       description: {
         story: 'Breadcrumbs on the programs listing page showing simple navigation.',
@@ -72,7 +75,8 @@ export const ProgramsList: Story = {
 };
 
 export const NewProgram: Story = {
-  args: {},  parameters: {
+  args: {},
+  parameters: {
     docs: {
       description: {
         story: 'Breadcrumbs when creating a new program, showing nested navigation.',
@@ -82,27 +86,32 @@ export const NewProgram: Story = {
 };
 
 export const ProgramDetails: Story = {
-  args: {},  parameters: {
+  args: {},
+  parameters: {
     docs: {
       description: {
-        story: 'Breadcrumbs on a program details page with dynamic ID. In production, this would fetch the actual program name.',
+        story:
+          'Breadcrumbs on a program details page with dynamic ID. In production, this would fetch the actual program name.',
       },
     },
   },
 };
 
 export const EditProgram: Story = {
-  args: {},  parameters: {
+  args: {},
+  parameters: {
     docs: {
       description: {
-        story: 'Breadcrumbs when editing a program, showing the full hierarchy with dynamic segments.',
+        story:
+          'Breadcrumbs when editing a program, showing the full hierarchy with dynamic segments.',
       },
     },
   },
 };
 
 export const ProgramCourseReorder: Story = {
-  args: {},  parameters: {
+  args: {},
+  parameters: {
     docs: {
       description: {
         story: 'Breadcrumbs for the course reordering page within a program.',
@@ -112,7 +121,8 @@ export const ProgramCourseReorder: Story = {
 };
 
 export const BeneficiariesList: Story = {
-  args: {},  parameters: {
+  args: {},
+  parameters: {
     docs: {
       description: {
         story: 'Breadcrumbs on the beneficiaries listing page.',
@@ -122,17 +132,20 @@ export const BeneficiariesList: Story = {
 };
 
 export const BeneficiaryDetails: Story = {
-  args: {},  parameters: {
+  args: {},
+  parameters: {
     docs: {
       description: {
-        story: 'Breadcrumbs on a beneficiary details page. In production, this would show the beneficiary\'s actual name.',
+        story:
+          "Breadcrumbs on a beneficiary details page. In production, this would show the beneficiary's actual name.",
       },
     },
   },
 };
 
 export const CoursesList: Story = {
-  args: {},  parameters: {
+  args: {},
+  parameters: {
     docs: {
       description: {
         story: 'Breadcrumbs on the courses listing page.',
@@ -142,7 +155,8 @@ export const CoursesList: Story = {
 };
 
 export const CourseEdit: Story = {
-  args: {},  parameters: {
+  args: {},
+  parameters: {
     docs: {
       description: {
         story: 'Breadcrumbs when editing a course with dynamic course name.',
@@ -152,7 +166,8 @@ export const CourseEdit: Story = {
 };
 
 export const CourseSessionNew: Story = {
-  args: {},  parameters: {
+  args: {},
+  parameters: {
     docs: {
       description: {
         story: 'Breadcrumbs when creating a new session within a course.',
@@ -162,7 +177,8 @@ export const CourseSessionNew: Story = {
 };
 
 export const EvaluationsList: Story = {
-  args: {},  parameters: {
+  args: {},
+  parameters: {
     docs: {
       description: {
         story: 'Breadcrumbs on the evaluations listing page.',
@@ -172,7 +188,8 @@ export const EvaluationsList: Story = {
 };
 
 export const TakeEvaluation: Story = {
-  args: {},  parameters: {
+  args: {},
+  parameters: {
     docs: {
       description: {
         story: 'Breadcrumbs when taking an evaluation.',
@@ -182,7 +199,8 @@ export const TakeEvaluation: Story = {
 };
 
 export const EvaluationResults: Story = {
-  args: {},  parameters: {
+  args: {},
+  parameters: {
     docs: {
       description: {
         story: 'Breadcrumbs showing evaluation results with multiple dynamic segments.',
@@ -192,7 +210,8 @@ export const EvaluationResults: Story = {
 };
 
 export const LearningPaths: Story = {
-  args: {},  parameters: {
+  args: {},
+  parameters: {
     docs: {
       description: {
         story: 'Breadcrumbs on the learning paths page.',
@@ -202,7 +221,8 @@ export const LearningPaths: Story = {
 };
 
 export const LearningPathDetails: Story = {
-  args: {},  parameters: {
+  args: {},
+  parameters: {
     docs: {
       description: {
         story: 'Breadcrumbs on a learning path details page.',
@@ -212,7 +232,8 @@ export const LearningPathDetails: Story = {
 };
 
 export const Reports: Story = {
-  args: {},  parameters: {
+  args: {},
+  parameters: {
     docs: {
       description: {
         story: 'Breadcrumbs on the reports page.',
@@ -222,7 +243,8 @@ export const Reports: Story = {
 };
 
 export const MyDevelopmentReport: Story = {
-  args: {},  parameters: {
+  args: {},
+  parameters: {
     docs: {
       description: {
         story: 'Breadcrumbs for the My Development report page.',
@@ -232,7 +254,8 @@ export const MyDevelopmentReport: Story = {
 };
 
 export const CoachDashboard: Story = {
-  args: {},  parameters: {
+  args: {},
+  parameters: {
     docs: {
       description: {
         story: 'Breadcrumbs on the coach dashboard.',
@@ -242,7 +265,8 @@ export const CoachDashboard: Story = {
 };
 
 export const StudentProfile: Story = {
-  args: {},  parameters: {
+  args: {},
+  parameters: {
     docs: {
       description: {
         story: 'Breadcrumbs on a student profile page viewed by a coach.',
@@ -252,7 +276,8 @@ export const StudentProfile: Story = {
 };
 
 export const Settings: Story = {
-  args: {},  parameters: {
+  args: {},
+  parameters: {
     docs: {
       description: {
         story: 'Breadcrumbs on the settings page.',
@@ -262,7 +287,8 @@ export const Settings: Story = {
 };
 
 export const Profile: Story = {
-  args: {},  parameters: {
+  args: {},
+  parameters: {
     docs: {
       description: {
         story: 'Breadcrumbs on the user profile page.',
@@ -272,7 +298,8 @@ export const Profile: Story = {
 };
 
 export const WithCustomStyling: Story = {
-  args: {},  parameters: {
+  args: {},
+  parameters: {
     docs: {
       description: {
         story: 'Breadcrumbs with custom styling applied via className prop.',
@@ -282,7 +309,8 @@ export const WithCustomStyling: Story = {
 };
 
 export const DarkMode: Story = {
-  args: {},  parameters: {
+  args: {},
+  parameters: {
     backgrounds: { default: 'dark' },
     docs: {
       description: {
@@ -292,9 +320,7 @@ export const DarkMode: Story = {
   },
   decorators: [
     (Story, context) => (
-      <div className="dark bg-gray-900 p-4">
-        {context.decorators[0](Story, context)}
-      </div>
+      <div className="dark bg-gray-900 p-4">{context.decorators[0](Story, context)}</div>
     ),
   ],
 };

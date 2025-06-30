@@ -1,8 +1,2 @@
-export default function Login() {
-  return (
-    <div>
-      <h2 className="text-xl font-bold mb-4">Login</h2>
-      <p>Login page - To be implemented</p>
-    </div>
-  );
-}
+// Re-export the new LoginPage as the default export
+export { LoginPage as default } from './LoginPage';

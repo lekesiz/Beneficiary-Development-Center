@@ -24,11 +24,7 @@ export interface SuggestedMilestone {
 export interface LearningPathUpdate {
   id: number;
   learning_path_id: number;
-  update_type:
-    | 'add_milestone'
-    | 'reorder'
-    | 'obsolete_milestone'
-    | 'modify_milestone';
+  update_type: 'add_milestone' | 'reorder' | 'obsolete_milestone' | 'modify_milestone';
   source: 'ai' | 'system' | 'manual';
   suggested_milestones: SuggestedMilestone[];
   milestone_updates: Record<string, any>;
@@ -70,9 +66,7 @@ export function usePendingLearningPathUpdates(learningPathId: number | null) {
     queryKey: ['learningPathUpdates', 'pending', learningPathId],
     queryFn: async () => {
       if (!learningPathId) return null;
-      const response = await apiClient.get(
-        `/api/learning-paths/${learningPathId}/pending-updates`
-      );
+      const response = await apiClient.get(`/api/learning-paths/${learningPathId}/pending-updates`);
       return response.data;
     },
     enabled: !!learningPathId,
@@ -85,9 +79,7 @@ export function useApproveLearningPathUpdate() {
 
   return useMutation({
     mutationFn: async (updateId: number) => {
-      const response = await apiClient.post(
-        `/api/learning-paths/updates/${updateId}/approve`
-      );
+      const response = await apiClient.post(`/api/learning-paths/updates/${updateId}/approve`);
       return response.data;
     },
     onSuccess: (data) => {
@@ -105,19 +97,10 @@ export function useRejectLearningPathUpdate() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({
-      updateId,
-      reason,
-    }: {
-      updateId: number;
-      reason: string;
-    }) => {
-      const response = await apiClient.post(
-        `/api/learning-paths/updates/${updateId}/reject`,
-        {
-          reason,
-        }
-      );
+    mutationFn: async ({ updateId, reason }: { updateId: number; reason: string }) => {
+      const response = await apiClient.post(`/api/learning-paths/updates/${updateId}/reject`, {
+        reason,
+      });
       return response.data;
     },
     onSuccess: (data) => {
@@ -133,9 +116,7 @@ export function useApplyLearningPathUpdate() {
 
   return useMutation({
     mutationFn: async (updateId: number) => {
-      const response = await apiClient.post(
-        `/api/learning-paths/updates/${updateId}/apply`
-      );
+      const response = await apiClient.post(`/api/learning-paths/updates/${updateId}/apply`);
       return response.data;
     },
     onSuccess: (data) => {

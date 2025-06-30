@@ -93,12 +93,10 @@ export const CourseList: React.FC = () => {
   const { data: programsData } = usePrograms({ per_page: 100 }); // For filter dropdown
 
   // Permission checks
-  const canCreate =
-    user?.role && ['admin', 'manager', 'instructor'].includes(user.role);
+  const canCreate = user?.role && ['admin', 'manager', 'instructor'].includes(user.role);
   const canEdit = (course: Course) => {
     if (user?.role === 'admin' || user?.role === 'manager') return true;
-    if (user?.role === 'instructor' && course.instructor_id === user.id)
-      return true;
+    if (user?.role === 'instructor' && course.instructor_id === user.id) return true;
     return false;
   };
   const canDelete = user?.role === 'admin';
@@ -160,9 +158,7 @@ export const CourseList: React.FC = () => {
             </Link>
             <span className="text-sm text-gray-500">{row.original.code}</span>
             {row.original.subtitle && (
-              <span className="text-xs text-gray-400">
-                {row.original.subtitle}
-              </span>
+              <span className="text-xs text-gray-400">{row.original.subtitle}</span>
             )}
           </div>
         ),
@@ -172,12 +168,8 @@ export const CourseList: React.FC = () => {
         header: t('courses.list.columns.program'),
         cell: ({ row }) => (
           <div className="flex flex-col">
-            <span className="text-sm font-medium">
-              {row.original.program_title}
-            </span>
-            <span className="text-xs text-gray-500">
-              #{row.original.order_index}
-            </span>
+            <span className="text-sm font-medium">{row.original.program_title}</span>
+            <span className="text-xs text-gray-500">#{row.original.order_index}</span>
           </div>
         ),
       },
@@ -209,12 +201,8 @@ export const CourseList: React.FC = () => {
         header: t('courses.list.columns.difficulty'),
         enableSorting: true,
         cell: ({ row }) => {
-          const difficultyInfo = getDifficultyLevelInfo(
-            row.original.difficulty_level
-          );
-          return (
-            <Badge color={difficultyInfo.color}>{difficultyInfo.label}</Badge>
-          );
+          const difficultyInfo = getDifficultyLevelInfo(row.original.difficulty_level);
+          return <Badge color={difficultyInfo.color}>{difficultyInfo.label}</Badge>;
         },
       },
       {
@@ -222,9 +210,7 @@ export const CourseList: React.FC = () => {
         header: t('courses.list.columns.duration'),
         enableSorting: true,
         cell: ({ row }) =>
-          formatCourseDuration(
-            row.original.total_duration_hours || row.original.duration_hours
-          ),
+          formatCourseDuration(row.original.total_duration_hours || row.original.duration_hours),
       },
       {
         accessorKey: 'participant_count',
@@ -288,9 +274,7 @@ export const CourseList: React.FC = () => {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() =>
-                  setDeleteConfirm({ isOpen: true, course: row.original })
-                }
+                onClick={() => setDeleteConfirm({ isOpen: true, course: row.original })}
                 className="text-red-600 hover:text-red-800"
               >
                 <Trash2 className="h-4 w-4" />
@@ -306,9 +290,7 @@ export const CourseList: React.FC = () => {
   if (error) {
     return (
       <Card className="p-6">
-        <div className="text-center text-red-600">
-          {t('courses.form.messages.loadError')}
-        </div>
+        <div className="text-center text-red-600">{t('courses.form.messages.loadError')}</div>
       </Card>
     );
   }
@@ -319,9 +301,7 @@ export const CourseList: React.FC = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">{t('courses.title')}</h1>
-          <p className="text-gray-600 mt-1">
-            {t('courses.subtitle')}
-          </p>
+          <p className="text-gray-600 mt-1">{t('courses.subtitle')}</p>
         </div>
         {canCreate && (
           <Button onClick={() => navigate('/courses/new')}>
@@ -347,10 +327,7 @@ export const CourseList: React.FC = () => {
                 />
               </div>
             </div>
-            <Button
-              variant="outline"
-              onClick={() => setShowFilters(!showFilters)}
-            >
+            <Button variant="outline" onClick={() => setShowFilters(!showFilters)}>
               <Filter className="h-4 w-4 mr-2" />
               {t('common.filters')}
             </Button>
@@ -363,10 +340,7 @@ export const CourseList: React.FC = () => {
                 placeholder={t('courses.list.filters.selectProgram')}
                 value={filters.program_id?.toString() || ''}
                 onChange={(value) =>
-                  handleFilterChange(
-                    'program_id',
-                    value ? parseInt(value) : undefined
-                  )
+                  handleFilterChange('program_id', value ? parseInt(value) : undefined)
                 }
                 options={[
                   { value: '', label: t('courses.list.filters.allPrograms') },
@@ -421,9 +395,7 @@ export const CourseList: React.FC = () => {
       {data?.courses && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card className="p-4">
-            <div className="text-2xl font-bold text-blue-600">
-              {data.courses.length}
-            </div>
+            <div className="text-2xl font-bold text-blue-600">{data.courses.length}</div>
             <div className="text-sm text-gray-600">{t('courses.list.stats.totalCourses')}</div>
           </Card>
           <Card className="p-4">
@@ -489,11 +461,11 @@ export const CourseList: React.FC = () => {
       <ConfirmDialog
         isOpen={deleteConfirm.isOpen}
         onClose={() => setDeleteConfirm({ isOpen: false })}
-        onConfirm={() =>
-          deleteConfirm.course && handleDelete(deleteConfirm.course)
-        }
+        onConfirm={() => deleteConfirm.course && handleDelete(deleteConfirm.course)}
         title={t('courses.form.messages.deleteConfirmTitle')}
-        description={t('courses.form.messages.deleteConfirmMessage', { name: deleteConfirm.course?.title })}
+        description={t('courses.form.messages.deleteConfirmMessage', {
+          name: deleteConfirm.course?.title,
+        })}
         confirmText={t('common.delete')}
         cancelText={t('common.cancel')}
         loading={deleteCourse.isPending}

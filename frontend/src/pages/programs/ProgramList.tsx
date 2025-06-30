@@ -18,10 +18,7 @@ import { EmptyState } from '../../components/ui/EmptyState';
 import { Input } from '../../components/ui/Input';
 import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
 import { Select } from '../../components/ui/Select';
-import {
-  PROGRAM_STATUS_OPTIONS,
-  PROGRAM_TYPE_OPTIONS,
-} from '../../constants/program';
+import { PROGRAM_STATUS_OPTIONS, PROGRAM_TYPE_OPTIONS } from '../../constants/program';
 import { useAuth } from '../../contexts/AuthContext';
 import { usePrograms, useDeleteProgram } from '../../hooks/usePrograms';
 import type { Program, ProgramFilters } from '../../types/program';
@@ -76,9 +73,12 @@ export const ProgramList: React.FC = () => {
   const { data, isLoading, error } = usePrograms(filters);
 
   // Permission checks
-  const canCreate = user?.role && ['admin', 'manager'].includes(user.role);
-  const canEdit = user?.role && ['admin', 'manager'].includes(user.role);
-  const canDelete = user?.role === 'admin';
+  const canCreate = user?.roles?.some(role => ['admin', 'manager', 'trainer'].includes(role.name)) || 
+                    user?.primaryRole && ['admin', 'manager', 'trainer'].includes(user.primaryRole);
+  const canEdit = user?.roles?.some(role => ['admin', 'manager', 'trainer'].includes(role.name)) || 
+                  user?.primaryRole && ['admin', 'manager', 'trainer'].includes(user.primaryRole);
+  const canDelete = user?.roles?.some(role => ['admin'].includes(role.name)) || 
+                    user?.primaryRole === 'admin';
 
   // Handle search
   const handleSearch = (value: string) => {
@@ -160,15 +160,13 @@ export const ProgramList: React.FC = () => {
         accessorKey: 'start_date',
         header: t('programs.list.columns.startDate'),
         enableSorting: true,
-        cell: ({ row }) =>
-          formatProgramDate(row.original.start_date, 'dd MMM yyyy'),
+        cell: ({ row }) => formatProgramDate(row.original.start_date, 'dd MMM yyyy'),
       },
       {
         accessorKey: 'end_date',
         header: t('programs.list.columns.endDate'),
         enableSorting: true,
-        cell: ({ row }) =>
-          formatProgramDate(row.original.end_date, 'dd MMM yyyy'),
+        cell: ({ row }) => formatProgramDate(row.original.end_date, 'dd MMM yyyy'),
       },
       {
         accessorKey: 'enrollment_count',
@@ -176,14 +174,11 @@ export const ProgramList: React.FC = () => {
         cell: ({ row }) => (
           <div className="text-center">
             <div className="font-medium">
-              {row.original.enrollment_count || 0} /{' '}
-              {row.original.max_participants}
+              {row.original.enrollment_count || 0} / {row.original.max_participants}
             </div>
             <div className="text-sm text-gray-500">
               {Math.round(
-                ((row.original.enrollment_count || 0) /
-                  row.original.max_participants) *
-                  100
+                ((row.original.enrollment_count || 0) / row.original.max_participants) * 100
               )}
               %
             </div>
@@ -193,8 +188,7 @@ export const ProgramList: React.FC = () => {
       {
         accessorKey: 'price',
         header: t('programs.list.columns.price'),
-        cell: ({ row }) =>
-          formatProgramPrice(row.original.price, row.original.currency),
+        cell: ({ row }) => formatProgramPrice(row.original.price, row.original.currency),
       },
       {
         accessorKey: 'coordinator_name',
@@ -205,8 +199,7 @@ export const ProgramList: React.FC = () => {
         accessorKey: 'created_at',
         header: t('programs.list.columns.createdAt'),
         enableSorting: true,
-        cell: ({ row }) =>
-          formatProgramDate(row.original.created_at, 'dd MMM yyyy'),
+        cell: ({ row }) => formatProgramDate(row.original.created_at, 'dd MMM yyyy'),
       },
       {
         id: 'actions',
@@ -234,9 +227,7 @@ export const ProgramList: React.FC = () => {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() =>
-                  setDeleteConfirm({ isOpen: true, program: row.original })
-                }
+                onClick={() => setDeleteConfirm({ isOpen: true, program: row.original })}
                 className="text-red-600 hover:text-red-800"
               >
                 <Trash2 className="h-4 w-4" />
@@ -254,9 +245,7 @@ export const ProgramList: React.FC = () => {
   if (error) {
     return (
       <Card className="p-6">
-        <div className="text-center text-red-600">
-          {t('errors.loadFailed')}
-        </div>
+        <div className="text-center text-red-600">{t('errors.loadFailed')}</div>
       </Card>
     );
   }
@@ -267,9 +256,7 @@ export const ProgramList: React.FC = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">{t('programs.title')}</h1>
-          <p className="text-gray-600 mt-1">
-            {t('programs.subtitle')}
-          </p>
+          <p className="text-gray-600 mt-1">{t('programs.subtitle')}</p>
         </div>
         {canCreate && (
           <Button onClick={() => navigate('/programs/new')}>
@@ -295,10 +282,7 @@ export const ProgramList: React.FC = () => {
                 />
               </div>
             </div>
-            <Button
-              variant="outline"
-              onClick={() => setShowFilters(!showFilters)}
-            >
+            <Button variant="outline" onClick={() => setShowFilters(!showFilters)}>
               <Filter className="h-4 w-4 mr-2" />
               {t('common.filters')}
             </Button>
@@ -336,9 +320,7 @@ export const ProgramList: React.FC = () => {
                   type="checkbox"
                   id="upcoming_only"
                   checked={filters.upcoming_only || false}
-                  onChange={(e) =>
-                    handleFilterChange('upcoming_only', e.target.checked)
-                  }
+                  onChange={(e) => handleFilterChange('upcoming_only', e.target.checked)}
                   className="rounded border-gray-300"
                 />
                 <label htmlFor="upcoming_only" className="text-sm">
@@ -350,9 +332,7 @@ export const ProgramList: React.FC = () => {
                   type="checkbox"
                   id="active_only"
                   checked={filters.active_only || false}
-                  onChange={(e) =>
-                    handleFilterChange('active_only', e.target.checked)
-                  }
+                  onChange={(e) => handleFilterChange('active_only', e.target.checked)}
                   className="rounded border-gray-300"
                 />
                 <label htmlFor="active_only" className="text-sm">
@@ -406,11 +386,11 @@ export const ProgramList: React.FC = () => {
       <ConfirmDialog
         isOpen={deleteConfirm.isOpen}
         onClose={() => setDeleteConfirm({ isOpen: false })}
-        onConfirm={() =>
-          deleteConfirm.program && handleDelete(deleteConfirm.program)
-        }
+        onConfirm={() => deleteConfirm.program && handleDelete(deleteConfirm.program)}
         title={t('programs.form.messages.deleteConfirmTitle')}
-        description={t('programs.form.messages.deleteConfirmMessage', { name: deleteConfirm.program?.title })}
+        description={t('programs.form.messages.deleteConfirmMessage', {
+          name: deleteConfirm.program?.title,
+        })}
         confirmText={t('common.delete')}
         cancelText={t('common.cancel')}
         loading={deleteProgram.isPending}

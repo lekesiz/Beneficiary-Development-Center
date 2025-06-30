@@ -91,7 +91,7 @@ export interface CreateProgramRequest {
   coordinator_id?: number;
 }
 
-export type UpdateProgramRequest = Partial<CreateProgramRequest>
+export type UpdateProgramRequest = Partial<CreateProgramRequest>;
 
 export interface ProgramFilters {
   page?: number;

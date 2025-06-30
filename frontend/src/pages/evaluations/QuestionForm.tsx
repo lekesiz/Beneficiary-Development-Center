@@ -20,13 +20,7 @@ import { z } from 'zod';
 
 import { Badge } from '@/components/ui/Badge';
 import { Card } from '@/components/ui/Card';
-import {
-  FormField,
-  Input,
-  Textarea,
-  Select,
-  Button,
-} from '@/components/ui/Form';
+import { FormField, Input, Textarea, Select, Button } from '@/components/ui/Form';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { TagInput } from '@/components/ui/TagInput';
 import {
@@ -35,16 +29,11 @@ import {
   useCreateEvaluationQuestion,
   useUpdateEvaluationQuestion,
 } from '@/hooks/useEvaluations';
-import type {
-  CreateQuestionRequest,
-  UpdateQuestionRequest,
-} from '@/types/evaluation';
+import type { CreateQuestionRequest, UpdateQuestionRequest } from '@/types/evaluation';
 
 // Question type specific validation schemas
 const multipleChoiceSchema = z.object({
-  options: z
-    .array(z.string().min(1, 'Seçenek boş olamaz'))
-    .min(2, 'En az 2 seçenek gereklidir'),
+  options: z.array(z.string().min(1, 'Seçenek boş olamaz')).min(2, 'En az 2 seçenek gereklidir'),
   correct_answer: z.string().min(1, 'Doğru cevap seçilmelidir'),
 });
 
@@ -73,34 +62,19 @@ const questionSchema = z
       .string()
       .min(1, 'Soru metni gereklidir')
       .max(2000, 'Soru metni en fazla 2000 karakter olabilir'),
-    question_type: z.enum([
-      'multiple_choice',
-      'true_false',
-      'short_answer',
-      'essay',
-    ]),
+    question_type: z.enum(['multiple_choice', 'true_false', 'short_answer', 'essay']),
     points: z
       .number()
       .min(0.1, 'Puan en az 0.1 olmalıdır')
       .max(100, 'Puan en fazla 100 olabilir')
       .default(1),
     difficulty_level: z.enum(['easy', 'medium', 'hard']).default('medium'),
-    explanation: z
-      .string()
-      .max(1000, 'Açıklama en fazla 1000 karakter olabilir')
-      .optional(),
-    hints: z
-      .array(z.string().max(200, 'İpucu en fazla 200 karakter olabilir'))
-      .default([]),
+    explanation: z.string().max(1000, 'Açıklama en fazla 1000 karakter olabilir').optional(),
+    hints: z.array(z.string().max(200, 'İpucu en fazla 200 karakter olabilir')).default([]),
     tags: z.array(z.string()).default([]),
     is_required: z.boolean().default(false),
     order: z.number().min(0).optional(),
-    question_data: z.union([
-      multipleChoiceSchema,
-      trueFalseSchema,
-      shortAnswerSchema,
-      essaySchema,
-    ]),
+    question_data: z.union([multipleChoiceSchema, trueFalseSchema, shortAnswerSchema, essaySchema]),
   })
   .refine(
     (data) => {
@@ -142,13 +116,10 @@ const QuestionForm: React.FC<QuestionFormProps> = ({ mode }) => {
   const qId = questionId ? parseInt(questionId) : undefined;
 
   // React Query hooks
-  const { data: evaluation, isLoading: evaluationLoading } =
-    useEvaluation(evalId);
-  const { data: question, isLoading: questionLoading } = useEvaluationQuestion(
-    evalId,
-    qId!,
-    { enabled: mode === 'edit' && !!qId }
-  );
+  const { data: evaluation, isLoading: evaluationLoading } = useEvaluation(evalId);
+  const { data: question, isLoading: questionLoading } = useEvaluationQuestion(evalId, qId!, {
+    enabled: mode === 'edit' && !!qId,
+  });
   const createMutation = useCreateEvaluationQuestion();
   const updateMutation = useUpdateEvaluationQuestion();
 
@@ -235,11 +206,7 @@ const QuestionForm: React.FC<QuestionFormProps> = ({ mode }) => {
 
     // Don't reset if data already matches the expected structure
     if (currentType === 'multiple_choice' && currentData?.options) return;
-    if (
-      currentType === 'true_false' &&
-      typeof currentData?.correct_answer === 'boolean'
-    )
-      return;
+    if (currentType === 'true_false' && typeof currentData?.correct_answer === 'boolean') return;
     if (currentType === 'short_answer' && currentData?.correct_answers) return;
     if (currentType === 'essay' && typeof currentData === 'object') return;
 
@@ -302,12 +269,7 @@ const QuestionForm: React.FC<QuestionFormProps> = ({ mode }) => {
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h4 className="font-medium">Seçenekler</h4>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => addOption('')}
-              >
+              <Button type="button" variant="outline" size="sm" onClick={() => addOption('')}>
                 <Plus className="mr-1 h-4 w-4" />
                 Seçenek Ekle
               </Button>
@@ -323,11 +285,7 @@ const QuestionForm: React.FC<QuestionFormProps> = ({ mode }) => {
                     name={`question_data.options.${index}` as any}
                     control={control}
                     render={({ field }) => (
-                      <Input
-                        {...field}
-                        placeholder={`${index + 1}. seçenek`}
-                        className="flex-1"
-                      />
+                      <Input {...field} placeholder={`${index + 1}. seçenek`} className="flex-1" />
                     )}
                   />
                   {optionFields.length > 2 && (
@@ -353,19 +311,13 @@ const QuestionForm: React.FC<QuestionFormProps> = ({ mode }) => {
                   error={errors.question_data?.correct_answer?.message}
                   required
                 >
-                  <Select
-                    {...field}
-                    error={!!errors.question_data?.correct_answer}
-                  >
+                  <Select {...field} error={!!errors.question_data?.correct_answer}>
                     <option value="">Doğru cevabı seçin</option>
-                    {(watchedQuestionData as any)?.options?.map(
-                      (option: string, index: number) => (
-                        <option key={index} value={option}>
-                          {String.fromCharCode(65 + index)} -{' '}
-                          {option || `${index + 1}. seçenek`}
-                        </option>
-                      )
-                    )}
+                    {(watchedQuestionData as any)?.options?.map((option: string, index: number) => (
+                      <option key={index} value={option}>
+                        {String.fromCharCode(65 + index)} - {option || `${index + 1}. seçenek`}
+                      </option>
+                    ))}
                   </Select>
                 </FormField>
               )}
@@ -414,12 +366,7 @@ const QuestionForm: React.FC<QuestionFormProps> = ({ mode }) => {
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h4 className="font-medium">Kabul Edilebilir Cevaplar</h4>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => addAnswer('')}
-              >
+              <Button type="button" variant="outline" size="sm" onClick={() => addAnswer('')}>
                 <Plus className="mr-1 h-4 w-4" />
                 Cevap Ekle
               </Button>
@@ -468,9 +415,7 @@ const QuestionForm: React.FC<QuestionFormProps> = ({ mode }) => {
                       min="1"
                       max="1000"
                       onChange={(e) =>
-                        field.onChange(
-                          e.target.value ? parseInt(e.target.value) : undefined
-                        )
+                        field.onChange(e.target.value ? parseInt(e.target.value) : undefined)
                       }
                     />
                   </FormField>
@@ -516,9 +461,7 @@ const QuestionForm: React.FC<QuestionFormProps> = ({ mode }) => {
                       min="1"
                       max="10000"
                       onChange={(e) =>
-                        field.onChange(
-                          e.target.value ? parseInt(e.target.value) : undefined
-                        )
+                        field.onChange(e.target.value ? parseInt(e.target.value) : undefined)
                       }
                     />
                   </FormField>
@@ -539,9 +482,7 @@ const QuestionForm: React.FC<QuestionFormProps> = ({ mode }) => {
                       min="1"
                       max="10000"
                       onChange={(e) =>
-                        field.onChange(
-                          e.target.value ? parseInt(e.target.value) : undefined
-                        )
+                        field.onChange(e.target.value ? parseInt(e.target.value) : undefined)
                       }
                     />
                   </FormField>
@@ -643,26 +584,19 @@ const QuestionForm: React.FC<QuestionFormProps> = ({ mode }) => {
               </Badge>
             </div>
 
-            <h3 className="text-lg font-medium">
-              {watch('question_text') || 'Soru metni...'}
-            </h3>
+            <h3 className="text-lg font-medium">{watch('question_text') || 'Soru metni...'}</h3>
 
             {/* Question preview based on type */}
             {watchedQuestionType === 'multiple_choice' && (
               <div className="space-y-2">
-                {(watchedQuestionData as any)?.options?.map(
-                  (option: string, index: number) => (
-                    <div
-                      key={index}
-                      className="flex items-center space-x-2 p-2 border rounded"
-                    >
-                      <span className="w-6 h-6 border rounded-full flex items-center justify-center text-xs">
-                        {String.fromCharCode(65 + index)}
-                      </span>
-                      <span>{option || `${index + 1}. seçenek`}</span>
-                    </div>
-                  )
-                )}
+                {(watchedQuestionData as any)?.options?.map((option: string, index: number) => (
+                  <div key={index} className="flex items-center space-x-2 p-2 border rounded">
+                    <span className="w-6 h-6 border rounded-full flex items-center justify-center text-xs">
+                      {String.fromCharCode(65 + index)}
+                    </span>
+                    <span>{option || `${index + 1}. seçenek`}</span>
+                  </div>
+                ))}
               </div>
             )}
 
@@ -700,11 +634,7 @@ const QuestionForm: React.FC<QuestionFormProps> = ({ mode }) => {
                 name="question_text"
                 control={control}
                 render={({ field }) => (
-                  <FormField
-                    label="Soru Metni"
-                    error={errors.question_text?.message}
-                    required
-                  >
+                  <FormField label="Soru Metni" error={errors.question_text?.message} required>
                     <Textarea
                       {...field}
                       placeholder="Sorunuzu buraya yazın..."
@@ -720,11 +650,7 @@ const QuestionForm: React.FC<QuestionFormProps> = ({ mode }) => {
                   name="question_type"
                   control={control}
                   render={({ field }) => (
-                    <FormField
-                      label="Soru Tipi"
-                      error={errors.question_type?.message}
-                      required
-                    >
+                    <FormField label="Soru Tipi" error={errors.question_type?.message} required>
                       <Select {...field} error={!!errors.question_type}>
                         <option value="multiple_choice">Çoktan Seçmeli</option>
                         <option value="true_false">Doğru/Yanlış</option>
@@ -739,20 +665,14 @@ const QuestionForm: React.FC<QuestionFormProps> = ({ mode }) => {
                   name="points"
                   control={control}
                   render={({ field }) => (
-                    <FormField
-                      label="Puan"
-                      error={errors.points?.message}
-                      required
-                    >
+                    <FormField label="Puan" error={errors.points?.message} required>
                       <Input
                         {...field}
                         type="number"
                         min="0.1"
                         max="100"
                         step="0.1"
-                        onChange={(e) =>
-                          field.onChange(parseFloat(e.target.value))
-                        }
+                        onChange={(e) => field.onChange(parseFloat(e.target.value))}
                         error={!!errors.points}
                       />
                     </FormField>
@@ -789,9 +709,7 @@ const QuestionForm: React.FC<QuestionFormProps> = ({ mode }) => {
                       onChange={field.onChange}
                       className="rounded border-gray-300"
                     />
-                    <span className="text-sm font-medium">
-                      Bu soru zorunludur
-                    </span>
+                    <span className="text-sm font-medium">Bu soru zorunludur</span>
                   </label>
                 )}
               />
@@ -820,10 +738,7 @@ const QuestionForm: React.FC<QuestionFormProps> = ({ mode }) => {
                 name="explanation"
                 control={control}
                 render={({ field }) => (
-                  <FormField
-                    label="Açıklama"
-                    error={errors.explanation?.message}
-                  >
+                  <FormField label="Açıklama" error={errors.explanation?.message}>
                     <Textarea
                       {...field}
                       placeholder="Sorunun doğru cevabının açıklaması..."
@@ -838,12 +753,7 @@ const QuestionForm: React.FC<QuestionFormProps> = ({ mode }) => {
               <div>
                 <div className="flex justify-between items-center mb-2">
                   <label className="text-sm font-medium">İpuçları</label>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => addHint('')}
-                  >
+                  <Button type="button" variant="outline" size="sm" onClick={() => addHint('')}>
                     <Plus className="mr-1 h-4 w-4" />
                     İpucu Ekle
                   </Button>
@@ -905,11 +815,7 @@ const QuestionForm: React.FC<QuestionFormProps> = ({ mode }) => {
               İptal
             </Button>
 
-            <Button
-              type="submit"
-              loading={isSubmitting}
-              disabled={isSubmitting}
-            >
+            <Button type="submit" loading={isSubmitting} disabled={isSubmitting}>
               <Save className="mr-2 h-4 w-4" />
               {mode === 'create' ? 'Soruyu Ekle' : 'Güncelle'}
             </Button>

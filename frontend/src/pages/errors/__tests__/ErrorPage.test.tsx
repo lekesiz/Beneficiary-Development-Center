@@ -116,9 +116,7 @@ describe('ErrorPage', () => {
     const contactButton = screen.getByText('Contact Support');
     fireEvent.click(contactButton);
 
-    expect(openMock).toHaveBeenCalledWith(
-      expect.stringContaining('mailto:support@bdc.com')
-    );
+    expect(openMock).toHaveBeenCalledWith(expect.stringContaining('mailto:support@bdc.com'));
   });
 
   it('allows custom button visibility overrides', () => {

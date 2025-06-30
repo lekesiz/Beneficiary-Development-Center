@@ -13,12 +13,76 @@ from pathlib import Path
 def setup_logging(app=None):
     """Setup structured logging for the application"""
     
-    # Create logs directory if it doesn't exist
-    log_dir = Path('logs')
-    log_dir.mkdir(exist_ok=True)
+    # Use /tmp for logs in App Engine, otherwise create logs directory
+    if os.environ.get('GAE_ENV', '').startswith('standard'):
+        log_dir = Path('/tmp/logs')
+    else:
+        log_dir = Path('logs')
+    
+    try:
+        log_dir.mkdir(exist_ok=True)
+    except OSError:
+        # If we can't create the directory, use stdout only
+        log_dir = None
     
     # Determine log level from environment
     log_level = os.getenv('LOG_LEVEL', 'INFO').upper()
+    
+    # Base handlers - always include console
+    handlers_config = {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'level': log_level,
+            'formatter': 'default',
+            'stream': sys.stdout
+        }
+    }
+    
+    # Add file handlers only if we have a writable log directory
+    if log_dir is not None:
+        handlers_config.update({
+            'file': {
+                'class': 'logging.handlers.RotatingFileHandler',
+                'level': 'INFO',
+                'formatter': 'detailed',
+                'filename': str(log_dir / 'app.log'),
+                'maxBytes': 10485760,  # 10MB
+                'backupCount': 5,
+                'encoding': 'utf8'
+            },
+            'error_file': {
+                'class': 'logging.handlers.RotatingFileHandler',
+                'level': 'ERROR',
+                'formatter': 'detailed',
+                'filename': str(log_dir / 'errors.log'),
+                'maxBytes': 10485760,  # 10MB
+                'backupCount': 5,
+                'encoding': 'utf8'
+            },
+            'access_file': {
+                'class': 'logging.handlers.RotatingFileHandler',
+                'level': 'INFO',
+                'formatter': 'default',
+                'filename': str(log_dir / 'access.log'),
+                'maxBytes': 10485760,  # 10MB
+                'backupCount': 5,
+                'encoding': 'utf8'
+            },
+            'security_file': {
+                'class': 'logging.handlers.RotatingFileHandler',
+                'level': 'WARNING',
+                'formatter': 'detailed',
+                'filename': str(log_dir / 'security.log'),
+                'maxBytes': 10485760,  # 10MB
+                'backupCount': 5,
+                'encoding': 'utf8'
+            }
+        })
+    
+    # Determine which handlers to use
+    default_handlers = ['console']
+    if log_dir is not None:
+        default_handlers.extend(['file', 'error_file'])
     
     # Logging configuration
     LOGGING_CONFIG = {
@@ -38,80 +102,37 @@ def setup_logging(app=None):
                 'format': '%(asctime)s %(name)s %(levelname)s %(message)s'
             }
         },
-        'handlers': {
-            'console': {
-                'class': 'logging.StreamHandler',
-                'level': log_level,
-                'formatter': 'default',
-                'stream': sys.stdout
-            },
-            'file': {
-                'class': 'logging.handlers.RotatingFileHandler',
-                'level': 'INFO',
-                'formatter': 'detailed',
-                'filename': 'logs/app.log',
-                'maxBytes': 10485760,  # 10MB
-                'backupCount': 5,
-                'encoding': 'utf8'
-            },
-            'error_file': {
-                'class': 'logging.handlers.RotatingFileHandler',
-                'level': 'ERROR',
-                'formatter': 'detailed',
-                'filename': 'logs/errors.log',
-                'maxBytes': 10485760,  # 10MB
-                'backupCount': 5,
-                'encoding': 'utf8'
-            },
-            'access_file': {
-                'class': 'logging.handlers.RotatingFileHandler',
-                'level': 'INFO',
-                'formatter': 'default',
-                'filename': 'logs/access.log',
-                'maxBytes': 10485760,  # 10MB
-                'backupCount': 5,
-                'encoding': 'utf8'
-            },
-            'security_file': {
-                'class': 'logging.handlers.RotatingFileHandler',
-                'level': 'WARNING',
-                'formatter': 'detailed',
-                'filename': 'logs/security.log',
-                'maxBytes': 10485760,  # 10MB
-                'backupCount': 5,
-                'encoding': 'utf8'
-            }
-        },
+        'handlers': handlers_config,
         'loggers': {
             'app': {
                 'level': log_level,
-                'handlers': ['console', 'file', 'error_file'],
+                'handlers': default_handlers,
                 'propagate': False
             },
             'app.api': {
                 'level': log_level,
-                'handlers': ['console', 'file', 'access_file'],
+                'handlers': ['console'] + (['file', 'access_file'] if log_dir else []),
                 'propagate': False
             },
             'app.security': {
                 'level': 'WARNING',
-                'handlers': ['console', 'security_file'],
+                'handlers': ['console'] + (['security_file'] if log_dir else []),
                 'propagate': False
             },
             'sqlalchemy.engine': {
                 'level': 'WARNING',
-                'handlers': ['console', 'file'],
+                'handlers': ['console'] + (['file'] if log_dir else []),
                 'propagate': False
             },
             'werkzeug': {
                 'level': 'WARNING',
-                'handlers': ['console', 'access_file'],
+                'handlers': ['console'] + (['access_file'] if log_dir else []),
                 'propagate': False
             }
         },
         'root': {
             'level': log_level,
-            'handlers': ['console', 'file']
+            'handlers': ['console'] + (['file'] if log_dir else [])
         }
     }
     

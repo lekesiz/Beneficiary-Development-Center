@@ -87,7 +87,7 @@ describe('Program Management - End to End', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    
+
     // Mock authentication
     vi.mocked(authContext.useAuth).mockReturnValue({
       user: {
@@ -135,7 +135,7 @@ describe('Program Management - End to End', () => {
       isLoading: false,
       error: null,
     } as any);
-    
+
     vi.mocked(usePrograms.useDeleteProgram).mockReturnValue({
       mutateAsync: vi.fn(),
       isPending: false,
@@ -179,7 +179,7 @@ describe('Program Management - End to End', () => {
     await programsApi.create(newProgram);
     expect(vi.mocked(programsApi.create)).toHaveBeenCalledWith(newProgram);
 
-    // Test update  
+    // Test update
     await programsApi.update(1, { title: 'Updated Program' });
     expect(vi.mocked(programsApi.update)).toHaveBeenCalledWith(1, { title: 'Updated Program' });
 

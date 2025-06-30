@@ -10,9 +10,65 @@ users_bp = Blueprint("users", __name__)
 
 
 @users_bp.route("/")
+@jwt_required()
 def get_users():
     """Get all users."""
-    return {"message": "Users endpoint"}
+    from app.core.jwt_utils import get_current_user_id
+    from app.core.decorators import requires_role
+    
+    try:
+        current_user_id = get_current_user_id()
+        current_user = db.session.query(User).filter_by(id=current_user_id).first()
+        
+        if not current_user:
+            return jsonify({"error": "User not found"}), 404
+            
+        # Only admins and managers can list all users
+        if current_user.role not in ["admin", "manager"]:
+            return jsonify({"error": "Insufficient permissions"}), 403
+        
+        # Get users from same tenant
+        users = db.session.query(User).filter_by(tenant_id=current_user.tenant_id).all()
+        
+        return jsonify({
+            "users": [user.to_dict() for user in users],
+            "total": len(users)
+        }), 200
+        
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@users_bp.route("/<int:user_id>")
+@jwt_required()
+def get_user(user_id):
+    """Get a specific user by ID."""
+    from app.core.jwt_utils import get_current_user_id
+    
+    try:
+        current_user_id = get_current_user_id()
+        current_user = db.session.query(User).filter_by(id=current_user_id).first()
+        
+        if not current_user:
+            return jsonify({"error": "User not found"}), 404
+        
+        # Users can view their own profile, admins/managers can view any user
+        if user_id != current_user_id and current_user.role not in ["admin", "manager"]:
+            return jsonify({"error": "Insufficient permissions"}), 403
+        
+        # Get the requested user
+        user = db.session.query(User).filter_by(
+            id=user_id, 
+            tenant_id=current_user.tenant_id
+        ).first()
+        
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+        
+        return jsonify(user.to_dict(include_roles=True)), 200
+        
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 @users_bp.route("/me/preferences", methods=["PUT"])
@@ -134,45 +190,41 @@ def update_user_preferences():
         # Get current user
         user_id = get_jwt_identity()
         user = db.session.get(User, user_id)
-        
+
         if not user:
             return jsonify({"message": "User not found"}), 404
-        
+
         # Get request data
         data = request.get_json()
-        
-        if not data or 'notifications' not in data:
+
+        if not data or "notifications" not in data:
             return jsonify({"message": "Invalid preferences format"}), 400
-        
+
         # Update preferences in the JSONB column
         if not user.preferences:
             user.preferences = {}
-        
+
         # Update notification preferences
-        user.preferences['notifications'] = data['notifications']
-        
+        user.preferences["notifications"] = data["notifications"]
+
         # Mark the column as modified for SQLAlchemy to detect the change
         db.session.query(User).filter_by(id=user_id).update(
-            {"preferences": user.preferences},
-            synchronize_session=False
+            {"preferences": user.preferences}, synchronize_session=False
         )
-        
+
         db.session.commit()
-        
+
         # Log the action
         log_user_action(
             "update_preferences",
             user_id=user.id,
             tenant_id=user.tenant_id,
             email=user.email,
-            preferences_type="notifications"
+            preferences_type="notifications",
         )
-        
-        return jsonify({
-            "message": "Preferences updated successfully",
-            "preferences": user.preferences
-        }), 200
-        
+
+        return jsonify({"message": "Preferences updated successfully", "preferences": user.preferences}), 200
+
     except Exception as e:
         db.session.rollback()
         return jsonify({"message": f"Failed to update preferences: {str(e)}"}), 500
@@ -226,33 +278,33 @@ def get_user_preferences():
         # Get current user
         user_id = get_jwt_identity()
         user = db.session.get(User, user_id)
-        
+
         if not user:
             return jsonify({"message": "User not found"}), 404
-        
+
         # Get preferences, return default if not set
         preferences = user.preferences or {}
-        
+
         # Ensure notifications structure exists with defaults
-        if 'notifications' not in preferences:
-            preferences['notifications'] = {
-                'email': {
-                    'new_message': True,
-                    'appointment_reminder': True,
-                    'evaluation_completed': True,
-                    'course_enrollment': True,
-                    'program_update': True
+        if "notifications" not in preferences:
+            preferences["notifications"] = {
+                "email": {
+                    "new_message": True,
+                    "appointment_reminder": True,
+                    "evaluation_completed": True,
+                    "course_enrollment": True,
+                    "program_update": True,
                 },
-                'in_app': {
-                    'new_message': True,
-                    'appointment_reminder': True,
-                    'evaluation_completed': True,
-                    'course_enrollment': True,
-                    'program_update': True
-                }
+                "in_app": {
+                    "new_message": True,
+                    "appointment_reminder": True,
+                    "evaluation_completed": True,
+                    "course_enrollment": True,
+                    "program_update": True,
+                },
             }
-        
+
         return jsonify({"preferences": preferences}), 200
-        
+
     except Exception as e:
         return jsonify({"message": f"Failed to get preferences: {str(e)}"}), 500

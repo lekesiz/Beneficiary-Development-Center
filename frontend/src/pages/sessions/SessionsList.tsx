@@ -33,7 +33,11 @@ export const SessionsList: React.FC = () => {
   const [filterInstructor, setFilterInstructor] = useState<number | null>(null);
 
   // This hook would need to be created to fetch all sessions
-  const { data: sessions, isLoading, error } = useSessions({
+  const {
+    data: sessions,
+    isLoading,
+    error,
+  } = useSessions({
     include_past: showPast,
     instructor_id: filterInstructor,
   });
@@ -49,9 +53,7 @@ export const SessionsList: React.FC = () => {
   if (error) {
     return (
       <Card className="p-6">
-        <div className="text-center text-red-600">
-          Oturumlar yüklenirken hata oluştu.
-        </div>
+        <div className="text-center text-red-600">Oturumlar yüklenirken hata oluştu.</div>
       </Card>
     );
   }
@@ -103,13 +105,11 @@ export const SessionsList: React.FC = () => {
                 {upcomingSessions.length > 0
                   ? Math.ceil(
                       (new Date(upcomingSessions[0].session_date).getTime() - Date.now()) /
-                      (1000 * 60 * 60 * 24)
+                        (1000 * 60 * 60 * 24)
                     )
                   : '-'}
               </div>
-              <div className="text-sm text-gray-600">
-                Sonraki Oturuma Gün
-              </div>
+              <div className="text-sm text-gray-600">Sonraki Oturuma Gün</div>
             </div>
           </div>
         </Card>
@@ -144,11 +144,7 @@ export const SessionsList: React.FC = () => {
               <h2 className="text-lg font-semibold mb-4">Yaklaşan Oturumlar</h2>
               <div className="grid grid-cols-1 gap-4">
                 {upcomingSessions.map((session: SessionWithCourse) => (
-                  <SessionCard
-                    key={session.id}
-                    session={session}
-                    isPast={false}
-                  />
+                  <SessionCard key={session.id} session={session} isPast={false} />
                 ))}
               </div>
             </div>
@@ -157,16 +153,10 @@ export const SessionsList: React.FC = () => {
           {/* Past Sessions */}
           {showPast && pastSessions.length > 0 && (
             <div>
-              <h2 className="text-lg font-semibold mb-4 text-gray-600">
-                Geçmiş Oturumlar
-              </h2>
+              <h2 className="text-lg font-semibold mb-4 text-gray-600">Geçmiş Oturumlar</h2>
               <div className="grid grid-cols-1 gap-4">
                 {pastSessions.map((session: SessionWithCourse) => (
-                  <SessionCard
-                    key={session.id}
-                    session={session}
-                    isPast={true}
-                  />
+                  <SessionCard key={session.id} session={session} isPast={true} />
                 ))}
               </div>
             </div>
@@ -200,13 +190,13 @@ const SessionCard: React.FC<{
                   {session.course.title} ({session.course.code})
                 </Link>
               )}
-              
+
               <div className="flex flex-wrap gap-4 text-sm text-gray-600 mb-3">
                 <div className="flex items-center gap-1">
                   <Clock className="h-4 w-4" />
                   <span>{formatSessionDateTime(session)}</span>
                 </div>
-                
+
                 {session.is_online ? (
                   <div className="flex items-center gap-1">
                     <Globe className="h-4 w-4" />
@@ -221,7 +211,7 @@ const SessionCard: React.FC<{
                     </div>
                   )
                 )}
-                
+
                 {session.instructor_name && (
                   <div className="flex items-center gap-1">
                     <User className="h-4 w-4" />
@@ -242,10 +232,8 @@ const SessionCard: React.FC<{
                 ) : (
                   <Badge color="green">Yaklaşıyor</Badge>
                 )}
-                
-                {!session.is_mandatory && (
-                  <Badge variant="outline">Opsiyonel</Badge>
-                )}
+
+                {!session.is_mandatory && <Badge variant="outline">Opsiyonel</Badge>}
               </div>
             </div>
           </div>

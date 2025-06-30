@@ -16,7 +16,8 @@ interface ErrorPageProps {
 const errorConfigs = {
   404: {
     title: 'Page Not Found',
-    description: "We can't find the page you're looking for. It might have been moved, deleted, or you entered the wrong URL.",
+    description:
+      "We can't find the page you're looking for. It might have been moved, deleted, or you entered the wrong URL.",
     illustration: '🔍',
     primaryAction: 'Go Home',
     showBackButton: true,
@@ -26,7 +27,8 @@ const errorConfigs = {
   },
   403: {
     title: 'Access Denied',
-    description: "You don't have permission to access this resource. Contact your administrator if you believe this is an error.",
+    description:
+      "You don't have permission to access this resource. Contact your administrator if you believe this is an error.",
     illustration: '🔒',
     primaryAction: 'Go Back',
     showBackButton: true,
@@ -36,7 +38,8 @@ const errorConfigs = {
   },
   500: {
     title: 'Server Error',
-    description: 'Something went wrong on our end. Please try again later or contact support if the problem persists.',
+    description:
+      'Something went wrong on our end. Please try again later or contact support if the problem persists.',
     illustration: '⚠️',
     primaryAction: 'Try Again',
     showBackButton: true,
@@ -73,7 +76,11 @@ export default function ErrorPage({
   const handleContact = () => {
     const subject = encodeURIComponent(`Help needed - Error ${statusCode}`);
     const body = encodeURIComponent(
-      `I encountered an error while using the BDC application:\n\nError: ${statusCode} - ${title || config.title}\nURL: ${window.location.href}\nTimestamp: ${new Date().toISOString()}\n\nPlease describe what you were trying to do:\n\n`
+      `I encountered an error while using the BDC application:\n\nError: ${statusCode} - ${
+        title || config.title
+      }\nURL: ${
+        window.location.href
+      }\nTimestamp: ${new Date().toISOString()}\n\nPlease describe what you were trying to do:\n\n`
     );
     window.open(`mailto:support@bdc.com?subject=${subject}&body=${body}`);
   };
@@ -93,12 +100,8 @@ export default function ErrorPage({
           <div className="text-center mb-6">
             <div className="text-6xl mb-4">{config.illustration}</div>
             <div className="text-3xl font-bold text-gray-900 mb-2">{statusCode}</div>
-            <h1 className="text-xl font-semibold text-gray-900 mb-3">
-              {displayTitle}
-            </h1>
-            <p className="text-gray-600 text-sm leading-relaxed">
-              {displayDescription}
-            </p>
+            <h1 className="text-xl font-semibold text-gray-900 mb-3">{displayTitle}</h1>
+            <p className="text-gray-600 text-sm leading-relaxed">{displayDescription}</p>
           </div>
 
           {/* Action Buttons */}
@@ -106,22 +109,14 @@ export default function ErrorPage({
             {/* Primary Actions */}
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               {shouldShowBackButton && (
-                <Button
-                  onClick={handleGoBack}
-                  variant="outline"
-                  className="w-full"
-                >
+                <Button onClick={handleGoBack} variant="outline" className="w-full">
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Go Back
                 </Button>
               )}
-              
+
               {shouldShowHomeButton && (
-                <Button
-                  onClick={handleGoHome}
-                  variant="primary"
-                  className="w-full"
-                >
+                <Button onClick={handleGoHome} variant="primary" className="w-full">
                   <Home className="h-4 w-4 mr-2" />
                   Go Home
                 </Button>
@@ -132,22 +127,14 @@ export default function ErrorPage({
             {(shouldShowRefreshButton || shouldShowContactButton) && (
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 {shouldShowRefreshButton && (
-                  <Button
-                    onClick={handleRefresh}
-                    variant="ghost"
-                    className="w-full"
-                  >
+                  <Button onClick={handleRefresh} variant="ghost" className="w-full">
                     <RefreshCw className="h-4 w-4 mr-2" />
                     Try Again
                   </Button>
                 )}
-                
+
                 {shouldShowContactButton && (
-                  <Button
-                    onClick={handleContact}
-                    variant="ghost"
-                    className="w-full"
-                  >
+                  <Button onClick={handleContact} variant="ghost" className="w-full">
                     <Mail className="h-4 w-4 mr-2" />
                     Contact Support
                   </Button>

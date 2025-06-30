@@ -126,9 +126,7 @@ export const mockBeneficiaryList = [
   },
 ];
 
-export const createMockBeneficiary = (
-  overrides?: Partial<Beneficiary>
-): Beneficiary => {
+export const createMockBeneficiary = (overrides?: Partial<Beneficiary>): Beneficiary => {
   return {
     ...mockBeneficiary,
     ...overrides,

@@ -60,7 +60,7 @@ const renderWithRouter = (component: React.ReactElement) => {
       },
     },
   });
-  
+
   return render(
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>{component}</BrowserRouter>

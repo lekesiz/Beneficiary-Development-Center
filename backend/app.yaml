@@ -1,4 +1,5 @@
 runtime: python312
+entrypoint: gunicorn -b :$PORT main:app
 
 instance_class: F4
 
@@ -15,6 +16,10 @@ env_variables:
   FLASK_APP: "wsgi.py"
   GOOGLE_CLOUD_PROJECT: "bilan-competence-449414"
   GAE_ENV: "standard"
+  CLOUD_SQL_CONNECTION_NAME: "bilan-competence-449414:europe-west1:bdc-db"
+  DB_NAME: "bdc_production"
+  DB_USER: "bdc_user"
+  CORS_ORIGINS: "https://bilan-competence-449414.ew.r.appspot.com"
 
 handlers:
 - url: /static
@@ -25,12 +30,13 @@ handlers:
   script: auto
   secure: always
 
-vpc_access_connector:
-  name: projects/bilan-competence-449414/locations/europe-west1/connectors/bdc-connector
+# VPC connector disabled for now
+# vpc_access_connector:
+#   name: projects/bilan-competence-449414/locations/europe-west1/connectors/bdc-connector
 
 # Health check configuration
 readiness_check:
-  path: "/api/v1/health"
+  path: "/ready"
   check_interval_sec: 5
   timeout_sec: 4
   failure_threshold: 2
@@ -38,15 +44,8 @@ readiness_check:
   app_start_timeout_sec: 300
 
 liveness_check:
-  path: "/api/v1/health"
+  path: "/health"
   check_interval_sec: 30
   timeout_sec: 4
   failure_threshold: 2
   success_threshold: 2
-
-# Environment specific configuration
-env_variables:
-  CLOUD_SQL_CONNECTION_NAME: "bilan-competence-449414:europe-west1:bdc-db"
-  DB_NAME: "bdc_production"
-  DB_USER: "bdc_user"
-  CORS_ORIGINS: "https://bilan-competence-449414.ew.r.appspot.com"

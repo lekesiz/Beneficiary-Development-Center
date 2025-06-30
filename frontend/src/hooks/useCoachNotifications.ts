@@ -38,24 +38,17 @@ export function useCoachNotifications(): UseCoachNotificationsReturn {
 
   // Initialize Socket.IO connection
   useEffect(() => {
-    if (
-      !user ||
-      !token ||
-      !['admin', 'manager', 'instructor', 'trainer'].includes(user.role)
-    ) {
+    if (!user || !token || !['admin', 'manager', 'instructor', 'trainer'].includes(user.role)) {
       return;
     }
 
-    const socketInstance = io(
-      process.env.REACT_APP_API_URL || 'http://localhost:5000',
-      {
-        auth: {
-          token: token,
-        },
-        transports: ['websocket', 'polling'],
-        withCredentials: true,
-      }
-    );
+    const socketInstance = io(process.env.REACT_APP_API_URL || 'http://localhost:5000', {
+      auth: {
+        token: token,
+      },
+      transports: ['websocket', 'polling'],
+      withCredentials: true,
+    });
 
     socketInstance.on('connect', () => {
       console.log('Connected to notification service');
@@ -130,9 +123,7 @@ export function useCoachNotifications(): UseCoachNotificationsReturn {
 
   const markAsRead = useCallback((notificationId: string) => {
     setNotifications((prev) =>
-      prev.map((notif) =>
-        notif.id === notificationId ? { ...notif, read: true } : notif
-      )
+      prev.map((notif) => (notif.id === notificationId ? { ...notif, read: true } : notif))
     );
   }, []);
 
@@ -141,9 +132,7 @@ export function useCoachNotifications(): UseCoachNotificationsReturn {
   }, []);
 
   const clearNotification = useCallback((notificationId: string) => {
-    setNotifications((prev) =>
-      prev.filter((notif) => notif.id !== notificationId)
-    );
+    setNotifications((prev) => prev.filter((notif) => notif.id !== notificationId));
   }, []);
 
   const unreadCount = notifications.filter((n) => !n.read).length;

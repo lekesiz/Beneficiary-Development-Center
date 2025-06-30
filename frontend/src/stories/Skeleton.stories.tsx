@@ -9,7 +9,8 @@ const meta = {
     layout: 'centered',
     docs: {
       description: {
-        component: 'Skeleton screens provide a low fidelity representation of content before it loads to improve perceived performance.',
+        component:
+          'Skeleton screens provide a low fidelity representation of content before it loads to improve perceived performance.',
       },
     },
   },

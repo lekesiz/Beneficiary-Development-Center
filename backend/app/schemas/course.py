@@ -16,8 +16,12 @@ class CourseBaseSchema(Schema):
     description = fields.String(allow_none=True)
 
     # Course details
-    status = fields.String(validate=validate.OneOf([s.value for s in CourseStatus]), load_default=CourseStatus.DRAFT.value)
-    format = fields.String(validate=validate.OneOf([f.value for f in CourseFormat]), load_default=CourseFormat.LECTURE.value)
+    status = fields.String(
+        validate=validate.OneOf([s.value for s in CourseStatus]), load_default=CourseStatus.DRAFT.value
+    )
+    format = fields.String(
+        validate=validate.OneOf([f.value for f in CourseFormat]), load_default=CourseFormat.LECTURE.value
+    )
     difficulty_level = fields.String(
         validate=validate.OneOf([d.value for d in DifficultyLevel]), load_default=DifficultyLevel.BEGINNER.value
     )
@@ -56,7 +60,7 @@ class CourseBaseSchema(Schema):
 
     # Relations
     instructor_id = fields.Integer(allow_none=True)
-    program_id = fields.Integer(required=True)
+    program_id = fields.Integer(required=False)  # Not required for create since it comes from URL
 
     @pre_load
     def process_input(self, data, **kwargs):
@@ -120,7 +124,7 @@ class CourseResponseSchema(CourseBaseSchema):
     instructor_name = fields.String(dump_only=True)
     program_title = fields.String(dump_only=True)
     program_code = fields.String(dump_only=True)
-    
+
     # Optional related data
     sessions = fields.List(fields.Dict(), dump_only=True, load_default=None)
 

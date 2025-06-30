@@ -3,6 +3,9 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 import { NotificationSettings } from '@/components/settings/NotificationSettings';
+import { AppearanceSettings } from '@/components/settings/AppearanceSettings';
+import { ProfileSettings } from '@/components/settings/ProfileSettings';
+import { SecuritySettings } from '@/components/settings/SecuritySettings';
 import { Card } from '@/components/ui/Card';
 
 interface Tab {
@@ -13,36 +16,15 @@ interface Tab {
 }
 
 const ProfileTab: React.FC = () => {
-  return (
-    <Card>
-      <div className="p-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Profile Settings</h3>
-        <p className="text-gray-500">Profile settings will be implemented here.</p>
-      </div>
-    </Card>
-  );
+  return <ProfileSettings />;
 };
 
 const SecurityTab: React.FC = () => {
-  return (
-    <Card>
-      <div className="p-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Security Settings</h3>
-        <p className="text-gray-500">Security settings will be implemented here.</p>
-      </div>
-    </Card>
-  );
+  return <SecuritySettings />;
 };
 
 const AppearanceTab: React.FC = () => {
-  return (
-    <Card>
-      <div className="p-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Appearance Settings</h3>
-        <p className="text-gray-500">Appearance settings will be implemented here.</p>
-      </div>
-    </Card>
-  );
+  return <AppearanceSettings />;
 };
 
 const tabs: Tab[] = [
@@ -75,13 +57,13 @@ const tabs: Tab[] = [
 export default function Settings() {
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   // Get initial tab from URL or default to 'profile'
   const getInitialTab = () => {
     const hash = location.hash.replace('#', '');
-    return tabs.find(tab => tab.id === hash) ? hash : 'profile';
+    return tabs.find((tab) => tab.id === hash) ? hash : 'profile';
   };
-  
+
   const [activeTab, setActiveTab] = useState(getInitialTab());
 
   const handleTabChange = (tabId: string) => {
@@ -89,7 +71,7 @@ export default function Settings() {
     navigate(`#${tabId}`, { replace: true });
   };
 
-  const ActiveComponent = tabs.find(tab => tab.id === activeTab)?.component || ProfileTab;
+  const ActiveComponent = tabs.find((tab) => tab.id === activeTab)?.component || ProfileTab;
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
@@ -111,9 +93,10 @@ export default function Settings() {
                   className={`
                     w-full flex items-center space-x-3 px-3 py-2 text-sm font-medium rounded-md
                     transition-colors duration-150 ease-in-out
-                    ${activeTab === tab.id
-                      ? 'bg-primary-50 text-primary-700 border-l-4 border-primary-600'
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                    ${
+                      activeTab === tab.id
+                        ? 'bg-primary-50 text-primary-700 border-l-4 border-primary-600'
+                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                     }
                   `}
                   aria-current={activeTab === tab.id ? 'page' : undefined}

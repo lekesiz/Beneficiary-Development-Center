@@ -91,7 +91,7 @@ describe('Settings Page', () => {
 
     // Click on Notifications tab
     fireEvent.click(screen.getByText('Notifications'));
-    
+
     // Wait for notification preferences to load
     await waitFor(() => {
       expect(screen.getByText('Notification Preferences')).toBeInTheDocument();

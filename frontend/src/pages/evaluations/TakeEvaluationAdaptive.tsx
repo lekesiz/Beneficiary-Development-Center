@@ -36,11 +36,7 @@ import {
   useSaveQuestionResponse,
   useEvaluationAttempt,
 } from '@/hooks/useEvaluations';
-import type {
-  Question,
-  EvaluationAttempt,
-  QuestionResponse,
-} from '@/types/evaluation';
+import type { Question, EvaluationAttempt, QuestionResponse } from '@/types/evaluation';
 
 // Question types components (reuse from original TakeEvaluation)
 interface QuestionComponentProps {
@@ -71,9 +67,7 @@ const MultipleChoiceQuestion: React.FC<QuestionComponentProps> = ({
             name={`question-${question.id}`}
             value={option}
             checked={response?.selected_option === option}
-            onChange={(e) =>
-              onResponseChange({ selected_option: e.target.value })
-            }
+            onChange={(e) => onResponseChange({ selected_option: e.target.value })}
             disabled={disabled}
             className="text-blue-600"
           />
@@ -141,8 +135,7 @@ const ShortAnswerQuestion: React.FC<QuestionComponentProps> = ({
       />
       {question.question_data.max_length && (
         <p className="text-sm text-gray-500 mt-1">
-          {(response?.text || '').length} / {question.question_data.max_length}{' '}
-          karakter
+          {(response?.text || '').length} / {question.question_data.max_length} karakter
         </p>
       )}
     </div>
@@ -220,17 +213,10 @@ const AdaptiveDifficultyIndicator: React.FC<{
 }> = ({ currentDifficulty, isAdapting }) => {
   return (
     <div className="flex items-center space-x-2">
-      <Brain
-        className={`h-5 w-5 ${
-          isAdapting ? 'animate-pulse' : ''
-        } text-purple-600`}
-      />
+      <Brain className={`h-5 w-5 ${isAdapting ? 'animate-pulse' : ''} text-purple-600`} />
       <div>
         <span className="text-sm text-gray-600">AI Zorluk Seviyesi:</span>
-        <Badge
-          className={`ml-2 ${getDifficultyColor(currentDifficulty)}`}
-          variant="outline"
-        >
+        <Badge className={`ml-2 ${getDifficultyColor(currentDifficulty)}`} variant="outline">
           {getDifficultyLabel(currentDifficulty)}
         </Badge>
       </div>
@@ -249,10 +235,8 @@ const PerformanceIndicator: React.FC<{
   recentPerformance: number; // 0-1 scale
 }> = ({ recentPerformance }) => {
   const getPerformanceIcon = () => {
-    if (recentPerformance >= 0.8)
-      return <TrendingUp className="h-5 w-5 text-green-600" />;
-    if (recentPerformance <= 0.4)
-      return <TrendingDown className="h-5 w-5 text-red-600" />;
+    if (recentPerformance >= 0.8) return <TrendingUp className="h-5 w-5 text-green-600" />;
+    if (recentPerformance <= 0.4) return <TrendingDown className="h-5 w-5 text-red-600" />;
     return <Activity className="h-5 w-5 text-yellow-600" />;
   };
 
@@ -281,15 +265,13 @@ export default function TakeEvaluationAdaptive() {
   const [responses, setResponses] = useState<Record<number, any>>({});
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
-  const [currentAttempt, setCurrentAttempt] =
-    useState<EvaluationAttempt | null>(null);
+  const [currentAttempt, setCurrentAttempt] = useState<EvaluationAttempt | null>(null);
   const [isLoadingQuestion, setIsLoadingQuestion] = useState(false);
   const [answeredQuestions, setAnsweredQuestions] = useState<Question[]>([]);
   const [recentPerformance, setRecentPerformance] = useState(0.5);
 
   // React Query hooks
-  const { data: evaluation, isLoading: evaluationLoading } =
-    useEvaluation(evaluationId);
+  const { data: evaluation, isLoading: evaluationLoading } = useEvaluation(evaluationId);
   const startAttemptMutation = useStartEvaluationAttempt();
   const submitAttemptMutation = useSubmitEvaluationAttempt();
   const saveResponseMutation = useSaveQuestionResponse();
@@ -433,9 +415,7 @@ export default function TakeEvaluationAdaptive() {
         },
         {
           onSuccess: () => {
-            navigate(
-              `/evaluations/${evaluationId}/results/${currentAttempt.id}`
-            );
+            navigate(`/evaluations/${evaluationId}/results/${currentAttempt.id}`);
           },
         }
       );
@@ -495,9 +475,7 @@ export default function TakeEvaluationAdaptive() {
       <div className="p-6">
         <div className="text-center py-12">
           <AlertCircle className="h-12 w-12 text-yellow-500 mx-auto mb-4" />
-          <p className="text-yellow-600">
-            Bu değerlendirme şu anda mevcut değil.
-          </p>
+          <p className="text-yellow-600">Bu değerlendirme şu anda mevcut değil.</p>
           <button
             onClick={() => navigate('/evaluations')}
             className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
@@ -511,9 +489,7 @@ export default function TakeEvaluationAdaptive() {
 
   const answeredCount = Object.keys(responses).length;
   const progressPercentage =
-    evaluation.total_questions > 0
-      ? (answeredCount / evaluation.total_questions) * 100
-      : 0;
+    evaluation.total_questions > 0 ? (answeredCount / evaluation.total_questions) * 100 : 0;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -524,18 +500,14 @@ export default function TakeEvaluationAdaptive() {
             <div>
               <h1 className="text-xl font-bold">{evaluation.title}</h1>
               <div className="flex items-center space-x-4 mt-1">
-                <span className="text-sm text-gray-600">
-                  Soru {currentQuestionIndex + 1}
-                </span>
+                <span className="text-sm text-gray-600">Soru {currentQuestionIndex + 1}</span>
                 <div className="w-32 bg-gray-200 rounded-full h-2">
                   <div
                     className="bg-blue-600 h-2 rounded-full transition-all"
                     style={{ width: `${progressPercentage}%` }}
                   />
                 </div>
-                <span className="text-sm text-gray-600">
-                  {answeredCount} cevaplandı
-                </span>
+                <span className="text-sm text-gray-600">{answeredCount} cevaplandı</span>
               </div>
             </div>
 
@@ -587,32 +559,21 @@ export default function TakeEvaluationAdaptive() {
               <div>
                 <div className="flex items-center space-x-2 mb-2">
                   <Badge variant="outline">
-                    {currentQuestion.question_type === 'multiple_choice' &&
-                      'Çoktan Seçmeli'}
-                    {currentQuestion.question_type === 'true_false' &&
-                      'Doğru/Yanlış'}
-                    {currentQuestion.question_type === 'short_answer' &&
-                      'Kısa Cevap'}
+                    {currentQuestion.question_type === 'multiple_choice' && 'Çoktan Seçmeli'}
+                    {currentQuestion.question_type === 'true_false' && 'Doğru/Yanlış'}
+                    {currentQuestion.question_type === 'short_answer' && 'Kısa Cevap'}
                     {currentQuestion.question_type === 'essay' && 'Kompozisyon'}
                   </Badge>
-                  <Badge variant="secondary">
-                    {currentQuestion.points} Puan
-                  </Badge>
-                  {currentQuestion.is_required && (
-                    <Badge variant="warning">Zorunlu</Badge>
-                  )}
+                  <Badge variant="secondary">{currentQuestion.points} Puan</Badge>
+                  {currentQuestion.is_required && <Badge variant="warning">Zorunlu</Badge>}
                   <Badge
-                    className={getDifficultyColor(
-                      currentQuestion.difficulty_level
-                    )}
+                    className={getDifficultyColor(currentQuestion.difficulty_level)}
                     variant="outline"
                   >
                     {getDifficultyLabel(currentQuestion.difficulty_level)}
                   </Badge>
                 </div>
-                <h2 className="text-lg font-medium mb-4">
-                  {currentQuestion.question_text}
-                </h2>
+                <h2 className="text-lg font-medium mb-4">{currentQuestion.question_text}</h2>
               </div>
             </div>
 
@@ -649,9 +610,7 @@ export default function TakeEvaluationAdaptive() {
                   <CheckCircle className="h-5 w-5 text-green-600" />
                 )}
                 <span className="text-sm text-gray-600">
-                  {responses[currentQuestion.id]
-                    ? 'Cevaplandı'
-                    : 'Cevaplanmadı'}
+                  {responses[currentQuestion.id] ? 'Cevaplandı' : 'Cevaplanmadı'}
                 </span>
               </div>
 
@@ -686,8 +645,7 @@ export default function TakeEvaluationAdaptive() {
               <div>
                 <h4 className="font-medium text-yellow-800">Dikkat!</h4>
                 <p className="text-yellow-700 text-sm mt-1">
-                  Değerlendirmeyi bitirdikten sonra cevaplarınızı
-                  değiştiremezsiniz.
+                  Değerlendirmeyi bitirdikten sonra cevaplarınızı değiştiremezsiniz.
                 </p>
               </div>
             </div>
@@ -696,9 +654,7 @@ export default function TakeEvaluationAdaptive() {
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div className="bg-gray-50 p-3 rounded">
               <div className="font-medium">Cevaplanan</div>
-              <div className="text-lg font-bold text-green-600">
-                {answeredCount}
-              </div>
+              <div className="text-lg font-bold text-green-600">{answeredCount}</div>
             </div>
             <div className="bg-gray-50 p-3 rounded">
               <div className="font-medium">AI Adaptasyon</div>
@@ -710,10 +666,7 @@ export default function TakeEvaluationAdaptive() {
             <Button variant="outline" onClick={() => setShowSubmitModal(false)}>
               Devam Et
             </Button>
-            <Button
-              onClick={handleSubmit}
-              loading={submitAttemptMutation.isPending}
-            >
+            <Button onClick={handleSubmit} loading={submitAttemptMutation.isPending}>
               Bitir ve Gönder
             </Button>
           </div>

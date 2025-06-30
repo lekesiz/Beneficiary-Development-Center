@@ -17,21 +17,12 @@ export const programFormSchema = z
     end_date: z.string().min(1, 'Bitiş tarihi zorunludur'),
     enrollment_start: z.string().optional(),
     enrollment_end: z.string().optional(),
-    min_participants: z
-      .number()
-      .min(1, 'Minimum katılımcı sayısı en az 1 olmalıdır')
-      .optional(),
-    max_participants: z
-      .number()
-      .min(1, 'Maksimum katılımcı sayısı en az 1 olmalıdır'),
+    min_participants: z.number().min(1, 'Minimum katılımcı sayısı en az 1 olmalıdır').optional(),
+    max_participants: z.number().min(1, 'Maksimum katılımcı sayısı en az 1 olmalıdır'),
     location: z.string().optional(),
     is_online: z.boolean().optional(),
     is_hybrid: z.boolean().optional(),
-    online_link: z
-      .string()
-      .url('Geçerli bir URL giriniz')
-      .optional()
-      .or(z.literal('')),
+    online_link: z.string().url('Geçerli bir URL giriniz').optional().or(z.literal('')),
     price: z.number().min(0, 'Ücret 0 veya daha büyük olmalıdır').optional(),
     currency: z.string().optional(),
     tags: z.array(z.string()).optional(),

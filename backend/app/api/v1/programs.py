@@ -11,6 +11,7 @@ from app.core.decorators import require_tenant, check_role
 from app.extensions import db
 from app.core.logging import logger
 from app.core.exceptions import NotFoundError, BadRequestError, ForbiddenError
+from app.core.jwt_utils import get_current_user_id
 
 bp = Blueprint("programs", __name__, url_prefix="/api/v1/programs")
 
@@ -69,7 +70,7 @@ def get_programs():
     try:
         jwt_payload = get_jwt()
         tenant_id = jwt_payload.get("tenant_id")
-        user_id = get_jwt_identity()
+        user_id = get_current_user_id()
 
         # Get current user
         user = db.session.query(User).filter_by(id=user_id).first()
@@ -154,7 +155,7 @@ def get_program(program_id):
     try:
         jwt_payload = get_jwt()
         tenant_id = jwt_payload.get("tenant_id")
-        user_id = get_jwt_identity()
+        user_id = get_current_user_id()
 
         # Get current user
         user = db.session.query(User).filter_by(id=user_id).first()
@@ -190,7 +191,7 @@ def create_program():
     try:
         jwt_payload = get_jwt()
         tenant_id = jwt_payload.get("tenant_id")
-        user_id = get_jwt_identity()
+        user_id = get_current_user_id()
 
         # Get current user
         user = db.session.query(User).filter_by(id=user_id).first()
@@ -201,15 +202,15 @@ def create_program():
         data = program_schema.load(request.json)
 
         # Convert string enum values to actual enums
-        if 'program_type' in data and isinstance(data['program_type'], str):
+        if "program_type" in data and isinstance(data["program_type"], str):
             try:
-                data['program_type'] = ProgramType(data['program_type'])
+                data["program_type"] = ProgramType(data["program_type"])
             except ValueError:
                 return jsonify({"error": f"Invalid program_type: {data['program_type']}"}), 400
-        
-        if 'status' in data and isinstance(data['status'], str):
+
+        if "status" in data and isinstance(data["status"], str):
             try:
-                data['status'] = ProgramStatus(data['status'])
+                data["status"] = ProgramStatus(data["status"])
             except ValueError:
                 return jsonify({"error": f"Invalid status: {data['status']}"}), 400
 
@@ -239,7 +240,7 @@ def update_program(program_id):
     try:
         jwt_payload = get_jwt()
         tenant_id = jwt_payload.get("tenant_id")
-        user_id = get_jwt_identity()
+        user_id = get_current_user_id()
 
         # Get current user
         user = db.session.query(User).filter_by(id=user_id).first()
@@ -250,15 +251,15 @@ def update_program(program_id):
         data = program_schema.load(request.json, partial=True)
 
         # Convert string enum values to actual enums
-        if 'program_type' in data and isinstance(data['program_type'], str):
+        if "program_type" in data and isinstance(data["program_type"], str):
             try:
-                data['program_type'] = ProgramType(data['program_type'])
+                data["program_type"] = ProgramType(data["program_type"])
             except ValueError:
                 return jsonify({"error": f"Invalid program_type: {data['program_type']}"}), 400
-        
-        if 'status' in data and isinstance(data['status'], str):
+
+        if "status" in data and isinstance(data["status"], str):
             try:
-                data['status'] = ProgramStatus(data['status'])
+                data["status"] = ProgramStatus(data["status"])
             except ValueError:
                 return jsonify({"error": f"Invalid status: {data['status']}"}), 400
 
@@ -290,7 +291,7 @@ def delete_program(program_id):
     try:
         jwt_payload = get_jwt()
         tenant_id = jwt_payload.get("tenant_id")
-        user_id = get_jwt_identity()
+        user_id = get_current_user_id()
 
         # Get current user
         user = db.session.query(User).filter_by(id=user_id).first()
@@ -323,7 +324,7 @@ def update_program_status(program_id):
     try:
         jwt_payload = get_jwt()
         tenant_id = jwt_payload.get("tenant_id")
-        user_id = get_jwt_identity()
+        user_id = get_current_user_id()
 
         # Get current user
         user = db.session.query(User).filter_by(id=user_id).first()
@@ -366,7 +367,7 @@ def add_course_to_program(program_id):
     try:
         jwt_payload = get_jwt()
         tenant_id = jwt_payload.get("tenant_id")
-        user_id = get_jwt_identity()
+        user_id = get_current_user_id()
 
         # Get current user
         user = db.session.query(User).filter_by(id=user_id).first()
@@ -404,7 +405,7 @@ def get_program_statistics():
     try:
         jwt_payload = get_jwt()
         tenant_id = jwt_payload.get("tenant_id")
-        user_id = get_jwt_identity()
+        user_id = get_current_user_id()
 
         # Get current user
         user = db.session.query(User).filter_by(id=user_id).first()

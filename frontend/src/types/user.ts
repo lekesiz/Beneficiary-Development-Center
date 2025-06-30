@@ -69,7 +69,7 @@ export interface NotificationSettings {
 export interface LoginCredentials {
   email: string;
   password: string;
-  tenantId: number;
+  tenant_id: number;
 }
 
 export interface RegisterData {

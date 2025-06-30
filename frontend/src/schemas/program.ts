@@ -2,44 +2,22 @@ import { z } from 'zod';
 
 export const programSchema = z
   .object({
-    title: z
-      .string()
-      .min(1, 'Başlık zorunludur')
-      .max(200, 'Başlık en fazla 200 karakter olabilir'),
-    code: z
-      .string()
-      .min(1, 'Kod zorunludur')
-      .max(50, 'Kod en fazla 50 karakter olabilir'),
+    title: z.string().min(1, 'Başlık zorunludur').max(200, 'Başlık en fazla 200 karakter olabilir'),
+    code: z.string().min(1, 'Kod zorunludur').max(50, 'Kod en fazla 50 karakter olabilir'),
     description: z.string().optional(),
-    type: z.enum([
-      'training',
-      'workshop',
-      'certification',
-      'bootcamp',
-      'mentorship',
-      'other',
-    ]),
-    status: z
-      .enum(['draft', 'published', 'active', 'completed', 'archived'])
-      .default('draft'),
+    type: z.enum(['training', 'workshop', 'certification', 'bootcamp', 'mentorship', 'other']),
+    status: z.enum(['draft', 'published', 'active', 'completed', 'archived']).default('draft'),
     start_date: z.string().min(1, 'Başlangıç tarihi zorunludur'),
     end_date: z.string().min(1, 'Bitiş tarihi zorunludur'),
     capacity: z.object({
       min: z.number().min(1, 'Minimum katılımcı sayısı 1 olmalıdır').default(1),
-      max: z
-        .number()
-        .min(1, 'Maksimum katılımcı sayısı 1 olmalıdır')
-        .default(50),
+      max: z.number().min(1, 'Maksimum katılımcı sayısı 1 olmalıdır').default(50),
     }),
     location: z.object({
       is_online: z.boolean().default(false),
       is_hybrid: z.boolean().default(false),
       physical_location: z.string().optional(),
-      online_link: z
-        .string()
-        .url('Geçerli bir URL giriniz')
-        .optional()
-        .or(z.literal('')),
+      online_link: z.string().url('Geçerli bir URL giriniz').optional().or(z.literal('')),
     }),
     pricing: z.object({
       is_free: z.boolean().default(false),
@@ -49,11 +27,7 @@ export const programSchema = z
     metadata: z.object({
       tags: z.array(z.string()).default([]),
       categories: z.array(z.string()).default([]),
-      image_url: z
-        .string()
-        .url('Geçerli bir URL giriniz')
-        .optional()
-        .or(z.literal('')),
+      image_url: z.string().url('Geçerli bir URL giriniz').optional().or(z.literal('')),
     }),
     coordinator_id: z.number().optional(),
     additional_info: z.string().optional(),

@@ -17,7 +17,7 @@ class ProgramService(BaseService[Program]):
 
     def __init__(self, db_session: Session):
         """Initialize service."""
-        super().__init__(Program, db_session)
+        super().__init__(model_class=Program, db_session=db_session)
 
     def get_all(
         self,
@@ -91,10 +91,10 @@ class ProgramService(BaseService[Program]):
             "program_type": Program.program_type,
             "max_participants": Program.max_participants,
         }
-        
+
         # Default to created_at if invalid sort field
         sort_field = sort_mapping.get(sort_by, Program.created_at)
-        
+
         # Apply sort order
         if sort_order.lower() == "asc":
             query = query.order_by(sort_field.asc())
@@ -110,37 +110,34 @@ class ProgramService(BaseService[Program]):
     def count(self, tenant_id: int, filters: Optional[Dict[str, Any]] = None) -> int:
         """
         Count programs with filters.
-        
+
         Args:
             tenant_id: Tenant ID
             filters: Optional filters
-            
+
         Returns:
             Count of programs
         """
-        query = self.db.query(Program).filter(
-            Program.tenant_id == tenant_id,
-            Program.deleted_at == None
-        )
-        
+        query = self.db.query(Program).filter(Program.tenant_id == tenant_id, Program.deleted_at == None)
+
         if filters:
             # Apply same filters as get_all
-            if filters.get('status'):
-                query = query.filter(Program.status == filters['status'])
-            if filters.get('program_type'):
-                query = query.filter(Program.program_type == filters['program_type'])
-            if filters.get('search'):
+            if filters.get("status"):
+                query = query.filter(Program.status == filters["status"])
+            if filters.get("program_type"):
+                query = query.filter(Program.program_type == filters["program_type"])
+            if filters.get("search"):
                 search_filter = or_(
                     Program.title.ilike(f"%{filters['search']}%"),
                     Program.description.ilike(f"%{filters['search']}%"),
                     Program.code.ilike(f"%{filters['search']}%"),
                 )
                 query = query.filter(search_filter)
-            if filters.get('upcoming_only'):
+            if filters.get("upcoming_only"):
                 query = query.filter(Program.start_date > datetime.now())
-            if filters.get('active_only'):
+            if filters.get("active_only"):
                 query = query.filter(Program.status == ProgramStatus.ACTIVE)
-                
+
         return query.count()
 
     def get_by_id(self, tenant_id: int, program_id: int, user: User) -> Program:
@@ -420,7 +417,7 @@ class ProgramService(BaseService[Program]):
 
         # Create course
         from app.models.course import CourseFormat, DifficultyLevel
-        
+
         # Convert string enum values to proper enum instances
         if "format" in course_data and isinstance(course_data["format"], str):
             try:
@@ -428,14 +425,14 @@ class ProgramService(BaseService[Program]):
             except ValueError:
                 # If the format is invalid, use default
                 course_data["format"] = CourseFormat.LECTURE
-                
+
         if "difficulty_level" in course_data and isinstance(course_data["difficulty_level"], str):
             try:
                 course_data["difficulty_level"] = DifficultyLevel(course_data["difficulty_level"])
             except ValueError:
                 # If the difficulty level is invalid, use default
                 course_data["difficulty_level"] = DifficultyLevel.BEGINNER
-        
+
         course = Course(tenant_id=tenant_id, program_id=program.id, created_by=user.id, **course_data)
 
         program.courses.append(course)
